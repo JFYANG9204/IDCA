@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <Import Project="..\IDCA.Bll\IDCA.Bll.projitems" Label="Shared" />
+
+  <Import Project="..\IDCA.Mvvm\IDCA.Mvvm.projitems" Label="Shared" />
+
+</Project>
