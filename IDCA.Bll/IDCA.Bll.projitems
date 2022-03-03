@@ -11,6 +11,15 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)FileBuilder\Factory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MddDocument\Document.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MddDocument\Enumerators.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MddDocument\IContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MddDocument\IContexts.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MddDocument\IDocument.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MddDocument\ILabel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MddDocument\ILanguage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MddDocument\ILanguages.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MddDocument\IMDMObject.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MddDocument\IProperties.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SpecDocument\SpecData.cs" />
   </ItemGroup>
 </Project>
