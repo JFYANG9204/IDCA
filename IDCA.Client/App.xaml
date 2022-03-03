@@ -4,6 +4,36 @@
              xmlns:local="clr-namespace:IDCA.Client"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <Style x:Key="BaseStyle">
+            <Style.Setters>
+                <Setter Property="Control.Background" Value="#FFEEEEF2"/>
+            </Style.Setters>
+        </Style>
+        <Style x:Key="HeaderButton" TargetType="Button">
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Trigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <ColorAnimation To="WhiteSmoke" 
+                                                BeginTime="0:0:0.2" 
+                                                Duration="0:0:0.2" 
+                                                Storyboard.TargetProperty="(Border.Background).(LinearGradientBrush.GradientStops)[0].(GradientStop.Color)"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.EnterActions>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="CloseButton" TargetType="Button">
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Trigger.Setters>
+                        <Setter Property="Background" Value="Red"/>
+                        <Setter Property="Foreground" Value="White"/>
+                    </Trigger.Setters>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </Application.Resources>
 </Application>
