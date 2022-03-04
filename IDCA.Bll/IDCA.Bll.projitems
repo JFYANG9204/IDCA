@@ -10,16 +10,25 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)FileBuilder\Factory.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MddDocument\Document.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MddDocument\Enumerators.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MddDocument\IContext.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MddDocument\IContexts.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MddDocument\IDocument.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MddDocument\ILabel.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MddDocument\ILanguage.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MddDocument\ILanguages.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MddDocument\IMDMObject.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MddDocument\IProperties.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IConfig.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\Document.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\ICategory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\ICategoryMap.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\IContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\IDataSource.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\IDocument.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\IElement.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\IField.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\ILabel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\ILanguage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\IMDMCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\IMDMObject.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\IProperties.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\IProperty.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\Style.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\ITypes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\IVariable.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\SaveLogs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SpecDocument\SpecData.cs" />
   </ItemGroup>
 </Project>

@@ -10,17 +10,18 @@
         WindowStyle="None"
         AllowsTransparency="True"
         ResizeMode="CanResizeWithGrip"
+        Closing="Window_Closing"
         Style="{StaticResource ResourceKey=BaseStyle}">
-    <StackPanel Style="{StaticResource ResourceKey=BaseStyle}">
+    <Grid>
         <!-- 阴影效果 -->
-        <StackPanel.Effect>
+        <Grid.Effect>
             <DropShadowEffect ShadowDepth="0" BlurRadius="10" Opacity="0.5"/>
-        </StackPanel.Effect>
+        </Grid.Effect>
         <!-- 标题栏 -->
-        <Grid Height="40">
+        <StackPanel Height="40" Style="{StaticResource ResourceKey=BaseStyle}" MouseDown="Window_MouseDown" VerticalAlignment="Top">
             <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
                 <!-- 最小化按钮 -->
-                <Button Width="50" Height="40" VerticalAlignment="Center" Style="{StaticResource HeaderButton}">
+                <Button Width="50" Height="40" VerticalAlignment="Center" Style="{StaticResource HeaderButtonStyle}" Click="MinimizeButton_OnClick">
                     <Button.Template>
                         <ControlTemplate>
                             <Grid Background="Transparent">
@@ -30,7 +31,7 @@
                     </Button.Template>
                 </Button>
                 <!-- 最大化按钮 -->
-                <Button Width="50" Height="40" VerticalAlignment="Center">
+                <Button Width="50" Height="40" VerticalAlignment="Center" Style="{StaticResource HeaderButtonStyle}" Click="MaximizeButton_OnClick">
                     <Button.Template>
                         <ControlTemplate>
                             <Grid Background="Transparent">
@@ -40,7 +41,7 @@
                     </Button.Template>
                 </Button>
                 <!-- 关闭按钮 -->
-                <Button Width="50" Height="40" VerticalAlignment="Center" Style="{StaticResource CloseButton}">
+                <Button Width="50" Height="40" VerticalAlignment="Center" Style="{StaticResource HeaderButtonStyle}" Click="CloseButton_OnClick">
                     <Button.Template>
                         <ControlTemplate>
                             <Grid Background="Transparent">
@@ -51,6 +52,6 @@
                     </Button.Template>
                 </Button>
             </StackPanel>
-        </Grid>
-    </StackPanel>
+        </StackPanel>
+    </Grid>
 </Window>
