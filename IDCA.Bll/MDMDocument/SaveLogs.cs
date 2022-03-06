@@ -2,7 +2,7 @@
 using System;
 using System.Collections;
 
-namespace IDCA.Bll.MddDocument
+namespace IDCA.Bll.MDMDocument
 {
     public interface ISaveLogs : IEnumerable, IMDMCollection<ISaveLog>
     {

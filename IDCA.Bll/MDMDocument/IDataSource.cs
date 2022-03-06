@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Runtime.InteropServices;
 
-namespace IDCA.Bll.MddDocument
+namespace IDCA.Bll.MDMDocument
 {
     public interface IDataSource
     {

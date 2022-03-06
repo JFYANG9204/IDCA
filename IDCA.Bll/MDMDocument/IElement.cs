@@ -1,7 +1,7 @@
 ﻿
 using System.Collections;
 
-namespace IDCA.Bll.MddDocument
+namespace IDCA.Bll.MDMDocument
 {
 
     public interface IElement : IMDMLabeledObject, IEnumerable
@@ -32,7 +32,12 @@ namespace IDCA.Bll.MddDocument
 
     public interface IElements : IMDMCollection<IElement>, IEnumerable
     {
-
+        /// <summary>
+        /// 依据数值索引获取集合元素
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        IElement this[int index] { get; }
     }
 
 

@@ -1,26 +1,30 @@
 ﻿
 using System.Collections;
 
-namespace IDCA.Bll.MddDocument
+namespace IDCA.Bll.MDMDocument
 {
     public interface ILanguage
     {
         /// <summary>
-        /// 语言名称
+        /// 语言名称，例如：Arabic - Algeria
         /// </summary>
         string Name { get; }
         /// <summary>
-        /// 对应国家缩写
+        /// 3字符缩写
         /// </summary>
-        string Country { get; }
+        string ShortCode { get; }
         /// <summary>
         /// 语言长文本表示字符
         /// </summary>
-        string LongName { get; }
+        string LongCode { get; }
         /// <summary>
         /// 属性集合
         /// </summary>
-        IProperties Properties { get; }
+        IProperties? Properties { get; }
+        /// <summary>
+        /// 父级集合对象
+        /// </summary>
+        ILanguages Parent { get; }
     }
 
 
@@ -49,7 +53,11 @@ namespace IDCA.Bll.MddDocument
         /// <summary>
         /// 属性集合
         /// </summary>
-        IProperties Properties { get; }
+        IProperties? Properties { get; }
+        /// <summary>
+        /// 语言列表所在的文档对象
+        /// </summary>
+        IDocument Document { get; }
     }
 
 

@@ -2,14 +2,14 @@
 using System.Collections;
 using System.Runtime.InteropServices;
 
-namespace IDCA.Bll.MddDocument
+namespace IDCA.Bll.MDMDocument
 {
     public interface ILabel
     {
         /// <summary>
         /// 标签名，XML文档中对应 text 包裹的文本
         /// </summary>
-        string Name { get; }
+        string Name { get; internal set; }
         /// <summary>
         /// 父级文档对象
         /// </summary>
@@ -21,8 +21,11 @@ namespace IDCA.Bll.MddDocument
         /// <summary>
         /// 上下文类型
         /// </summary>
-        string Context { get; }
-
+        string Context { get; internal set; }
+        /// <summary>
+        /// 语言类型
+        /// </summary>
+        ILanguage Language { get; internal set; }
     }
 
     public interface ILabels : IEnumerable, IMDMCollection<ILabel>

@@ -25,10 +25,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\IMDMObject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\IProperties.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\IProperty.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\Languages.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\Style.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\ITypes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\IVariable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\SaveLogs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\XmlHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SpecDocument\SpecData.cs" />
   </ItemGroup>
 </Project>

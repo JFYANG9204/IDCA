@@ -13,45 +13,21 @@
         Closing="Window_Closing"
         Style="{StaticResource ResourceKey=BaseStyle}">
     <Grid>
-        <!-- 阴影效果 -->
-        <Grid.Effect>
-            <DropShadowEffect ShadowDepth="0" BlurRadius="10" Opacity="0.5"/>
-        </Grid.Effect>
-        <!-- 标题栏 -->
-        <StackPanel Height="40" Style="{StaticResource ResourceKey=BaseStyle}" MouseDown="Window_MouseDown" VerticalAlignment="Top">
-            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                <!-- 最小化按钮 -->
-                <Button Width="50" Height="40" VerticalAlignment="Center" Style="{StaticResource HeaderButtonStyle}" Click="MinimizeButton_OnClick">
-                    <Button.Template>
-                        <ControlTemplate>
-                            <Grid Background="Transparent">
-                                <Rectangle Width="12" Height="1.2" Fill="Black"/>
-                            </Grid>
-                        </ControlTemplate>
-                    </Button.Template>
-                </Button>
-                <!-- 最大化按钮 -->
-                <Button Width="50" Height="40" VerticalAlignment="Center" Style="{StaticResource HeaderButtonStyle}" Click="MaximizeButton_OnClick">
-                    <Button.Template>
-                        <ControlTemplate>
-                            <Grid Background="Transparent">
-                                <Rectangle Width="12" Height="12" Stroke="Black" StrokeThickness="1.2"/>
-                            </Grid>
-                        </ControlTemplate>
-                    </Button.Template>
-                </Button>
-                <!-- 关闭按钮 -->
-                <Button Width="50" Height="40" VerticalAlignment="Center" Style="{StaticResource HeaderButtonStyle}" Click="CloseButton_OnClick">
-                    <Button.Template>
-                        <ControlTemplate>
-                            <Grid Background="Transparent">
-                                <Line X1="19" Y1="14" X2="31" Y2="26" Stroke="Black" StrokeThickness="1.2"/>
-                                <Line X1="19" Y1="26" X2="31" Y2="14" Stroke="Black" StrokeThickness="1.2"/>
-                            </Grid>
-                        </ControlTemplate>
-                    </Button.Template>
-                </Button>
+        <StackPanel Orientation="Vertical">
+            <!-- 标题栏 -->
+            <StackPanel Height="40" Style="{StaticResource ResourceKey=BaseStyle}" MouseDown="Window_MouseDown" VerticalAlignment="Top">
+                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                    <!-- 最小化按钮 -->
+                    <Button Style="{StaticResource MinimizeButton}" Click="MinimizeButton_OnClick" />
+                    <!-- 最大化按钮 -->
+                    <Button Style="{StaticResource MaximizeButton}" Click="MaximizeButton_OnClick" />
+                    <!-- 关闭按钮 -->
+                    <Button Style="{StaticResource CloseButton}" Click="CloseButton_OnClick" />
+                </StackPanel>
             </StackPanel>
+            <Grid>
+                
+            </Grid>
         </StackPanel>
     </Grid>
 </Window>

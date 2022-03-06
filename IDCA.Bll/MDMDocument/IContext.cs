@@ -1,7 +1,7 @@
 ﻿
 using System.Collections;
 
-namespace IDCA.Bll.MddDocument
+namespace IDCA.Bll.MDMDocument
 {
     public interface IContext
     {
