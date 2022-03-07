@@ -4,13 +4,13 @@ using System.Collections;
 namespace IDCA.Bll.MDMDocument
 {
 
-    public interface IElement : IMDMLabeledObject, IEnumerable
+    public interface IElement : IMDMLabeledObject
     {
-        IElement Reference { get; }
+        IElement? Reference { get; }
         ElementType Type { get; }
         CategoryFlag Flag { get; }
-        IVariable OtherReference { get; }
-        IVariable OtherVariable { get; }
+        IVariable? OtherReference { get; }
+        IVariable? OtherVariable { get; }
         /// <summary>
         /// MDM元素的Factor可以是数值类型或字符串类型
         /// 在脚本中，系统自动完成转换：
@@ -18,26 +18,32 @@ namespace IDCA.Bll.MDMDocument
         /// - 如果是小数，转换成浮点数
         /// - 其他情况，转换成字符串
         /// </summary>
-        object Factor { get; }
+        object? Factor { get; }
         /// <summary>
         /// 标记Factor数据类型，可以是长整型、浮点型或字符串类型
         /// </summary>
-        FactorType FactorType { get; }
+        FactorType? FactorType { get; }
         bool IsOtherLocal { get; }
-        IVariable MultiplierReference { get; }
-        IVariable MultiplierVariable { get; }
+        IVariable? MultiplierReference { get; }
+        IVariable? MultiplierVariable { get; }
         bool IsMultiplierLocal { get; }
         bool Versioned { get; }
     }
 
-    public interface IElements : IMDMCollection<IElement>, IEnumerable
+    public interface IElements : IMDMCollection<IElement>, IMDMObject, IEnumerable
     {
         /// <summary>
         /// 依据数值索引获取集合元素
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        IElement this[int index] { get; }
+        IElement? this[int index] { get; }
+        /// <summary>
+        /// 依据元素名称获取对应集合对象
+        /// </summary>
+        /// <param name="name">元素名索引，不区分大小写</param>
+        /// <returns>对应名称的集合元素，如果不存在，返回null</returns>
+        IElement? this[string name] { get; }
     }
 
 

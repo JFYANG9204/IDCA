@@ -1,30 +1,30 @@
 ﻿
 namespace IDCA.Bll.MDMDocument
 {
-    public interface IStyle
+    public struct Style
     {
-        IStyle Parent { get; }
-        bool UseCascadedStyles { get; }
-        string Color { get; }
-        string BgColor { get; }
-        bool Hidden { get; }
-        Alignments Align { get; }
-        ElementAlignments ElementAlign { get; }
-        int Indent { get; }
-        int ZIndex { get; }
-        CursorType Cursor { get; }
-        string Image { get; }
-        ImagePosition ImagePosition { get; }
-        Orientation Orientation { get; }
-        int Columns { get; }
-        int Rows { get; }
-        string Width { get; }
-        string Height { get; }
-        CellStyle Cell { get; }
-        ControlStyle Control { get; }
-        FontStyle Font { get; }
-        bool IsEmpty { get; }
-        AudioStyle Audio { get; }
+        public object? Parent;
+        public bool? UseCascadedStyles;
+        public string? Color;
+        public string? BgColor;
+        public bool? Hidden;
+        public Alignments? Align;
+        public ElementAlignments? ElementAlign;
+        public int? Indent;
+        public int? ZIndex;
+        public CursorType? Cursor;
+        public string? Image;
+        public ImagePosition? ImagePosition;
+        public Orientation? Orientation;
+        public int? Columns;
+        public int? Rows;
+        public string? Width;
+        public string? Height;
+        public CellStyle? Cell;
+        public ControlStyle? Control;
+        public FontStyle? Font;
+        public bool IsEmpty;
+        public AudioStyle? Audio;
     }
 
     public enum Alignments

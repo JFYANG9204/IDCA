@@ -16,6 +16,6 @@ namespace IDCA.Bll
         /// <typeparam name="T">指定配置信息的类型</typeparam>
         /// <param name="key">配置名称</param>
         /// <returns>配置值</returns>
-        T TryGet<T>(string key);
+        T? TryGet<T>(string key);
     }
 }

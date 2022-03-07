@@ -1,62 +1,105 @@
 ﻿
 using System;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace IDCA.Bll.MDMDocument
 {
-    public interface ISaveLogs : IEnumerable, IMDMCollection<ISaveLog>
+    public class MDMUsers : IMDMUsers
     {
-        /// <summary>
-        /// 依据数字索引获取对应位置元素
-        /// </summary>
-        /// <param name="index">数字索引位置</param>
-        /// <returns>对应索引位置的存储对象</returns>
-        ISaveLog this[int index] { get; }
+        internal MDMUsers(ISaveLog saveLog)
+        {
+            _parent = saveLog;
+        }
+
+        readonly List<MDMUser> _list = new();
+        readonly Dictionary<string, MDMUser> _cache = new();
+        readonly ISaveLog _parent;
+
+        public MDMUser? this[int index] => index >= 0 && index < _list.Count ? _list[index] : null; 
+        public MDMUser? this[string name] => _cache.ContainsKey(name.ToLower()) ? _cache[name] : null;
+        public int Count => _list.Count;
+        public ISaveLog Parent => _parent;
+
+        public void Add(MDMUser item)
+        {
+            string lName = item.Name.ToLower();
+            if (!string.IsNullOrEmpty(lName) && !_cache.ContainsKey(lName))
+            {
+                _list.Add(item);
+                _cache.Add(lName, item);
+            }
+        }
+
+        public MDMUser NewObject()
+        {
+            return new MDMUser
+            {
+                Name = "",
+                FileVersion = "",
+                Comment = ""
+            };
+        }
     }
 
-    public interface ISaveLog
+    public class SaveLog : ISaveLog
     {
-        DateTime Date { get; }
-        string VersionSet { get; }
-        string UserName { get; }
-        string FileVersion { get; }
-        IMDMUsers Users { get; }
-        int SaveCount { get; }
+        internal SaveLog(ISaveLogs parent)
+        {
+            _parent = parent;
+        }
+
+        readonly ISaveLogs _parent;
+        DateTime _date = DateTime.MinValue;
+        string _versionSet = "";
+        string _userName = "";
+        string _fileVersion = "";
+        IMDMUsers? _users = null;
+        int _saveCount = 0;
+
+        public DateTime Date { get => _date; internal set => _date = value; }
+        public string VersionSet { get => _versionSet; internal set => _versionSet = value; }
+        public string UserName { get => _userName; internal set => _userName = value; }
+        public string FileVersion { get => _fileVersion; internal set => _fileVersion = value; }
+        public IMDMUsers? Users => _users;
+        public int SaveCount { get => _saveCount; internal set => _saveCount = value; }
+        public ISaveLogs Parent => _parent;
+
+        public IMDMUsers NewUsers()
+        {
+            return _users = new MDMUsers(this);
+        }
     }
 
-    public interface IMDMUsers : IMDMCollection<MDMUser>
+    public class SaveLogs : ISaveLogs
     {
-        /// <summary>
-        /// 依据数字索引获取用户信息对象
-        /// </summary>
-        /// <param name="index">数字索引</param>
-        /// <returns>索引位置的对象，如果索引越线，返回null</returns>
-        MDMUser? this[int index] { get; }
-        /// <summary>
-        /// 依据用户名获取对象
-        /// </summary>
-        /// <param name="name">索引用户名</param>
-        /// <returns>对应用户名的对象，如果不存在，返回null</returns>
-        MDMUser? this[string name] { get; }
-    }
+        internal SaveLogs(IDocument document)
+        {
+            _document = document;
+        }
 
-    /// <summary>
-    /// 存储时的用户信息
-    /// </summary>
-    public struct MDMUser
-    {
-        /// <summary>
-        /// 用户名
-        /// </summary>
-        public string Name;
-        /// <summary>
-        /// 用户文件版本
-        /// </summary>
-        public string FileVersion;
-        /// <summary>
-        /// 用户添加的注释
-        /// </summary>
-        public string Comment;
-    }
+        readonly IDocument _document;
+        readonly List<ISaveLog> _logs = new();
 
+        public ISaveLog? this[int index] => index >= 0 && index < _logs.Count ? _logs[index] : null;
+
+        public int Count => _logs.Count;
+
+        public IDocument Document => _document;
+
+        public void Add(ISaveLog item)
+        {
+            _logs.Add(item);
+        }
+
+        public IEnumerator GetEnumerator()
+        {
+            return _logs.GetEnumerator();
+        }
+
+        public ISaveLog NewObject()
+        {
+            return new SaveLog(this);
+        }
+    }
 }

@@ -13,6 +13,10 @@ namespace IDCA.Bll.MDMDocument
         /// <param name="name"></param>
         /// <param name="value"></param>
         void Add(string name, string value);
+        /// <summary>
+        /// 所在的文档对象
+        /// </summary>
+        IDocument Document { get; }
     }
 
     public struct CategoryId

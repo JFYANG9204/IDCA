@@ -8,10 +8,6 @@ namespace IDCA.Bll.MDMDocument
         /// </summary>
         public int Count { get; }
         /// <summary>
-        /// 向集合末尾添加元素并将其返回
-        /// </summary>
-        public T Add();
-        /// <summary>
         /// 将属性对象添加到集合的末尾
         /// </summary>
         /// <param name="item"></param>

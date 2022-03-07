@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace IDCA.Bll.MDMDocument
 {
-    public interface IDocument : IMDMLabeledObject
+    public interface IDocument : IMDMObject
     {
         /// <summary>
         /// MDM文档完整路径
@@ -18,9 +18,13 @@ namespace IDCA.Bll.MDMDocument
         /// </summary>
         string LastVersion { get; }
         /// <summary>
-        /// 属性集合
+        /// 当前上下文类型
         /// </summary>
-        IProperties Properties { get; }
+        string Context { get; }
+        /// <summary>
+        /// 当前语言类型
+        /// </summary>
+        string Language { get; }
         /// <summary>
         /// 模板配置集合
         /// </summary>

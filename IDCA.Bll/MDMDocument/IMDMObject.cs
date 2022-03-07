@@ -31,6 +31,10 @@ namespace IDCA.Bll.MDMDocument
         /// 所在的文档对象
         /// </summary>
         IDocument Document { get; }
+        /// <summary>
+        /// 属性集合，可以为空
+        /// </summary>
+        IProperties? Properties { get; }
     }
 
     public interface IMDMLabeledObject : IMDMObject
@@ -38,11 +42,15 @@ namespace IDCA.Bll.MDMDocument
         /// <summary>
         /// 标签集合
         /// </summary>
-        ILabels Labels { get; }
+        ILabels? Labels { get; }
         /// <summary>
         /// 当前默认的标签
         /// </summary>
         string Label { get; }
+        /// <summary>
+        /// 标签格式配置，可以为空
+        /// </summary>
+        Style? LabelStyles { get; }
     }
 
     public interface IMDMRange

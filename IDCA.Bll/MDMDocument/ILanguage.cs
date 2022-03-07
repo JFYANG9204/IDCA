@@ -25,6 +25,15 @@ namespace IDCA.Bll.MDMDocument
         /// 父级集合对象
         /// </summary>
         ILanguages Parent { get; }
+        /// <summary>
+        /// 根据语言长代码设定语言类型数据
+        /// </summary>
+        /// <param name="longCode"></param>
+        void SetLongCode(string longCode);
+        /// <summary>
+        /// 提示此对象是否是默认值
+        /// </summary>
+        bool IsDefault { get; }
     }
 
 
@@ -41,7 +50,7 @@ namespace IDCA.Bll.MDMDocument
         /// </summary>
         /// <param name="name">语言名称，不区分大小写</param>
         /// <returns></returns>
-        ILanguage this[string name] { get; }
+        ILanguage this[string longCode] { get; }
         /// <summary>
         /// 当前语言名称
         /// </summary>
@@ -58,6 +67,10 @@ namespace IDCA.Bll.MDMDocument
         /// 语言列表所在的文档对象
         /// </summary>
         IDocument Document { get; }
+        /// <summary>
+        /// 默认语言类型，用于替换此类型的null
+        /// </summary>
+        ILanguage Default { get; }
     }
 
 

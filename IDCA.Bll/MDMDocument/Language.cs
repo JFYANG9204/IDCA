@@ -414,6 +414,14 @@ namespace IDCA.Bll.MDMDocument
 
     public class Language : ILanguage
     {
+        internal Language(ILanguages parent)
+        {
+            _longCode = "";
+            _shortCode = "";
+            _name = "";
+            _parent = parent;
+        }
+
         internal Language(string longCode, ILanguages parent)
         {
             _longCode = longCode;
@@ -422,9 +430,9 @@ namespace IDCA.Bll.MDMDocument
             _parent = parent;
         }
 
-        readonly string _name;
-        readonly string _shortCode;
-        readonly string _longCode;
+        string _name;
+        string _shortCode;
+        string _longCode;
         IProperties? _properties = null;
         readonly ILanguages _parent;
 
@@ -437,50 +445,66 @@ namespace IDCA.Bll.MDMDocument
             internal set => _properties = value; 
         }
         public ILanguages Parent => _parent;
+
+        public void SetLongCode(string longCode)
+        {
+            _longCode = longCode;
+            _name = LanguageHelper.GetNameFromLongCode(_longCode);
+            _shortCode= LanguageHelper.GetShortCodeFromLongCode(_longCode);
+        }
+
+        public bool IsDefault => string.IsNullOrEmpty(_longCode);
     }
 
     public class Languages : ILanguages
     {
 
-        public Languages(IDocument document)
+        internal Languages(IDocument document, string @base)
         {
             _document = document;
+            _base = @base;
+            _languages = new();
+            _languageCache = new();
+            _default = new Language(this);
         }
 
         readonly IDocument _document;
+        readonly ILanguage? _current = null;
+        readonly string _base;
+        readonly List<ILanguage> _languages;
+        readonly Dictionary<string, ILanguage> _languageCache;
+        readonly ILanguage _default;
 
-        public ILanguage this[int index] => throw new System.NotImplementedException();
-
-        public ILanguage this[string name] => throw new System.NotImplementedException();
-
-        public string Current => throw new System.NotImplementedException();
-
-        public string Base => throw new System.NotImplementedException();
-
+        public ILanguage this[int index] => index >= 0 && index < _languages.Count ? _languages[index] : _default;
+        public ILanguage this[string longCode] => _languageCache.ContainsKey(longCode.ToLower()) ? _languageCache[longCode.ToLower()] : _default;
+        public string Current => _current == null ? string.Empty : _current.LongCode;
+        public string Base => _base;
         public IProperties? Properties { get; internal set; }
-
-        public int Count => throw new System.NotImplementedException();
-
+        public int Count => _languages.Count;
         public IDocument Document => _document;
-
-        public ILanguage Add()
-        {
-            throw new System.NotImplementedException();
-        }
+        public ILanguage Default => _default;
 
         public void Add(ILanguage item)
         {
-            throw new System.NotImplementedException();
+            string lcode = item.LongCode.ToLower();
+            if (!string.IsNullOrEmpty(lcode) && !_languageCache.ContainsKey(lcode))
+            {
+                _languageCache.Add(lcode, item);
+                _languages.Add(item);
+            }
         }
 
         public IEnumerator GetEnumerator()
         {
-            throw new System.NotImplementedException();
+            return _languages.GetEnumerator();
         }
 
         public ILanguage NewObject()
         {
-            throw new System.NotImplementedException();
+            return new Language(this);
         }
+
+
+
     }
 }

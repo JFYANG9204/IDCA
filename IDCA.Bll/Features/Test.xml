@@ -3099,7 +3099,7 @@
             </variable>
             <variable id="dd0e8024-6ce3-4679-974c-14397bf86128" name="TestQ1" type="3" min="1" mintype="3" max="2" maxtype="3">
                 <labels context="LABEL">
-                    <text context="QUESTION" xml:lang="zh-cn">Test Q1</text>
+                    <text context="QUESTION" xml:lang="zh-cn">Gender</text>
                 </labels>
                 <categories global-name-space="-1" fixed="-1">
                     <deleted />
@@ -3108,7 +3108,23 @@
                     </properties>
                     <category id="_3c9eb0a4-7080-415c-8ba1-d241846f73da" name="category">
                         <labels context="LABEL">
-                            <text context="QUESTION" xml:lang="zh-cn">category</text>
+                            <text context="QUESTION" xml:lang="zh-cn">LT_Label</text>
+                        </labels>
+                        <labelstyles>
+                            <property name="Color" value="#FFFCCC" type="8" context="Question" />
+                        </labelstyles>
+                        <styles>
+                            <property name="Color" value="#FFFCCC" type="8" context="Question" />
+                        </styles>
+                    </category>
+                    <category id="_6cf70767-e69d-4e97-a4ab-15826ea6a30c" name="category1">
+                        <labels context="LABEL">
+                            <text context="QUESTION" xml:lang="zh-cn">L_CN</text>
+                        </labels>
+                    </category>
+                    <category id="_6a8a36d7-d1ba-4a61-abe6-6071dd366174" name="category2">
+                        <labels context="LABEL">
+                            <text context="QUESTION" xml:lang="zh-cn">UC_Question</text>
                         </labels>
                     </category>
                     <element id="_4b80f832-0ef0-4d8b-b78f-d4914bb170bc" name="subheading" type="1">
@@ -3241,6 +3257,12 @@
                     <text context="QUESTION" xml:lang="zh-cn"></text>
                 </labels>
                 <deleted />
+                <styles>
+                    <property name="Color" value="#FFFFFF" type="8" context="Question" />
+                    <property name="BgColor" value="#FFFCCC" type="8" context="Question" />
+                    <property name="ElementAlign" value="2" type="3" context="Question" />
+                    <property name="Align" value="1" type="3" context="Question" />
+                </styles>
                 <category id="_b57bfa6a-67f2-46fe-bd42-206dd5c07c1e" name="t1" keycode="1" factor-value="1" factor-type="3">
                     <labels context="LABEL">
                         <text context="QUESTION" xml:lang="zh-cn"></text>
@@ -3535,7 +3557,7 @@
             <context name="MRSCRIPTBASIC" />
         </scripttypes>
         <savelogs>
-            <savelog fileversion="6.0.1.1.60" versionset="" username="JWHD" date="3/4/2022 5:21:59 PM" count="55">
+            <savelog fileversion="6.0.1.1.60" versionset="" username="JWHD" date="3/7/2022 6:09:08 PM" count="82">
                 <user name="mrStudio.exe" fileversion="6.0.101.31" comment="Executable of the process MDM run under" />
             </savelog>
         </savelogs>
@@ -4155,6 +4177,10 @@
             <atom name="sourcetype" />
             <atom name="validation" />
             <atom name="precisions" />
+            <atom name="Color" />
+            <atom name="BgColor" />
+            <atom name="ElementAlign" />
+            <atom name="Align" />
         </atoms>
         <versionlist />
         <categorymap>
@@ -4202,6 +4228,17 @@
             <categoryid name="min" value="43" />
             <categoryid name="max" value="44" />
             <categoryid name="analysiscategory" value="45" />
+            <categoryid name="t1" value="46" />
+            <categoryid name="t2" value="47" />
+            <categoryid name="t3" value="48" />
+            <categoryid name="category" value="49" />
+            <categoryid name="subheading" value="50" />
+            <categoryid name="subtotal" value="51" />
+            <categoryid name="summarydata" value="52" />
+            <categoryid name="stddev" value="53" />
+            <categoryid name="stderr" value="54" />
+            <categoryid name="samplevariance" value="55" />
+            <categoryid name="base" value="56" />
         </categorymap>
     </mdm:metadata>
 </xml>
