@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace IDCA.Bll.MDMDocument
 {
-    public interface IDocument : IMDMObject
+    public interface IMDMDocument : IMDMObject
     {
         /// <summary>
         /// MDM文档完整路径
@@ -28,35 +28,39 @@ namespace IDCA.Bll.MDMDocument
         /// <summary>
         /// 模板配置集合
         /// </summary>
-        IProperties Templates { get; }
+        Properties Templates { get; }
         /// <summary>
         /// 数据库链接集合
         /// </summary>
-        IDataSources DataSources { get; }
+        DataSources DataSources { get; }
+        /// <summary>
+        /// Field类型子项变量集合
+        /// </summary>
+        Fields Fields { get; }
         /// <summary>
         /// 文档的所有语言配置
         /// </summary>
-        ILanguages Languages { get; }
+        Languages Languages { get; }
         /// <summary>
         /// 文档的所有上下文类型
         /// </summary>
-        IContexts Contexts { get; }
+        Contexts Contexts { get; }
         /// <summary>
         /// 文档的所有标签类型
         /// </summary>
-        IContexts LabelTypes { get; }
+        Contexts LabelTypes { get; }
         /// <summary>
         /// 文档的所有上下文路由
         /// </summary>
-        IContexts RoutingContexts { get; }
+        Contexts RoutingContexts { get; }
         /// <summary>
         /// 脚本类型
         /// </summary>
-        IContexts ScriptTypes { get; }
+        Contexts ScriptTypes { get; }
         /// <summary>
         /// 分类元素表
         /// </summary>
-        ICategoryMap CategoryMap { get; }
+        CategoryMap CategoryMap { get; }
         /// <summary>
         /// 文档元素名称
         /// </summary>
@@ -64,7 +68,7 @@ namespace IDCA.Bll.MDMDocument
         /// <summary>
         /// 用户存储信息
         /// </summary>
-        ISaveLogs SaveLogs { get; }
+        SaveLogs SaveLogs { get; }
         /// <summary>
         /// 文档存储的脚本，没有脚本将返回null
         /// </summary>
@@ -86,5 +90,11 @@ namespace IDCA.Bll.MDMDocument
         /// 文档的XML内容
         /// </summary>
         string Xml { get; }
+        /// <summary>
+        /// 文档的父级对象应为空
+        /// </summary>
+        new IMDMObject? Parent { get; }
+
+
     }
 }

@@ -1,14 +1,11 @@
-﻿
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace IDCA.Bll.MDMDocument
 {
-    public class Label : ILabel
+    public class Label : MDMObject, ILabel
     {
-        internal Label(ILabels parent, IContexts contexts, ILanguages languages)
+        internal Label(Labels parent, IContexts<Context> contexts, ILanguages<Language> languages) : base(parent.Document, parent)
         {
-            _parent = parent;
             _contexts = contexts;
             _context = _contexts.Default;
             _languages = languages;
@@ -16,28 +13,26 @@ namespace IDCA.Bll.MDMDocument
             _text = string.Empty;
         }
 
-        readonly ILabels _parent;
-        readonly IContexts _contexts;
-        readonly ILanguages _languages;
+        readonly IContexts<Context> _contexts;
+        readonly ILanguages<Language> _languages;
 
         string _text;
         IContext _context;
         ILanguage _language;
 
         public string Text { get => _text; internal set => _text = value; }
-        public ILabels Parent => _parent;
         public IContext Context => _context;
         public ILanguage Language => _language;
 
         public void Set(string context, string language, string text)
         {
-            IContext targetContext = _contexts[context];
+            IContext targetContext = _contexts[context] ?? _contexts.Default;
             if (targetContext.IsDefault)
             {
                 _context = targetContext;
             }
 
-            ILanguage targetLanguage = _languages[context];
+            ILanguage targetLanguage = _languages[context] ?? _languages.Default;
             if (targetLanguage.IsDefault)
             {
                 _language = targetLanguage;
@@ -48,22 +43,19 @@ namespace IDCA.Bll.MDMDocument
 
     }
 
-    public class Labels : ILabels
+    public class Labels : MDMCollection<Label>, ILabels<Label>
     {
-        internal Labels(IMDMObject parent, IDocument document, string context)
+        internal Labels(IMDMObject parent, IMDMDocument document, string context) : base(parent.Document, parent)
         {
-            _parent = parent;
-            _document = document;
-            _currentContext = document.Contexts[context];
+            _currentContext = document.Contexts[context] ?? document.Contexts.Default;
         }
 
-        readonly IMDMObject _parent;
-        readonly IDocument _document;
-        readonly List<ILabel> _items = new();
-        readonly Dictionary<string, Dictionary<string, ILabel>> _languageLabelsCache = new();
+        readonly Dictionary<string, Dictionary<string, Label>> _languageLabelsCache = new();
         readonly IContext _currentContext;
 
-        public ILabel? this[string language, string context = ""]
+        new public Label? this[int index] => index >= 0 && index < _items.Count ? _items[index] : null;
+
+        public Label? this[string language, string context = ""]
         {
             get
             {
@@ -93,12 +85,11 @@ namespace IDCA.Bll.MDMDocument
             }
         }
         public IContext Context => _currentContext;
-        public IProperties? Properties { get; internal set; } = null;
-        public int Count => _items.Count;
-        public IMDMObject Parent => _parent;
-        public IDocument Document => _document;
+        public IProperties<Property>? Properties { get; internal set; } = null;
 
-        public void Add(ILabel item)
+        public MDMObjectType ObjectType => throw new System.NotImplementedException();
+
+        public override void Add(Label item)
         {
             _items.Add(item);
             string lowerLanguage = item.Language.LongCode.ToLower();
@@ -122,12 +113,7 @@ namespace IDCA.Bll.MDMDocument
             }
         }
 
-        public IEnumerator GetEnumerator()
-        {
-            return _items.GetEnumerator();
-        }
-
-        public ILabel NewObject()
+        public override Label NewObject()
         {
             return new Label(this, _document.Contexts, _document.Languages);
         }

@@ -1,14 +1,8 @@
 ﻿
-using System.Collections;
-
 namespace IDCA.Bll.MDMDocument
 {
-    public interface IProperty
+    public interface IProperty : IMDMNamedObject
     {
-        /// <summary>
-        /// 属性名
-        /// </summary>
-        public string Name { get; }
         /// <summary>
         /// 属性值，可以是字符串、整数、实数类型
         /// </summary>
@@ -21,10 +15,6 @@ namespace IDCA.Bll.MDMDocument
         /// 上下文类型
         /// </summary>
         string Context { get; }
-        /// <summary>
-        /// 父级对象，属性的父级对象一般为属性集合
-        /// </summary>
-        public IProperties Parent { get; }
     }
 
     /// <summary>
@@ -54,28 +44,18 @@ namespace IDCA.Bll.MDMDocument
         Bool = 11,
     }
 
-    public interface IProperties : IEnumerable, IMDMCollection<IProperty>
+    public interface IProperties<T> : IMDMCollection<T> where T : IProperty
     {
-        /// <summary>
-        /// 依据数值索引获取集合元素
-        /// </summary>
-        /// <param name="index">数值索引</param>
-        /// <returns></returns>
-        public IProperty? this[int index] { get; }
         /// <summary>
         /// 依据属性名获取集合元素
         /// </summary>
         /// <param name="name">属性名称</param>
         /// <returns></returns>
-        public IProperty? this[string name] { get; }
-        /// <summary>
-        /// 当前对象的父级对象，可以是属性集合(IProperties)或者是属性(IProperty)
-        /// </summary>
-        public object Parent { get; }
+        public T? this[string name] { get; }
         /// <summary>
         /// 属性集合
         /// </summary>
-        public IProperties? SubProperties { get; internal set; }
+        public IProperties<T>? SubProperties { get; internal set; }
     }
 
 

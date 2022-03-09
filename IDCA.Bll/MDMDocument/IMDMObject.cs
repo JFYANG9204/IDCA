@@ -4,14 +4,6 @@ namespace IDCA.Bll.MDMDocument
     public interface IMDMObject
     {
         /// <summary>
-        /// 对象的ID编号
-        /// </summary>
-        string Id { get; }
-        /// <summary>
-        /// 对象名
-        /// </summary>
-        string Name { get; }
-        /// <summary>
         /// 对象的类型
         /// </summary>
         MDMObjectType ObjectType { get; }
@@ -20,6 +12,26 @@ namespace IDCA.Bll.MDMDocument
         /// </summary>
         IMDMObject Parent { get; }
         /// <summary>
+        /// 所在的文档对象
+        /// </summary>
+        IMDMDocument Document { get; }
+        /// <summary>
+        /// 属性集合，可以为空
+        /// </summary>
+        IProperties<Property>? Properties { get; }
+    }
+
+    public interface IMDMNamedObject : IMDMObject
+    {
+        /// <summary>
+        /// 对象的ID编号
+        /// </summary>
+        string Id { get; }
+        /// <summary>
+        /// 对象名
+        /// </summary>
+        string Name { get; }
+        /// <summary>
         /// 是否引用自其他对象
         /// </summary>
         bool IsReference { get; }
@@ -27,22 +39,14 @@ namespace IDCA.Bll.MDMDocument
         /// 是否是系统变量
         /// </summary>
         bool IsSystem { get; }
-        /// <summary>
-        /// 所在的文档对象
-        /// </summary>
-        IDocument Document { get; }
-        /// <summary>
-        /// 属性集合，可以为空
-        /// </summary>
-        IProperties? Properties { get; }
     }
 
-    public interface IMDMLabeledObject : IMDMObject
+    public interface IMDMLabeledObject : IMDMNamedObject
     {
         /// <summary>
         /// 标签集合
         /// </summary>
-        ILabels? Labels { get; }
+        Labels? Labels { get; }
         /// <summary>
         /// 当前默认的标签
         /// </summary>
@@ -75,6 +79,7 @@ namespace IDCA.Bll.MDMDocument
 
     public enum MDMDataType
     {
+        None = -1,
         Info = 0,
         Long = 1,
         Text = 2,

@@ -5,17 +5,17 @@ namespace IDCA.Bll.MDMDocument
 {
     public class CategoryMap : ICategoryMap
     {
-        internal CategoryMap(IDocument document)
+        internal CategoryMap(IMDMDocument document)
         {
             _document = document;
         }
 
-        readonly IDocument _document;
+        readonly IMDMDocument _document;
         readonly List<CategoryId> _items = new();
         readonly Dictionary<string, CategoryId> _cache = new();
 
         public int Count => _items.Count;
-        public IDocument Document => _document;
+        public IMDMDocument Document => _document;
 
         public void Add(string name, string value)
         {

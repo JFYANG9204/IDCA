@@ -38,24 +38,19 @@ namespace IDCA.Bll.MDMDocument
         }
     }
 
-    public class Context : IContext
+    public class Context : MDMNamedObject, IContext
     {
-        internal Context(IContexts parent)
+        internal Context(IMDMObject parent) : base(parent.Document, parent)
         {
-            _parent = parent;
         }
 
-        readonly IContexts _parent;
-        string _name = string.Empty;
         IContextAlternatives? _alternatives = null;
         string _description = string.Empty;
         ContextUsage _usage = ContextUsage.Properties;
 
-        public string Name { get => _name; internal set => _name = value; }
         public IContextAlternatives? Alternatives => _alternatives;
         public string Description { get => _description; internal set => _description = value; }
         public ContextUsage Usage { get => _usage; internal set => _usage = value; }
-        public IContexts Parent => _parent;
         public bool IsDefault => string.IsNullOrEmpty(_name);
 
         public IContextAlternatives NewAlternatives()
@@ -64,40 +59,25 @@ namespace IDCA.Bll.MDMDocument
         }
     }
 
-    public class Contexts : IContexts
+    public class Contexts : MDMObjectCollection<Context>, IContexts<Context>
     {
-        internal Contexts(IDocument document, string @base)
+        internal Contexts(IMDMDocument document, string @base) : base(document, document, collection => new Context(collection))
         {
             _base = @base;
-            _document = document;
             _default = new Context(this);
         }
 
-        readonly string _base;
-        readonly IDocument _document;
-        readonly List<IContext> _items = new();
+        public IContext? this[string name] => _cache.ContainsKey(name.ToLower()) ? _cache[name.ToLower()] : null;
+
         readonly Dictionary<string, IContext> _cache = new();
+        readonly string _base;
         readonly IContext _default;
         
-        public IContext this[string name] => _cache.ContainsKey(name.ToLower()) ? _cache[name.ToLower()] : Default;
         public string Base => _base;
-        public int Count => _items.Count;
-        public IDocument Document => _document;
         public IContext Default => _default;
 
-        public void Add(IContext item)
-        {
-            string lName = item.Name.ToLower();
-            if (!string.IsNullOrEmpty(lName) && !_cache.ContainsKey(lName))
-            {
-                _items.Add(item);
-                _cache.Add(lName, item);
-            }
-        }
 
-        public IContext NewObject()
-        {
-            return new Context(this);
-        }
+
+
     }
 }

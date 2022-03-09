@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections;
-
+﻿
 namespace IDCA.Bll.MDMDocument
 {
-    public class Element : IElement
+    public class Element : MDMLabeledObject, IElement
     {
-        internal Element(IMDMObject parent)
+        internal Element(IMDMObject parent) : base(parent.Document, parent)
         {
-            _parent = parent;
-            _document = parent.Document;
         }
 
-        readonly IDocument _document;
-        readonly IMDMObject _parent;
         IElement? _reference;
+        ElementType _type = ElementType.Category;
         CategoryFlag _flag = CategoryFlag.None;
         IVariable? _otherReference;
         IVariable? _otherVariable;
@@ -24,13 +19,9 @@ namespace IDCA.Bll.MDMDocument
         IVariable? _multiplierVariable;
         bool _isMultiplierLocal = false;
         bool _versioned = false;
-        ILabels? _labels;
-        Style? _labelStyle;
-        string _name = string.Empty;
-        string _id = string.Empty;
 
         public IElement? Reference { get => _reference; internal set => _reference = value; }
-        public ElementType Type => throw new NotImplementedException();
+        public ElementType Type { get => _type; internal set => _type = value; }
         public CategoryFlag Flag { get => _flag; internal set => _flag = value; }
         public IVariable? OtherReference { get => _otherReference; internal set => _otherReference = value; }
         public IVariable? OtherVariable { get => _otherVariable; internal set => _otherVariable = value; }
@@ -41,29 +32,6 @@ namespace IDCA.Bll.MDMDocument
         public IVariable? MultiplierVariable { get => _multiplierVariable; internal set => _multiplierVariable = value; }
         public bool IsMultiplierLocal { get => _isMultiplierLocal; internal set => _isMultiplierLocal = value; }
         public bool Versioned { get => _versioned; internal set => _versioned = value; }
-        public ILabels? Labels { get => _labels; internal set => _labels = value; }
-        public string Label
-        {
-            get
-            {
-                if (_labels == null)
-                {
-                    return string.Empty;
-                }
-                var label = _labels[_document.Language, _document.Context];
-                return label == null ? string.Empty : label.Text;
-            }
-        }
-        public Style? LabelStyles { get => _labelStyle; internal set => _labelStyle = value; }
-        public string Id { get => _id; internal set => _id = value; }
-        public string Name { get => _name; internal set => _name = value; }
-        public MDMObjectType ObjectType => throw new NotImplementedException();
-        public IMDMObject Parent => _parent;
-        public bool IsReference => throw new NotImplementedException();
-        public bool IsSystem => _parent.IsSystem;
-        public IDocument Document => _document;
-
-        public IProperties? Properties => throw new NotImplementedException();
 
     }
 }

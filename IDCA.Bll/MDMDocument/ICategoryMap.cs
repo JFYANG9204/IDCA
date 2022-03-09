@@ -16,7 +16,7 @@ namespace IDCA.Bll.MDMDocument
         /// <summary>
         /// 所在的文档对象
         /// </summary>
-        IDocument Document { get; }
+        IMDMDocument Document { get; }
     }
 
     public struct CategoryId

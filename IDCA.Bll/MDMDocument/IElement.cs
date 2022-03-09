@@ -30,20 +30,8 @@ namespace IDCA.Bll.MDMDocument
         bool Versioned { get; }
     }
 
-    public interface IElements : IMDMCollection<IElement>, IMDMObject, IEnumerable
+    public interface IElements : IMDMNamedCollection<IElement>, IMDMObject, IEnumerable
     {
-        /// <summary>
-        /// 依据数值索引获取集合元素
-        /// </summary>
-        /// <param name="index"></param>
-        /// <returns></returns>
-        IElement? this[int index] { get; }
-        /// <summary>
-        /// 依据元素名称获取对应集合对象
-        /// </summary>
-        /// <param name="name">元素名索引，不区分大小写</param>
-        /// <returns>对应名称的集合元素，如果不存在，返回null</returns>
-        IElement? this[string name] { get; }
     }
 
 

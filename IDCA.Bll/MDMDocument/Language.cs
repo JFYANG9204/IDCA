@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace IDCA.Bll.MDMDocument
 {
@@ -412,39 +411,27 @@ namespace IDCA.Bll.MDMDocument
     }
 
 
-    public class Language : ILanguage
+    public class Language : MDMNamedObject, ILanguage
     {
-        internal Language(ILanguages parent)
+        internal Language(IMDMObject parent) : base(parent.Document, parent)
         {
             _longCode = "";
             _shortCode = "";
             _name = "";
-            _parent = parent;
         }
 
-        internal Language(string longCode, ILanguages parent)
+        internal Language(string longCode, IMDMObject parent) : base(parent.Document, parent)
         {
             _longCode = longCode;
             _name = LanguageHelper.GetNameFromLongCode(longCode);
             _shortCode = LanguageHelper.GetShortCodeFromLongCode(longCode);
-            _parent = parent;
         }
 
-        string _name;
         string _shortCode;
         string _longCode;
-        IProperties? _properties = null;
-        readonly ILanguages _parent;
 
-        public string Name => _name;
         public string ShortCode => _shortCode;
         public string LongCode => _longCode;
-        public IProperties? Properties 
-        { 
-            get => _properties; 
-            internal set => _properties = value; 
-        }
-        public ILanguages Parent => _parent;
 
         public void SetLongCode(string longCode)
         {
@@ -456,55 +443,22 @@ namespace IDCA.Bll.MDMDocument
         public bool IsDefault => string.IsNullOrEmpty(_longCode);
     }
 
-    public class Languages : ILanguages
+    public class Languages : MDMNamedCollection<Language>, ILanguages<Language>
     {
 
-        internal Languages(IDocument document, string @base)
+        internal Languages(IMDMDocument document, string @base) : base(document, document, collection => new Language(collection))
         {
-            _document = document;
             _base = @base;
-            _languages = new();
-            _languageCache = new();
             _default = new Language(this);
         }
 
-        readonly IDocument _document;
         readonly ILanguage? _current = null;
         readonly string _base;
-        readonly List<ILanguage> _languages;
-        readonly Dictionary<string, ILanguage> _languageCache;
         readonly ILanguage _default;
 
-        public ILanguage this[int index] => index >= 0 && index < _languages.Count ? _languages[index] : _default;
-        public ILanguage this[string longCode] => _languageCache.ContainsKey(longCode.ToLower()) ? _languageCache[longCode.ToLower()] : _default;
         public string Current => _current == null ? string.Empty : _current.LongCode;
         public string Base => _base;
-        public IProperties? Properties { get; internal set; }
-        public int Count => _languages.Count;
-        public IDocument Document => _document;
         public ILanguage Default => _default;
-
-        public void Add(ILanguage item)
-        {
-            string lcode = item.LongCode.ToLower();
-            if (!string.IsNullOrEmpty(lcode) && !_languageCache.ContainsKey(lcode))
-            {
-                _languageCache.Add(lcode, item);
-                _languages.Add(item);
-            }
-        }
-
-        public IEnumerator GetEnumerator()
-        {
-            return _languages.GetEnumerator();
-        }
-
-        public ILanguage NewObject()
-        {
-            return new Language(this);
-        }
-
-
 
     }
 }
