@@ -7,6 +7,7 @@ namespace IDCA.Bll.MDMDocument
         internal Type(IMDMObject parent) : base(parent.Document, parent)
         {
             _categories = new Categories(_parent.Document, _parent);
+            _objectType = MDMObjectType.Field;
         }
 
         readonly ICategories _categories;
@@ -21,6 +22,7 @@ namespace IDCA.Bll.MDMDocument
     {
         internal Types(IMDMDocument document) : base(document, document, collection => new Type(collection))
         {
+            _objectType = MDMObjectType.Types;
         }
 
         bool _globalNamespace = false;

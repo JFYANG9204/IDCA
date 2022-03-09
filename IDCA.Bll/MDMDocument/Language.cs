@@ -453,11 +453,11 @@ namespace IDCA.Bll.MDMDocument
         }
 
         readonly ILanguage? _current = null;
-        readonly string _base;
+        string _base;
         readonly ILanguage _default;
 
         public string Current => _current == null ? string.Empty : _current.LongCode;
-        public string Base => _base;
+        public string Base { get => _base; internal set => _base = value; }
         public ILanguage Default => _default;
 
     }

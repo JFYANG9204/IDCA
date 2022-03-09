@@ -24,6 +24,10 @@ namespace IDCA.Bll.MDMDocument
         /// 根据当前对象信息创建新的属性对象，但是不添加进集合
         /// </summary>
         T NewObject();
+        /// <summary>
+        /// 清空集合
+        /// </summary>
+        void Clear();
     }
 
     public interface IMDMObjectCollection<T> : IMDMCollection<T>, IMDMObject
@@ -38,6 +42,12 @@ namespace IDCA.Bll.MDMDocument
         /// <param name="name"></param>
         /// <returns></returns>
         T? this[string name] { get; }
+        /// <summary>
+        /// 依据集合内变量ID编号获取对应数据，不区分大小写
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        T? GetById(string id);
     }
 
 

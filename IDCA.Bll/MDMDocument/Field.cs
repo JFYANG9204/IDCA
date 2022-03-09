@@ -12,6 +12,7 @@ namespace IDCA.Bll.MDMDocument
         ICategories? _categories;
         IElements? _elements;
 
+        IMDMObjectCollection<Variable>? _items;
         MDMDataType _type = MDMDataType.None;
 
         bool _isSystemVariable = false;
@@ -31,6 +32,7 @@ namespace IDCA.Bll.MDMDocument
         public object MaxValue { get => _maxValue; internal set => _maxValue = value; }
         public object EffectiveMinValue { get => _effectiveMinValue; internal set => _effectiveMinValue = value; }
         public object EffectiveMaxValue { get => _effectiveMaxValue; internal set => _effectiveMaxValue = value; }
+        public IMDMObjectCollection<Variable>? Items { get => _items; internal set => _items = value; }
     }
 
     public class Fields : MDMNamedCollection<Field>, IMDMNamedCollection<Field>

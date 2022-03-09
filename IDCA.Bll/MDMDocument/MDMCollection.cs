@@ -45,6 +45,11 @@ namespace IDCA.Bll.MDMDocument
         {
             return _constructor(this);
         }
+
+        public virtual void Clear()
+        {
+            _items.Clear();
+        }
     }
 
     public class MDMObjectCollection<T> : MDMCollection<T>, IMDMObjectCollection<T> where T : MDMObject
@@ -70,10 +75,10 @@ namespace IDCA.Bll.MDMDocument
         new public IMDMDocument Document => _document;
         new public IMDMObject Parent => _parent;
 
-        protected MDMObjectType _type;
+        protected MDMObjectType _objectType;
         protected IProperties<Property>? _properties;
 
-        public MDMObjectType ObjectType { get => _type; internal set => _type = value; }
+        public MDMObjectType ObjectType { get => _objectType; internal set => _objectType = value; }
         public IProperties<Property>? Properties { get => _properties; internal set => _properties = value; }
 
     }
@@ -96,6 +101,8 @@ namespace IDCA.Bll.MDMDocument
 
         protected readonly Dictionary<string, IElement> _itemCache = new();
         protected readonly Dictionary<string, T> _cache = new();
+        protected readonly Dictionary<string, T> _idCache = new();
+
         protected Labels? _labels;
         protected Style? _labelStyles;
         protected bool _isReference = false;
@@ -127,6 +134,12 @@ namespace IDCA.Bll.MDMDocument
         public bool IsReference { get => _isReference; internal set => _isReference = value; }
         public bool IsSystem { get => _isSystem; internal set => _isSystem = value; }
 
+        public T? GetById(string id)
+        {
+            string lId = id.ToLower();
+            return !string.IsNullOrEmpty(id) && _idCache.ContainsKey(lId) ? _idCache[lId] : null;
+        }
+
         public override void Add(T item)
         {
             string lName = item.Name.ToLower();
@@ -134,8 +147,21 @@ namespace IDCA.Bll.MDMDocument
             {
                 _cache.Add(lName, item);
                 base.Add(item);
+                string lId = item.Id.ToLower();
+                if (!_idCache.ContainsKey(lId))
+                {
+                    _idCache.Add(lId, item);
+                }
             }
         }
+
+        public override void Clear()
+        {
+            base.Clear();
+            _cache.Clear();
+            _idCache.Clear();
+        }
+
     }
 
 }

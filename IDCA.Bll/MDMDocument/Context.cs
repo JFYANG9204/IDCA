@@ -36,6 +36,11 @@ namespace IDCA.Bll.MDMDocument
         {
             return string.Empty;
         }
+
+        public void Clear()
+        {
+            _alternatives.Clear();
+        }
     }
 
     public class Context : MDMNamedObject, IContext
@@ -70,10 +75,10 @@ namespace IDCA.Bll.MDMDocument
         public IContext? this[string name] => _cache.ContainsKey(name.ToLower()) ? _cache[name.ToLower()] : null;
 
         readonly Dictionary<string, IContext> _cache = new();
-        readonly string _base;
+        string _base;
         readonly IContext _default;
-        
-        public string Base => _base;
+
+        public string Base { get => _base; internal set => _base = value; }
         public IContext Default => _default;
 
 

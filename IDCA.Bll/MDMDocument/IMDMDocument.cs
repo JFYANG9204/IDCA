@@ -34,9 +34,33 @@ namespace IDCA.Bll.MDMDocument
         /// </summary>
         DataSources DataSources { get; }
         /// <summary>
-        /// Field类型子项变量集合
+        /// 变量定义集合
+        /// </summary>
+        Variables Variables { get; }
+        /// <summary>
+        /// 变量设计集合
         /// </summary>
         Fields Fields { get; }
+        /// <summary>
+        /// 定义的类型集合，在XML中由 types 标签包裹
+        /// </summary>
+        Types Types { get; }
+        /// <summary>
+        /// 页面属性配置集合
+        /// </summary>
+        Pages Pages { get; }
+        /// <summary>
+        /// 变量路由配置
+        /// </summary>
+        Routings Routings { get; }
+        /// <summary>
+        /// 系统变量路由配置
+        /// </summary>
+        Routings SystemRoutings { get; }
+        /// <summary>
+        /// 变量实例列表
+        /// </summary>
+        Mapping Mapping { get; }
         /// <summary>
         /// 文档的所有语言配置
         /// </summary>

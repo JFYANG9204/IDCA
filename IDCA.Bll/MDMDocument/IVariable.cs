@@ -3,7 +3,9 @@ namespace IDCA.Bll.MDMDocument
 {
     public interface IVariable : IMDMLabeledObject
     {
-        ITypes<Type> HelperFields { get; }
+        IProperties<Property>? Templates { get; }
+        IProperties<Property>? Notes { get; }
+        ITypes<Type>? HelperFields { get; }
         VariableUsage UsageType { get; }
         bool HasCaseData { get; }
         bool Versioned { get; }
@@ -35,7 +37,7 @@ namespace IDCA.Bll.MDMDocument
         /// 完整名称，如果是循环变量的下级变量，则为Top[{T}].Side这种格式
         /// </summary>
         string FullName { get; }
-        IVariable Variable { get; }
+        IVariable? Variable { get; }
         string Expression { get; }
         SourceType SourceType { get; }
     }

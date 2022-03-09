@@ -41,6 +41,11 @@ namespace IDCA.Bll.MDMDocument
         {
             return _items.GetEnumerator();
         }
+
+        public void Clear()
+        {
+            _items.Clear();
+        }
     }
 
     public class SaveLogs : MDMObjectCollection<SaveLog>, IMDMObjectCollection<SaveLog>

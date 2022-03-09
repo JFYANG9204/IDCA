@@ -23,6 +23,10 @@ namespace IDCA.Bll.MDMDocument
         /// 是否是系统变量，在XML文档中的system标签下
         /// </summary>
         bool IsSystemVariable { get; }
+        /// <summary>
+        /// 下级变量集合，用于表示多级变量
+        /// </summary>
+        IMDMObjectCollection<Variable>? Items { get; }
     }
 
 }

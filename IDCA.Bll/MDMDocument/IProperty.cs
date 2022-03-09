@@ -44,14 +44,8 @@ namespace IDCA.Bll.MDMDocument
         Bool = 11,
     }
 
-    public interface IProperties<T> : IMDMCollection<T> where T : IProperty
+    public interface IProperties<T> : IMDMNamedCollection<T> where T : IProperty
     {
-        /// <summary>
-        /// 依据属性名获取集合元素
-        /// </summary>
-        /// <param name="name">属性名称</param>
-        /// <returns></returns>
-        public T? this[string name] { get; }
         /// <summary>
         /// 属性集合
         /// </summary>
