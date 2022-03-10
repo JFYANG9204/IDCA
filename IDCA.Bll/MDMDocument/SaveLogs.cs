@@ -9,6 +9,7 @@ namespace IDCA.Bll.MDMDocument
     {
         internal SaveLog(IMDMObjectCollection<SaveLog> parent) : base(parent.Document, parent)
         {
+            _objectType = MDMObjectType.SaveLog;
         }
 
         DateTime _date = DateTime.MinValue;
@@ -19,6 +20,7 @@ namespace IDCA.Bll.MDMDocument
 
         readonly List<MDMUser> _items = new();
 
+        new public MDMObjectType ObjectType => _objectType;
         public DateTime Date { get => _date; internal set => _date = value; }
         public string VersionSet { get => _versionSet; internal set => _versionSet = value; }
         public string UserName { get => _userName; internal set => _userName = value; }
@@ -52,6 +54,9 @@ namespace IDCA.Bll.MDMDocument
     {
         internal SaveLogs(IMDMDocument document) : base(document, document, collection => new SaveLog(collection))
         {
+            _objectType = MDMObjectType.SaveLogs;
         }
+
+        new public MDMObjectType ObjectType => _objectType;
     }
 }

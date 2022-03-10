@@ -55,6 +55,10 @@ namespace IDCA.Bll.MDMDocument
         /// 标签格式配置，可以为空
         /// </summary>
         Style? LabelStyles { get; }
+        /// <summary>
+        /// 外观配置
+        /// </summary>
+        Style? Style { get; }
     }
 
     public interface IMDMRange
@@ -97,20 +101,39 @@ namespace IDCA.Bll.MDMDocument
         Class,
         Element,
         Elements,
+        Categories,
         Label,
+        Labels,
         Field,
         HelperFields,
         Fields,
+        Type,
         Types,
+        Property,
         Properties,
         Routing,
+        Routings,
+        Context,
         Contexts,
+        Language,
         Languages,
         VariableInstance,
         RoutingItem,
         Compound,
-        Language,
         RoutingItems,
+        Variables,
+        Mapping,
+        Script,
+        Scripts,
+        ScriptType,
+        ScriptTypes,
+        Page,
+        Pages,
+        SaveLog,
+        SaveLogs,
+        CategoryMap,
+        DataSource,
+        DataSources,
     }
 
 }

@@ -3099,7 +3099,7 @@
             </variable>
             <variable id="dd0e8024-6ce3-4679-974c-14397bf86128" name="TestQ1" type="3" min="1" mintype="3" max="2" maxtype="3">
                 <labels context="LABEL">
-                    <text context="QUESTION" xml:lang="zh-cn">Gender</text>
+                    <text context="QUESTION" xml:lang="zh-cn">Test Q1</text>
                 </labels>
                 <categories global-name-space="-1" fixed="-1">
                     <deleted />
@@ -3108,24 +3108,62 @@
                     </properties>
                     <category id="_3c9eb0a4-7080-415c-8ba1-d241846f73da" name="category">
                         <labels context="LABEL">
-                            <text context="QUESTION" xml:lang="zh-cn">LT_Label</text>
+                            <text context="QUESTION" xml:lang="zh-cn">category</text>
                         </labels>
-                        <labelstyles>
-                            <property name="Color" value="#FFFCCC" type="8" context="Question" />
-                        </labelstyles>
                         <styles>
-                            <property name="Color" value="#FFFCCC" type="8" context="Question" />
+                            <property name="Cell" type="9" context="Question">
+                                <styles>
+                                    <property name="BorderColor" value="blue" type="8" context="Question" />
+                                    <property name="BorderStyle" value="2" type="3" context="Question" />
+                                    <property name="CWidth" value="20pm" type="8" context="Question" />
+                                    <property name="BorderTopColor" value="yellow" type="8" context="Question" />
+                                    <property name="BorderBottomColor" value="red" type="8" context="Question" />
+                                    <property name="BorderTopStyle" value="6" type="3" context="Question" />
+                                    <property name="BorderBottomStyle" value="5" type="3" context="Question" />
+                                    <property name="Padding" value="10" type="3" context="Question" />
+                                    <property name="Wrap" value="-1" type="11" context="Question" />
+                                    <property name="ColSpan" value="1" type="3" context="Question" />
+                                    <property name="RepeatHeader" value="2" type="3" context="Question" />
+                                </styles>
+                            </property>
+                            <property name="Control" type="9" context="Question">
+                                <styles>
+                                    <property name="Accelerator" value="R" type="8" context="Question" />
+                                    <property name="Type" value="8" type="3" context="Question" />
+                                    <property name="ReadOnly" value="-1" type="11" context="Question" />
+                                </styles>
+                            </property>
+                            <property name="Font" type="9" context="Question">
+                                <styles>
+                                    <property name="Family" value="arial" type="8" context="Question" />
+                                    <property name="Effects" value="255" type="3" context="Question" />
+                                    <property name="Size" value="12" type="3" context="Question" />
+                                </styles>
+                            </property>
+                            <property name="Audio" type="9" context="Question">
+                                <styles>
+                                    <property name="Name" value="" type="8" context="Question" />
+                                    <property name="PlayControlPosition" value="1" type="3" context="Question" />
+                                    <property name="RecordControlPosition" value="0" type="3" context="Question" />
+                                    <property name="Record" value="1" type="3" context="Question" />
+                                </styles>
+                            </property>
+                            <property name="Color" value="Blue" type="8" context="Question" />
+                            <property name="BgColor" value="red" type="8" context="Question" />
+                            <property name="Hidden" value="-1" type="11" context="Question" />
+                            <property name="Align" value="1" type="3" context="Question" />
+                            <property name="ElementAlign" value="1" type="3" context="Question" />
+                            <property name="Indent" value="1" type="3" context="Question" />
+                            <property name="ZIndex" value="2" type="3" context="Question" />
+                            <property name="Cursor" value="0" type="3" context="Question" />
+                            <property name="Image" value="" type="8" context="Question" />
+                            <property name="ImagePosition" value="4" type="3" context="Question" />
+                            <property name="Orientation" value="2" type="3" context="Question" />
+                            <property name="Columns" value="2" type="3" context="Question" />
+                            <property name="Rows" value="3" type="3" context="Question" />
+                            <property name="Width" value="3pm" type="8" context="Question" />
+                            <property name="Height" value="4pm" type="8" context="Question" />
                         </styles>
-                    </category>
-                    <category id="_6cf70767-e69d-4e97-a4ab-15826ea6a30c" name="category1">
-                        <labels context="LABEL">
-                            <text context="QUESTION" xml:lang="zh-cn">L_CN</text>
-                        </labels>
-                    </category>
-                    <category id="_6a8a36d7-d1ba-4a61-abe6-6071dd366174" name="category2">
-                        <labels context="LABEL">
-                            <text context="QUESTION" xml:lang="zh-cn">UC_Question</text>
-                        </labels>
                     </category>
                     <element id="_4b80f832-0ef0-4d8b-b78f-d4914bb170bc" name="subheading" type="1">
                         <labels context="LABEL">
@@ -3187,11 +3225,6 @@
                             <text context="QUESTION" xml:lang="zh-cn">max</text>
                         </labels>
                     </element>
-                    <element id="_0020644f-1023-4ef0-85f9-e30db91f0615" name="analysisCategory" type="14">
-                        <labels context="LABEL">
-                            <text context="QUESTION" xml:lang="zh-cn">analysisCategory</text>
-                        </labels>
-                    </element>
                     <categories id="_fa8137e0-83e1-4872-a2f7-a30607575473" name="list" categoriesref="3932e138-78df-485e-85d3-49b6e2dce5c5" global-name-space="-1" fixed="-1" ref_name="list">
                         <deleted />
                     </categories>
@@ -3205,12 +3238,26 @@
                             <text context="QUESTION" xml:lang="zh-cn">B</text>
                         </labels>
                     </category>
-                    <category id="_26efcbe1-8f6f-42dd-bf87-dc74f8d3becd" name="_3" factor-value="1.234" factor-type="5">
+                    <category id="_26efcbe1-8f6f-42dd-bf87-dc74f8d3becd" name="_3">
                         <labels context="LABEL">
                             <text context="QUESTION" xml:lang="zh-cn">C</text>
                         </labels>
+                        <styles>
+                            <property name="Cell" type="9" context="Question">
+                                <styles>
+                                    <property name="CWidth" value="double" type="8" context="Question" />
+                                </styles>
+                            </property>
+                        </styles>
+                        <labelstyles>
+                            <property name="Font" type="9" context="Question">
+                                <labelstyles>
+                                    <property name="Family" value="arial" type="8" context="Question" />
+                                </labelstyles>
+                            </property>
+                        </labelstyles>
                     </category>
-                    <category id="_544507e8-7833-47f2-a3f5-69df7adf3cdc" name="_4" factor-value="abc" factor-type="8">
+                    <category id="_544507e8-7833-47f2-a3f5-69df7adf3cdc" name="_4">
                         <labels context="LABEL">
                             <text context="QUESTION" xml:lang="zh-cn">D</text>
                         </labels>
@@ -3231,7 +3278,15 @@
                 <helperfields id="a4d06723-fe94-45ae-9d37-61c3c5e2f9ea" name="@helperfields" global-name-space="-1">
                     <deleted />
                 </helperfields>
-                <axis expression="{e1 '' text(),base 'Base : Total Respondent' base(),e2 '' text(),..,e3 '' text(),sigma 'Sigma' subtotal,e4 '' text(),mean 'Mean' mean() [decimals=2]}" />
+                <labelstyles>
+                    <property name="Font" type="9" context="Question">
+                        <labelstyles>
+                            <property name="Family" value="arial" type="8" context="Question" />
+                            <property name="Effects" value="255" type="3" context="Question" />
+                            <property name="Size" value="12" type="3" context="Question" />
+                        </labelstyles>
+                    </property>
+                </labelstyles>
             </variable>
             <variable id="8358973b-6d41-4723-acfb-1458ecfe57f6" name="TestQ2" type="3">
                 <labels context="LABEL">
@@ -3257,12 +3312,6 @@
                     <text context="QUESTION" xml:lang="zh-cn"></text>
                 </labels>
                 <deleted />
-                <styles>
-                    <property name="Color" value="#FFFFFF" type="8" context="Question" />
-                    <property name="BgColor" value="#FFFCCC" type="8" context="Question" />
-                    <property name="ElementAlign" value="2" type="3" context="Question" />
-                    <property name="Align" value="1" type="3" context="Question" />
-                </styles>
                 <category id="_b57bfa6a-67f2-46fe-bd42-206dd5c07c1e" name="t1" keycode="1" factor-value="1" factor-type="3">
                     <labels context="LABEL">
                         <text context="QUESTION" xml:lang="zh-cn"></text>
@@ -3557,7 +3606,7 @@
             <context name="MRSCRIPTBASIC" />
         </scripttypes>
         <savelogs>
-            <savelog fileversion="6.0.1.1.60" versionset="" username="JWHD" date="3/7/2022 6:09:08 PM" count="82">
+            <savelog fileversion="6.0.1.1.60" versionset="" username="JWHD" date="3/10/2022 5:34:57 PM" count="95">
                 <user name="mrStudio.exe" fileversion="6.0.101.31" comment="Executable of the process MDM run under" />
             </savelog>
         </savelogs>
@@ -4178,9 +4227,60 @@
             <atom name="validation" />
             <atom name="precisions" />
             <atom name="Color" />
+            <atom name="BorderColor" />
+            <atom name="BorderStyle" />
+            <atom name="CWidth" />
+            <atom name="Family" />
+            <atom name="Effects" />
+            <atom name="Size" />
             <atom name="BgColor" />
-            <atom name="ElementAlign" />
+            <atom name="Hidden" />
             <atom name="Align" />
+            <atom name="VerticalAlign" />
+            <atom name="ElementAlign" />
+            <atom name="Indent" />
+            <atom name="ZIndex" />
+            <atom name="Cursor" />
+            <atom name="Image" />
+            <atom name="ImagePosition" />
+            <atom name="Orientation" />
+            <atom name="DisplayOrientation" />
+            <atom name="Columns" />
+            <atom name="Rows" />
+            <atom name="Width" />
+            <atom name="Height" />
+            <atom name="CHeight" />
+            <atom name="BorderTopColor" />
+            <atom name="BorderRightColor" />
+            <atom name="BorderBottomColor" />
+            <atom name="BorderLeftColor" />
+            <atom name="BorderWidth" />
+            <atom name="BorderTopWidth" />
+            <atom name="BorderRightWidth" />
+            <atom name="BorderBottomWidth" />
+            <atom name="BorderLeftWidth" />
+            <atom name="BorderTopStyle" />
+            <atom name="BorderRightStyle" />
+            <atom name="BorderBottomStyle" />
+            <atom name="BorderLeftStyle" />
+            <atom name="Padding" />
+            <atom name="PaddingTop" />
+            <atom name="PaddingRight" />
+            <atom name="PaddingBottom" />
+            <atom name="PaddingLeft" />
+            <atom name="Wrap" />
+            <atom name="ColSpan" />
+            <atom name="RowSpan" />
+            <atom name="CBgColor" />
+            <atom name="RepeatHeader" />
+            <atom name="RepeatSideHeader" />
+            <atom name="Accelerator" />
+            <atom name="Type" />
+            <atom name="ReadOnly" />
+            <atom name="Name" />
+            <atom name="PlayControlPosition" />
+            <atom name="RecordControlPosition" />
+            <atom name="Record" />
         </atoms>
         <versionlist />
         <categorymap>
@@ -4227,18 +4327,6 @@
             <categoryid name="_4" value="41" />
             <categoryid name="min" value="43" />
             <categoryid name="max" value="44" />
-            <categoryid name="analysiscategory" value="45" />
-            <categoryid name="t1" value="46" />
-            <categoryid name="t2" value="47" />
-            <categoryid name="t3" value="48" />
-            <categoryid name="category" value="49" />
-            <categoryid name="subheading" value="50" />
-            <categoryid name="subtotal" value="51" />
-            <categoryid name="summarydata" value="52" />
-            <categoryid name="stddev" value="53" />
-            <categoryid name="stderr" value="54" />
-            <categoryid name="samplevariance" value="55" />
-            <categoryid name="base" value="56" />
         </categorymap>
     </mdm:metadata>
 </xml>

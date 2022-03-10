@@ -35,7 +35,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\IMDMCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\IMDMObject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\IProperty.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\IVersion.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\Label.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\Language.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\MDMCollection.cs" />

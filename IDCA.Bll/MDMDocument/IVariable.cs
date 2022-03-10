@@ -3,9 +3,12 @@ namespace IDCA.Bll.MDMDocument
 {
     public interface IVariable : IMDMLabeledObject
     {
-        IProperties<Property>? Templates { get; }
-        IProperties<Property>? Notes { get; }
-        ITypes<Type>? HelperFields { get; }
+
+        Elements? Elements { get; }
+        Categories? Categories { get; }
+        Properties? Templates { get; }
+        Properties? Notes { get; }
+        Types? HelperFields { get; }
         VariableUsage UsageType { get; }
         bool HasCaseData { get; }
         bool Versioned { get; }

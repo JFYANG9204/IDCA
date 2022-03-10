@@ -7,13 +7,13 @@ namespace IDCA.Bll.MDMDocument
         internal Type(IMDMObject parent) : base(parent.Document, parent)
         {
             _categories = new Categories(_parent.Document, _parent);
-            _objectType = MDMObjectType.Field;
+            _objectType = MDMObjectType.Type;
         }
 
         readonly ICategories _categories;
-
         bool _globalNamespace = false;
 
+        new public MDMObjectType ObjectType => _objectType;
         public ICategories Categories => _categories;
         public bool GlobalNamespace { get => _globalNamespace; internal set => _globalNamespace = value; }
     }
@@ -28,6 +28,6 @@ namespace IDCA.Bll.MDMDocument
         bool _globalNamespace = false;
 
         public bool GlobalNamespace { get => _globalNamespace; set => _globalNamespace = value; }
-
+        new public MDMObjectType ObjectType => _objectType;
     }
 }

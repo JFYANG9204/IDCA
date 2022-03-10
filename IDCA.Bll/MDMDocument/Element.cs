@@ -1,37 +1,53 @@
 ﻿
+
 namespace IDCA.Bll.MDMDocument
 {
     public class Element : MDMLabeledObject, IElement
     {
         internal Element(IMDMObject parent) : base(parent.Document, parent)
         {
+            _objectType = MDMObjectType.Element;
         }
 
+        new readonly MDMObjectType _objectType;
         IElement? _reference;
         ElementType _type = ElementType.Category;
         CategoryFlag _flag = CategoryFlag.None;
-        IVariable? _otherReference;
-        IVariable? _otherVariable;
+        Variable? _otherReference;
+        Variable? _otherVariable;
         object? _factor;
         FactorType? _factorType;
         bool _isOtherLocal = false;
-        IVariable? _multiplierReference;
-        IVariable? _multiplierVariable;
+        Variable? _multiplierReference;
+        Variable? _multiplierVariable;
         bool _isMultiplierLocal = false;
         bool _versioned = false;
+        Properties? _templates;
 
+        new public MDMObjectType ObjectType => _objectType;
+        public Properties? Templates { get => _templates; internal set => _templates = value; }
         public IElement? Reference { get => _reference; internal set => _reference = value; }
         public ElementType Type { get => _type; internal set => _type = value; }
         public CategoryFlag Flag { get => _flag; internal set => _flag = value; }
-        public IVariable? OtherReference { get => _otherReference; internal set => _otherReference = value; }
-        public IVariable? OtherVariable { get => _otherVariable; internal set => _otherVariable = value; }
+        public Variable? OtherReference { get => _otherReference; internal set => _otherReference = value; }
+        public Variable? OtherVariable { get => _otherVariable; internal set => _otherVariable = value; }
         public object? Factor { get => _factor; internal set => _factor = value; }
         public FactorType? FactorType { get => _factorType; internal set => _factorType = value; }
         public bool IsOtherLocal { get => _isOtherLocal; internal set => _isOtherLocal = value; }
-        public IVariable? MultiplierReference { get => _multiplierReference; internal set => _multiplierReference = value; }
-        public IVariable? MultiplierVariable { get => _multiplierVariable; internal set => _multiplierVariable = value; }
+        public Variable? MultiplierReference { get => _multiplierReference; internal set => _multiplierReference = value; }
+        public Variable? MultiplierVariable { get => _multiplierVariable; internal set => _multiplierVariable = value; }
         public bool IsMultiplierLocal { get => _isMultiplierLocal; internal set => _isMultiplierLocal = value; }
         public bool Versioned { get => _versioned; internal set => _versioned = value; }
-
     }
+
+    public class Elements : MDMNamedCollection<Element>, IElements
+    {
+        internal Elements(IMDMObject parent) : base(parent.Document, parent, ctor => new Element(ctor))
+        {
+            _objectType = MDMObjectType.Elements;
+        }
+
+        new public MDMObjectType ObjectType => _objectType;
+    }
+
 }

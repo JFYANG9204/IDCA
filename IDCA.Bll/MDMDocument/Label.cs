@@ -11,6 +11,7 @@ namespace IDCA.Bll.MDMDocument
             _languages = languages;
             _language = _languages.Default;
             _text = string.Empty;
+            _objectType = MDMObjectType.Label;
         }
 
         readonly IContexts<Context> _contexts;
@@ -87,7 +88,7 @@ namespace IDCA.Bll.MDMDocument
         public IContext Context => _currentContext;
         public IProperties<Property>? Properties { get; internal set; } = null;
 
-        public MDMObjectType ObjectType => throw new System.NotImplementedException();
+        public MDMObjectType ObjectType => MDMObjectType.Labels;
 
         public override void Add(Label item)
         {

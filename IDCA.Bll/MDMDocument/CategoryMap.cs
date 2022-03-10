@@ -3,19 +3,18 @@ using System.Collections.Generic;
 
 namespace IDCA.Bll.MDMDocument
 {
-    public class CategoryMap : ICategoryMap
+    public class CategoryMap : MDMObject, ICategoryMap
     {
-        internal CategoryMap(IMDMDocument document)
+        internal CategoryMap(IMDMDocument document) : base(document, document)
         {
-            _document = document;
+            _objectType = MDMObjectType.CategoryMap;
         }
 
-        readonly IMDMDocument _document;
         readonly List<CategoryId> _items = new();
         readonly Dictionary<string, CategoryId> _cache = new();
 
         public int Count => _items.Count;
-        public IMDMDocument Document => _document;
+        new public MDMObjectType ObjectType => _objectType;
 
         public void Add(string name, string value)
         {

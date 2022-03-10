@@ -418,6 +418,7 @@ namespace IDCA.Bll.MDMDocument
             _longCode = "";
             _shortCode = "";
             _name = "";
+            _objectType = MDMObjectType.Language;
         }
 
         internal Language(string longCode, IMDMObject parent) : base(parent.Document, parent)
@@ -425,6 +426,7 @@ namespace IDCA.Bll.MDMDocument
             _longCode = longCode;
             _name = LanguageHelper.GetNameFromLongCode(longCode);
             _shortCode = LanguageHelper.GetShortCodeFromLongCode(longCode);
+            _objectType = MDMObjectType.Language;
         }
 
         string _shortCode;
@@ -432,6 +434,7 @@ namespace IDCA.Bll.MDMDocument
 
         public string ShortCode => _shortCode;
         public string LongCode => _longCode;
+        new public MDMObjectType ObjectType => _objectType;
 
         public void SetLongCode(string longCode)
         {
@@ -450,6 +453,7 @@ namespace IDCA.Bll.MDMDocument
         {
             _base = @base;
             _default = new Language(this);
+            _objectType = MDMObjectType.Languages;
         }
 
         readonly ILanguage? _current = null;
@@ -459,6 +463,6 @@ namespace IDCA.Bll.MDMDocument
         public string Current => _current == null ? string.Empty : _current.LongCode;
         public string Base { get => _base; internal set => _base = value; }
         public ILanguage Default => _default;
-
+        new public MDMObjectType ObjectType => _objectType;
     }
 }

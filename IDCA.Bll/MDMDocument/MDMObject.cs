@@ -46,9 +46,11 @@ namespace IDCA.Bll.MDMDocument
 
         protected Labels? _labels;
         protected Style? _labelStyle;
+        protected Style? _style;
 
         public Labels? Labels { get => _labels; internal set => _labels = value; }
         public Style? LabelStyles { get => _labelStyle; internal set => _labelStyle = value; }
+        public Style? Style { get => _style; internal set => _style = value; }
 
         public string Label
         {

@@ -83,7 +83,7 @@ namespace IDCA.Bll.MDMDocument
 
     }
 
-    public class MDMNamedCollection<T> : MDMObjectCollection<T>, IMDMNamedCollection<T> where T : MDMNamedObject
+    public class MDMNamedCollection<T> : MDMObjectCollection<T>, IMDMNamedCollection<T>, IMDMObject where T : MDMNamedObject
     {
         internal MDMNamedCollection(IMDMDocument document, IMDMObject parent, Func<IMDMNamedCollection<T>, T> constructor) : base(document, parent)
         {

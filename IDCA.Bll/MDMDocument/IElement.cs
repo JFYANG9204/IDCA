@@ -6,11 +6,12 @@ namespace IDCA.Bll.MDMDocument
 
     public interface IElement : IMDMLabeledObject
     {
+        Properties? Templates { get; }
         IElement? Reference { get; }
         ElementType Type { get; }
         CategoryFlag Flag { get; }
-        IVariable? OtherReference { get; }
-        IVariable? OtherVariable { get; }
+        Variable? OtherReference { get; }
+        Variable? OtherVariable { get; }
         /// <summary>
         /// MDM元素的Factor可以是数值类型或字符串类型
         /// 在脚本中，系统自动完成转换：
@@ -24,13 +25,13 @@ namespace IDCA.Bll.MDMDocument
         /// </summary>
         FactorType? FactorType { get; }
         bool IsOtherLocal { get; }
-        IVariable? MultiplierReference { get; }
-        IVariable? MultiplierVariable { get; }
+        Variable? MultiplierReference { get; }
+        Variable? MultiplierVariable { get; }
         bool IsMultiplierLocal { get; }
         bool Versioned { get; }
     }
 
-    public interface IElements : IMDMNamedCollection<IElement>, IMDMObject, IEnumerable
+    public interface IElements : IMDMNamedCollection<Element>, IEnumerable
     {
     }
 

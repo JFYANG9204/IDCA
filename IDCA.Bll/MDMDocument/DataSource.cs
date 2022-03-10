@@ -8,6 +8,7 @@ namespace IDCA.Bll.MDMDocument
     {
         internal DataSource(IMDMDocument document, IMDMObject parent) : base(document, parent)
         {
+            _objectType = MDMObjectType.DataSource;
         }
 
         string _name = string.Empty;
@@ -16,6 +17,7 @@ namespace IDCA.Bll.MDMDocument
         string _project = string.Empty;
         string _id = string.Empty;
 
+        new public MDMObjectType ObjectType => _objectType;
         public string Name { get => _name; internal set => _name = value; }
         public string DBLocation { get => _dbLocation; internal set => _dbLocation = value; }
         public string CDSCName { get => _cdscName; internal set => _cdscName = value; }
@@ -26,12 +28,15 @@ namespace IDCA.Bll.MDMDocument
     public class DataSources : MDMObject, IMDMObjectCollection<DataSource>
     {
         internal DataSources(IMDMDocument document) : base(document, document)
-        { }
+        {
+            _objectType = MDMObjectType.DataSources;
+        }
 
         readonly List<DataSource> _items = new();
 
         public DataSource? this[int index] => index >= 0 && index < _items.Count ? _items[index] : null;
         public int Count => _items.Count;
+        new public MDMObjectType ObjectType => _objectType;
 
         public void Add(DataSource item)
         {
@@ -46,6 +51,11 @@ namespace IDCA.Bll.MDMDocument
         public DataSource NewObject()
         {
             return new DataSource(_document, this);
+        }
+
+        public void Clear()
+        {
+            _items.Clear();
         }
     }
 

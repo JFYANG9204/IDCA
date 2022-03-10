@@ -3,7 +3,6 @@ namespace IDCA.Bll.MDMDocument
 {
     public struct Style
     {
-        public object? Parent;
         public bool? UseCascadedStyles;
         public string? Color;
         public string? BgColor;
@@ -23,7 +22,6 @@ namespace IDCA.Bll.MDMDocument
         public CellStyle? Cell;
         public ControlStyle? Control;
         public FontStyle? Font;
-        public bool IsEmpty;
         public AudioStyle? Audio;
     }
 
