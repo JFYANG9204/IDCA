@@ -100,6 +100,15 @@ namespace IDCA.Bll.MDMDocument
 
         internal static Labels ReadLabels(Labels labels, XElement element)
         {
+            if (labels.Context.IsDefault && labels.Document.Contexts.Count > 0)
+            {
+                string context = ReadPropertyStringValue(element, "context");
+                IContext? current;
+                if (!string.IsNullOrEmpty(context) && (current = labels.Document.Contexts[context]) != null)
+                {
+                    labels.Context = current;
+                }
+            }
             ForEachChild(element, "text", text => labels.Add(ReadLabel(labels, text)));
             return labels;
         }
@@ -662,6 +671,7 @@ namespace IDCA.Bll.MDMDocument
 
         internal static Variables ReadGloablVariables(Variables variables, XElement element)
         {
+            ForEachChild(element, "class", e => variables.Add(ReadVariable(variables.NewObject(), e)));
             ForEachChild(element, "variable", e => variables.Add(ReadVariable(variables.NewObject(), e)));
             ForEachChild(element, "othervariable", e => variables.Add(ReadVariable(variables.NewObject(), e)));
             ForEachChild(element, "multiplier-variable", e => variables.Add(ReadVariable(variables.NewObject(), e)));
@@ -714,7 +724,7 @@ namespace IDCA.Bll.MDMDocument
 
         internal static Class ReadFieldClass(Class @class, XElement element)
         {
-            ReadNameObject(@class, element);
+            ReadLabeledObject(@class, element);
             FirstChild(element, "types", e => @class.Types = ReadClassTypes(new Types(@class.Document, @class), e));
             FirstChild(element, "fields", e => @class.Fields = ReadClassFields(new Fields(@class.Document, @class), e));
             FirstChild(element, "pages", e => @class.Pages = ReadClassPages(new Pages(@class), e));
@@ -730,6 +740,7 @@ namespace IDCA.Bll.MDMDocument
                 return field;
             }
             ReadLabeledObject(field, element);
+            field.IteratorType = ReadPropertyEnumValue<IteratorType>(element.Attribute("iteratortype"));
             FirstChild(element, "categories", e => field.Categories = ReadCategories(new Categories(field.Document, field), e));
             FirstChild(element, "class", e => field.Class = ReadFieldClass(new Class(field), e));
             FirstChild(element, "ranges", e =>

@@ -81,7 +81,14 @@ namespace IDCA.Bll.MDMDocument
         public string Base { get => _base; internal set => _base = value; }
         public IContext Default => _default;
 
-
+        public override void Add(Context item)
+        {
+            if (!_cache.ContainsKey(item.Name.ToLower()))
+            {
+                _cache.Add(item.Name.ToLower(), item);
+                base.Add(item);
+            }
+        }
 
 
     }

@@ -39,6 +39,7 @@ namespace IDCA.Bll.MDMDocument
 
     public enum IteratorType
     {
+        None = 0,
         Categorical = 2,
         NumericRanges = 3,
     }

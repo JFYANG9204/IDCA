@@ -52,7 +52,7 @@ namespace IDCA.Bll.MDMDocument
         }
 
         readonly Dictionary<string, Dictionary<string, Label>> _languageLabelsCache = new();
-        readonly IContext _currentContext;
+        IContext _currentContext;
 
         new public Label? this[int index] => index >= 0 && index < _items.Count ? _items[index] : null;
 
@@ -85,7 +85,7 @@ namespace IDCA.Bll.MDMDocument
                 return null;
             }
         }
-        public IContext Context => _currentContext;
+        public IContext Context { get => _currentContext; internal set => _currentContext = value; }
         public Properties? Properties { get; internal set; } = null;
         public MDMObjectType ObjectType => MDMObjectType.Labels;
         public Properties? Templates { get; internal set; } = null;

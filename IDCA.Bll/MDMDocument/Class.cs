@@ -1,7 +1,7 @@
 ﻿
 namespace IDCA.Bll.MDMDocument
 {
-    public class Class : MDMNamedObject, IClass
+    public class Class : MDMLabeledObject, IClass
     {
         internal Class(IField field) : base(field.Document, field)
         {

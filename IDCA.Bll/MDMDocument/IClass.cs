@@ -1,7 +1,7 @@
 ﻿
 namespace IDCA.Bll.MDMDocument
 {
-    public interface IClass : IMDMNamedObject
+    public interface IClass : IMDMLabeledObject
     {
         Types? Types { get; }
         Fields? Fields { get; }
