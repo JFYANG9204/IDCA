@@ -18,7 +18,11 @@ namespace IDCA.Bll.MDMDocument
         /// <summary>
         /// 属性集合，可以为空
         /// </summary>
-        IProperties<Property>? Properties { get; }
+        Properties? Properties { get; }
+        /// <summary>
+        /// 模板集合，可以为空
+        /// </summary>
+        Properties? Templates { get; }
     }
 
     public interface IMDMNamedObject : IMDMObject
@@ -134,6 +138,7 @@ namespace IDCA.Bll.MDMDocument
         CategoryMap,
         DataSource,
         DataSources,
+        Document
     }
 
 }

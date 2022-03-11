@@ -13,12 +13,14 @@ namespace IDCA.Bll.MDMDocument
         readonly protected IMDMDocument _document;
 
         protected MDMObjectType _objectType = MDMObjectType.Unknown;
-        protected IProperties<Property>? _properties;
+        protected Properties? _properties;
+        protected Properties? _templates;
 
         public MDMObjectType ObjectType { get => _objectType; internal set => _objectType = value; }
         public IMDMObject Parent => _parent;
         public IMDMDocument Document => _document;
-        public IProperties<Property>? Properties { get => _properties; internal set => _properties = value; }
+        public Properties? Properties { get => _properties; internal set => _properties = value; }
+        public Properties? Templates { get => _templates; internal set => _templates = value; }
     }
 
     public class MDMNamedObject : MDMObject, IMDMNamedObject

@@ -6,7 +6,7 @@ namespace IDCA.Bll.MDMDocument
         /// <summary>
         /// 引用的对象，不引用返回null
         /// </summary>
-        Field? Reference { get; }
+        Variable? Reference { get; }
         /// <summary>
         /// 当前对象的Category分类集合，不存在返回null
         /// </summary>
@@ -22,7 +22,25 @@ namespace IDCA.Bll.MDMDocument
         /// <summary>
         /// 下级变量集合，用于表示多级变量
         /// </summary>
-        Variables? Items { get; }
+        Class? Class { get; }
+        /// <summary>
+        /// 迭代器类型
+        /// </summary>
+        IteratorType? IteratorType { get; }
+        /// <summary>
+        /// 如果迭代器为数值类型，此属性保存区间上限
+        /// </summary>
+        int? UpperBound { get; }
+        /// <summary>
+        /// 如果迭代器为数值类型，此属性保存区间下限
+        /// </summary>
+        int? LowerBound { get; }
+    }
+
+    public enum IteratorType
+    {
+        Categorical = 2,
+        NumericRanges = 3,
     }
 
 }

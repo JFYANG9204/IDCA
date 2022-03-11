@@ -44,12 +44,12 @@ namespace IDCA.Bll.MDMDocument
         Bool = 11,
     }
 
-    public interface IProperties<T> : IMDMNamedCollection<T> where T : IProperty
+    public interface IProperties : IMDMNamedCollection<Property>
     {
         /// <summary>
         /// 属性集合
         /// </summary>
-        public IProperties<T>? SubProperties { get; internal set; }
+        public Properties? SubProperties { get; internal set; }
     }
 
 

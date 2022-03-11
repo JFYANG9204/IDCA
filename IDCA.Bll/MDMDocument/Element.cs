@@ -22,10 +22,8 @@ namespace IDCA.Bll.MDMDocument
         Variable? _multiplierVariable;
         bool _isMultiplierLocal = false;
         bool _versioned = false;
-        Properties? _templates;
 
         new public MDMObjectType ObjectType => _objectType;
-        public Properties? Templates { get => _templates; internal set => _templates = value; }
         public IElement? Reference { get => _reference; internal set => _reference = value; }
         public ElementType Type { get => _type; internal set => _type = value; }
         public CategoryFlag Flag { get => _flag; internal set => _flag = value; }

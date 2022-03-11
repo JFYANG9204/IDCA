@@ -10,23 +10,32 @@ namespace IDCA.Bll.MDMDocument
 
         Elements? _elements;
         Categories? _categories;
-        Properties? _templates;
         Properties? _notes;
-        Types? _helperFields;
+        Variables? _helperFields;
 
-        readonly VariableUsage _usageType = VariableUsage.Variable;
+        VariableUsage _usageType = VariableUsage.Variable;
+        MDMDataType _type = MDMDataType.None;
 
         bool _hasCaseData = false;
         bool _versioned = false;
 
+        object _minValue = string.Empty;
+        object _maxValue = string.Empty;
+        object _effectiveMinValue = string.Empty;
+        object _effectiveMaxValue = string.Empty;
+
         new public MDMObjectType ObjectType => _objectType;
 
+        public MDMDataType DataType { get => _type; internal set => _type = value; }
         public Elements? Elements { get => _elements; internal set => _elements = value; }
         public Categories? Categories { get => _categories; internal set => _categories = value; }
-        public Properties? Templates { get => _templates; internal set => _templates = value; }
         public Properties? Notes { get => _notes; internal set => _notes = value; }
-        public Types? HelperFields { get => _helperFields; internal set => _helperFields = value; }
-        public VariableUsage UsageType => _usageType;
+        public Variables? HelperFields { get => _helperFields; internal set => _helperFields = value; }
+        public VariableUsage UsageType { get => _usageType; internal set => _usageType = value; }
+        public object MinValue { get => _minValue; internal set => _minValue = value; }
+        public object MaxValue { get => _maxValue; internal set => _maxValue = value; }
+        public object EffectiveMinValue { get => _effectiveMinValue; internal set => _effectiveMinValue = value; }
+        public object EffectiveMaxValue { get => _effectiveMaxValue; internal set => _effectiveMaxValue = value; }
 
         public bool HasCaseData { get => _hasCaseData; internal set => _hasCaseData = value; }
         public bool Versioned { get => _versioned; internal set => _versioned = value; }
@@ -34,12 +43,15 @@ namespace IDCA.Bll.MDMDocument
 
     public class Variables : MDMNamedCollection<Variable>, IMDMObject
     {
-        internal Variables(IMDMDocument document) : base(document, document, collection => new Variable(document, collection))
+        internal Variables(IMDMDocument document, IMDMObject? parent = null) : base(document, parent ?? document, collection => new Variable(document, collection))
         {
             _objectType = MDMObjectType.Variables;
         }
 
+        bool _globalNamespace = false;
+
         new public MDMObjectType ObjectType => _objectType;
+        public bool GlobalNamespace { get => _globalNamespace; internal set => _globalNamespace = value; }
     }
 
     public class VariableInstance : MDMObject, IVariableInstance

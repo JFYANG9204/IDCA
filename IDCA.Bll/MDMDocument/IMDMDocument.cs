@@ -18,6 +18,26 @@ namespace IDCA.Bll.MDMDocument
         /// </summary>
         string LastVersion { get; }
         /// <summary>
+        /// 文档ID编号
+        /// </summary>
+        string Id { get; }
+        /// <summary>
+        /// 数据版本
+        /// </summary>
+        string DataVersion { get; }
+        /// <summary>
+        /// 数据下级版本
+        /// </summary>
+        string DataSubVersion { get; }
+        /// <summary>
+        /// 是否支持系统变量
+        /// </summary>
+        bool SystemVariable { get; }
+        /// <summary>
+        /// 是否对数据库筛选器进行有效性检查
+        /// </summary>
+        bool DbFilterValidation { get; }
+        /// <summary>
         /// 当前上下文类型
         /// </summary>
         string Context { get; }
@@ -26,13 +46,13 @@ namespace IDCA.Bll.MDMDocument
         /// </summary>
         string Language { get; }
         /// <summary>
-        /// 模板配置集合
-        /// </summary>
-        Properties Templates { get; }
-        /// <summary>
         /// 数据库链接集合
         /// </summary>
         DataSources DataSources { get; }
+        /// <summary>
+        /// 文档名称标签
+        /// </summary>
+        Labels Labels { get; }
         /// <summary>
         /// 变量定义集合
         /// </summary>

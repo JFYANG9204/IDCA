@@ -32,8 +32,10 @@ namespace IDCA.Bll.MDMDocument
             _objectType = MDMObjectType.DataSources;
         }
 
+        string _default = string.Empty;
         readonly List<DataSource> _items = new();
 
+        public string Default { get => _default; internal set => _default = value; }
         public DataSource? this[int index] => index >= 0 && index < _items.Count ? _items[index] : null;
         public int Count => _items.Count;
         new public MDMObjectType ObjectType => _objectType;

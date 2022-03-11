@@ -12,7 +12,7 @@ namespace IDCA.Bll.MDMDocument
         /// <summary>
         /// 分类集合
         /// </summary>
-        ICategories Categories { get; }
+        Categories Categories { get; }
 
         bool GlobalNamespace { get; }
     }

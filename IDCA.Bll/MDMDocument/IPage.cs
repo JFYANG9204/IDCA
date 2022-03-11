@@ -1,16 +1,14 @@
 ﻿
 namespace IDCA.Bll.MDMDocument
 {
-    public interface IPage : IMDMObject
+    public interface IPage : IMDMLabeledObject
     {
-        string Id { get; }
-        string Name { get; }
         string Reference { get; }
+        Variables? Items { get; }
     }
 
-    public interface IPages<T> : IMDMObjectCollection<T>
+    public interface IPages<T> : IMDMNamedCollection<T>
     {
-        string Name { get; }
         bool GlobalNamespace { get; }
     }
 

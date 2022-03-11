@@ -13,8 +13,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)IConfig.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\Categories.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\CategoryMap.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\Class.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\Context.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\DataSource.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\IClass.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\IPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\IScript.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\MDMDocument.cs" />

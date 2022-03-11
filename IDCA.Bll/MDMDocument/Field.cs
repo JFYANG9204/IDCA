@@ -1,7 +1,7 @@
 ﻿
 namespace IDCA.Bll.MDMDocument
 {
-    public class Field : MDMLabeledObject, IField
+    public class Field : Variable, IField
     {
 
         internal Field(IMDMObject parent) : base(parent.Document, parent)
@@ -9,40 +9,32 @@ namespace IDCA.Bll.MDMDocument
             _objectType = MDMObjectType.Field;
         }
 
-        Field? _reference;
-        Categories? _categories;
-        Elements? _elements;
-
-        Variables? _items;
-        MDMDataType _type = MDMDataType.None;
-
-        object _minValue = string.Empty;
-        object _maxValue = string.Empty;
-        object _effectiveMinValue = string.Empty;
-        object _effectiveMaxValue = string.Empty;
+        Variable? _reference;
+        Class? _class;
+        IteratorType? _iteratorType;
+        int? _upperBound;
+        int? _lowerBound;
 
         new public MDMObjectType ObjectType => _objectType;
 
-        public Field? Reference { get => _reference; internal set => _reference = value; }
-        public Categories? Categories { get => _categories; internal set => _categories = value; }
-        public Elements? Elements { get => _elements; internal set => _elements = value; }
-        public MDMDataType DataType { get => _type; internal set => _type = value; }
-
-        public object MinValue { get => _minValue; internal set => _minValue = value; }
-        public object MaxValue { get => _maxValue; internal set => _maxValue = value; }
-        public object EffectiveMinValue { get => _effectiveMinValue; internal set => _effectiveMinValue = value; }
-        public object EffectiveMaxValue { get => _effectiveMaxValue; internal set => _effectiveMaxValue = value; }
-        public Variables? Items { get => _items; internal set => _items = value; }
+        public Variable? Reference { get => _reference; internal set => _reference = value; }
+        public Class? Class { get => _class; internal set => _class = value; }
+        public IteratorType? IteratorType { get => _iteratorType; internal set => _iteratorType = value; }
+        public int? LowerBound { get => _lowerBound; internal set => _lowerBound = value; }
+        public int? UpperBound { get => _upperBound; internal set => _upperBound = value; }
     }
 
     public class Fields : MDMNamedCollection<Field>, IMDMNamedCollection<Field>
     {
-        internal Fields(IMDMDocument document) : base(document, document, collection => new Field(collection))
+        internal Fields(IMDMDocument document, IMDMObject? parent = null) : base(document, parent ?? document, collection => new Field(collection))
         {
             _objectType = MDMObjectType.Fields;
         }
 
+        bool _globalNamespace = false;
+
         new public MDMObjectType ObjectType => _objectType;
+        public bool GlobalNamespace { get => _globalNamespace; internal set => _globalNamespace = value; }
     }
 
 }

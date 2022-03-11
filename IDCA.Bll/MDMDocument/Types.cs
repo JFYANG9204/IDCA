@@ -10,17 +10,17 @@ namespace IDCA.Bll.MDMDocument
             _objectType = MDMObjectType.Type;
         }
 
-        readonly ICategories _categories;
+        readonly Categories _categories;
         bool _globalNamespace = false;
 
         new public MDMObjectType ObjectType => _objectType;
-        public ICategories Categories => _categories;
+        public Categories Categories => _categories;
         public bool GlobalNamespace { get => _globalNamespace; internal set => _globalNamespace = value; }
     }
 
     public class Types : MDMNamedCollection<Type>, ITypes<Type>
     {
-        internal Types(IMDMDocument document) : base(document, document, collection => new Type(collection))
+        internal Types(IMDMDocument document, IMDMObject? parent = null) : base(document, parent ?? document, collection => new Type(collection))
         {
             _objectType = MDMObjectType.Types;
         }

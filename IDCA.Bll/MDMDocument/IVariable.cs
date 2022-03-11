@@ -1,14 +1,13 @@
 ﻿
 namespace IDCA.Bll.MDMDocument
 {
-    public interface IVariable : IMDMLabeledObject
+    public interface IVariable : IMDMLabeledObject, IMDMRange
     {
-
+        MDMDataType DataType { get; }
         Elements? Elements { get; }
         Categories? Categories { get; }
-        Properties? Templates { get; }
         Properties? Notes { get; }
-        Types? HelperFields { get; }
+        Variables? HelperFields { get; }
         VariableUsage UsageType { get; }
         bool HasCaseData { get; }
         bool Versioned { get; }

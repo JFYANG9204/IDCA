@@ -23,7 +23,7 @@ namespace IDCA.Bll.MDMDocument
     }
 
 
-    public class Properties : MDMNamedCollection<Property>, IProperties<Property>
+    public class Properties : MDMNamedCollection<Property>, IProperties
     {
         internal Properties(IMDMObject parent) : base(parent.Document, parent, collection => new Property(collection))
         {
@@ -31,7 +31,7 @@ namespace IDCA.Bll.MDMDocument
         }
 
         new public MDMObjectType ObjectType => _objectType;
-        public IProperties<Property>? SubProperties { get => _properties; set => _properties = value; }
+        public Properties? SubProperties { get => _properties; set => _properties = value; }
 
         public override void Add(Property item)
         {

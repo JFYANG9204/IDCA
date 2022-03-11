@@ -7,36 +7,36 @@ namespace IDCA.Bll.MDMDocument
     internal static class XmlHelper
     {
 
-        private static string ReadPropertyStringValue(XElement element, string propertyName)
+        internal static string ReadPropertyStringValue(XElement element, string propertyName)
         {
             XAttribute? attr;
             return (attr = element.Attribute(propertyName)) != null ? attr.Value : string.Empty;
         }
 
-        private static bool ReadPropertyBoolValue(XElement element, string propertyName)
+        internal static bool ReadPropertyBoolValue(XElement element, string propertyName)
         {
             XAttribute? attr;
             return (attr = element.Attribute(propertyName)) != null && attr.Value == "-1";
         }
 
-        private static int ReadPropertyIntValue(XElement element, string propertyName)
+        internal static int ReadPropertyIntValue(XElement element, string propertyName)
         {
             XAttribute? attr;
             return ((attr = element.Attribute(propertyName)) != null && int.TryParse(attr.Value, out int value)) ? value : 0;
         }
 
-        private static double ReadPropertyDecimalValue(XElement element, string propertyName)
+        internal static double ReadPropertyDecimalValue(XElement element, string propertyName)
         {
             XAttribute? attr;
             return ((attr = element.Attribute(propertyName)) != null && double.TryParse(attr.Value, out double value)) ? value : 0;
         }
 
-        private static T ReadPropertyEnumValue<T>(XAttribute? attr) where T : Enum
+        internal static T ReadPropertyEnumValue<T>(XAttribute? attr) where T : Enum
         { 
             return (attr != null && int.TryParse(attr.Value, out int value)) ? (T)(object)value : (T)(object)0;
         }
 
-        private static void ForEachChild(XElement element, string nodeName, Action<XElement> action)
+        internal static void ForEachChild(XElement element, string nodeName, Action<XElement> action)
         {
             foreach (var ele in element.Elements(nodeName))
             {
@@ -44,7 +44,7 @@ namespace IDCA.Bll.MDMDocument
             }
         }
 
-        private static void FirstChild(XElement element, string nodeName, Action<XElement> action)
+        internal static void FirstChild(XElement element, string nodeName, Action<XElement> action)
         {
             var first = element.Element(nodeName);
             if (first == null)
@@ -581,6 +581,173 @@ namespace IDCA.Bll.MDMDocument
             ForEachChild(element, "category", e => categories.Add(ReadElement(categories.NewObject(), e)));
             ForEachChild(element, "categories", e => JoinCategories(categories, e));
             return categories;
+        }
+
+        internal static Type ReadType(Type type, XElement element)
+        {
+            type.Id = ReadPropertyStringValue(element, "id");
+            type.Name = ReadPropertyStringValue(element, "name");
+            type.GlobalNamespace = ReadPropertyBoolValue(element, "global-name-space");
+            ReadCategories(type.Categories, element);
+            FirstChild(element, "labels", e => type.Labels = ReadLabels(new Labels(type, type.Document, ReadPropertyStringValue(e, "context")), e));
+            return type;
+        }
+
+        internal static Types ReadTypes(Types types, XElement element)
+        {
+            ForEachChild(element, "categories", e => types.Add(ReadType(types.NewObject(), e)));
+            return types;
+        }
+
+        internal static T ReadNameObject<T>(T namedObject, XElement element) where T : MDMNamedObject
+        {
+            namedObject.Name = ReadPropertyStringValue(element, "name");
+            namedObject.Id = ReadPropertyStringValue(element, "id");
+            FirstChild(element, "properties", e => namedObject.Properties = ReadProperties(new Properties(namedObject), element));
+            FirstChild(element, "templates", e => namedObject.Templates = ReadProperties(new Properties(namedObject), e));
+            return namedObject;
+        }
+
+        internal static T ReadLabeledObject<T>(T labeledObject, XElement element) where T : MDMLabeledObject
+        {
+            ReadNameObject(labeledObject, element);
+            FirstChild(element, "labels", e => labeledObject.Labels = ReadLabels(new Labels(labeledObject, labeledObject.Document, ReadPropertyStringValue(e, "context")), e));
+            FirstChild(element, "styles", e => labeledObject.Style = ReadStyle(e));
+            FirstChild(element, "labelstyles", e => labeledObject.LabelStyles = ReadStyle(e));
+            return labeledObject;
+        }
+
+        internal static Variable ReadVariable(Variable variable, XElement element)
+        {
+            ReadLabeledObject(variable, element);
+            variable.DataType = ReadPropertyEnumValue<MDMDataType>(element.Attribute("type"));
+            variable.UsageType = ReadPropertyEnumValue<VariableUsage>(element.Attribute("usagetype"));
+            variable.MinValue = ReadPropertyStringValue(element, "min");
+            variable.MaxValue = ReadPropertyStringValue(element, "max");
+            variable.EffectiveMinValue = ReadPropertyStringValue(element, "effectivemin");
+            variable.EffectiveMaxValue = ReadPropertyStringValue(element, "effectivemax");
+            variable.HasCaseData = ReadPropertyBoolValue(element, "hascasedata");
+            variable.Versioned = ReadPropertyBoolValue(element, "versioned");    
+            FirstChild(element, "categories", e => {
+                variable.Categories = ReadCategories(new Categories(variable.Document, variable), e);
+                variable.Elements = ReadElements(new Elements(variable), e);
+            });
+            FirstChild(element, "helperfields", e =>
+            {
+                ForEachChild(e, "variable", v =>
+                {
+                    if (variable.HelperFields is null)
+                    {
+                        variable.HelperFields = new Variables(variable.Document, variable);
+                    }
+                    Variable? exist = variable.Document.Variables.GetById(ReadPropertyStringValue(v, "ref"));
+                    if (exist != null)
+                    {
+                        variable.HelperFields.Add(exist);
+                    }
+                });
+            });
+            return variable;
+        }
+
+        internal static Variables ReadGloablVariables(Variables variables, XElement element)
+        {
+            ForEachChild(element, "variable", e => variables.Add(ReadVariable(variables.NewObject(), e)));
+            ForEachChild(element, "othervariable", e => variables.Add(ReadVariable(variables.NewObject(), e)));
+            ForEachChild(element, "multiplier-variable", e => variables.Add(ReadVariable(variables.NewObject(), e)));
+            return variables;
+        }
+
+        internal static Pages ReadGlobalPages(Pages pages, XElement element)
+        {
+            ForEachChild(element, "page", e => pages.Add(ReadPage(pages.NewObject(), e)));
+            return pages;
+        }
+
+        internal static Fields ReadClassFields(Fields fields, XElement element)
+        {
+            fields.Name = ReadPropertyStringValue(element, "name");
+            fields.GlobalNamespace = ReadPropertyBoolValue(element, "global-name-space");
+            ForEachChild(element, "variable", e => fields.Add(ReadField(fields.NewObject(), e)));
+            ForEachChild(element, "loop", e => fields.Add(ReadField(fields.NewObject(), e)));
+            ForEachChild(element, "grid", e => fields.Add(ReadField(fields.NewObject(), e)));
+            return fields;
+        }
+
+        internal static Types ReadClassTypes(Types types, XElement element)
+        {
+            types.GlobalNamespace = ReadPropertyBoolValue(element, "global-name-space");
+            ForEachChild(element, "categories", e =>
+            {
+                Type? reference = types.Document.Types.GetById(ReadPropertyStringValue(e, "ref"));
+                if (reference != null)
+                {
+                    types.Add(reference);
+                }
+            });
+            return types;
+        }
+
+        internal static Pages ReadClassPages(Pages pages, XElement element)
+        {
+            pages.GlobalNamespace = ReadPropertyBoolValue(element, "global-name-space");
+            ForEachChild(element, "page", e =>
+            {
+                Page? reference = pages.Document.Pages.GetById(ReadPropertyStringValue(e, "ref"));
+                if (reference != null)
+                {
+                    pages.Add(reference);
+                }
+            });
+            return pages;
+        }
+
+        internal static Class ReadFieldClass(Class @class, XElement element)
+        {
+            ReadNameObject(@class, element);
+            FirstChild(element, "types", e => @class.Types = ReadClassTypes(new Types(@class.Document, @class), e));
+            FirstChild(element, "fields", e => @class.Fields = ReadClassFields(new Fields(@class.Document, @class), e));
+            FirstChild(element, "pages", e => @class.Pages = ReadClassPages(new Pages(@class), e));
+            return @class;
+        }
+
+        internal static Field ReadField(Field field, XElement element)
+        {
+            XAttribute? refAttr = element.Attribute("ref");
+            if (refAttr != null)
+            {
+                field.Reference = field.Document.Fields.GetById(refAttr.Value);
+                return field;
+            }
+            ReadLabeledObject(field, element);
+            FirstChild(element, "categories", e => field.Categories = ReadCategories(new Categories(field.Document, field), e));
+            FirstChild(element, "class", e => field.Class = ReadFieldClass(new Class(field), e));
+            FirstChild(element, "ranges", e =>
+            {
+                FirstChild(e, "range", r =>
+                {
+                    field.UpperBound = ReadPropertyIntValue(r, "upperbound");
+                    field.LowerBound = ReadPropertyIntValue(r, "lowerbound");
+                });
+            });
+            return field;
+        }
+
+        internal static DataSource ReadDataSource(DataSource dataSource, XElement element)
+        {
+            dataSource.Name = ReadPropertyStringValue(element, "name");
+            dataSource.DBLocation = ReadPropertyStringValue(element, "dblocation");
+            dataSource.CDSCName = ReadPropertyStringValue(element, "cdscname");
+            dataSource.Project = ReadPropertyStringValue(element, "project");
+            dataSource.Id = ReadPropertyStringValue(element, "id");
+            return dataSource;
+        }
+
+        internal static DataSources ReadDataSources(DataSources dataSources, XElement element)
+        {
+            dataSources.Default = ReadPropertyStringValue(element, "default");
+            ForEachChild(element, "connection", e => dataSources.Add(ReadDataSource(dataSources.NewObject(), e)));
+            return dataSources;
         }
 
     }

@@ -76,11 +76,12 @@ namespace IDCA.Bll.MDMDocument
         new public IMDMObject Parent => _parent;
 
         protected MDMObjectType _objectType;
-        protected IProperties<Property>? _properties;
+        protected Properties? _properties;
+        protected Properties? _templates;
 
         public MDMObjectType ObjectType { get => _objectType; internal set => _objectType = value; }
-        public IProperties<Property>? Properties { get => _properties; internal set => _properties = value; }
-
+        public Properties? Properties { get => _properties; internal set => _properties = value; }
+        public Properties? Templates { get => _templates; internal set => _templates = value; }
     }
 
     public class MDMNamedCollection<T> : MDMObjectCollection<T>, IMDMNamedCollection<T>, IMDMObject where T : MDMNamedObject
@@ -104,6 +105,7 @@ namespace IDCA.Bll.MDMDocument
         protected readonly Dictionary<string, T> _idCache = new();
 
         protected Labels? _labels;
+        protected Style? _styles;
         protected Style? _labelStyles;
         protected bool _isReference = false;
         protected bool _isSystem = false;
@@ -133,6 +135,7 @@ namespace IDCA.Bll.MDMDocument
         public Style? LabelStyles { get => _labelStyles; internal set => _labelStyles = value; }
         public bool IsReference { get => _isReference; internal set => _isReference = value; }
         public bool IsSystem { get => _isSystem; internal set => _isSystem = value; }
+        public Style? Style { get => _styles; internal set => _styles = value; }
 
         public T? GetById(string id)
         {

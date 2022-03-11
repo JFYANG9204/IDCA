@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IDCA.Client", "IDCA.Client\IDCA.Client.csproj", "{F2A06E33-E023-4A09-8D09-1519963E3010}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDCA.Client", "IDCA.Client\IDCA.Client.csproj", "{F2A06E33-E023-4A09-8D09-1519963E3010}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "IDCA.Bll", "IDCA.Bll\IDCA.Bll.shproj", "{3BA6375D-4343-4C93-81D3-EA0063E8452A}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "IDCA.Mvvm", "IDCA.Mvvm\IDCA.Mvvm.shproj", "{9E9320A8-27F1-4177-9D7D-3EB9B6BA564D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IDCA.Test", "IDCA.Test\IDCA.Test.csproj", "{775817B2-7FD6-477B-A0EF-4BA2A44DFAF8}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -25,6 +27,10 @@ Global
 		{F2A06E33-E023-4A09-8D09-1519963E3010}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F2A06E33-E023-4A09-8D09-1519963E3010}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F2A06E33-E023-4A09-8D09-1519963E3010}.Release|Any CPU.Build.0 = Release|Any CPU
+		{775817B2-7FD6-477B-A0EF-4BA2A44DFAF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{775817B2-7FD6-477B-A0EF-4BA2A44DFAF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{775817B2-7FD6-477B-A0EF-4BA2A44DFAF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{775817B2-7FD6-477B-A0EF-4BA2A44DFAF8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -6,7 +6,7 @@ namespace IDCA.Bll.MDMDocument
 
     public interface IElement : IMDMLabeledObject
     {
-        Properties? Templates { get; }
+        new Properties? Templates { get; }
         IElement? Reference { get; }
         ElementType Type { get; }
         CategoryFlag Flag { get; }

@@ -86,9 +86,9 @@ namespace IDCA.Bll.MDMDocument
             }
         }
         public IContext Context => _currentContext;
-        public IProperties<Property>? Properties { get; internal set; } = null;
-
+        public Properties? Properties { get; internal set; } = null;
         public MDMObjectType ObjectType => MDMObjectType.Labels;
+        public Properties? Templates { get; internal set; } = null;
 
         public override void Add(Label item)
         {
