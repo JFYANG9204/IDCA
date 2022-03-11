@@ -13,16 +13,16 @@ namespace IDCA.Bll.MDMDocument
             _properties = new Properties(this);
             _templates = new Properties(this);
             _dataSources = new DataSources(this);
+            _contexts = new Contexts(this, "");
+            _languages = new Languages(this, "");
             _labels = new Labels(this, this, "");
             _variables = new Variables(this);
             _fields = new Fields(this);
             _types = new Types(this);
             _pages = new Pages(this);
-            _systemRoutings = new Routings(this);
             _routings = new Routings(this);
+            _systemRoutings = new Routings(this);
             _mapping = new Mapping(this);
-            _languages = new Languages(this, "");
-            _contexts = new Contexts(this, "");
             _labelTypes = new Contexts(this, "");
             _routingContexts = new Contexts(this, "");
             _scriptTypes = new Contexts(this, "");
@@ -40,8 +40,6 @@ namespace IDCA.Bll.MDMDocument
         bool _dbFilterValidation = false;
         string _context = string.Empty;
         string _language = string.Empty;
-        string _script = string.Empty;
-        string _xml = string.Empty;
 
         readonly Properties _properties;
         readonly Properties _templates;
@@ -51,8 +49,8 @@ namespace IDCA.Bll.MDMDocument
         readonly Fields _fields;
         readonly Types _types;
         readonly Pages _pages;
-        readonly Routings _systemRoutings;
         readonly Routings _routings;
+        readonly Routings _systemRoutings;
         readonly Mapping _mapping;
         readonly Languages _languages;
         readonly Contexts _contexts;
@@ -62,8 +60,6 @@ namespace IDCA.Bll.MDMDocument
         readonly CategoryMap _categoryMap;
         readonly List<string> _atoms = new();
         readonly SaveLogs _saveLogs;
-
-        XDocument _xmlDocument = new();
 
         public string Url => _url;
         public string CreateVersion { get => _createVersion; private set => _createVersion = value; }
@@ -87,8 +83,8 @@ namespace IDCA.Bll.MDMDocument
         public Fields Fields => _fields;
         public Types Types => _types;
         public Pages Pages => _pages;
-        public Routings SystemRoutings => _systemRoutings;
         public Routings Routings => _routings;
+        public Routings SystemRoutings => _systemRoutings;
         public Mapping Mapping => _mapping;
         public Languages Languages => _languages;
         public Contexts Contexts => _contexts;
@@ -98,9 +94,7 @@ namespace IDCA.Bll.MDMDocument
         public CategoryMap CategoryMap => _categoryMap;
         public List<string> Atoms => _atoms;
         public SaveLogs SaveLogs => _saveLogs;
-        public string Script => _script;
-        public string Xml => _xml;
-        public MDMObjectType ObjectType => MDMObjectType.Unknown;
+        public MDMObjectType ObjectType => MDMObjectType.Document;
 
 
         public void Clear()
@@ -123,58 +117,70 @@ namespace IDCA.Bll.MDMDocument
                 throw new FileNotFoundException(path);
             }
 
-            _xmlDocument = XDocument.Load(path);
-            _xml = _xmlDocument.ToString();
-            XElement? _xmlRoot = _xmlDocument.Root;
+            XDocument xmlDocument = new();
+            xmlDocument = XDocument.Load(path);
+            XElement? _xmlRoot = xmlDocument.Root;
 
             if (_xmlRoot is null)
             {
                 throw new Exception("文档格式不符合标准，未找到XML根节点。");
             }
 
-            XElement? _xmlMDM = _xmlRoot.Element("{http://www.spss.com/mr/dm/metadatamodel/Arc 3/2000-02-04}metadata");
+            XElement? xmlMDM = _xmlRoot.Element("{http://www.spss.com/mr/dm/metadatamodel/Arc 3/2000-02-04}metadata");
 
-            if (_xmlMDM is null)
+            if (xmlMDM is null)
             {
                 throw new Exception("文档格式不符合标准，未找到MDM根节点。");
             }
 
-            // 载入基础属性
-            _createVersion = XmlHelper.ReadPropertyStringValue(_xmlMDM, "mdm_createversion");
-            _lastVersion = XmlHelper.ReadPropertyStringValue(_xmlMDM, "mdm_lastversion");
-            _id = XmlHelper.ReadPropertyStringValue(_xmlMDM, "id");
-            _dataVersion = XmlHelper.ReadPropertyStringValue(_xmlMDM, "data_version");
-            _dataSubVersion = XmlHelper.ReadPropertyStringValue(_xmlMDM, "data_sub_version");
-            _systemVariable = XmlHelper.ReadPropertyBoolValue(_xmlMDM, "systemvariable");
-            _dbFilterValidation = XmlHelper.ReadPropertyBoolValue(_xmlMDM, "dbfiltervalidation");
-
-            // 载入数据源配置
-            XmlHelper.ReadDataSources(_dataSources, _xmlMDM);
-            // 载入属性配置
-            XmlHelper.ReadProperties(_properties, _xmlMDM);
-            XmlHelper.ReadProperties(_templates, _xmlMDM);
             // 载入标签、上下文等基础配置
-            XmlHelper.ReadLabels(_labels, _xmlMDM);
-            XmlHelper.ReadLanguages(_languages, _xmlMDM);
-            XmlHelper.ReadContexts(_contexts, _xmlMDM);
-            XmlHelper.ReadContexts(_labelTypes, _xmlMDM);
-            XmlHelper.ReadContexts(_scriptTypes, _xmlMDM);
-            XmlHelper.ReadAtoms(_atoms, _xmlMDM);
-            XmlHelper.ReadCategoryMap(_categoryMap, _xmlMDM);
+            XmlHelper.TryReadElement(_languages, xmlMDM, "languages", XmlHelper.ReadLanguages);
+            XmlHelper.TryReadElement(_contexts, xmlMDM, "contexts", XmlHelper.ReadContexts);
+            // 设置当前语言和上下文类型
+            _context = _contexts.Base;
+            _language = _languages.Base;
+
+            XmlHelper.TryReadElement(_labels, xmlMDM, "labels", XmlHelper.ReadLabels);
+            XmlHelper.TryReadElement(_labelTypes, xmlMDM, "labelstyles", XmlHelper.ReadContexts);
+            XmlHelper.TryReadElement(_scriptTypes, xmlMDM, "scripttypes", XmlHelper.ReadContexts);
+            XmlHelper.TryReadElement(_atoms, xmlMDM, "atoms", XmlHelper.ReadAtoms);
+            XmlHelper.TryReadElement(_categoryMap, xmlMDM, "categorymap", XmlHelper.ReadCategoryMap);
+
+            // 载入基础属性
+            _createVersion = XmlHelper.ReadPropertyStringValue(xmlMDM, "mdm_createversion");
+            _lastVersion = XmlHelper.ReadPropertyStringValue(xmlMDM, "mdm_lastversion");
+            _id = XmlHelper.ReadPropertyStringValue(xmlMDM, "id");
+            _dataVersion = XmlHelper.ReadPropertyStringValue(xmlMDM, "data_version");
+            _dataSubVersion = XmlHelper.ReadPropertyStringValue(xmlMDM, "data_sub_version");
+            _systemVariable = XmlHelper.ReadPropertyBoolValue(xmlMDM, "systemvariable");
+            _dbFilterValidation = XmlHelper.ReadPropertyBoolValue(xmlMDM, "dbfiltervalidation");
+            // 载入数据源配置
+            XmlHelper.TryReadElement(_dataSources, xmlMDM, "datasources", XmlHelper.ReadDataSources);
+            // 载入属性配置
+            XmlHelper.TryReadElement(_properties, xmlMDM, "properties", XmlHelper.ReadProperties);
+            XmlHelper.TryReadElement(_templates, xmlMDM, "templates", XmlHelper.ReadProperties);
             // 载入定义
-            XElement? _xmlDefine = _xmlMDM.Element("definition");
+            XElement? _xmlDefine = xmlMDM.Element("definition");
             if (_xmlDefine != null)
             {
                 XmlHelper.ReadTypes(_types, _xmlDefine);
                 XmlHelper.ReadGloablVariables(_variables, _xmlDefine);
                 XmlHelper.ReadGlobalPages(_pages, _xmlDefine);
             }
+            // 载入系统变量
+            XmlHelper.TryReadElement(_fields, xmlMDM, "system", XmlHelper.ReadSystemFields);
             // 载入Field定义
-            XElement? _xmlDesign = _xmlMDM.Element("design");
-            if (_xmlDesign != null)
+            XElement? xmlDesign = xmlMDM.Element("design");
+            if (xmlDesign != null)
             {
-                XmlHelper.ReadClassFields(_fields, _xmlDesign);
-            }
+                XmlHelper.TryReadElement(_fields, xmlDesign, "fields", XmlHelper.ReadClassFields);
+                XmlHelper.TryReadElement(_routings, xmlDesign, "routings", XmlHelper.ReadRoutings);
+            }            
+            // 载入剩余定义
+            XmlHelper.TryReadElement(_mapping, xmlMDM, "mappings", XmlHelper.ReadMapping);
+            XmlHelper.TryReadElement(_routingContexts, xmlMDM, "routingcontexts", XmlHelper.ReadContexts);
+            XmlHelper.TryReadElement(_systemRoutings, xmlMDM, "systemrouting", XmlHelper.ReadRoutings);
+            XmlHelper.TryReadElement(_saveLogs, xmlMDM, "savelogs", XmlHelper.ReadSaveLogs);
         }
     }
 }

@@ -456,11 +456,9 @@ namespace IDCA.Bll.MDMDocument
             _objectType = MDMObjectType.Languages;
         }
 
-        readonly ILanguage? _current = null;
         string _base;
         readonly ILanguage _default;
 
-        public string Current => _current == null ? string.Empty : _current.LongCode;
         public string Base { get => _base; internal set => _base = value; }
         public ILanguage Default => _default;
         new public MDMObjectType ObjectType => _objectType;

@@ -21,9 +21,9 @@ namespace IDCA.Bll.MDMDocument
         public string Text { get => _text; internal set => _text = value; }
     }
 
-    public class ScriptType : MDMObject, IScriptType
+    public class ScriptType : MDMObjectCollection<Script>, IScriptType
     {
-        internal ScriptType(IMDMObject parent) : base(parent.Document, parent)
+        internal ScriptType(IMDMObject parent) : base(parent.Document, parent, collection => new Script(collection))
         {
             _objectType = MDMObjectType.ScriptType;
         }

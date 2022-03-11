@@ -20,7 +20,6 @@ namespace IDCA.Bll.MDMDocument
 
         readonly List<MDMUser> _items = new();
 
-        new public MDMObjectType ObjectType => _objectType;
         public DateTime Date { get => _date; internal set => _date = value; }
         public string VersionSet { get => _versionSet; internal set => _versionSet = value; }
         public string UserName { get => _userName; internal set => _userName = value; }
@@ -57,6 +56,5 @@ namespace IDCA.Bll.MDMDocument
             _objectType = MDMObjectType.SaveLogs;
         }
 
-        new public MDMObjectType ObjectType => _objectType;
     }
 }

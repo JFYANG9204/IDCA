@@ -8,7 +8,7 @@ namespace IDCA.Bll.MDMDocument
         string Text { get; }
     }
 
-    public interface IScriptType : IMDMObject
+    public interface IScriptType : IMDMObject, IMDMObjectCollection<Script>
     {
         string Type { get; }
         string Context { get; }

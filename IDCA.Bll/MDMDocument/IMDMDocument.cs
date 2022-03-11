@@ -114,10 +114,6 @@ namespace IDCA.Bll.MDMDocument
         /// </summary>
         SaveLogs SaveLogs { get; }
         /// <summary>
-        /// 文档存储的脚本，没有脚本将返回null
-        /// </summary>
-        string Script { get; }
-        /// <summary>
         /// 打开对应路径文档
         /// </summary>
         /// <param name="path">文档完整路径</param>
@@ -130,10 +126,6 @@ namespace IDCA.Bll.MDMDocument
         /// 清空文档对象内容
         /// </summary>
         void Clear();
-        /// <summary>
-        /// 文档的XML内容
-        /// </summary>
-        string Xml { get; }
         /// <summary>
         /// 文档的父级对象应为空
         /// </summary>

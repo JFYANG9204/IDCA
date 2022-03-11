@@ -6,6 +6,15 @@ namespace IDCA.Bll.MDMDocument
 {
     internal static class XmlHelper
     {
+        internal static OutType TryReadElement<OutType>(OutType current, XElement baseElement, string tagName, Func<OutType, XElement, OutType> func)
+        {
+            XElement? e = baseElement.Element(tagName);
+            if (e != null)
+            {
+                func(current, e);
+            }
+            return current;
+        }
 
         internal static string ReadPropertyStringValue(XElement element, string propertyName)
         {
@@ -204,6 +213,7 @@ namespace IDCA.Bll.MDMDocument
             scriptType.Context = ReadPropertyStringValue(element, "context");
             scriptType.InterviewMode = ReadPropertyEnumValue<InterviewModes>(element.Attribute("interviewmodes"));
             scriptType.UseKeyCodes = ReadPropertyBoolValue(element, "usekeycodes");
+            ForEachChild(element, "script", e => scriptType.Add(ReadScript(scriptType.NewObject(), e)));
             return scriptType;
         }
 
@@ -716,7 +726,7 @@ namespace IDCA.Bll.MDMDocument
             XAttribute? refAttr = element.Attribute("ref");
             if (refAttr != null)
             {
-                field.Reference = field.Document.Fields.GetById(refAttr.Value);
+                field.Reference = field.Document.Variables.GetById(refAttr.Value);
                 return field;
             }
             ReadLabeledObject(field, element);
@@ -748,6 +758,18 @@ namespace IDCA.Bll.MDMDocument
             dataSources.Default = ReadPropertyStringValue(element, "default");
             ForEachChild(element, "connection", e => dataSources.Add(ReadDataSource(dataSources.NewObject(), e)));
             return dataSources;
+        }
+
+        internal static Fields ReadSystemFields(Fields fields, XElement element)
+        {
+            ForEachChild(element, "class", e =>
+            {
+                var field = fields.NewObject();
+                field.IsSystem = true;
+                ReadField(field, e);
+                fields.Add(field);
+            });
+            return fields;
         }
 
     }

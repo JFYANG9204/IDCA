@@ -14,7 +14,6 @@ namespace IDCA.Bll.MDMDocument
         readonly Dictionary<string, CategoryId> _cache = new();
 
         public int Count => _items.Count;
-        new public MDMObjectType ObjectType => _objectType;
 
         public void Add(string name, string value)
         {

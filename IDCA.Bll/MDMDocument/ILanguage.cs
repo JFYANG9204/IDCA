@@ -28,10 +28,6 @@ namespace IDCA.Bll.MDMDocument
     public interface ILanguages<T> : IEnumerable, IMDMNamedCollection<T> where T : ILanguage
     {
         /// <summary>
-        /// 当前语言名称
-        /// </summary>
-        string Current { get; }
-        /// <summary>
         /// 基础语言
         /// </summary>
         string Base { get; }

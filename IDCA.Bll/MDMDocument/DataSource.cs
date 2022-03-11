@@ -17,7 +17,6 @@ namespace IDCA.Bll.MDMDocument
         string _project = string.Empty;
         string _id = string.Empty;
 
-        new public MDMObjectType ObjectType => _objectType;
         public string Name { get => _name; internal set => _name = value; }
         public string DBLocation { get => _dbLocation; internal set => _dbLocation = value; }
         public string CDSCName { get => _cdscName; internal set => _cdscName = value; }

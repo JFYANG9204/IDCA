@@ -56,24 +56,15 @@ namespace IDCA.Bll.MDMDocument
     {
         protected MDMObjectCollection(IMDMDocument document, IMDMObject parent) : base(document, parent)
         {
-            _document = document;
-            _parent = parent;
-            _constructor = constructor => (T)new MDMObject(document, parent);
+            _objectConstructor = constructor => (T)new MDMObject(document, parent);
         }
 
         internal MDMObjectCollection(IMDMDocument document, IMDMObject parent, Func<IMDMObjectCollection<T>, T> constructor) : base(document, parent)
         { 
-            _document = document;
-            _parent = parent;
-            _constructor = constructor;
+            _objectConstructor = constructor;
         }
 
-        new protected readonly IMDMDocument _document;
-        new protected readonly IMDMObject _parent;
-        new protected readonly Func<IMDMObjectCollection<T>, T> _constructor;
-
-        new public IMDMDocument Document => _document;
-        new public IMDMObject Parent => _parent;
+        protected readonly Func<IMDMObjectCollection<T>, T> _objectConstructor;
 
         protected MDMObjectType _objectType;
         protected Properties? _properties;
@@ -82,23 +73,22 @@ namespace IDCA.Bll.MDMDocument
         public MDMObjectType ObjectType { get => _objectType; internal set => _objectType = value; }
         public Properties? Properties { get => _properties; internal set => _properties = value; }
         public Properties? Templates { get => _templates; internal set => _templates = value; }
+
+        public override T NewObject()
+        {
+            return _objectConstructor(this);
+        }
+
     }
 
     public class MDMNamedCollection<T> : MDMObjectCollection<T>, IMDMNamedCollection<T>, IMDMObject where T : MDMNamedObject
     {
         internal MDMNamedCollection(IMDMDocument document, IMDMObject parent, Func<IMDMNamedCollection<T>, T> constructor) : base(document, parent)
         {
-            _document = document;
-            _parent = parent;
-            _constructor = constructor;
+            _namedConstructor = constructor;
         }
 
-        new protected readonly Func<IMDMNamedCollection<T>, T> _constructor;
-        new protected readonly IMDMDocument _document;
-        new protected readonly IMDMObject _parent;
-
-        new public IMDMDocument Document => _document;
-        new public IMDMObject Parent => _parent;
+        protected readonly Func<IMDMNamedCollection<T>, T> _namedConstructor;
 
         protected readonly Dictionary<string, IElement> _itemCache = new();
         protected readonly Dictionary<string, T> _cache = new();
@@ -156,6 +146,11 @@ namespace IDCA.Bll.MDMDocument
                     _idCache.Add(lId, item);
                 }
             }
+        }
+
+        public override T NewObject()
+        {
+            return _namedConstructor(this);
         }
 
         public override void Clear()

@@ -24,8 +24,6 @@ namespace IDCA.Bll.MDMDocument
         object _effectiveMinValue = string.Empty;
         object _effectiveMaxValue = string.Empty;
 
-        new public MDMObjectType ObjectType => _objectType;
-
         public MDMDataType DataType { get => _type; internal set => _type = value; }
         public Elements? Elements { get => _elements; internal set => _elements = value; }
         public Categories? Categories { get => _categories; internal set => _categories = value; }

@@ -13,7 +13,6 @@ namespace IDCA.Bll.MDMDocument
         readonly Categories _categories;
         bool _globalNamespace = false;
 
-        new public MDMObjectType ObjectType => _objectType;
         public Categories Categories => _categories;
         public bool GlobalNamespace { get => _globalNamespace; internal set => _globalNamespace = value; }
     }
@@ -28,6 +27,5 @@ namespace IDCA.Bll.MDMDocument
         bool _globalNamespace = false;
 
         public bool GlobalNamespace { get => _globalNamespace; set => _globalNamespace = value; }
-        new public MDMObjectType ObjectType => _objectType;
     }
 }

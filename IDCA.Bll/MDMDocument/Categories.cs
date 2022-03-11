@@ -8,8 +8,6 @@ namespace IDCA.Bll.MDMDocument
         {
             _objectType = MDMObjectType.Categories;
         }
-
-        new public MDMObjectType ObjectType => _objectType;
     }
 
 }

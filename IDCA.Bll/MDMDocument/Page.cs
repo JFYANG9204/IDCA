@@ -11,8 +11,6 @@ namespace IDCA.Bll.MDMDocument
 
         string _reference = string.Empty;
         readonly Variables _items;
-
-        new public MDMObjectType ObjectType => _objectType;
         public string Reference { get => _reference; internal set => _reference = value; }
         public Variables? Items => _items;
     }
@@ -25,8 +23,6 @@ namespace IDCA.Bll.MDMDocument
         }
 
         bool _globalNamespace = false;
-
-        new public MDMObjectType ObjectType => _objectType;
         public bool GlobalNamespace { get => _globalNamespace; internal set => _globalNamespace = value; }
     }
 

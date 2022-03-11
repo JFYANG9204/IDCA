@@ -9,7 +9,6 @@ namespace IDCA.Bll.MDMDocument
             _objectType = MDMObjectType.Element;
         }
 
-        new readonly MDMObjectType _objectType;
         IElement? _reference;
         ElementType _type = ElementType.Category;
         CategoryFlag _flag = CategoryFlag.None;
@@ -23,7 +22,6 @@ namespace IDCA.Bll.MDMDocument
         bool _isMultiplierLocal = false;
         bool _versioned = false;
 
-        new public MDMObjectType ObjectType => _objectType;
         public IElement? Reference { get => _reference; internal set => _reference = value; }
         public ElementType Type { get => _type; internal set => _type = value; }
         public CategoryFlag Flag { get => _flag; internal set => _flag = value; }

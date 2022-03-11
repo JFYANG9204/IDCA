@@ -15,9 +15,15 @@ namespace IDCA.Bll.MDMDocument
         int? _upperBound;
         int? _lowerBound;
 
-        new public MDMObjectType ObjectType => _objectType;
-
-        public Variable? Reference { get => _reference; internal set => _reference = value; }
+        public Variable? Reference
+        {
+            get => _reference;
+            internal set
+            {
+                _reference = value;
+                _isReference = value != null;
+            }
+        }
         public Class? Class { get => _class; internal set => _class = value; }
         public IteratorType? IteratorType { get => _iteratorType; internal set => _iteratorType = value; }
         public int? LowerBound { get => _lowerBound; internal set => _lowerBound = value; }

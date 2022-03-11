@@ -14,6 +14,7 @@ EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		IDCA.Bll\IDCA.Bll.projitems*{3ba6375d-4343-4c93-81d3-ea0063e8452a}*SharedItemsImports = 13
+		IDCA.Bll\IDCA.Bll.projitems*{775817b2-7fd6-477b-a0ef-4ba2a44dfaf8}*SharedItemsImports = 5
 		IDCA.Mvvm\IDCA.Mvvm.projitems*{9e9320a8-27f1-4177-9d7d-3eb9b6ba564d}*SharedItemsImports = 13
 		IDCA.Bll\IDCA.Bll.projitems*{f2a06e33-e023-4a09-8d09-1519963e3010}*SharedItemsImports = 5
 		IDCA.Mvvm\IDCA.Mvvm.projitems*{f2a06e33-e023-4a09-8d09-1519963e3010}*SharedItemsImports = 5
