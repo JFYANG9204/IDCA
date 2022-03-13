@@ -119,14 +119,14 @@ namespace IDCA.Bll.MDMDocument
 
             XDocument xmlDocument = new();
             xmlDocument = XDocument.Load(path);
-            XElement? _xmlRoot = xmlDocument.Root;
+            XElement? xmlRoot = xmlDocument.Root;
 
-            if (_xmlRoot is null)
+            if (xmlRoot is null)
             {
                 throw new Exception("文档格式不符合标准，未找到XML根节点。");
             }
 
-            XElement? xmlMDM = _xmlRoot.Element("{http://www.spss.com/mr/dm/metadatamodel/Arc 3/2000-02-04}metadata");
+            XElement? xmlMDM = xmlRoot.Element("{http://www.spss.com/mr/dm/metadatamodel/Arc 3/2000-02-04}metadata");
 
             if (xmlMDM is null)
             {
@@ -136,12 +136,12 @@ namespace IDCA.Bll.MDMDocument
             // 载入标签、上下文等基础配置
             XmlHelper.TryReadElement(_languages, xmlMDM, "languages", XmlHelper.ReadLanguages);
             XmlHelper.TryReadElement(_contexts, xmlMDM, "contexts", XmlHelper.ReadContexts);
+            XmlHelper.TryReadElement(_labelTypes, xmlMDM, "labeltypes", XmlHelper.ReadContexts);
             // 设置当前语言和上下文类型
             _context = _contexts.Base;
             _language = _languages.Base;
 
             XmlHelper.TryReadElement(_labels, xmlMDM, "labels", XmlHelper.ReadLabels);
-            XmlHelper.TryReadElement(_labelTypes, xmlMDM, "labelstyles", XmlHelper.ReadContexts);
             XmlHelper.TryReadElement(_scriptTypes, xmlMDM, "scripttypes", XmlHelper.ReadContexts);
             XmlHelper.TryReadElement(_atoms, xmlMDM, "atoms", XmlHelper.ReadAtoms);
             XmlHelper.TryReadElement(_categoryMap, xmlMDM, "categorymap", XmlHelper.ReadCategoryMap);
@@ -160,12 +160,12 @@ namespace IDCA.Bll.MDMDocument
             XmlHelper.TryReadElement(_properties, xmlMDM, "properties", XmlHelper.ReadProperties);
             XmlHelper.TryReadElement(_templates, xmlMDM, "templates", XmlHelper.ReadProperties);
             // 载入定义
-            XElement? _xmlDefine = xmlMDM.Element("definition");
-            if (_xmlDefine != null)
+            XElement? xmlDefine = xmlMDM.Element("definition");
+            if (xmlDefine != null)
             {
-                XmlHelper.ReadTypes(_types, _xmlDefine);
-                XmlHelper.ReadGloablVariables(_variables, _xmlDefine);
-                XmlHelper.ReadGlobalPages(_pages, _xmlDefine);
+                XmlHelper.ReadTypes(_types, xmlDefine);
+                XmlHelper.ReadGloablVariables(_variables, xmlDefine);
+                XmlHelper.ReadGlobalPages(_pages, xmlDefine);
             }
             // 载入系统变量
             XmlHelper.TryReadElement(_fields, xmlMDM, "system", XmlHelper.ReadSystemFields);

@@ -135,15 +135,15 @@ namespace IDCA.Bll.MDMDocument
 
         public override void Add(T item)
         {
-            string lName = item.Name.ToLower();
-            if (!_cache.ContainsKey(lName) && !string.IsNullOrEmpty(lName))
+            string lowerId = item.Id.ToLower();
+            if (!string.IsNullOrEmpty(lowerId) && !_idCache.ContainsKey(lowerId))
             {
-                _cache.Add(lName, item);
                 base.Add(item);
-                string lId = item.Id.ToLower();
-                if (!_idCache.ContainsKey(lId))
+                _idCache.Add(lowerId, item);
+                string lowerName = item.Name.ToLower();
+                if (!string.IsNullOrEmpty(lowerName) && !_cache.ContainsKey(lowerName))
                 {
-                    _idCache.Add(lId, item);
+                    _cache.Add(lowerName, item);
                 }
             }
         }

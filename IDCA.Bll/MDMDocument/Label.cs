@@ -28,13 +28,13 @@ namespace IDCA.Bll.MDMDocument
         public void Set(string context, string language, string text)
         {
             IContext targetContext = _contexts[context] ?? _contexts.Default;
-            if (targetContext.IsDefault)
+            if (!targetContext.IsDefault)
             {
                 _context = targetContext;
             }
 
-            ILanguage targetLanguage = _languages[context] ?? _languages.Default;
-            if (targetLanguage.IsDefault)
+            ILanguage targetLanguage = _languages[language] ?? _languages.Default;
+            if (!targetLanguage.IsDefault)
             {
                 _language = targetLanguage;
             }

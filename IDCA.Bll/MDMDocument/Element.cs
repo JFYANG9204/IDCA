@@ -23,7 +23,7 @@ namespace IDCA.Bll.MDMDocument
         bool _versioned = false;
 
         public IElement? Reference { get => _reference; internal set => _reference = value; }
-        public ElementType Type { get => _type; internal set => _type = value; }
+        public ElementType ElementType { get => _type; internal set => _type = value; }
         public CategoryFlag Flag { get => _flag; internal set => _flag = value; }
         public Variable? OtherReference { get => _otherReference; internal set => _otherReference = value; }
         public Variable? OtherVariable { get => _otherVariable; internal set => _otherVariable = value; }

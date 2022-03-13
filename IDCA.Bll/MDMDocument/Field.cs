@@ -22,6 +22,24 @@ namespace IDCA.Bll.MDMDocument
             {
                 _reference = value;
                 _isReference = value != null;
+                if (value != null)
+                {
+                    Name = value.Name;
+                    Labels = value.Labels;
+                    DataType = value.DataType;
+                    MinValue = value.MinValue;
+                    MaxValue = value.MaxValue;
+                    EffectiveMaxValue = value.EffectiveMaxValue;
+                    EffectiveMinValue = value.EffectiveMinValue;
+                    Categories = value.Categories;
+                    HelperFields = value.HelperFields;
+                    HasCaseData = value.HasCaseData;
+                    Versioned = value.Versioned;
+                    Properties = value.Properties;
+                    Templates = value.Templates;
+                    Style = value.Style;
+                    LabelStyles = value.LabelStyles;
+                }
             }
         }
         public Class? Class { get => _class; internal set => _class = value; }

@@ -47,6 +47,7 @@ namespace IDCA.Bll.MDMDocument
     {
         internal Context(IMDMObject parent) : base(parent.Document, parent)
         {
+            _objectType = MDMObjectType.Context;
         }
 
         IContextAlternatives? _alternatives = null;
@@ -70,6 +71,7 @@ namespace IDCA.Bll.MDMDocument
         {
             _base = @base;
             _default = new Context(this);
+            _objectType = MDMObjectType.Contexts;
         }
 
         public IContext? this[string name] => _cache.ContainsKey(name.ToLower()) ? _cache[name.ToLower()] : null;

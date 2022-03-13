@@ -37,7 +37,7 @@ namespace IDCA.Bll.MDMDocument
     public interface IMDMNamedCollection<T> : IMDMObjectCollection<T>, IMDMLabeledObject
     {
         /// <summary>
-        /// 依据名称索引集合数据，不区分大小写
+        /// 依据名称索引集合数据，不区分大小写，当有重复名称时，只会返回第一个符合的值。
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>

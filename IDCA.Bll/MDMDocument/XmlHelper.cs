@@ -104,7 +104,7 @@ namespace IDCA.Bll.MDMDocument
             {
                 string context = ReadPropertyStringValue(element, "context");
                 IContext? current;
-                if (!string.IsNullOrEmpty(context) && (current = labels.Document.Contexts[context]) != null)
+                if (!string.IsNullOrEmpty(context) && (current = labels.Document.LabelTypes[context]) != null)
                 {
                     labels.Context = current;
                 }
@@ -190,7 +190,11 @@ namespace IDCA.Bll.MDMDocument
 
         internal static Language ReadLanguage(Language language, XElement element)
         {
-            language.Name = ReadPropertyStringValue(element, "name");
+            string longCode = ReadPropertyStringValue(element, "name");
+            if (!string.IsNullOrEmpty(longCode))
+            {
+                language.SetLongCode(longCode);
+            }
             language.Id = ReadPropertyStringValue(element, "id");
             var properties = element.Element("properties");
             if (properties != null)
@@ -566,7 +570,7 @@ namespace IDCA.Bll.MDMDocument
         {
             element.Name = ReadPropertyStringValue(xElement, "name");
             element.Id = ReadPropertyStringValue(xElement, "id");
-            element.Type = ReadPropertyEnumValue<ElementType>(xElement.Attribute("type"));
+            element.ElementType = ReadPropertyEnumValue<ElementType>(xElement.Attribute("type"));
             FirstChild(xElement, "labels", ele => element.Labels = ReadLabels(new Labels(element, element.Document, ReadPropertyStringValue(ele, "context")), ele));
             FirstChild(xElement, "properties", ele => element.Properties = ReadProperties(new Properties(element), ele));
             FirstChild(xElement, "templates", ele => element.Templates = ReadProperties(new Properties(element), ele));
@@ -733,13 +737,13 @@ namespace IDCA.Bll.MDMDocument
 
         internal static Field ReadField(Field field, XElement element)
         {
+            ReadLabeledObject(field, element);
             XAttribute? refAttr = element.Attribute("ref");
             if (refAttr != null)
             {
                 field.Reference = field.Document.Variables.GetById(refAttr.Value);
                 return field;
             }
-            ReadLabeledObject(field, element);
             field.IteratorType = ReadPropertyEnumValue<IteratorType>(element.Attribute("iteratortype"));
             FirstChild(element, "categories", e => field.Categories = ReadCategories(new Categories(field.Document, field), e));
             FirstChild(element, "class", e => field.Class = ReadFieldClass(new Class(field), e));
@@ -776,8 +780,9 @@ namespace IDCA.Bll.MDMDocument
             ForEachChild(element, "class", e =>
             {
                 var field = fields.NewObject();
-                field.IsSystem = true;
+                field.Class = ReadFieldClass(new Class(field), e);
                 ReadField(field, e);
+                field.IsSystem = true;
                 fields.Add(field);
             });
             return fields;

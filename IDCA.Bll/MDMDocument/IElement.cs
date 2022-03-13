@@ -8,7 +8,7 @@ namespace IDCA.Bll.MDMDocument
     {
         new Properties? Templates { get; }
         IElement? Reference { get; }
-        ElementType Type { get; }
+        ElementType ElementType { get; }
         CategoryFlag Flag { get; }
         Variable? OtherReference { get; }
         Variable? OtherVariable { get; }
