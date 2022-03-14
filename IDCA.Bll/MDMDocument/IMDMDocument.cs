@@ -126,7 +126,15 @@ namespace IDCA.Bll.MDMDocument
         /// 文档的父级对象应为空
         /// </summary>
         new IMDMObject? Parent { get; }
-
-
+        /// <summary>
+        /// 设定当前的上下文类型，需要当前Contexts集合中存在这个名称
+        /// </summary>
+        /// <param name="context"></param>
+        void SetContext(string context);
+        /// <summary>
+        /// 设定当前的语言类型，需要当前Langauges集合中存在这个名称
+        /// </summary>
+        /// <param name="language"></param>
+        void SetLanguage(string language);
     }
 }

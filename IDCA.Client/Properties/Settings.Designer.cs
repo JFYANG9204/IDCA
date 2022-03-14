@@ -22,5 +22,16 @@ namespace IDCA.Client.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection Templates {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["Templates"]));
+            }
+            set {
+                this["Templates"] = value;
+            }
+        }
     }
 }

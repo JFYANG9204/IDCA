@@ -69,8 +69,8 @@ namespace IDCA.Bll.MDMDocument
         public string DataSubVersion { get => _dataSubVersion; private set => _dataSubVersion = value; }
         public bool SystemVariable { get => _systemVariable; private set => _systemVariable = value; }
         public bool DbFilterValidation { get => _dbFilterValidation; private set => _dbFilterValidation = value; }
-        public string Context { get => _context; private set => _context = value; }
-        public string Language { get => _language; private set => _language = value; }
+        public string Context { get => _context; }
+        public string Language { get => _language; }
 
         public IMDMObject Parent => this;
         public IMDMDocument Document => this;
@@ -196,6 +196,24 @@ namespace IDCA.Bll.MDMDocument
             XmlHelper.TryReadElement(_routingContexts, xmlMDM, "routingcontexts", XmlHelper.ReadContexts);
             XmlHelper.TryReadElement(_systemRoutings, xmlMDM, "systemrouting", XmlHelper.ReadRoutings);
             XmlHelper.TryReadElement(_saveLogs, xmlMDM, "savelogs", XmlHelper.ReadSaveLogs);
+        }
+
+        public void SetContext(string context)
+        {
+            IContext? ctx = Contexts[context];
+            if (ctx != null)
+            {
+                _context = ctx.Name;
+            }
+        }
+
+        public void SetLanguage(string language)
+        {
+            ILanguage? lng = _languages[language];
+            if (lng != null)
+            {
+                _language = lng.Name;
+            }
         }
     }
 }
