@@ -97,11 +97,26 @@ namespace IDCA.Bll.MDMDocument
         public MDMObjectType ObjectType => MDMObjectType.Document;
 
 
-        public void Clear()
+        private void Clear()
         {
             _properties.Clear();
             _templates.Clear();
-            
+            _dataSources.Clear();
+            _labels.Clear();
+            _variables.Clear();
+            _fields.Clear();
+            _types.Clear();
+            _pages.Clear();
+            _routings.Clear();
+            _systemRoutings.Clear();
+            _mapping.Clear();
+            _languages.Clear();
+            _contexts.Clear();
+            _labelTypes.Clear();
+            _routingContexts.Clear();
+            _scriptTypes.Clear();
+            _atoms.Clear();
+            _saveLogs.Clear();
         }
 
         public void Close()

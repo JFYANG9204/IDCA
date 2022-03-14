@@ -123,10 +123,6 @@ namespace IDCA.Bll.MDMDocument
         /// </summary>
         void Close();
         /// <summary>
-        /// 清空文档对象内容
-        /// </summary>
-        void Clear();
-        /// <summary>
         /// 文档的父级对象应为空
         /// </summary>
         new IMDMObject? Parent { get; }
