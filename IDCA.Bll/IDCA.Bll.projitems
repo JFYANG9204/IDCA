@@ -11,6 +11,7 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)FileBuilder\Factory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IConfig.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ITemplate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\Categories.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\CategoryMap.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\Class.cs" />
