@@ -32,6 +32,7 @@ namespace IDCA.Bll.MDMDocument
                     EffectiveMaxValue = value.EffectiveMaxValue;
                     EffectiveMinValue = value.EffectiveMinValue;
                     Categories = value.Categories;
+                    Elements = value.Elements;
                     HelperFields = value.HelperFields;
                     HasCaseData = value.HasCaseData;
                     Versioned = value.Versioned;
