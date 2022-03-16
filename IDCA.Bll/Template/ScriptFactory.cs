@@ -12,9 +12,9 @@ namespace IDCA.Bll.Template
         /// <param name="codes">判断选中的码号</param>
         /// <param name="exact">是否仅包含</param>
         /// <returns>脚本代码字符串</returns>
-        internal static string CreateContainsAnyScript(string variable, string codes, bool exact)
+        internal static string CreateContainsAnyScript(string? variable, string? codes, bool exact)
         {
-            return $"{variable}.ContainsAny({{{codes}}}{(exact ? ", True" : "")})";
+            return $"{variable ?? string.Empty}.ContainsAny({{{codes ?? string.Empty}}}{(exact ? ", True" : "")})";
         }
 
         /// <summary>
@@ -24,9 +24,23 @@ namespace IDCA.Bll.Template
         /// <param name="codes">判断选中的码号</param>
         /// <param name="exact">是否包含仅全部</param>
         /// <returns>脚本代码字符串</returns>
-        internal static string CreateContainsAllScript(string variable, string codes, bool exact)
+        internal static string CreateContainsAllScript(string? variable, string? codes, bool exact = false)
         {
-            return $"{variable}.ContainsAll({{{codes}}}{(exact ? ", True" : "")})";
+            return $"{variable ?? string.Empty}.ContainsAll({{{codes ?? string.Empty}}}{(exact ? ", True" : "")})";
+        }
+
+        /// <summary>
+        /// 创建ContainsSome条件判断语句脚本
+        /// </summary>
+        /// <param name="variable">变量名</param>
+        /// <param name="codes">判断选中的码号</param>
+        /// <param name="min">最小数量</param>
+        /// <param name="max">最大数量</param>
+        /// <param name="exact">是否不包含其他</param>
+        /// <returns>脚本代码字符串</returns>
+        internal static string CreateContainsSomeScript(string? variable, string? codes, string? min = null, string? max = null, bool exact = false)
+        {
+            return $"{variable ?? string.Empty}.ContainsSome({{{codes ?? string.Empty}}}{(string.IsNullOrEmpty(min) ? string.Empty : $", {min}")}{(string.IsNullOrEmpty(max) ? string.Empty : $", {max}")}{(exact ? ", True" : string.Empty)})";
         }
 
         /// <summary>
@@ -34,9 +48,9 @@ namespace IDCA.Bll.Template
         /// </summary>
         /// <param name="variable">变量名</param>
         /// <returns>脚本代码字符串</returns>
-        internal static string CreateIsEmptyScript(string variable)
+        internal static string CreateIsEmptyScript(string? variable)
         {
-            return $"{variable}.IsEmpty()";
+            return $"{variable ?? string.Empty}.IsEmpty()";
         }
 
         /// <summary>
@@ -46,45 +60,27 @@ namespace IDCA.Bll.Template
         /// <param name="right">右侧表达式，默认会在两端生成括号</param>
         /// <param name="type">二元操作符类型</param>
         /// <returns>脚本代码字符串</returns>
-        internal static string CreateBinaryScript(string left, string right, BinaryType type)
+        internal static string CreateBinaryScript(string? left, string? right, BinaryOperatorFlags type)
         {
             string logic = string.Empty;
             switch (type)
             {
-                case BinaryType.And:           logic = "And"; break;
-                case BinaryType.Or:            logic = "Or";  break;
-                case BinaryType.Xor:           logic = "Xor"; break;
-                case BinaryType.Equal:         logic = "=";   break;
-                case BinaryType.NotEqual:      logic = "<>";  break;
-                case BinaryType.Plus:          logic = "+";   break;
-                case BinaryType.Min:           logic = "-";   break;
-                case BinaryType.Asterisk:      logic = "*";   break;
-                case BinaryType.Slash:         logic = "/";   break;
-                case BinaryType.Greater:       logic = ">";   break;
-                case BinaryType.GreaterEqual:  logic = ">=";  break;
-                case BinaryType.Less:          logic = "<";   break;
-                case BinaryType.LessEqual:     logic = "<=";  break;
-                default:                                      break;
+                case BinaryOperatorFlags.And:           logic = "And"; break;
+                case BinaryOperatorFlags.Or:            logic = "Or";  break;
+                case BinaryOperatorFlags.Xor:           logic = "Xor"; break;
+                case BinaryOperatorFlags.Equal:         logic = "=";   break;
+                case BinaryOperatorFlags.NotEqual:      logic = "<>";  break;
+                case BinaryOperatorFlags.Plus:          logic = "+";   break;
+                case BinaryOperatorFlags.Min:           logic = "-";   break;
+                case BinaryOperatorFlags.Asterisk:      logic = "*";   break;
+                case BinaryOperatorFlags.Slash:         logic = "/";   break;
+                case BinaryOperatorFlags.Greater:       logic = ">";   break;
+                case BinaryOperatorFlags.GreaterEqual:  logic = ">=";  break;
+                case BinaryOperatorFlags.Less:          logic = "<";   break;
+                case BinaryOperatorFlags.LessEqual:     logic = "<=";  break;
+                default:                                               break;
             }
-            return $"{left} {logic} {right}";
-        }
-
-
-        internal enum BinaryType
-        {
-            And,
-            Or,
-            Xor,
-            Equal,
-            NotEqual,
-            Plus,
-            Min,
-            Asterisk,
-            Slash,
-            Greater,
-            GreaterEqual,
-            Less,
-            LessEqual,
+            return $"{left ?? string.Empty} {logic} {right ?? string.Empty}";
         }
 
         /// <summary>
@@ -92,9 +88,9 @@ namespace IDCA.Bll.Template
         /// </summary>
         /// <param name="right">右侧表达式</param>
         /// <returns>脚本代码字符串</returns>
-        internal static string CreateNotScript(string right)
+        internal static string CreateNotScript(string? right)
         {
-            return $"Not ({right})";
+            return $"Not ({right ?? string.Empty})";
         }
 
         readonly static string tab = "    ";
@@ -109,7 +105,7 @@ namespace IDCA.Bll.Template
             return builder.ToString();
         }
 
-        static string GetMultipleLineScript(int indentLevel, params string[] scripts)
+        static string GetMultipleLineScript(int indentLevel, params string?[] scripts)
         {
             string indent = GetIndent(indentLevel);
             StringBuilder builder = new();
@@ -117,22 +113,22 @@ namespace IDCA.Bll.Template
             {
                 for (int i = 0; i < scripts.Length; i++)
                 {
-                    builder.AppendLine($"{indent}{scripts[i]}");
+                    builder.AppendLine($"{indent}{scripts[i] ?? string.Empty}");
                 }
             }
             return builder.ToString();
         }
 
 
-        static string GetScriptWithVariable(int indentLevel, string[] templates, params string[] variables)
+        static string GetScriptWithVariable(int indentLevel, string?[]? templates, params string?[]? variables)
         {
             string indent = GetIndent(indentLevel);
             StringBuilder builder = new();
-            if (templates.Length > 0)
+            if (variables != null && templates != null && templates.Length > 0)
             {
-                foreach (string template in templates)
+                foreach (string? template in templates)
                 {
-                    builder.AppendLine($"{indent}{string.Format(template, variables)}");
+                    builder.AppendLine($"{indent}{string.Format(template ?? string.Empty, variables)}");
                 }
             }
             return builder.ToString();
@@ -144,14 +140,20 @@ namespace IDCA.Bll.Template
         /// <param name="topVariable">最上级变量名</param>
         /// <param name="parameter">下级变量参数</param>
         /// <returns>脚本代码字符串</returns>
-        internal static string CreateVariableTemplate(string topVariable, (string subVariable, string code)[] parameter)
+        internal static string CreateVariableTemplate(string? topVariable, (string subVariable, string code)[]? parameter = null)
         {
             StringBuilder builder = new();
             builder.Append(topVariable);
-            for (int i = 0; i < parameter.Length; i++)
+            if (parameter != null)
             {
-                var (subVariable, code) = parameter[i];
-                builder.Append($"[{code}].{subVariable}");
+                for (int i = 0; i < parameter.Length; i++)
+                {
+                    var (subVariable, code) = parameter[i];
+                    if (!string.IsNullOrEmpty(subVariable) && !string.IsNullOrEmpty(code))
+                    {
+                        builder.Append($"[{code}].{subVariable}");
+                    }
+                }
             }
             return builder.ToString();
         }
@@ -162,12 +164,12 @@ namespace IDCA.Bll.Template
         /// <param name="test">If测试的条件语句</param>
         /// <param name="thens">条件为True时执行的语句</param>
         /// <returns>脚本代码字符串</returns>
-        internal static string CreateIfScript(string test, string[] thens, int indentLevel = 0)
+        internal static string CreateIfScript(string? test, string?[] thens, int indentLevel = 0)
         {
             string indent = GetIndent(indentLevel);
             string then = GetMultipleLineScript(indentLevel, thens);
             bool endIf = thens.Length > 1;
-            return endIf ? $"{indent}If {test} Then\n{indent}{tab}{then}\n{indent}End If" : $"{indent}If {test} Then {then}";
+            return endIf ? $"{indent}If {test ?? string.Empty} Then\n{indent}{tab}{then}\n{indent}End If" : $"{indent}If {test ?? string.Empty} Then {then}";
         }
 
         /// <summary>
@@ -198,7 +200,7 @@ namespace IDCA.Bll.Template
         }
 
         /// <summary>
-        /// 创建For variable = lbound To ubound ... Next 格式的For循环语句
+        /// 创建For [variable] = [lbound] To [ubound] ... Next 格式的For循环语句
         /// </summary>
         /// <param name="indentLevel">缩进级别</param>
         /// <param name="variable">循环变量名</param>
@@ -207,14 +209,14 @@ namespace IDCA.Bll.Template
         /// <param name="uBound">下限</param>
         /// <param name="templates">循环体语句模板，需要是字符串替换模板</param>
         /// <returns>脚本代码字符串</returns>
-        internal static string CreateForScript(int indentLevel, string variable, string[] totalVariable, string lBound, string uBound, string[] templates)
+        internal static string CreateForScript(int indentLevel, string? variable, string[]? totalVariable, string? lBound, string? uBound, string?[]? templates)
         {
             string indent = GetIndent(indentLevel);
-            return $"{indent}For {variable} = {lBound} To {uBound}\n{GetScriptWithVariable(indentLevel, templates, totalVariable)}\n{indent}Next";
+            return $"{indent}For {variable ?? string.Empty} = {lBound ?? string.Empty} To {uBound ?? string.Empty}\n{GetScriptWithVariable(indentLevel, templates, totalVariable)}\n{indent}Next";
         }
 
         /// <summary>
-        /// 创建For Each variable In collection ... Next格式的For循环语句
+        /// 创建For Each [variable] In [collection] ... Next格式的For循环语句
         /// </summary>
         /// <param name="indentLevel">缩进级别</param>
         /// <param name="variable">循环变量名</param>
@@ -222,10 +224,80 @@ namespace IDCA.Bll.Template
         /// <param name="collection">集合变量名</param>
         /// <param name="templates">循环体语句模板，需要是字符串替换模板</param>
         /// <returns>脚本代码字符串</returns>
-        internal static string CreateForEachScript(int indentLevel, string variable, string[] totalVariable, string collection, string[] templates)
+        internal static string CreateForEachScript(int indentLevel, string? variable, string?[]? totalVariable, string? collection, string?[]? templates)
         {
             string indent = GetIndent(indentLevel);
-            return $"{indent}For Each {variable} In {collection}\n{GetScriptWithVariable(indentLevel, templates, totalVariable)}\n{indent}Next";
+            return $"{indent}For Each {variable ?? string.Empty} In {collection ?? string.Empty}\n{GetScriptWithVariable(indentLevel, templates, totalVariable)}\n{indent}Next";
+        }
+
+        /// <summary>
+        /// 创建While [Test] ... End While格式的While循环语句
+        /// </summary>
+        /// <param name="indentLevel">缩进级别</param>
+        /// <param name="test">循环判断语句</param>
+        /// <param name="totalVariable">所有级别循环的变量名，顺序需要和templates代码模板中的替换顺序相同</param>
+        /// <param name="templates">循环体脚本语句模板</param>
+        /// <returns>脚本代码字符串</returns>
+        internal static string CreateWhileScript(int indentLevel, string? test, string?[]? totalVariable, string?[]? templates)
+        {
+            string indent = GetIndent(indentLevel);
+            return $"{indent}While {test ?? string.Empty}\n{GetScriptWithVariable(indentLevel, templates, totalVariable)}\n{indent}End While";
+        }
+
+        /// <summary>
+        /// 创建Do ... Loop While [TestExpression]格式的DoLoop循环语句
+        /// </summary>
+        /// <param name="indentLevel">缩进级别</param>
+        /// <param name="test">循环判断语句</param>
+        /// <param name="totalVariable">所有级别循环的变量名，顺序需要和templates代码模板中的替换顺序相同</param>
+        /// <param name="templates">循环体脚本语句模板</param>
+        /// <returns>脚本代码字符串</returns>
+        internal static string CreateDoLoopWhileScript(int indentLevel, string? test, string?[]? totalVariable, string?[]? templates)
+        {
+            string indent = GetIndent(indentLevel);
+            return $"{indent}Do\n{GetScriptWithVariable(indentLevel, templates, totalVariable)}\n{indent}Loop While {test ?? string.Empty}";
+        }
+
+        /// <summary>
+        /// 创建Do ... Loop Until [TestExpression]格式的DoLoop循环语句
+        /// </summary>
+        /// <param name="indentLevel">缩进级别</param>
+        /// <param name="test">循环判断语句</param>
+        /// <param name="totalVariable">所有级别循环的变量名，顺序需要和templates代码模板中的替换顺序相同</param>
+        /// <param name="templates">循环体脚本语句模板</param>
+        /// <returns>脚本代码字符串</returns>
+        internal static string CreateDoLoopUntilScript(int indentLevel, string? test, string?[]? totalVariable, string?[]? templates)
+        {
+            string indent = GetIndent(indentLevel);
+            return $"{indent}Do\n{GetScriptWithVariable(indentLevel, templates, totalVariable)}\n{indent}Loop Until {test ?? string.Empty}";
+        }
+
+        /// <summary>
+        /// 创建Do While [TestExpression]... Loop格式的DoLoop循环语句
+        /// </summary>
+        /// <param name="indentLevel">缩进级别</param>
+        /// <param name="test">循环判断语句</param>
+        /// <param name="totalVariable">所有级别循环的变量名，顺序需要和templates代码模板中的替换顺序相同</param>
+        /// <param name="templates">循环体脚本语句模板</param>
+        /// <returns>脚本代码字符串</returns>
+        internal static string CreateDoWhileLoopScript(int indentLevel, string? test, string?[]? totalVariable, string?[]? templates)
+        {
+            string indent = GetIndent(indentLevel);
+            return $"{indent}Do While {test ?? string.Empty}\n{GetScriptWithVariable(indentLevel, templates, totalVariable)}\n{indent}Loop";
+        }
+
+        /// <summary>
+        /// 创建Do Until [TestExpression]... Loop格式的DoLoop循环语句
+        /// </summary>
+        /// <param name="indentLevel">缩进级别</param>
+        /// <param name="test">循环判断语句</param>
+        /// <param name="totalVariable">所有级别循环的变量名，顺序需要和templates代码模板中的替换顺序相同</param>
+        /// <param name="templates">循环体脚本语句模板</param>
+        /// <returns>脚本代码字符串</returns>
+        internal static string CreateDoUntilLoopScript(int indentLevel, string? test, string?[]? totalVariable, string?[]? templates)
+        {
+            string indent = GetIndent(indentLevel);
+            return $"{indent}Do Until {test ?? string.Empty}\n{GetScriptWithVariable(indentLevel, templates, totalVariable)}\n{indent}Loop";
         }
 
     }

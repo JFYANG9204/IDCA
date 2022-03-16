@@ -36,12 +36,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)SpecDocument\ISpecDocument.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SpecDocument\ISpecObject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SpecDocument\ISpecObjectCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Template\TemplateLoader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Template\ScriptFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SpecDocument\SpecObject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SpecDocument\SpecObjectCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Template\Template.cs" />
-    <Compile Include="..\IDCA.Bll\Template\ITemplateParameter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Template\ITemplate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Template\TemplateParameter.cs" />
     <Compile Include="..\IDCA.Bll\MDMDocument\IMDMDocument.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\IElement.cs" />
