@@ -31,7 +31,7 @@ namespace IDCA.Bll.Template
 
         protected string _content;
         protected readonly TemplateType _type;
-        protected readonly TemplateParameters<TemplateParameter> _parameters;
+        protected readonly TemplateParameters _parameters;
 
         /// <summary>
         /// 模板类型
@@ -40,7 +40,7 @@ namespace IDCA.Bll.Template
         /// <summary>
         /// 模板参数集合
         /// </summary>
-        public TemplateParameters<TemplateParameter> Parameters => _parameters;
+        public TemplateParameters Parameters => _parameters;
         /// <summary>
         /// 按照当前的参数配置进行文本修改，返回最终结果
         /// </summary>
@@ -224,7 +224,7 @@ namespace IDCA.Bll.Template
             Parameters.Add(parameter);
         }
 
-        struct FieldLevel
+        class FieldLevel
         {
             public FieldLevel(string codeName, string variableName, bool isCategorical)
             {
@@ -248,7 +248,7 @@ namespace IDCA.Bll.Template
                     FieldLevel? fieldLevel = Parameters[i].GetValue<FieldLevel>();
                     if (fieldLevel != null)
                     {
-                        fields[i] = new(fieldLevel.Value.VariableName, fieldLevel.Value.IsCategorical ? $"{{{fieldLevel.Value.CodeName}}}" : fieldLevel.Value.CodeName);
+                        fields[i] = new(fieldLevel.VariableName, fieldLevel.IsCategorical ? $"{{{fieldLevel.CodeName}}}" : fieldLevel.CodeName);
                     }
                 }
                 result = ScriptFactory.CreateVariableTemplate(_topField, fields);
@@ -292,8 +292,15 @@ namespace IDCA.Bll.Template
         /// </summary>
         public string FunctionTemplate { get => _functionTemplate; set => _functionTemplate = value; }
 
-        struct FunctionParameter
+        class FunctionParameter
         {
+            public FunctionParameter(string name, string value, TemplateValueType valueType)
+            {
+                Name = name;
+                Value = value;
+                Type = valueType;
+            }
+
             public string Name { get; set; }
             public string Value { get; set; }
             public TemplateValueType Type { get; set; }
@@ -324,8 +331,26 @@ namespace IDCA.Bll.Template
         {
             var parameter = Parameters.NewObject();
             parameter.Name = parameterName;
-            parameter.Value = new FunctionParameter() { Name = parameterName, Value = parameterValue, Type = valueType };
+            parameter.Value = new FunctionParameter(parameterName, parameterValue, valueType);
             Parameters.Add(parameter);
+        }
+
+        /// <summary>
+        /// 修改指定索引位置的变量值
+        /// </summary>
+        /// <param name="index">参数位置，0开始</param>
+        /// <param name="value">需要修改的参数值</param>
+        public void SetParameterValue(int index, string value, TemplateValueType valueType)
+        {
+            if (index < 0 || index >= Parameters.Count)
+            {
+                return;
+            }
+            if (Parameters[index].Value is FunctionParameter param)
+            {
+                param.Value = value;
+                param.Type = valueType;
+            }
         }
 
         public override string Exec()
@@ -339,7 +364,7 @@ namespace IDCA.Bll.Template
                     FunctionParameter? functionParam = param.GetValue<FunctionParameter>();
                     if (functionParam != null)
                     {
-                        result = result.Replace(functionParam.Value.GetTemplate(), functionParam.Value.GetValue(), StringComparison.OrdinalIgnoreCase);
+                        result = result.Replace(functionParam.GetTemplate(), functionParam.GetValue(), StringComparison.OrdinalIgnoreCase);
                     }
                 }
             }

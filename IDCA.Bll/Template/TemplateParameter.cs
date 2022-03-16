@@ -5,16 +5,24 @@ using System.Collections.Generic;
 
 namespace IDCA.Bll.Template
 {
+
+    public enum TemplateParameterUsage
+    {
+
+    }
+
     public class TemplateParameter
     {
-        public TemplateParameter()
+        public TemplateParameter(TemplateParameters parent)
         {
             _name = "";
             _value = "";
+            _parameters = parent;
         }
 
         string _name;
         object _value;
+        readonly TemplateParameters _parameters;
 
         /// <summary>
         /// 变量名
@@ -24,6 +32,10 @@ namespace IDCA.Bll.Template
         /// 变量的值
         /// </summary>
         public object Value { get => _value; set => _value = value; }
+        /// <summary>
+        /// 所在的参数集合对象
+        /// </summary>
+        public TemplateParameters TemplateParameters => _parameters;
 
         /// <summary>
         /// 转换为字符串类型的模板参数替换模板，格式为：$[variable]
@@ -71,7 +83,7 @@ namespace IDCA.Bll.Template
 
     }
 
-    public class TemplateParameters<T> where T : TemplateParameter, new()
+    public class TemplateParameters
     {
         internal TemplateParameters(Template template)
         {
@@ -79,14 +91,14 @@ namespace IDCA.Bll.Template
         }
 
         readonly Template _template;
-        readonly List<T> _parameters = new();
+        readonly List<TemplateParameter> _parameters = new();
 
         /// <summary>
         /// 根据数值索引当前位置的元素信息
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        public T this[int index]
+        public TemplateParameter this[int index]
         {
             get
             {
@@ -111,7 +123,7 @@ namespace IDCA.Bll.Template
         /// 将模板参数对象添加进集合
         /// </summary>
         /// <param name="templateParameter">需要添加的模板参数对象</param>
-        public void Add(T templateParameter)
+        public void Add(TemplateParameter templateParameter)
         {
             _parameters.Add(templateParameter);
         }
@@ -120,9 +132,9 @@ namespace IDCA.Bll.Template
         /// 创建新的模板参数对象
         /// </summary>
         /// <returns></returns>
-        public T NewObject()
+        public TemplateParameter NewObject()
         {
-            return new();
+            return new(this);
         }
 
         public IEnumerator GetEnumerator()
