@@ -1,6 +1,5 @@
 ﻿
 using System.Collections.Generic;
-using System.Linq;
 
 namespace IDCA.Bll.SpecDocument
 {
@@ -17,7 +16,7 @@ namespace IDCA.Bll.SpecDocument
 
         public override string ToString()
         {
-            string text = _items.Cast<string>().Aggregate((left, right) => $"{left}, {right}");
+            string text = string.Join(',', _items);
             return _type == AxisType.Normal ? $"{{{text}}}" : $"axis({{{text}}})";
         }
     }
@@ -113,7 +112,7 @@ namespace IDCA.Bll.SpecDocument
         {
             if (_items.Count > 0)
             {
-                string value = _items.Aggregate((left, right) => $"{left},{right}");
+                string value = string.Join(',', _items);
                 return _isCategorical ? $"{{{value}}}" : value;
             }
             return string.Empty;

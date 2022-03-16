@@ -5,9 +5,20 @@ using System.Collections.Generic;
 
 namespace IDCA.Bll.Template
 {
-
+    
     public enum TemplateParameterUsage
     {
+        None = 0,
+        
+        ManipulateVariable,
+        ManipulateCode,
+        ManipulateLabel,
+        ManipulateValue,
+
+        TableTopVariable,
+        TableSideVariable,
+        TableTitle,
+        TableBaseText,
 
     }
 
@@ -18,11 +29,13 @@ namespace IDCA.Bll.Template
             _name = "";
             _value = "";
             _parameters = parent;
+            _usage = TemplateParameterUsage.None;
         }
 
         string _name;
         object _value;
         readonly TemplateParameters _parameters;
+        TemplateParameterUsage _usage;
 
         /// <summary>
         /// 变量名
@@ -36,6 +49,10 @@ namespace IDCA.Bll.Template
         /// 所在的参数集合对象
         /// </summary>
         public TemplateParameters TemplateParameters => _parameters;
+        /// <summary>
+        /// 参数用处
+        /// </summary>
+        public TemplateParameterUsage Usage { get => _usage; set => _usage = value; }
 
         /// <summary>
         /// 转换为字符串类型的模板参数替换模板，格式为：$[variable]

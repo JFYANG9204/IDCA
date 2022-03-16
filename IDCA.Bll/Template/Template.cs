@@ -416,4 +416,29 @@ namespace IDCA.Bll.Template
         }
 
     }
+
+
+    public class DeclareExpressionTemplate : ExpressionTemplate
+    {
+        public DeclareExpressionTemplate() : base()
+        {
+            _flag = ExpressionTemplateFlags.DeclareVariable;
+        }
+
+        public override string Exec()
+        {
+            string result = string.Empty;
+            if (Parameters.Count > 0)
+            {
+                string?[] parameters = new string[Parameters.Count];
+                for (int i = 0; i < Parameters.Count; i++)
+                {
+                    parameters[i] = Parameters[i].GetValue<string>();
+                }
+                result = ScriptFactory.CreateDeclareScript(parameters);
+            }
+            return result;
+        }
+    }
+
 }

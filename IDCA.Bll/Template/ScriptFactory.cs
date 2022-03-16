@@ -54,6 +54,16 @@ namespace IDCA.Bll.Template
         }
 
         /// <summary>
+        /// 创建变量声明脚本语句
+        /// </summary>
+        /// <param name="variables"></param>
+        /// <returns></returns>
+        internal static string CreateDeclareScript(string?[] variables)
+        {
+            return $"Dim {(variables == null ? string.Empty : string.Join(',', variables))}";
+        }
+
+        /// <summary>
         /// 创建二元操作符语句，需要提供左值和右值
         /// </summary>
         /// <param name="left">左侧表达式，默认会在两端生成括号</param>
