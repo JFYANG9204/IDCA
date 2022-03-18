@@ -188,8 +188,13 @@ namespace IDCA.Bll.Template
         /// <param name="indentLevel">缩放级别</param>
         /// <param name="parameters">多级条件和后续语句</param>
         /// <returns>脚本代码字符串</returns>
-        internal static string CreateIfElseScript(int indentLevel, params (string test, string[] thens)[] parameters)
+        internal static string CreateIfElseScript(int indentLevel, params (string test, string[] thens)[]? parameters)
         {
+            if (parameters == null)
+            {
+                return string.Empty;
+            }
+
             if (parameters.Length == 1)
             {
                 return CreateIfScript(parameters[0].test, parameters[0].thens, indentLevel);

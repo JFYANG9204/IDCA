@@ -10,24 +10,49 @@ namespace IDCA.Bll.Template
     {
         None = 0,
         
-        ManipulateVariable,
-        ManipulateCode,
-        ManipulateLabel,
+        ManipulateMDMDocument,
+        ManipulateContextType,
+        ManipulateLanguageType,
+        ManipulateVariableName,
+        ManipulateCodeName,
+        ManipulateLabelText,
         ManipulateValue,
 
-        TableTopVariable,
-        TableSideVariable,
-        TableTitle,
+        TableTopVariableName,
+        TableSideVariableName,
+        TableTitleText,
         TableBaseText,
+        TableFilterText,
+        TableExtraSettings,
+
+        ScriptDeclaration,
+        ScriptLowerBoundary,
+        ScriptUpperBoundary,
+        ScriptForVariable,
+        ScriptCollection,
+        ScriptTest,
+        ScriptBody,
+        ScriptLoopVariables,
+        ScriptTopField,
+        ScriptLevelField,
+        ScriptObjectName,
+        ScriptFunctionTemplate,
+        ScriptBinaryLeft,
+        ScriptBinaryRight,
+
+        FunctionTemplate,
+        FunctionName,
+        FunctionParameters,
 
     }
 
-    public class TemplateParameter
+    [Serializable]
+    public class TemplateParameter : ICloneable
     {
         public TemplateParameter(TemplateParameters parent)
         {
             _name = "";
-            _value = "";
+            _value = new object[1];
             _parameters = parent;
             _usage = TemplateParameterUsage.None;
         }
@@ -42,10 +67,6 @@ namespace IDCA.Bll.Template
         /// </summary>
         public string Name { get => _name; set => _name = value; }
         /// <summary>
-        /// 变量的值
-        /// </summary>
-        public object Value { get => _value; set => _value = value; }
-        /// <summary>
         /// 所在的参数集合对象
         /// </summary>
         public TemplateParameters TemplateParameters => _parameters;
@@ -53,6 +74,10 @@ namespace IDCA.Bll.Template
         /// 参数用处
         /// </summary>
         public TemplateParameterUsage Usage { get => _usage; set => _usage = value; }
+        /// <summary>
+        /// 当前保存的参数值数量
+        /// </summary>
+        //public int Count => _value.Length;
 
         /// <summary>
         /// 转换为字符串类型的模板参数替换模板，格式为：$[variable]
@@ -64,43 +89,114 @@ namespace IDCA.Bll.Template
         }
 
         /// <summary>
+        /// 设置参数的值，允许保存多个值
+        /// </summary>
+        /// <param name="value">设置的参数值</param>
+        public void SetValue(object value)
+        {
+            _value = value;
+        }
+
+        /// <summary>
+        /// 尝试向当前值集合末尾添加新的参数对象
+        /// </summary>
+        /// <param name="value"></param>
+        public void TryPushParam(object value, TemplateParameterUsage usage)
+        {
+            if (_value is null)
+            {
+                _value = new TemplateParameters(_parameters.Template);
+            }
+
+            if (_value is TemplateParameters parameters)
+            {
+                var param = parameters.NewObject();
+                param.Usage = usage;
+                param.SetValue(value);
+                parameters.Add(param);
+            }
+        }
+
+        /// <summary>
+        /// 尝试向当前参数值数组末尾追加值，需要当前值为数组类型
+        /// </summary>
+        /// <param name="value"></param>
+        public void TryPushValue(object value)
+        {
+            if (_value is object[] array)
+            {
+                Array.Resize(ref array, array.Length);
+                array[^1] = value;
+            }
+        }
+
+        /// <summary>
+        /// 获取指定索引位置的参数值
+        /// </summary>
+        /// <param name="usage">参数用处</param>
+        /// <returns></returns>
+        public TemplateParameter? GetValue(TemplateParameterUsage usage)
+        {
+            if (_value is TemplateParameters parameters)
+            {
+                return parameters[usage];
+            }
+            return null;
+        }
+
+        /// <summary>
         /// 获取当前模板参数值的字符串类型值
         /// </summary>
         /// <returns></returns>
         public OutType? GetValue<OutType>()
         {
-            Type type = typeof(OutType);
-            Type valueType = _value.GetType();
-
-            if (type.Equals(typeof(string)) && _value is Template template)
+            if (typeof(OutType).IsInstanceOfType(_value))
             {
-                return (OutType)(object)template.Exec();
+                return (OutType)_value;
             }
-
-            if (type.Equals(valueType))
-            {
-                return (OutType?)_value;
-            }
-
             return default;
         }
 
         /// <summary>
-        /// 获取元组格式的模板参数值，如果Value属性的类型不是元组类型，则返回空元组
+        /// 尝试获取特定类型的参数值列表，如果没有符合类型的值，返回空列表
         /// </summary>
+        /// <typeparam name="OutType">需要匹配的参数值类型</typeparam>
         /// <returns></returns>
-        public (OutType1, OutType2) GetTupleValue<OutType1, OutType2>()
+        public OutType[] TryGetArray<OutType>(TemplateParameterUsage? usage = null)
         {
-            if (_value is (OutType1 item1, OutType2 item2))
+            List<OutType> array = new();
+            if (_value is TemplateParameters parameters)
             {
-                return new(item1, item2);
+                parameters.All(param =>
+                {
+                    var value = param.GetValue<OutType>();
+                    if (value != null)
+                    {
+                        array.Add(value);
+                    }
+                }, usage);
             }
-            return new();
+            return array.ToArray();
         }
 
+        public object Clone()
+        {
+            TemplateParameter clone = new(_parameters);
+            if (_value is ICloneable cloneable)
+            {
+                clone.SetValue(cloneable.Clone());
+            }
+            else
+            {
+                clone.SetValue(_value);
+            }
+            clone.Usage = _usage;
+            clone.Name = _name;
+            return clone;
+        }
     }
 
-    public class TemplateParameters
+    public class TemplateParameters : ICloneable
     {
         internal TemplateParameters(Template template)
         {
@@ -109,6 +205,7 @@ namespace IDCA.Bll.Template
 
         readonly Template _template;
         readonly List<TemplateParameter> _parameters = new();
+        readonly Dictionary<TemplateParameterUsage, TemplateParameter> _usageCache = new();
 
         /// <summary>
         /// 根据数值索引当前位置的元素信息
@@ -128,6 +225,13 @@ namespace IDCA.Bll.Template
         }
 
         /// <summary>
+        /// 依据参数用途获取指定的模板参数，如果不存在该用途的参数，返回null
+        /// </summary>
+        /// <param name="usage"></param>
+        /// <returns></returns>
+        public TemplateParameter? this[TemplateParameterUsage usage] => _usageCache.ContainsKey(usage) ? _usageCache[usage] : null;
+
+        /// <summary>
         /// 模板参数集合所在的模板对象
         /// </summary>
         public Template Template => _template;
@@ -137,12 +241,50 @@ namespace IDCA.Bll.Template
         public int Count => _parameters.Count;
 
         /// <summary>
-        /// 将模板参数对象添加进集合
+        /// 将模板参数对象添加进集合，相同用途的参数值可以存在多个，但是按用途索引时只会所引到最后一个
         /// </summary>
         /// <param name="templateParameter">需要添加的模板参数对象</param>
         public void Add(TemplateParameter templateParameter)
         {
             _parameters.Add(templateParameter);
+            if (!_usageCache.ContainsKey(templateParameter.Usage))
+            {
+                _usageCache.Add(templateParameter.Usage, templateParameter);
+            }
+            else
+            {
+                _usageCache[templateParameter.Usage] = templateParameter;
+            }
+        }
+
+        /// <summary>
+        /// 遍历列表中的所有元素，对所有元素执行回调函数
+        /// </summary>
+        /// <param name="callback"></param>
+        public void All(Action<TemplateParameter> callback, TemplateParameterUsage? usage = null)
+        {
+            foreach (TemplateParameter param in _parameters)
+            {
+                if (usage == null || param.Usage == usage)
+                {
+                    callback(param);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 遍历列表中的所有元素，对所有元素执行回调函数，回调函数接收索引值
+        /// </summary>
+        /// <param name="callback"></param>
+        public void All(Action<TemplateParameter, int> callback, TemplateParameterUsage? usage = null)
+        {
+            for (int i = 0; i < _parameters.Count; i++)
+            {
+                if (usage == null || _parameters[i].Usage == usage)
+                {
+                    callback(_parameters[i], i);
+                }
+            }
         }
 
         /// <summary>
@@ -159,48 +301,27 @@ namespace IDCA.Bll.Template
             return _parameters.GetEnumerator();
         }
 
-        /// <summary>
-        /// 从特定起始索引开始，获取对应的参数数组
-        /// </summary>
-        /// <param name="startIndex"></param>
-        /// <returns></returns>
-        public OutType?[] GetParameters<OutType>(int startIndex)
+        
+        public TemplateParameter? GetValue(TemplateParameterUsage usage)
         {
-            if (_parameters.Count == 0 || startIndex >= _parameters.Count)
+            if (!_usageCache.ContainsKey(usage))
             {
-                return Array.Empty<OutType?>();
+                return default;
             }
-            OutType?[] result = new OutType[_parameters.Count - startIndex];
-            int count = 0;
-            for (int i = startIndex; i < _parameters.Count; i++)
-            {
-                result[count++] = _parameters[i].GetValue<OutType>();
-            }
-            return result;
+            return _usageCache[usage];
         }
 
-        /// <summary>
-        /// 从特定起始索引开始，获取对应的元组参数数组
-        /// </summary>
-        /// <typeparam name="OutType1">元组第一个元素类型</typeparam>
-        /// <typeparam name="OutType2">元组第二个元组类型</typeparam>
-        /// <param name="startIndex">起始索引</param>
-        /// <returns>模板参数元组数组</returns>
-        public (OutType1, OutType2)[] GetTupleParameters<OutType1, OutType2>(int startIndex)
+        public object Clone()
         {
-            if (_parameters.Count == 0 || startIndex >= _parameters.Count)
+            TemplateParameters clone = new(_template);
+            foreach (var item in _parameters)
             {
-                return Array.Empty<(OutType1, OutType2)>();
+                TemplateParameter clonedItem = (TemplateParameter)item.Clone();
+                clone._parameters.Add(clonedItem);
+                clone._usageCache.Add(clonedItem.Usage, clonedItem);
             }
-            (OutType1, OutType2)[] result = new (OutType1, OutType2)[_parameters.Count - startIndex];
-            int count = 0;
-            for (int i = startIndex; i < _parameters.Count; i++)
-            {
-                result[count++] = _parameters[i].GetTupleValue<OutType1, OutType2>();
-            }
-            return result;
+            return clone;
         }
-
     }
 
 }

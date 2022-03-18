@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<xml>
+	<template name="MddManipulation" usage="1" filename="MddManipulation.mrs" />
+	<template name="Tab" usage="2" filename="Tab.mrs"/>
+	<template name="OnNextCase" usage="3" filename="OnNextCase.mrs" />
+</xml>
