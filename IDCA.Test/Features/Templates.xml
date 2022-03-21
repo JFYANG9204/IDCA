@@ -11,4 +11,5 @@
 	<template name="OnNextCase" type="1" flag="4" filename="OnNextCase.mrs" />
 	<template name="MetadataFile" type="1" flag="5" filename="sbMetadata.mrs" />
 	<template name="DmsMetadataFile" type="1" flag="6" filename="Metadata_dms.mrs" />
+	<template name="Library" type="99" path="Library" />
 </xml>

@@ -32,6 +32,7 @@ namespace IDCA.Bll.Template
         string _path;
 
         readonly List<FileTemplate> _libraryFileTemplates = new();
+        readonly List<FileTemplate> _otherUsefulFileTemplates = new();
         readonly Dictionary<FileTemplateFlags, Template> _fileTemplates = new();
         readonly Dictionary<FunctionTemplateFlags, Template> _functionTemplates = new();
         readonly Dictionary<ScriptTemplateFlags, Template> _scriptTemplates = new();
@@ -116,10 +117,22 @@ namespace IDCA.Bll.Template
                         {
                             Directory = directory = TryReadStringValue(element.Attribute("path")),
                             FileName = fileName = TryReadStringValue(element.Attribute("filename")),
-                            Content = TryReadTextFile(Path.Combine(_path, directory, fileName)),
                             Flag = fileFlag
                         };
-                        SetTemplateValue(template, fileFlag, _fileTemplates);
+                        ((FileTemplate)template).SetContent(TryReadTextFile(Path.Combine(_path, directory, fileName)));
+
+                        if (fileFlag == FileTemplateFlags.LibraryFile)
+                        {
+                            _libraryFileTemplates.Add((FileTemplate)template);
+                        }
+                        else if (fileFlag == FileTemplateFlags.OtherUsefulFile)
+                        {
+                            _otherUsefulFileTemplates.Add((FileTemplate)template);
+                        }
+                        else
+                        {
+                            SetTemplateValue(template, fileFlag, _fileTemplates);
+                        }
                         break;
                     }
 
@@ -155,7 +168,7 @@ namespace IDCA.Bll.Template
                                 fileTemplate.FileName = Path.GetFileName(file);
                                 fileTemplate.Directory = Path.GetDirectoryName(file) ?? string.Empty;
                                 fileTemplate.Flag = FileTemplateFlags.LibraryFile;
-                                fileTemplate.Content = TryReadTextFile(file);
+                                fileTemplate.SetContent(TryReadTextFile(file));
                                 _libraryFileTemplates.Add(fileTemplate);
                             }
                         }

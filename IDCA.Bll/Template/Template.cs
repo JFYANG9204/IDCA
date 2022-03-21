@@ -78,19 +78,16 @@ namespace IDCA.Bll.Template
     {
         public Template(TemplateType type)
         {
-            _content = "";
             _type = type;
             _parameters = new(this);
         }
 
         protected Template(Template template)
         {
-            _content = template.Content;
             _type = template.Type;
             _parameters = new(this);
         }
 
-        protected string _content;
         protected readonly TemplateType _type;
         protected readonly TemplateParameters _parameters;
 
@@ -112,10 +109,6 @@ namespace IDCA.Bll.Template
         /// </summary>
         /// <returns></returns>
         public abstract object Clone();
-        /// <summary>
-        /// 文件文本模板内容，所有需要替换的内容需要满足格式 ：$[variable]，变量名不区分大小写
-        /// </summary>
-        public string Content { get => _content; set => _content = value; }
         /// <summary>
         /// 将当前的模板参数复制进新的对象中
         /// </summary>
@@ -220,6 +213,7 @@ namespace IDCA.Bll.Template
             _directory = "";
             _fileName = "";
             _flag = FileTemplateFlags.None;
+            _content = new();
         }
 
         protected FileTemplate(FileTemplate template) : base(template)
@@ -227,11 +221,13 @@ namespace IDCA.Bll.Template
             _directory = template.Directory;
             _fileName = template.FileName;
             _flag = FileTemplateFlags.None;
+            _content = new();
         }
 
         string _directory;
         string _fileName;
         FileTemplateFlags _flag;
+        protected StringBuilder _content;
 
         /// <summary>
         /// 模板文件路径
@@ -245,10 +241,34 @@ namespace IDCA.Bll.Template
         /// 文件类型标记
         /// </summary>
         public FileTemplateFlags Flag { get => _flag; set => _flag = value; }
+        /// <summary>
+        /// 文件文本模板内容，所有需要替换的内容需要满足格式 ：$[variable]，变量名不区分大小写
+        /// </summary>
+        public string Content { get => _content.ToString(); }
+
+        /// <summary>
+        /// 设置当前的文本内容，会清除之前已有的内容
+        /// </summary>
+        /// <param name="content"></param>
+        public void SetContent(string content)
+        {
+            _content.Clear();
+            _content.Append(content);
+        }
+
+        /// <summary>
+        /// 向当前的内容后追加新的文本内容，会在之前添加新行
+        /// </summary>
+        /// <param name="value"></param>
+        public void Append(string value)
+        {
+            _content.AppendLine();
+            _content.Append(value);
+        }
 
         public override string Exec()
         {
-            string result = _content;
+            string result = _content.ToString();
             if (_parameters.Count > 0)
             {
                 foreach (TemplateParameter parameter in Parameters)
