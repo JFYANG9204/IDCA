@@ -9,40 +9,45 @@ namespace IDCA.Bll.Template
     public enum TemplateParameterUsage
     {
         None = 0,
+
+        JobProjectPath = 101,
+        JobMetaDataName = 102,
+        JobContextType = 103,
+        JobLanguageType = 104,
         
-        ManipulateMDMDocument,
-        ManipulateContextType,
-        ManipulateLanguageType,
-        ManipulateVariableName,
-        ManipulateCodeName,
-        ManipulateLabelText,
-        ManipulateValue,
+        ManipulateMDMDocument = 201,
+        ManipulateContextType = 202,
+        ManipulateLanguageType = 203,
+        ManipulateVariableName = 204,
+        ManipulateCodeName = 205,
+        ManipulateLabelText = 206,
+        ManipulateValue = 207,
 
-        TableTopVariableName,
-        TableSideVariableName,
-        TableTitleText,
-        TableBaseText,
-        TableFilterText,
-        TableExtraSettings,
+        TableTopVariableName = 301,
+        TableSideVariableName = 302,
+        TableTitleText = 303,
+        TableBaseText = 304,
+        TableFilterText = 305,
+        TableExtraSettings = 306,
 
-        ScriptDeclaration,
-        ScriptLowerBoundary,
-        ScriptUpperBoundary,
-        ScriptForVariable,
-        ScriptCollection,
-        ScriptTest,
-        ScriptBody,
-        ScriptLoopVariables,
-        ScriptTopField,
-        ScriptLevelField,
-        ScriptObjectName,
-        ScriptFunctionTemplate,
-        ScriptBinaryLeft,
-        ScriptBinaryRight,
+        ScriptDeclaration = 401,
+        ScriptLowerBoundary = 402,
+        ScriptUpperBoundary = 403,
+        ScriptForVariable = 404,
+        ScriptCollection = 405,
+        ScriptTest = 406,
+        ScriptBody = 407,
+        ScriptLoopVariables = 408,
+        ScriptTopField = 409,
+        ScriptLevelField = 410,
+        ScriptObjectName = 411,
+        ScriptFunctionTemplate = 412,
+        ScriptBinaryLeft = 413,
+        ScriptBinaryRight = 414,
 
-        FunctionTemplate,
-        FunctionName,
-        FunctionParameters,
+        FunctionTemplate = 501,
+        FunctionName = 502,
+        FunctionParameters = 503,
 
     }
 
@@ -98,6 +103,25 @@ namespace IDCA.Bll.Template
         }
 
         /// <summary>
+        /// 获取当前存储的参数值
+        /// </summary>
+        /// <returns></returns>
+        public object GetValue()
+        {
+            return _value;
+        }
+
+        /// <summary>
+        /// 尝试获取指定类型的参数值
+        /// </summary>
+        /// <typeparam name="OutType">需要获取的特定类型</typeparam>
+        /// <returns></returns>
+        public OutType? TryGetValue<OutType>()
+        {
+            return _value is OutType outValue ? outValue : default;
+        }
+
+        /// <summary>
         /// 尝试向当前值集合末尾添加新的参数对象
         /// </summary>
         /// <param name="value"></param>
@@ -115,33 +139,6 @@ namespace IDCA.Bll.Template
                 param.SetValue(value);
                 parameters.Add(param);
             }
-        }
-
-        /// <summary>
-        /// 尝试向当前参数值数组末尾追加值，需要当前值为数组类型
-        /// </summary>
-        /// <param name="value"></param>
-        public void TryPushValue(object value)
-        {
-            if (_value is object[] array)
-            {
-                Array.Resize(ref array, array.Length);
-                array[^1] = value;
-            }
-        }
-
-        /// <summary>
-        /// 获取指定索引位置的参数值
-        /// </summary>
-        /// <param name="usage">参数用处</param>
-        /// <returns></returns>
-        public TemplateParameter? GetValue(TemplateParameterUsage usage)
-        {
-            if (_value is TemplateParameters parameters)
-            {
-                return parameters[usage];
-            }
-            return null;
         }
 
         /// <summary>

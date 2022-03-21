@@ -1,6 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <xml>
-	<template name="MddManipulation" usage="1" filename="MddManipulation.mrs" />
-	<template name="Tab" usage="2" filename="Tab.mrs"/>
-	<template name="OnNextCase" usage="3" filename="OnNextCase.mrs" />
+	<template name="Job" type="1" flag="1" filename="Job.ini">
+		<param name="JobProjectPath" usage="101" />
+		<param name="JobMetaDataName" usage="102"/>
+		<param name="JobContextType" usage="103"/>
+		<param name="JobLanguageType" usage="104"/>
+	</template>
+	<template name="MddManipulation" type="1" flag="2" filename="MDD_Manipulation.mrs" />
+	<template name="Tab" type="1" flag="3" filename="Tab.mrs"/>
+	<template name="OnNextCase" type="1" flag="4" filename="OnNextCase.mrs" />
+	<template name="MetadataFile" type="1" flag="5" filename="sbMetadata.mrs" />
+	<template name="DmsMetadataFile" type="1" flag="6" filename="Metadata_dms.mrs" />
 </xml>

@@ -30,14 +30,15 @@ namespace IDCA.Bll.Template
         }
 
         string _path;
-        readonly Dictionary<TemplateUsage, Template> _fileTemplates = new();
-        readonly Dictionary<TemplateUsage, Template> _tableTemplates = new();
-        readonly Dictionary<TemplateUsage, Template> _functionTemplates = new();
-        readonly Dictionary<TemplateUsage, Template> _scriptTemplates = new();
+
+        readonly List<FileTemplate> _libraryFileTemplates = new();
+        readonly Dictionary<FileTemplateFlags, Template> _fileTemplates = new();
+        readonly Dictionary<FunctionTemplateFlags, Template> _functionTemplates = new();
+        readonly Dictionary<ScriptTemplateFlags, Template> _scriptTemplates = new();
 
         public void Load(string xmlPath)
         {
-            _path = xmlPath;
+            _path = Path.GetDirectoryName(xmlPath) ?? string.Empty;
             XDocument xml = XDocument.Load(xmlPath);
             XElement? root = xml.Root;
 
@@ -76,7 +77,7 @@ namespace IDCA.Bll.Template
             return (attribute != null && int.TryParse(attribute.Value, out var value)) ? (T)(object)value : (T)(object)0;
         }
 
-        static void SetTemplateValue(Template value, TemplateUsage usage, Dictionary<TemplateUsage, Template> collection)
+        static void SetTemplateValue<T>(Template value, T usage, Dictionary<T, Template> collection) where T : Enum
         {
             if (collection.ContainsKey(usage))
             {
@@ -104,38 +105,62 @@ namespace IDCA.Bll.Template
         void LoadTemplate(XElement element)
         {
             TemplateType type = TryReadEnumValue<TemplateType>(element.Attribute("type"));
-            TemplateUsage usage = TryReadEnumValue<TemplateUsage>(element.Attribute("usage"));
-
             Template? template = null;
             switch (type)
             {
                 case TemplateType.File:
                     {
                         string fileName, directory;
+                        FileTemplateFlags fileFlag = TryReadEnumValue<FileTemplateFlags>(element.Attribute("flag"));
                         template = new FileTemplate
                         {
-                            Directory = directory = TryReadStringValue(element.Attribute("directory")),
+                            Directory = directory = TryReadStringValue(element.Attribute("path")),
                             FileName = fileName = TryReadStringValue(element.Attribute("filename")),
-                            Content = TryReadTextFile(Path.Combine(_path, directory, fileName))
+                            Content = TryReadTextFile(Path.Combine(_path, directory, fileName)),
+                            Flag = fileFlag
                         };
-                        SetTemplateValue(template, usage, _fileTemplates);
+                        SetTemplateValue(template, fileFlag, _fileTemplates);
                         break;
                     }
 
                 case TemplateType.Script:
                     {
+                        ScriptTemplateFlags scriptFlag = TryReadEnumValue<ScriptTemplateFlags>(element.Attribute("flag"));
                         template = new ScriptTemplate
                         {
-                            IndentLevel = TryReadIntValue(element.Attribute("indent"))
+                            IndentLevel = TryReadIntValue(element.Attribute("indent")),
+                            Flag = scriptFlag
                         };
-                        SetTemplateValue(template, usage, _scriptTemplates);
+                        SetTemplateValue(template, scriptFlag, _scriptTemplates);
                         break;
                     }
 
                 case TemplateType.Function:
-                    template = new FunctionTemplate();
-                    SetTemplateValue(template, usage, _functionTemplates);
-                    break;
+                    {
+                        FunctionTemplateFlags functionFlag = TryReadEnumValue<FunctionTemplateFlags>(element.Attribute("flag"));
+                        template = new FunctionTemplate { Flag = functionFlag };
+                        SetTemplateValue(template, functionFlag, _functionTemplates);
+                        break;
+                    }
+
+                case TemplateType.Folder:
+                    {
+                        string path = TryReadStringValue(element.Attribute("path"));
+                        string fullPath = Path.Combine(_path, path);
+                        if (Directory.Exists(fullPath))
+                        {
+                            foreach (var file in Directory.GetFiles(fullPath))
+                            {
+                                FileTemplate fileTemplate = new();
+                                fileTemplate.FileName = Path.GetFileName(file);
+                                fileTemplate.Directory = Path.GetDirectoryName(file) ?? string.Empty;
+                                fileTemplate.Flag = FileTemplateFlags.LibraryFile;
+                                fileTemplate.Content = TryReadTextFile(file);
+                                _libraryFileTemplates.Add(fileTemplate);
+                            }
+                        }
+                        break;
+                    }
 
                 default:
                     break;
@@ -146,8 +171,10 @@ namespace IDCA.Bll.Template
                 return;
             }
 
-            template.Usage = usage;
-            LoadParameter(template.Parameters, element.Element("params"));
+            foreach (XElement param in element.Elements("param"))
+            {
+                LoadParameter(template.Parameters, param);
+            }
         }
 
     }

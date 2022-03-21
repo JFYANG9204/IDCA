@@ -33,7 +33,7 @@ namespace IDCA.Bll
                     }
                 }
             }
-            Log = handler;
+            Log += handler;
         }
 
     }

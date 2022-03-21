@@ -4,48 +4,76 @@ using System.Text;
 
 namespace IDCA.Bll.Template
 {
-
-    public enum TemplateUsage
-    {
-        None,
-
-        ManipulationFile,
-        TableFile,
-        OnNextCaseFile,
-        MetadataFile,
-        DmsMetadataFile,
-        EmptyFile,
-        OtherUsefulFile,
-
-        ManipulateTitleLabelFunction,
-        ManipulateResponseLabelFunction,
-        ManipulateAxisExpressionFunction,
-        ManipulateDefineLabelFunction,
-
-
-
-    }
-
+    /// <summary>
+    /// 模板类型，标记模板的基础用途
+    /// </summary>
     public enum TemplateType
     {
+        None = 0,
+        /// <summary>
+        /// 文件模板
+        /// </summary>
         File,
+        /// <summary>
+        /// 脚本模板
+        /// </summary>
         Script,
+        /// <summary>
+        /// 函数模板
+        /// </summary>
         Function,
+        /// <summary>
+        /// 变量模板
+        /// </summary>
         Field,
+        /// <summary>
+        /// 函数调用表达式模板
+        /// </summary>
         Call,
+        /// <summary>
+        /// 二元操作符表达式模板
+        /// </summary>
         Binary,
+        /// <summary>
+        /// 声明变量名模板
+        /// </summary>
         Declare,
+        /// <summary>
+        /// 将引用文件夹内的所有文件
+        /// </summary>
+        Folder = 99
     }
 
+    /// <summary>
+    /// 模板值类型，会影响文本替换的结果
+    /// </summary>
     public enum TemplateValueType
     {
+        /// <summary>
+        /// 字符串类型，替换后会被双引号包裹
+        /// </summary>
         String,
+        /// <summary>
+        /// 变量名，不做修改
+        /// </summary>
         Variable,
+        /// <summary>
+        /// 分类变量值类型，替换后会被花括号包裹
+        /// </summary>
         Categorical,
+        /// <summary>
+        /// 数值，不做修改
+        /// </summary>
         Number,
+        /// <summary>
+        /// 任意表达式，不做修改
+        /// </summary>
         Expression,
     }
 
+    /// <summary>
+    /// 所有模板的基类，同时是虚类，无法被实例化，所有派生类都需要实现它的方法
+    /// </summary>
     public abstract class Template : ICloneable
     {
         public Template(TemplateType type)
@@ -53,7 +81,6 @@ namespace IDCA.Bll.Template
             _content = "";
             _type = type;
             _parameters = new(this);
-            _usage = TemplateUsage.None;
         }
 
         protected Template(Template template)
@@ -61,13 +88,11 @@ namespace IDCA.Bll.Template
             _content = template.Content;
             _type = template.Type;
             _parameters = new(this);
-            _usage = TemplateUsage.None;
         }
 
         protected string _content;
         protected readonly TemplateType _type;
         protected readonly TemplateParameters _parameters;
-        protected TemplateUsage _usage;
 
         /// <summary>
         /// 模板类型
@@ -91,10 +116,6 @@ namespace IDCA.Bll.Template
         /// 文件文本模板内容，所有需要替换的内容需要满足格式 ：$[variable]，变量名不区分大小写
         /// </summary>
         public string Content { get => _content; set => _content = value; }
-        /// <summary>
-        /// 模板的用处
-        /// </summary>
-        public TemplateUsage Usage { get => _usage; set => _usage = value; }
         /// <summary>
         /// 将当前的模板参数复制进新的对象中
         /// </summary>
@@ -145,22 +166,72 @@ namespace IDCA.Bll.Template
 
     }
 
+    /// <summary>
+    /// 文件类型标记枚举类，用来标记文件的用途
+    /// </summary>
+    public enum FileTemplateFlags
+    {
+        /// <summary>
+        /// 默认值，创建文件时忽略此标记的模板
+        /// </summary>
+        None = 0,
+        /// <summary>
+        /// 配置文件，一般命名Job.ini
+        /// </summary>
+        JobFile = 1,
+        /// <summary>
+        /// MDM文档文本标签修改文件，一般命名MDD_Manipulation.mrs
+        /// </summary>
+        ManipulationFile = 2,
+        /// <summary>
+        /// 添加表格的文件模板
+        /// </summary>
+        TableFile = 3,
+        /// <summary>
+        /// 修改数据脚本的文件，一般命名OnNextCase.mrs
+        /// </summary>
+        OnNextCaseFile = 4,
+        /// <summary>
+        /// 直接新变量的文件，一般命名sbMetadata.mrs
+        /// </summary>
+        MetadataFile = 5,
+        /// <summary>
+        /// 新变量脚本文件，一般命名Metadata_DMS.mrs
+        /// </summary>
+        DmsMetadataFile = 6,
+        /// <summary>
+        /// 空文件
+        /// </summary>
+        EmptyFile = 7,
+        /// <summary>
+        /// 库文件，库文件内容不会被修改
+        /// </summary>
+        LibraryFile = 8,
+        /// <summary>
+        /// 其他有用的文件，允许被修改
+        /// </summary>
+        OtherUsefulFile = 9,
+    }
+
     public class FileTemplate : Template
     {
         public FileTemplate() : base(TemplateType.File)
         {
             _directory = "";
             _fileName = "";
+            _flag = FileTemplateFlags.None;
         }
 
         protected FileTemplate(FileTemplate template) : base(template)
         {
             _directory = template.Directory;
             _fileName = template.FileName;
+            _flag = FileTemplateFlags.None;
         }
 
         string _directory;
         string _fileName;
+        FileTemplateFlags _flag;
 
         /// <summary>
         /// 模板文件路径
@@ -170,6 +241,10 @@ namespace IDCA.Bll.Template
         /// 文件名，包含文件名和扩展名
         /// </summary>
         public string FileName { get => _fileName; set => _fileName = value; }
+        /// <summary>
+        /// 文件类型标记
+        /// </summary>
+        public FileTemplateFlags Flag { get => _flag; set => _flag = value; }
 
         public override string Exec()
         {
@@ -192,25 +267,36 @@ namespace IDCA.Bll.Template
         }
     }
 
-    public enum FunctionUsage
+    /// <summary>
+    /// 函数模板类型标记
+    /// </summary>
+    public enum FunctionTemplateFlags
     {
-        None,
+        None = 0,
+
+        ManipulateTitleLabel,
+        ManipulateSideLabel,
+        ManipulateSideAxis,
+        ManipulateTypeLabel,
     }
 
     public class FunctionTemplate : Template
     {
         public FunctionTemplate() : base(TemplateType.Function)
         {
-            _functionUsage = FunctionUsage.None;
+            _flag = FunctionTemplateFlags.None;
         }
 
         public FunctionTemplate(FunctionTemplate template) : base(template)
         {
-            _functionUsage = template.FunctionUsage;
+            _flag = FunctionTemplateFlags.None;
         }
 
-        FunctionUsage _functionUsage;
-        public FunctionUsage FunctionUsage { get => _functionUsage; set => _functionUsage = value; }
+        FunctionTemplateFlags _flag;
+        /// <summary>
+        /// 当前函数模板的用处标记
+        /// </summary>
+        public FunctionTemplateFlags Flag { get => _flag; set => _flag = value; }
 
         /// <summary>
         /// 设定函数模板的函数名
@@ -622,14 +708,6 @@ namespace IDCA.Bll.Template
             Clone(clone);
             return clone;
         }
-    }
-
-    public enum FunctionTemplateUsage
-    {
-        ManipulateTitleLabel,
-        ManipulateSideLabel,
-        ManipulateSideAxis,
-        ManipulateTypeLabel,
     }
 
     /// <summary>
