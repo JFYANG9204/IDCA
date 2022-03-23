@@ -4,7 +4,7 @@ using System.Text;
 
 namespace IDCA.Bll.SpecDocument
 {
-    internal class SpecData
+    public class SpecDocument
     {
     }
 }

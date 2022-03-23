@@ -3,17 +3,24 @@ using System.Collections.Generic;
 
 namespace IDCA.Bll.SpecDocument
 {
-    public class Axis : SpecObjectCollection<IAxisElement>, IAxis
+    public class Axis : SpecObjectCollection<AxisElement>
     {
-        internal Axis(ISpecObject parent, AxisType axisType) : base(parent, collection => new AxisElement(collection))
+        internal Axis(SpecObject parent, AxisType axisType) : base(parent, collection => new AxisElement(collection))
         {
             _objectType = SpecObjectType.Axis;
             _type = axisType;
         }
 
         AxisType _type;
+        /// <summary>
+        /// 轴表达式类型
+        /// </summary>
         public AxisType Type { get => _type; internal set => _type = value; }
 
+        /// <summary>
+        /// 转换为字符串
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             string text = string.Join(',', _items);
@@ -21,9 +28,21 @@ namespace IDCA.Bll.SpecDocument
         }
     }
 
-    public class AxisElement : SpecObject, IAxisElement
+    public enum AxisType
     {
-        internal AxisElement(ISpecObject parent) : base(parent)
+        /// <summary>
+        /// 一般的表达式，由左右花括号开始和结尾
+        /// </summary>
+        Normal,
+        /// <summary>
+        /// 可以直接添加表格的表达式，由"axis("开头，右括号")"结尾
+        /// </summary>
+        AxisTable,
+    }
+
+    public class AxisElement : SpecObject
+    {
+        internal AxisElement(SpecObject parent) : base(parent)
         {
             _objectType = SpecObjectType.AxisElement;
             _template = new AxisElementTemplate(this);
@@ -31,34 +50,90 @@ namespace IDCA.Bll.SpecDocument
 
         string _name = string.Empty;
         string _description = string.Empty;
-        IAxisElementTemplate _template;
+        AxisElementTemplate _template;
 
-        public string Name { get => _name; internal set => _name = value; } 
+        /// <summary>
+        /// 轴表达式元素的名称
+        /// </summary>
+        public string Name { get => _name; internal set => _name = value; }
+        /// <summary>
+        /// 轴表达式元素的描述
+        /// </summary>
         public string Description { get => _description; internal set => _description = value; }
-        public IAxisElementTemplate Template { get => _template; internal set => _template = value; }
+        /// <summary>
+        /// 轴表达式元素模板
+        /// </summary>
+        public AxisElementTemplate Template { get => _template; internal set => _template = value; }
 
+        /// <summary>
+        /// 转换为字符串
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             return $"{_name} '{_description}' {_template}";
         }
     }
 
-    public class AxisElementTemplate : SpecObject, IAxisElementTemplate
+
+    public enum AxisElementType
     {
-        internal AxisElementTemplate(ISpecObject parent) : base(parent)
+        Text,
+        Base,
+        UnweightedBase,
+        EffectiveBase,
+        Expression,
+        Numeric,
+        Derived,
+        Mean,
+        StdErr,
+        StdDev,
+        Total,
+        SubTotal,
+        Min,
+        Max,
+        Net,
+        Combine,
+        Sum,
+        Median,
+        Percentile,
+        Mode,
+        Ntd
+    }
+
+    /// <summary>
+    /// 轴表达式元素的字符串文本模板
+    /// </summary>
+    public class AxisElementTemplate : SpecObject
+    {
+        internal AxisElementTemplate(SpecObject parent) : base(parent)
         {
             _objectType = SpecObjectType.AxisElementTemplate;
-            _parameters = new SpecObjectCollection<IAxisElement>(this, collection => (IAxisElement)new AxisParameter(collection));
+            _parameters = new SpecObjectCollection<AxisParameter>(this, collection => new AxisParameter(collection));
         }
 
-        int _requirParamNumber = 0;
         AxisElementType _elementType = AxisElementType.Text;
-        readonly ISpecObjectCollection<IAxisElement> _parameters;
+        readonly SpecObjectCollection<AxisParameter> _parameters;
 
-        public int RequireParamNumber { get => _requirParamNumber; internal set => _requirParamNumber = value; }
-        public ISpecObjectCollection<IAxisParameter> Parameters => (ISpecObjectCollection<IAxisParameter>)_parameters;
+        /// <summary>
+        /// 参数列表
+        /// </summary>
+        public SpecObjectCollection<AxisParameter> Parameters => _parameters;
+        /// <summary>
+        /// 元素的类型
+        /// </summary>
         public AxisElementType ElementType { get => _elementType; internal set => _elementType = value; }
 
+
+        public void PushParameter(AxisParameter parameter)
+        {
+            _parameters.Add(parameter);
+        }
+
+        /// <summary>
+        /// 转换为字符串
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             return _elementType switch
@@ -90,9 +165,12 @@ namespace IDCA.Bll.SpecDocument
 
     }
 
-    public class AxisParameter : SpecObject, IAxisParameter
+
+
+
+    public class AxisParameter : SpecObject
     {
-        internal AxisParameter(ISpecObject parent) : base(parent)
+        internal AxisParameter(SpecObject parent) : base(parent)
         {
             _objectType = SpecObjectType.AxisParameter;
         }
@@ -100,14 +178,28 @@ namespace IDCA.Bll.SpecDocument
         readonly List<string> _items = new();
         bool _isCategorical = false;
 
+        /// <summary>
+        /// 参数元素列表
+        /// </summary>
         public List<string> Items => _items;
+        /// <summary>
+        /// 是否是Categorical类型
+        /// </summary>
         public bool IsCategorical { get => _isCategorical; internal set => _isCategorical = value;}
 
+        /// <summary>
+        /// 向集合中添加元素
+        /// </summary>
+        /// <param name="item"></param>
         public void Add(string item)
         {
             _items.Add(item);
         }
 
+        /// <summary>
+        /// 转换为字符串
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             if (_items.Count > 0)

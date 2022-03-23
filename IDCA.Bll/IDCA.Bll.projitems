@@ -32,11 +32,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\Variable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SpecDocument\Axis.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SpecDocument\AxisElementTemplateFactory.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SpecDocument\IAxis.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SpecDocument\ISpecData.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SpecDocument\ISpecDocument.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SpecDocument\ISpecObject.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SpecDocument\ISpecObjectCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SpecDocument\SpecDocument.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Template\TemplateLoader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Template\ScriptFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SpecDocument\SpecObject.cs" />
@@ -63,6 +59,5 @@
     <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\ISaveLogs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\Types.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\XmlHelper.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SpecDocument\SpecData.cs" />
   </ItemGroup>
 </Project>

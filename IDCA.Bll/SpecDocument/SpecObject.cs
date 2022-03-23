@@ -1,23 +1,47 @@
 ﻿
 namespace IDCA.Bll.SpecDocument
 {
-    public class SpecObject : ISpecObject
+    public abstract class SpecObject
     {
-        protected SpecObject(ISpecObject parent)
+        protected SpecObject(SpecObject parent)
         {
             _parent = parent;
             _document = parent.Document;
             _objectType = SpecObjectType.None;
         }
 
-        protected ISpecObject _parent;
-        protected ISpecDocument _document;
+        protected SpecObject _parent;
+        protected SpecDocument _document;
         protected SpecObjectType _objectType;
 
+        /// <summary>
+        /// Spec描述对象类型
+        /// </summary>
         public SpecObjectType SpecObjectType => _objectType;
-        public ISpecDocument Document => _document;
-        public ISpecObject Parent => _parent;
+        /// <summary>
+        /// 对象所在的文档对象
+        /// </summary>
+        public SpecDocument Document => _document;
+        /// <summary>
+        /// 此对象的父级对象
+        /// </summary>
+        public SpecObject Parent => _parent;
     }
+
+
+    public enum SpecObjectType
+    {
+        None,
+        Document,
+        Collection,
+        Table,
+        Axis,
+        AxisElement,
+        AxisElementTemplate,
+        AxisParameter,
+        NewVariable,
+    }
+
 }
 
 

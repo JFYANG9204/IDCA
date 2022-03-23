@@ -828,62 +828,6 @@ namespace IDCA.Bll.Template
     }
 
     /// <summary>
-    /// 二元表达式的模板信息，二元操作符包括：+、-、*、/、>、>=、<、<=、=、<>
-    /// </summary>
-    public class BinaryExpressionTemplate : ExpressionTemplate
-    {
-        public BinaryExpressionTemplate() : base(TemplateType.Binary)
-        {
-            _flag = ExpressionTemplateFlags.BinaryExpression;
-            _operatorFlag = BinaryOperatorFlags.None;
-        }
-
-        public BinaryExpressionTemplate(BinaryExpressionTemplate template) : base(template)
-        {
-            _flag = template.Flag;
-            _operatorFlag = template.OperatorFlag;
-        }
-
-        BinaryOperatorFlags _operatorFlag;
-        /// <summary>
-        /// 当前的二元操作符类型
-        /// </summary>
-        public BinaryOperatorFlags OperatorFlag { get => _operatorFlag; set => _operatorFlag = value; }
-
-        /// <summary>
-        /// 设置左值
-        /// </summary>
-        /// <param name="value"></param>
-        public void SetLeft(string value)
-        {
-            GetOrCreateParameter(TemplateParameterUsage.ScriptBinaryLeft).SetValue(value);
-        }
-
-        /// <summary>
-        /// 设置右值
-        /// </summary>
-        /// <param name="value"></param>
-        public void SetRight(string value)
-        {
-            GetOrCreateParameter(TemplateParameterUsage.ScriptBinaryRight).SetValue(value);
-        }
-
-        public override string Exec()
-        {
-            string? left = _parameters[TemplateParameterUsage.ScriptBinaryLeft]?.GetValue<string>();
-            string? right = _parameters[TemplateParameterUsage.ScriptBinaryRight]?.GetValue<string>();
-            return ScriptFactory.CreateBinaryScript(left, right, _operatorFlag);
-        }
-
-        public override object Clone()
-        {
-            var clone = new BinaryExpressionTemplate(this);
-            Clone(clone);
-            return clone;
-        }
-    }
-
-    /// <summary>
     /// 声明语句的模板信息
     /// </summary>
     public class DeclareExpressionTemplate : ExpressionTemplate
