@@ -48,5 +48,6 @@ namespace IDCA.Bll.SpecDocument
         {
             return _constructor(this);
         }
+
     }
 }

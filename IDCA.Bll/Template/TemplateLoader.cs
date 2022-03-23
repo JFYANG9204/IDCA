@@ -190,5 +190,30 @@ namespace IDCA.Bll.Template
             }
         }
 
+        /// <summary>
+        /// 获取指定类型的模板，如果未设置，返回null
+        /// </summary>
+        /// <typeparam name="T">模板类型</typeparam>
+        /// <typeparam name="Flag">模板标记类型</typeparam>
+        /// <param name="flag">需要查找的模板标记类型</param>
+        /// <returns>指定类型和标记的模板对象，未找到时返回null</returns>
+        public T? TryGet<T, Flag>(Flag flag) where T: Template
+        {
+            Type type = typeof(T);
+            if (flag is FileTemplateFlags fileFlag && type.Equals(typeof(FileTemplate)))
+            {
+                return _fileTemplates.ContainsKey(fileFlag) ? (T)_fileTemplates[fileFlag] : null;
+            }
+            else if (flag is FunctionTemplateFlags functionFlag && type.Equals(typeof(FunctionTemplate)))
+            {
+                return _functionTemplates.ContainsKey(functionFlag) ? (T)_functionTemplates[functionFlag] : null;
+            }
+            else if (flag is ScriptTemplateFlags scriptFlag && type.Equals(typeof(ScriptTemplate)))
+            {
+                return _scriptTemplates.ContainsKey(scriptFlag) ? (T)_scriptTemplates[scriptFlag] : null;
+            }
+            return null;
+        }
+
     }
 }
