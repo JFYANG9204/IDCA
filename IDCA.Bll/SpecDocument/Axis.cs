@@ -48,6 +48,11 @@ namespace IDCA.Bll.SpecDocument
             _template = new AxisElementTemplate(this);
         }
 
+        internal AxisElement(SpecObject parent, AxisElementType type) : this(parent)
+        {
+            _template.ElementType = type;
+        }
+
         string _name = string.Empty;
         string _description = string.Empty;
         AxisElementTemplate _template;
@@ -109,23 +114,31 @@ namespace IDCA.Bll.SpecDocument
         internal AxisElementTemplate(SpecObject parent) : base(parent)
         {
             _objectType = SpecObjectType.AxisElementTemplate;
-            _parameters = new SpecObjectCollection<AxisParameter>(this, collection => new AxisParameter(collection));
+            _parameters = new SpecObjectCollection<AxisElementParameter>(this, collection => new AxisElementParameter(collection));
         }
 
         AxisElementType _elementType = AxisElementType.Text;
-        readonly SpecObjectCollection<AxisParameter> _parameters;
+        readonly SpecObjectCollection<AxisElementParameter> _parameters;
 
-        /// <summary>
-        /// 参数列表
-        /// </summary>
-        public SpecObjectCollection<AxisParameter> Parameters => _parameters;
         /// <summary>
         /// 元素的类型
         /// </summary>
         public AxisElementType ElementType { get => _elementType; internal set => _elementType = value; }
 
+        /// <summary>
+        /// 创建新的表达式元素参数
+        /// </summary>
+        /// <returns></returns>
+        public AxisElementParameter NewParameter()
+        {
+            return _parameters.NewObject();
+        }
 
-        public void PushParameter(AxisParameter parameter)
+        /// <summary>
+        /// 将新的参数添加到参数列表末尾
+        /// </summary>
+        /// <param name="parameter"></param>
+        public void PushParameter(AxisElementParameter parameter)
         {
             _parameters.Add(parameter);
         }
@@ -166,26 +179,14 @@ namespace IDCA.Bll.SpecDocument
     }
 
 
-
-
-    public class AxisParameter : SpecObject
+    public class AxisElementParameter : SpecObject
     {
-        internal AxisParameter(SpecObject parent) : base(parent)
+        internal AxisElementParameter(SpecObject parent) : base(parent)
         {
             _objectType = SpecObjectType.AxisParameter;
         }
 
         readonly List<string> _items = new();
-        bool _isCategorical = false;
-
-        /// <summary>
-        /// 参数元素列表
-        /// </summary>
-        public List<string> Items => _items;
-        /// <summary>
-        /// 是否是Categorical类型
-        /// </summary>
-        public bool IsCategorical { get => _isCategorical; internal set => _isCategorical = value;}
 
         /// <summary>
         /// 向集合中添加元素
@@ -204,8 +205,7 @@ namespace IDCA.Bll.SpecDocument
         {
             if (_items.Count > 0)
             {
-                string value = string.Join(',', _items);
-                return _isCategorical ? $"{{{value}}}" : value;
+                return string.Join(',', _items);
             }
             return string.Empty;
         }
