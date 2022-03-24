@@ -12,7 +12,7 @@ namespace IDCA.Test
         public void LoadTemplate()
         {
             string path = Path.Combine(Directory.GetCurrentDirectory(), @"..\..\..\Features\Templates.xml");
-            TemplateLoader loader = new();
+            TemplateCollection loader = new();
             loader.Load(path);
             Console.WriteLine("End");
         }

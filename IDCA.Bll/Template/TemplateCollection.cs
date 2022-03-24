@@ -22,9 +22,9 @@ namespace IDCA.Bll.Template
     //
     //
 
-    public class TemplateLoader
+    public class TemplateCollection
     {
-        public TemplateLoader()
+        public TemplateCollection()
         {
             _path = string.Empty;
         }

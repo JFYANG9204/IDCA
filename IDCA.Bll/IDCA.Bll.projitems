@@ -31,9 +31,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\Script.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\Variable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SpecDocument\Axis.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SpecDocument\AxisElementTemplateFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SpecDocument\SpecDocument.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Template\TemplateLoader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SpecDocument\Table.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Template\TemplateCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Template\ScriptFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SpecDocument\SpecObject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SpecDocument\SpecObjectCollection.cs" />
