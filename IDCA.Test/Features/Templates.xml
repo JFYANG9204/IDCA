@@ -12,4 +12,5 @@
 	<template name="MetadataFile" type="1" flag="5" filename="sbMetadata.mrs" />
 	<template name="DmsMetadataFile" type="1" flag="6" filename="Metadata_dms.mrs" />
 	<template name="Library" type="99" path="Library" />
+	<template name="AddTableFunction" type="3" />
 </xml>

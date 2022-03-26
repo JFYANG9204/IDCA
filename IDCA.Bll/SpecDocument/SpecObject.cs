@@ -3,6 +3,11 @@ namespace IDCA.Bll.SpecDocument
 {
     public abstract class SpecObject
     {
+        protected SpecObject()
+        {
+            _objectType = SpecObjectType.None;
+        }
+
         protected SpecObject(SpecObject parent)
         {
             _parent = parent;
@@ -10,8 +15,8 @@ namespace IDCA.Bll.SpecDocument
             _objectType = SpecObjectType.None;
         }
 
-        protected SpecObject _parent;
-        protected SpecDocument _document;
+        protected SpecObject? _parent;
+        protected SpecDocument? _document;
         protected SpecObjectType _objectType;
 
         /// <summary>
@@ -21,11 +26,11 @@ namespace IDCA.Bll.SpecDocument
         /// <summary>
         /// 对象所在的文档对象
         /// </summary>
-        public SpecDocument Document => _document;
+        public SpecDocument? Document => _document;
         /// <summary>
         /// 此对象的父级对象
         /// </summary>
-        public SpecObject Parent => _parent;
+        public SpecObject? Parent => _parent;
     }
 
 

@@ -13,31 +13,27 @@ namespace IDCA.Bll.Template
         /// <summary>
         /// 文件模板
         /// </summary>
-        File,
+        File = 1,
         /// <summary>
         /// 脚本模板
         /// </summary>
-        Script,
+        Script = 2,
         /// <summary>
         /// 函数模板
         /// </summary>
-        Function,
+        Function = 3,
         /// <summary>
         /// 变量模板
         /// </summary>
-        Field,
+        Field = 4,
         /// <summary>
         /// 函数调用表达式模板
         /// </summary>
-        Call,
-        /// <summary>
-        /// 二元操作符表达式模板
-        /// </summary>
-        Binary,
+        Call = 5,
         /// <summary>
         /// 声明变量名模板
         /// </summary>
-        Declare,
+        Declare = 6,
         /// <summary>
         /// 将引用文件夹内的所有文件
         /// </summary>
@@ -298,6 +294,13 @@ namespace IDCA.Bll.Template
         ManipulateSideLabel,
         ManipulateSideAxis,
         ManipulateTypeLabel,
+
+        TableNormal,
+        TableGrid,
+        TableGridSlice,
+        TableMeanSummary,
+        TableResponseSummary,
+
     }
 
     public class FunctionTemplate : Template
@@ -673,6 +676,22 @@ namespace IDCA.Bll.Template
         public void SetTopField(string topField)
         {
             GetOrCreateParameter(TemplateParameterUsage.ScriptTopField).SetValue(topField);
+        }
+
+        /// <summary>
+        /// 当前顶级变量名，未设定返回空字符串
+        /// </summary>
+        public string TopField
+        {
+            get
+            {
+                TemplateParameter? top;
+                if ((top = _parameters[TemplateParameterUsage.ScriptTopField]) != null)
+                {
+                    return top.Name;
+                }
+                return string.Empty;
+            }
         }
 
         /// <summary>

@@ -4,37 +4,51 @@ using System;
 namespace IDCA.Bll
 {
 
-    public delegate void LogExceptionEventHandler(string message);
+    public delegate void LogExceptionEventHandler(string message, string reason);
 
     public class Logger
     {
 
-        static event LogExceptionEventHandler? Log = null;
-        public static void Error(string message)
+        static event LogExceptionEventHandler? ErrorLog = null;
+        static event LogExceptionEventHandler? WarningLog = null;
+
+        public static void Error(string message, string reason)
         {
-            Log?.Invoke(message);
+            ErrorLog?.Invoke(message, reason);
         }
 
-        public static void Warning(string message)
+        public static void Warning(string message, string reason)
         {
-            Log?.Invoke(message);
+            WarningLog?.Invoke(message, reason);
         }
 
-        public static void SetLogHandler(LogExceptionEventHandler handler)
+        public static void SetErrorLogHandler(LogExceptionEventHandler handler)
         {
-            if (Log != null)
+            if (ErrorLog != null)
             {
-                Delegate[] delegates = Log.GetInvocationList();
+                Delegate[] delegates = ErrorLog.GetInvocationList();
                 if (delegates != null)
                 {
                     foreach (Delegate d in delegates)
                     {
-                        Log -= (LogExceptionEventHandler)d;
+                        ErrorLog -= (LogExceptionEventHandler)d;
                     }
                 }
             }
-            Log += handler;
+            ErrorLog += handler;
         }
 
     }
+
+    public class Messages
+    {
+        // MDM 部分
+        public const string MDMFieldIsEmpty = "MDM文档载入错误，未载入Fields集合。";
+        // Table 部分
+        public const string TableFieldIsNotSetted = "未设定Table对象的Field信息，无法载入MDM文档Field对象。";
+        public const string TableFieldIsNotFound = "无法在MDM文档中找到对应名称的Field。";
+        // Tamplate 部分
+        public const string TemplateIsNotFind = "未找到用于{0}的函数模板。";
+    }
+
 }
