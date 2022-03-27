@@ -1,7 +1,7 @@
 ﻿
-using IDCA.Bll.MDMDocument;
 using IDCA.Bll.Template;
 using System.Collections.Generic;
+using System.Text;
 
 namespace IDCA.Bll.SpecDocument
 {
@@ -34,6 +34,22 @@ namespace IDCA.Bll.SpecDocument
             return table;
         }
 
+        /// <summary>
+        /// 导出当前集合中所有的Table配置到字符串
+        /// </summary>
+        /// <returns></returns>
+        public string Export()
+        {
+            StringBuilder builder = new();
+
+            foreach (var item in _items)
+            {
+                builder.AppendLine(item.Export());
+            }
+
+            return builder.ToString();
+        }
+
     }
 
     /// <summary>
@@ -54,46 +70,24 @@ namespace IDCA.Bll.SpecDocument
         /// </summary>
         public string Name { get => _name; set => _name = value; }
 
+        string _tableLabel = string.Empty;
+        /// <summary>
+        /// 表格的名称标签
+        /// </summary>
+        public string TableLabel { get => _tableLabel; set => _tableLabel = value; }
+
+        string _tableBase = string.Empty;
+        /// <summary>
+        /// 表格的Base标签
+        /// </summary>
+        public string TableBase { get => _tableBase; set => _tableBase = value; }
+
         readonly FieldExpressionTemplate _field;
-        FunctionTemplate? _manipulateTitle;
-        FunctionTemplate? _manipulateLabel;
-        FunctionTemplate? _manipulateAxisExpression;
         FunctionTemplate? _addTable;
         FunctionTemplate? _addGrid;
         FunctionTemplate? _addGridSlice;
         FunctionTemplate? _addMeanSummary;
         FunctionTemplate? _addReponseSummary;
-
-        Field? _mdmField;
-
-        /// <summary>
-        /// 从MDM文档的Field集合中读取符合当前Table变量名称的原始数据定义
-        /// </summary>
-        /// <param name="fields"></param>
-        public void LoadField(Fields? fields)
-        {
-            if (fields == null)
-            {
-                Logger.Error(Messages.MDMFieldIsEmpty, $"Table:{_name}");
-                return;
-            }
-
-            if (_field.Parameters.Count == 0 || string.IsNullOrEmpty(_field.TopField))
-            {
-                Logger.Error(Messages.TableFieldIsNotSetted, $"Table:{_name}");
-                return;
-            }
-
-            Field? find = fields[_field.TopField];
-
-            if (find is null)
-            {
-                Logger.Error(Messages.TableFieldIsNotFound, $"Table:{_name}");
-                return;
-            }
-
-            _mdmField = find;
-        }
 
         /// <summary>
         /// 从已载入完成的模板集合中载入所需要的模板
@@ -101,9 +95,6 @@ namespace IDCA.Bll.SpecDocument
         /// <param name="collection">已载入完成的模板集合</param>
         public void LoadTemplate(TemplateCollection collection)
         {
-            _manipulateTitle = collection.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateTitleLabel);
-            _manipulateLabel = collection.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateSideLabel);
-            _manipulateAxisExpression = collection.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateSideAxis);
             _addTable = collection.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.TableNormal);
             _addGrid = collection.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.TableGrid);
             _addGridSlice = collection.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.TableGridSlice);
@@ -171,8 +162,83 @@ namespace IDCA.Bll.SpecDocument
             return _sideAxis = new Axis(this, type);
         }
 
+        /// <summary>
+        /// 导入当前设置到字符串
+        /// </summary>
+        /// <returns></returns>
+        public string Export()
+        {
+            string result = string.Empty;
+            FunctionTemplate? function = null;
 
+            string side, banner;
+            if (_sideAxis != null)
+            {
+                side = _sideAxis.Type == AxisType.AxisVariable ? _sideAxis.ToString() : $"{_field.Exec()}{_sideAxis}";
+            }
+            else
+            {
+                side = _field.Exec();
+            }
 
+            if (_headerAxis != null && _headerAxis.Type == AxisType.Normal)
+            {
+                banner = _type == TableType.Grid ? $"{_field.TopField}{_headerAxis}" : $"{_banner}{_headerAxis}";
+            }
+            else
+            {
+                banner = _type == TableType.Grid ? _field.TopField : ((_headerAxis != null && _headerAxis.Type == AxisType.AxisVariable) ? _headerAxis.ToString() : _banner);
+            }
+
+            switch (_type)
+            {
+                case TableType.None:
+                    break;
+                case TableType.Normal:
+                    if (_addTable != null)
+                    {
+                        function = (FunctionTemplate)_addTable.Clone();
+                    }
+                    break;
+                case TableType.Grid:
+                    if (_addGrid != null)
+                    {
+                        function = (FunctionTemplate)_addGrid.Clone();
+                    }
+                    break;
+                case TableType.GridSlice:
+                    if (_addGridSlice != null)
+                    {
+                        function = (FunctionTemplate)_addGridSlice.Clone();
+                    }
+                    break;
+                case TableType.MeanSummary:
+                    if (_addMeanSummary != null)
+                    {
+                        function = (FunctionTemplate)_addMeanSummary.Clone();
+                    }
+                    break;
+                case TableType.ResponseSummary:
+                    if (_addReponseSummary != null)
+                    {
+                        function = (FunctionTemplate)_addReponseSummary.Clone();
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            if (function != null)
+            {
+                function.SetFunctionParameterValue(side, TemplateParameterUsage.TableSideVariableName);
+                function.SetFunctionParameterValue(banner, TemplateParameterUsage.TableTopVariableName);
+                function.SetFunctionParameterValue(_tableLabel, TemplateParameterUsage.TableTitleText);
+                function.SetFunctionParameterValue(_tableBase, TemplateParameterUsage.TableBaseText);
+                return function.Exec();
+            }
+
+            return result;
+        }
 
     }
 
@@ -182,7 +248,6 @@ namespace IDCA.Bll.SpecDocument
         Normal,
         Grid,
         GridSlice,
-        GridAndSlice,
         MeanSummary,
         ResponseSummary,
     }

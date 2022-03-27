@@ -256,10 +256,9 @@ namespace IDCA.Bll.Template
         /// 向当前的内容后追加新的文本内容，会在之前添加新行
         /// </summary>
         /// <param name="value"></param>
-        public void Append(string value)
+        public void AppendLine(string value)
         {
-            _content.AppendLine();
-            _content.Append(value);
+            _content.AppendLine(value);
         }
 
         public override string Exec()

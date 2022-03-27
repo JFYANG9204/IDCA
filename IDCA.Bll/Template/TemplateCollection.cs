@@ -37,6 +37,20 @@ namespace IDCA.Bll.Template
         readonly Dictionary<FunctionTemplateFlags, Template> _functionTemplates = new();
         readonly Dictionary<ScriptTemplateFlags, Template> _scriptTemplates = new();
 
+        /// <summary>
+        /// 当前模板集合中的Library部分文件模板
+        /// </summary>
+        public List<FileTemplate> Library => _libraryFileTemplates;
+        /// <summary>
+        /// 当前模板集合中的所有其他类型文件模板
+        /// </summary>
+        public List<FileTemplate> OtherUsefulFile => _otherUsefulFileTemplates;
+
+        /// <summary>
+        /// 根据XML文件配置载入当前模板配置
+        /// </summary>
+        /// <param name="xmlPath">模板内的XML文件路径</param>
+        /// <exception cref="Exception">XML文件格式错误时抛出读取错误</exception>
         public void Load(string xmlPath)
         {
             _path = Path.GetDirectoryName(xmlPath) ?? string.Empty;
