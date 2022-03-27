@@ -9,8 +9,56 @@ namespace IDCA.Bll.SpecDocument
 
         public Manipulations(SpecDocument document) : base(document, collection => new Manipulation(collection))
         {
+            _document = document;
+            _templates = document.Templates;
         }
 
+        readonly TemplateCollection _templates;
+
+        Manipulation CreateManipulation(ManipulationType type)
+        {
+            Manipulation manipulation = NewObject();
+            manipulation.Type = type;
+            manipulation.Init(_templates);
+            Add(manipulation);
+            return manipulation;
+        }
+
+        /// <summary>
+        /// 向当前集合末尾追加标题修改函数
+        /// </summary>
+        /// <returns></returns>
+        public Manipulation AppendFieldTitleManipulation()
+        {
+            return CreateManipulation(ManipulationType.Title);
+        }
+
+        /// <summary>
+        /// 向当前集合末尾追加轴表达式修改函数
+        /// </summary>
+        /// <returns></returns>
+        public Manipulation AppendAxisManipulation()
+        {
+            return CreateManipulation(ManipulationType.Axis);
+        }
+
+        /// <summary>
+        /// 向当前集合末尾追加表侧标签修改函数
+        /// </summary>
+        /// <returns></returns>
+        public Manipulation AppendResponseLabelManipulation()
+        {
+            return CreateManipulation(ManipulationType.ResponseLabel);
+        }
+
+        /// <summary>
+        /// 向当前集合末尾追加列表表侧标签修改函数
+        /// </summary>
+        /// <returns></returns>
+        public Manipulation AppendDifnitionLabelManipulation()
+        {
+            return CreateManipulation(ManipulationType.DefinitionLabel);
+        }
 
     }
 
@@ -69,6 +117,25 @@ namespace IDCA.Bll.SpecDocument
                 default:
                     break;
             }
+        }
+
+        /// <summary>
+        /// 尝试修改模板中参数的值，如果未载入模板，则忽略此次操作
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="usage"></param>
+        public void TrySetParameterValue(object value, TemplateParameterUsage usage)
+        {
+            if (_template != null)
+            {
+                _template.SetFunctionParameterValue(value, usage);
+            }
+        }
+
+
+        public override string ToString()
+        {
+            return _template is null ? string.Empty : _template.Exec();
         }
 
     }

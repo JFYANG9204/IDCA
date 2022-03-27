@@ -12,20 +12,25 @@ namespace IDCA.Bll.SpecDocument
     {
         public Tables(SpecDocument spec) : base(spec, collection => new Table(collection))
         {
+            _document = spec;
+            _templates = spec.Templates;
         }
-
+        
         public Table? this[string name] => _nameCache.ContainsKey(name) ? _nameCache[name] : null;
 
         readonly Dictionary<string, Table> _nameCache = new();
+        readonly TemplateCollection _templates;
 
         /// <summary>
         /// 创建新的Table对象，并返回
         /// </summary>
         /// <returns></returns>
-        public Table NewTable()
+        public Table NewTable(TableType type = TableType.None)
         {
             var table = NewObject();
             table.Name = $"T{Count + 1}";
+            table.Type = type;
+            table.LoadTemplate(_templates);
             Add(table);
             if (!_nameCache.ContainsKey(table.Name))
             {
@@ -84,11 +89,7 @@ namespace IDCA.Bll.SpecDocument
         public string TableBase { get => _tableBase; set => _tableBase = value; }
 
         readonly FieldExpressionTemplate _field;
-        FunctionTemplate? _addTable;
-        FunctionTemplate? _addGrid;
-        FunctionTemplate? _addGridSlice;
-        FunctionTemplate? _addMeanSummary;
-        FunctionTemplate? _addReponseSummary;
+        FunctionTemplate? _template;
 
         /// <summary>
         /// 从已载入完成的模板集合中载入所需要的模板
@@ -96,11 +97,27 @@ namespace IDCA.Bll.SpecDocument
         /// <param name="collection">已载入完成的模板集合</param>
         public void LoadTemplate(TemplateCollection collection)
         {
-            _addTable = collection.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.TableNormal);
-            _addGrid = collection.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.TableGrid);
-            _addGridSlice = collection.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.TableGridSlice);
-            _addMeanSummary = collection.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.TableMeanSummary);
-            _addReponseSummary = collection.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.TableResponseSummary);
+            switch (_type)
+            {
+                case TableType.Normal:
+                    _template = collection.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.TableNormal);
+                    break;
+                case TableType.Grid:
+                    _template = collection.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.TableGrid);
+                    break;
+                case TableType.GridSlice:
+                    _template = collection.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.TableGridSlice);
+                    break;
+                case TableType.MeanSummary:
+                    _template = collection.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.TableMeanSummary);
+                    break;
+                case TableType.ResponseSummary:
+                    _template = collection.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.TableResponseSummary);
+                    break;
+                case TableType.None:
+                default:
+                    break;
+            }
         }
 
         /// <summary>
@@ -169,71 +186,32 @@ namespace IDCA.Bll.SpecDocument
         /// <returns></returns>
         public string Export()
         {
-            FunctionTemplate? function = null;
+            if (_template != null)
+            {
+                string side, banner;
+                if (_sideAxis != null)
+                {
+                    side = _sideAxis.Type == AxisType.AxisVariable ? _sideAxis.ToString() : $"{_field.Exec()}{_sideAxis}";
+                }
+                else
+                {
+                    side = _field.Exec();
+                }
 
-            string side, banner;
-            if (_sideAxis != null)
-            {
-                side = _sideAxis.Type == AxisType.AxisVariable ? _sideAxis.ToString() : $"{_field.Exec()}{_sideAxis}";
-            }
-            else
-            {
-                side = _field.Exec();
-            }
+                if (_headerAxis != null && _headerAxis.Type == AxisType.Normal)
+                {
+                    banner = _type == TableType.Grid ? $"{_field.TopField}{_headerAxis}" : $"{_banner}{_headerAxis}";
+                }
+                else
+                {
+                    banner = _type == TableType.Grid ? _field.TopField : ((_headerAxis != null && _headerAxis.Type == AxisType.AxisVariable) ? _headerAxis.ToString() : _banner);
+                }
 
-            if (_headerAxis != null && _headerAxis.Type == AxisType.Normal)
-            {
-                banner = _type == TableType.Grid ? $"{_field.TopField}{_headerAxis}" : $"{_banner}{_headerAxis}";
-            }
-            else
-            {
-                banner = _type == TableType.Grid ? _field.TopField : ((_headerAxis != null && _headerAxis.Type == AxisType.AxisVariable) ? _headerAxis.ToString() : _banner);
-            }
-
-            switch (_type)
-            {
-                case TableType.Normal:
-                    if (_addTable != null)
-                    {
-                        function = _addTable;
-                    }
-                    break;
-                case TableType.Grid:
-                    if (_addGrid != null)
-                    {
-                        function = _addGrid;
-                    }
-                    break;
-                case TableType.GridSlice:
-                    if (_addGridSlice != null)
-                    {
-                        function = _addGridSlice;
-                    }
-                    break;
-                case TableType.MeanSummary:
-                    if (_addMeanSummary != null)
-                    {
-                        function = _addMeanSummary;
-                    }
-                    break;
-                case TableType.ResponseSummary:
-                    if (_addReponseSummary != null)
-                    {
-                        function = _addReponseSummary;
-                    }
-                    break;
-                case TableType.None:
-                default:
-                    break;
-            }
-
-            if (function != null)
-            {
-                function.SetFunctionParameterValue(side, TemplateParameterUsage.TableSideVariableName);
-                function.SetFunctionParameterValue(banner, TemplateParameterUsage.TableTopVariableName);
-                function.SetFunctionParameterValue(_tableLabel, TemplateParameterUsage.TableTitleText);
-                function.SetFunctionParameterValue(_tableBase, TemplateParameterUsage.TableBaseText);
-                return function.Exec();
+                _template.SetFunctionParameterValue(side, TemplateParameterUsage.TableSideVariableName);
+                _template.SetFunctionParameterValue(banner, TemplateParameterUsage.TableTopVariableName);
+                _template.SetFunctionParameterValue(_tableLabel, TemplateParameterUsage.TableTitleText);
+                _template.SetFunctionParameterValue(_tableBase, TemplateParameterUsage.TableBaseText);
+                return _template.Exec();
             }
 
             return string.Empty;
