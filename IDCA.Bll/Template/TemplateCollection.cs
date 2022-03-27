@@ -216,15 +216,15 @@ namespace IDCA.Bll.Template
             Type type = typeof(T);
             if (flag is FileTemplateFlags fileFlag && type.Equals(typeof(FileTemplate)))
             {
-                return _fileTemplates.ContainsKey(fileFlag) ? (T)_fileTemplates[fileFlag] : null;
+                return _fileTemplates.ContainsKey(fileFlag) ? (T)_fileTemplates[fileFlag].Clone() : null;
             }
             else if (flag is FunctionTemplateFlags functionFlag && type.Equals(typeof(FunctionTemplate)))
             {
-                return _functionTemplates.ContainsKey(functionFlag) ? (T)_functionTemplates[functionFlag] : null;
+                return _functionTemplates.ContainsKey(functionFlag) ? (T)_functionTemplates[functionFlag].Clone() : null;
             }
             else if (flag is ScriptTemplateFlags scriptFlag && type.Equals(typeof(ScriptTemplate)))
             {
-                return _scriptTemplates.ContainsKey(scriptFlag) ? (T)_scriptTemplates[scriptFlag] : null;
+                return _scriptTemplates.ContainsKey(scriptFlag) ? (T)_scriptTemplates[scriptFlag].Clone() : null;
             }
             return null;
         }

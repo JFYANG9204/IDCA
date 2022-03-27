@@ -60,6 +60,7 @@ namespace IDCA.Bll.SpecDocument
     {
         public Table(SpecObject parent) : base(parent)
         {
+            _objectType = SpecObjectType.Table;
             _type = TableType.None;
             _field = new FieldExpressionTemplate();
         }
@@ -168,7 +169,6 @@ namespace IDCA.Bll.SpecDocument
         /// <returns></returns>
         public string Export()
         {
-            string result = string.Empty;
             FunctionTemplate? function = null;
 
             string side, banner;
@@ -192,38 +192,37 @@ namespace IDCA.Bll.SpecDocument
 
             switch (_type)
             {
-                case TableType.None:
-                    break;
                 case TableType.Normal:
                     if (_addTable != null)
                     {
-                        function = (FunctionTemplate)_addTable.Clone();
+                        function = _addTable;
                     }
                     break;
                 case TableType.Grid:
                     if (_addGrid != null)
                     {
-                        function = (FunctionTemplate)_addGrid.Clone();
+                        function = _addGrid;
                     }
                     break;
                 case TableType.GridSlice:
                     if (_addGridSlice != null)
                     {
-                        function = (FunctionTemplate)_addGridSlice.Clone();
+                        function = _addGridSlice;
                     }
                     break;
                 case TableType.MeanSummary:
                     if (_addMeanSummary != null)
                     {
-                        function = (FunctionTemplate)_addMeanSummary.Clone();
+                        function = _addMeanSummary;
                     }
                     break;
                 case TableType.ResponseSummary:
                     if (_addReponseSummary != null)
                     {
-                        function = (FunctionTemplate)_addReponseSummary.Clone();
+                        function = _addReponseSummary;
                     }
                     break;
+                case TableType.None:
                 default:
                     break;
             }
@@ -237,7 +236,7 @@ namespace IDCA.Bll.SpecDocument
                 return function.Exec();
             }
 
-            return result;
+            return string.Empty;
         }
 
     }

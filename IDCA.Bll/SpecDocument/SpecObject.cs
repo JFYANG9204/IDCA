@@ -44,6 +44,7 @@ namespace IDCA.Bll.SpecDocument
         AxisElement,
         AxisElementTemplate,
         AxisParameter,
+        Manipulation,
         NewVariable,
     }
 
