@@ -349,28 +349,19 @@ namespace IDCA.Bll.Template
             return string.Empty;
         }
 
-        class FunctionParameter : ICloneable
+        class FunctionParameterValue : ICloneable
         {
-            public FunctionParameter(string name, string value, TemplateValueType valueType)
+            public FunctionParameterValue(string value, TemplateValueType valueType)
             {
-                _name = name;
                 _value = value;
                 _valueType = valueType;
             }
-
-            string _name;
-            public string Name { get => _name; set => _name = value; }
 
             string _value;
             public string Value { get => _value; set => _value = value; }
 
             TemplateValueType _valueType;
             public TemplateValueType ValueType { get => _valueType; set => _valueType = value; }
-
-            public string GetTemplate()
-            {
-                return $"$[{_name}]";
-            }
 
             public string GetValue()
             {
@@ -384,10 +375,11 @@ namespace IDCA.Bll.Template
 
             public object Clone()
             {
-                return new FunctionParameter(_name, _value, _valueType);
+                return new FunctionParameterValue(_value, _valueType);
             }
         }
 
+        readonly Dictionary<string, TemplateParameter> _paramCache = new();
         /// <summary>
         /// 将新的函数参数模板添加进集合末尾
         /// </summary>
@@ -396,7 +388,15 @@ namespace IDCA.Bll.Template
         /// <param name="type"></param>
         public void PushFunctionParameter(string name, string value, TemplateValueType type, TemplateParameterUsage usage)
         {
-            TryPushParameter(new FunctionParameter(name, value, type), TemplateParameterUsage.FunctionParameters, usage);
+            if (!_paramCache.ContainsKey(name.ToLower()) && _parameters[usage] == null)
+            {
+                TemplateParameter parameter = _parameters.NewObject();
+                parameter.Name = name;
+                parameter.Usage = usage;
+                parameter.SetValue(new FunctionParameterValue(value, type));
+                _paramCache.Add(name.ToLower(), parameter);
+                _parameters.Add(parameter);
+            }
         }
 
         /// <summary>
@@ -404,13 +404,13 @@ namespace IDCA.Bll.Template
         /// </summary>
         /// <param name="value"></param>
         /// <param name="usage"></param>
-        public void SetFunctionParameterValue(object value, TemplateParameterUsage usage)
+        public void SetFunctionParameterValue(string value, TemplateParameterUsage usage)
         {
-            TemplateParameter? parameter = _parameters[TemplateParameterUsage.FunctionParameters];
-            TemplateParameters? values;
-            if (parameter is not null && (values = parameter.GetValue<TemplateParameters>()) != null)
+            TemplateParameter? parameter = _parameters[usage];
+            FunctionParameterValue? paramValue;
+            if (parameter != null && (paramValue = parameter.GetValue<FunctionParameterValue>()) != null)
             {
-                values[usage]?.SetValue(value);
+                paramValue.Value = value;
             }
         }
 
@@ -428,17 +428,18 @@ namespace IDCA.Bll.Template
             StringBuilder result = new();
             result.Append(functionName);
             result.Append('(');
-            TemplateParameter? parameterParam = _parameters[TemplateParameterUsage.FunctionParameters];
-            TemplateParameters? functionParams = parameterParam?.GetValue<TemplateParameters>();
-            if (parameterParam != null && functionParams != null)
+            int count = 0;
+            foreach (TemplateParameter parameter in _paramCache.Values)
             {
-                for (int i = 0; i < functionParams.Count; i++)
+                FunctionParameterValue? paramValue = parameter.GetValue<FunctionParameterValue>();
+                if (paramValue != null)
                 {
-                    if (i > 0)
+                    if (count > 0)
                     {
                         result.Append(", ");
                     }
-                    result.Append(functionParams[i].GetValue<string>());
+                    result.Append(paramValue.GetValue());
+                    count++;
                 }
             }
             result.Append(')');
@@ -801,7 +802,7 @@ namespace IDCA.Bll.Template
         /// </summary>
         /// <param name="value"></param>
         /// <param name="usage"></param>
-        public void SetParameterValue(object value, TemplateParameterUsage usage)
+        public void SetParameterValue(string value, TemplateParameterUsage usage)
         {
             FunctionTemplate? function = _parameters[TemplateParameterUsage.FunctionTemplate]?.GetValue<FunctionTemplate>();
             if (function != null)
@@ -1011,6 +1012,17 @@ namespace IDCA.Bll.Template
             }
         }
 
+        string _lowerBoundary = string.Empty;
+        string _upperBoundary = string.Empty;
+        /// <summary>
+        /// 变量值区间下限
+        /// </summary>
+        public string LowerBoundary { get => _lowerBoundary; set => _lowerBoundary = value; }
+        /// <summary>
+        /// 变量值区间上限
+        /// </summary>
+        public string UpperBoundary { get => _upperBoundary; set => _upperBoundary = value; }
+
         readonly Dictionary<string, TemplateParameter> _categoricalCache = new();
         /// <summary>
         /// 设定当前元数据的Categorical子项，如果不存在，向集合中添加新的，如果已存在，修改已存在的内容。
@@ -1025,7 +1037,7 @@ namespace IDCA.Bll.Template
             if (_categoricalCache.ContainsKey(name.ToLower()))
             {
                 catParam = _categoricalCache[name.ToLower()];
-                MetadataCategorical? categorical = catParam.TryGetValue<MetadataCategorical>();
+                MetadataCategorical? categorical = catParam.GetValue<MetadataCategorical>();
                 if (catParam.Usage == TemplateParameterUsage.MetadataCategorical && categorical != null)
                 {
                     categorical.Label = label;
@@ -1054,7 +1066,7 @@ namespace IDCA.Bll.Template
             if (_subFieldsCache.ContainsKey(name.ToLower()))
             {
                 metaParam = _subFieldsCache[name.ToLower()];
-                MetadataTemplate? subField = metaParam.TryGetValue<MetadataTemplate>();
+                MetadataTemplate? subField = metaParam.GetValue<MetadataTemplate>();
                 if (subField != null)
                 {
                     return subField;
@@ -1086,7 +1098,92 @@ namespace IDCA.Bll.Template
 
         public override string Exec()
         {
-            throw new NotImplementedException();
+            if (_flag == MetadataTemplateFlag.None)
+            {
+                return string.Empty;
+            }
+
+            StringBuilder indent = new();
+            if (_indentLevel > 0)
+            {
+                for (int i = 0; i < _indentLevel; i++)
+                {
+                    indent.Append("    ");
+                }
+            }
+
+            StringBuilder builder = new();
+            // 变量名
+            TemplateParameter? metaNameParam = _parameters[TemplateParameterUsage.MetadataName];
+            builder.Append($"{indent}{(metaNameParam is null ? string.Empty : (metaNameParam.GetValue<string>() ?? string.Empty))}");
+            // 标签
+            TemplateParameter? labelParam = _parameters[TemplateParameterUsage.MetadataLabel];
+            string? label;
+            builder.Append(labelParam is null ? string.Empty : ((label = labelParam.GetValue<string>()) == null ? string.Empty : $"    \"{label}\""));
+            // 类型声明
+            switch (_flag)
+            {
+                case MetadataTemplateFlag.Long:
+                    builder.Append("    long");
+                    break;
+                case MetadataTemplateFlag.Double:
+                    builder.Append("    double");
+                    break;
+                case MetadataTemplateFlag.Text:
+                    builder.Append("    text");
+                    break;
+                case MetadataTemplateFlag.Info:
+                    builder.Append("    info");
+                    break;
+                case MetadataTemplateFlag.Categorical:
+                    builder.Append("    categorical");
+                    break;
+                case MetadataTemplateFlag.NumericLoop:
+                case MetadataTemplateFlag.CategoricalLoop:
+                    builder.Append("    loop");
+                    break;
+                case MetadataTemplateFlag.None:
+                default:
+                    break;
+            }
+            // 区间
+            if (!string.IsNullOrEmpty(_upperBoundary) || !string.IsNullOrEmpty(_lowerBoundary))
+            {
+                builder.Append($"[{(_upperBoundary.Equals(_lowerBoundary) ? _lowerBoundary : $"{_lowerBoundary}..{_upperBoundary}")}]");
+            }
+            // 不含脚本下级数据的类型
+            if (_flag == MetadataTemplateFlag.Long || _flag == MetadataTemplateFlag.Double || _flag == MetadataTemplateFlag.Info || _flag == MetadataTemplateFlag.Text)
+            {
+                builder.Append(';');
+                return builder.ToString();
+            }
+            // 含下级数据的类型
+            if (_flag == MetadataTemplateFlag.Categorical || _flag == MetadataTemplateFlag.CategoricalLoop)
+            {
+                builder.AppendLine();
+                builder.AppendLine($"{indent}{{");
+                _parameters.All((param, index) => builder.AppendLine($"{indent}    {param.GetValue<MetadataCategorical>()}{(index == _parameters.Count - 1 ? "" : ",")}"), TemplateParameterUsage.MetadataCategorical);
+                builder.Append('}');
+                if (_flag == MetadataTemplateFlag.Categorical)
+                {
+                    builder.Append(';');
+                    builder.AppendLine();
+                    return builder.ToString();
+                }
+            }
+
+            builder.AppendLine(" fields -");
+            builder.AppendLine($"{indent}(");
+            _parameters.All(param =>
+            {
+                MetadataTemplate? subField = param.GetValue<MetadataTemplate>();
+                if (subField != null)
+                {
+                    builder.AppendLine(subField.Exec());
+                }
+            }, TemplateParameterUsage.MetadataSubField);
+            builder.AppendLine($"{indent}) expand;");
+            return builder.ToString();
         }
     }
 

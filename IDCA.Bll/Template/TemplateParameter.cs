@@ -47,7 +47,6 @@ namespace IDCA.Bll.Template
 
         FunctionTemplate = 501,
         FunctionName = 502,
-        FunctionParameters = 503,
 
         MetadataTemplate = 601,
         MetadataName = 602,
@@ -56,7 +55,6 @@ namespace IDCA.Bll.Template
         MetadataSubField = 605,
     }
 
-    [Serializable]
     public class TemplateParameter : ICloneable
     {
         public TemplateParameter(TemplateParameters parent)
@@ -117,16 +115,6 @@ namespace IDCA.Bll.Template
         }
 
         /// <summary>
-        /// 尝试获取指定类型的参数值
-        /// </summary>
-        /// <typeparam name="OutType">需要获取的特定类型</typeparam>
-        /// <returns></returns>
-        public OutType? TryGetValue<OutType>()
-        {
-            return _value is OutType outValue ? outValue : default;
-        }
-
-        /// <summary>
         /// 尝试向当前值集合末尾添加新的参数对象
         /// </summary>
         /// <param name="value"></param>
@@ -152,11 +140,7 @@ namespace IDCA.Bll.Template
         /// <returns></returns>
         public OutType? GetValue<OutType>()
         {
-            if (typeof(OutType).IsInstanceOfType(_value))
-            {
-                return (OutType)_value;
-            }
-            return default;
+            return _value is OutType outValue ? outValue : default;
         }
 
         /// <summary>
