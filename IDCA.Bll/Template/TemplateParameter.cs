@@ -49,6 +49,11 @@ namespace IDCA.Bll.Template
         FunctionName = 502,
         FunctionParameters = 503,
 
+        MetadataTemplate = 601,
+        MetadataName = 602,
+        MetadataLabel = 603,
+        MetadataCategorical = 604,
+        MetadataSubField = 605,
     }
 
     [Serializable]

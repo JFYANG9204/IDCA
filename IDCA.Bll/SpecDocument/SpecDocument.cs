@@ -6,12 +6,14 @@ namespace IDCA.Bll.SpecDocument
 {
     public class SpecDocument : SpecObject
     {
-        public SpecDocument(string projectPath) : base()
+        public SpecDocument(string projectPath, string templateXmlPath) : base()
         {
             _projectPath = projectPath;
             _objectType = SpecObjectType.Document;
             _tables = new Tables(this);
+            _manipulations = new Manipulations(this);
             _templates = new TemplateCollection();
+            _templates.Load(templateXmlPath);
         }
 
         string _projectPath;
@@ -31,15 +33,14 @@ namespace IDCA.Bll.SpecDocument
         /// 初始化当前Spec文档，需要提供已载入的MDM文档对象和模板集合对象
         /// </summary>
         /// <param name="mdm">MDM文档对象</param>
-        /// <param name="templates">模板集合对象</param>
-        public void Init(MDMDocument.MDMDocument mdm, TemplateCollection templates)
+        public void Init(MDMDocument.MDMDocument mdm)
         {
             _mdmDocument = mdm;
-            _libraryFiles = templates.Library;
-            _otherUsefulFiles = templates.OtherUsefulFile;
-            _mddManipulationFile = templates.TryGet<FileTemplate, FileTemplateFlags>(FileTemplateFlags.ManipulationFile);
-            _tabFile = templates.TryGet<FileTemplate, FileTemplateFlags>(FileTemplateFlags.TableFile);
-            _onNextCaseFile = templates.TryGet<FileTemplate, FileTemplateFlags>(FileTemplateFlags.OnNextCaseFile);
+            _libraryFiles = _templates.Library;
+            _otherUsefulFiles = _templates.OtherUsefulFile;
+            _mddManipulationFile = _templates.TryGet<FileTemplate, FileTemplateFlags>(FileTemplateFlags.ManipulationFile);
+            _tabFile = _templates.TryGet<FileTemplate, FileTemplateFlags>(FileTemplateFlags.TableFile);
+            _onNextCaseFile = _templates.TryGet<FileTemplate, FileTemplateFlags>(FileTemplateFlags.OnNextCaseFile);
             _context = mdm.Context;
             _language = mdm.Language;
         }
@@ -56,7 +57,11 @@ namespace IDCA.Bll.SpecDocument
         /// </summary>
         public TemplateCollection Templates => _templates;
 
-
+        readonly Manipulations _manipulations;
+        /// <summary>
+        /// 当前文档的MDM修改集合
+        /// </summary>
+        public Manipulations Manipulations => _manipulations;
 
     }
 }

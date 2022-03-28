@@ -30,12 +30,12 @@ namespace IDCA.Mvvm
 
         public bool CanExecute(object? parameter)
         {
-            return _canExecute?.Invoke((T)parameter) ?? false;
+            return _canExecute?.Invoke((T?)parameter) ?? false;
         }
 
         public void Execute(object? parameter)
         {
-            _execute?.Invoke((T)parameter);
+            _execute?.Invoke((T?)parameter);
         }
 
     }

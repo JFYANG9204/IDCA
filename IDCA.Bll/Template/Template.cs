@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace IDCA.Bll.Template
@@ -34,6 +35,10 @@ namespace IDCA.Bll.Template
         /// 声明变量名模板
         /// </summary>
         Declare = 6,
+        /// <summary>
+        /// 元数据声明模板
+        /// </summary>
+        Metadata = 7,
         /// <summary>
         /// 将引用文件夹内的所有文件
         /// </summary>
@@ -94,7 +99,7 @@ namespace IDCA.Bll.Template
         /// <summary>
         /// 模板参数集合
         /// </summary>
-        public TemplateParameters Parameters => _parameters;
+        internal TemplateParameters Parameters => _parameters;
         /// <summary>
         /// 按照当前的参数配置进行文本修改，返回最终结果
         /// </summary>
@@ -898,5 +903,192 @@ namespace IDCA.Bll.Template
             return result;
         }
     }
+
+    public enum MetadataTemplateFlag
+    {
+        None,
+        Long,
+        Double,
+        Text,
+        Info,
+        Categorical,
+        NumericLoop,
+        CategoricalLoop,
+    }
+
+
+    public class MetadataTemplate : Template
+    {
+
+        public MetadataTemplate() : base(TemplateType.Metadata)
+        {
+            _flag = MetadataTemplateFlag.None;
+        }
+
+        public MetadataTemplate(MetadataTemplate template) : this()
+        {
+            _flag = template.Flag;
+        }
+
+        MetadataTemplateFlag _flag;
+        /// <summary>
+        /// 当前的元数据类型
+        /// </summary>
+        public MetadataTemplateFlag Flag { get => _flag; set => _flag = value; }
+
+        int _indentLevel = 0;
+        /// <summary>
+        /// 当前脚本的缩进级别
+        /// </summary>
+        public int IndentLevel { get => _indentLevel; set => _indentLevel = value; }
+
+        /// <summary>
+        /// 设定元数据的变量名
+        /// </summary>
+        /// <param name="name"></param>
+        public void SetMetadataName(string name)
+        {
+            TemplateParameter? nameParam = _parameters[TemplateParameterUsage.MetadataName];
+            if (nameParam != null)
+            {
+                nameParam.SetValue(name);
+            }
+            else
+            {
+                nameParam = _parameters.NewObject();
+                nameParam.Usage = TemplateParameterUsage.MetadataName;
+                nameParam.SetValue(name);
+                _parameters.Add(nameParam);
+            }
+        }
+
+        /// <summary>
+        /// 设定元数据的标签
+        /// </summary>
+        /// <param name="label"></param>
+        public void SetMetadataLabel(string label)
+        {
+            TemplateParameter? labelParam = _parameters[TemplateParameterUsage.MetadataLabel];
+            if (labelParam != null)
+            {
+                labelParam.SetValue(label);
+            }
+            else
+            {
+                labelParam = _parameters.NewObject();
+                labelParam.Usage = TemplateParameterUsage.MetadataLabel;
+                labelParam.SetValue(label);
+                _parameters.Add(labelParam);
+            }
+        }
+
+        class MetadataCategorical : ICloneable
+        {
+
+            public MetadataCategorical(string name, string label = "", string expression = "")
+            {
+                _name = name;
+                _label = label;
+                _expression = expression;
+            }
+
+            string _name;
+            string _label;
+            string _expression;
+
+            public string Name { get => _name; set => _name = value; }
+            public string Label { get => _label; set => _label = value; }
+            public string Expression { get => _expression; set => _expression = value; }
+
+            public object Clone()
+            {
+                return new MetadataCategorical(_name, _label, _expression);
+            }
+
+            public override string ToString()
+            {
+                return $"{_name}{(!string.IsNullOrEmpty(_label) ? $"    '{_label}'" : "")}{(!string.IsNullOrEmpty(_expression) ? $"    expression('{_expression}')" : "")}";
+            }
+        }
+
+        readonly Dictionary<string, TemplateParameter> _categoricalCache = new();
+        /// <summary>
+        /// 设定当前元数据的Categorical子项，如果不存在，向集合中添加新的，如果已存在，修改已存在的内容。
+        /// 存在与否以Name属性为准，不区分大小写。
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="label"></param>
+        /// <param name="expression"></param>
+        public void SetCategorical(string name, string label = "", string expression = "")
+        {
+            TemplateParameter catParam;
+            if (_categoricalCache.ContainsKey(name.ToLower()))
+            {
+                catParam = _categoricalCache[name.ToLower()];
+                MetadataCategorical? categorical = catParam.TryGetValue<MetadataCategorical>();
+                if (catParam.Usage == TemplateParameterUsage.MetadataCategorical && categorical != null)
+                {
+                    categorical.Label = label;
+                    categorical.Expression = expression;
+                }
+            }
+            else
+            {
+                catParam = _parameters.NewObject();
+                catParam.Usage = TemplateParameterUsage.MetadataCategorical;
+                catParam.SetValue(new MetadataCategorical(name, label, expression));
+                _categoricalCache.Add(name.ToLower(), catParam);
+                _parameters.Add(catParam);
+            }
+        }
+
+        readonly Dictionary<string, TemplateParameter> _subFieldsCache = new();
+        /// <summary>
+        /// 设定当前集合中指定名字的下级变量名称，如果已存在，直接返回，不存在的话，新建之后返回
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public MetadataTemplate SetSubField(string name)
+        {
+            TemplateParameter metaParam;
+            if (_subFieldsCache.ContainsKey(name.ToLower()))
+            {
+                metaParam = _subFieldsCache[name.ToLower()];
+                MetadataTemplate? subField = metaParam.TryGetValue<MetadataTemplate>();
+                if (subField != null)
+                {
+                    return subField;
+                }
+                MetadataTemplate newValue = new();
+                metaParam.SetValue(newValue);
+                newValue.IndentLevel++;
+                return newValue;
+            }
+            else
+            {
+                metaParam = _parameters.NewObject();
+                metaParam.Usage = TemplateParameterUsage.MetadataSubField;
+                MetadataTemplate value = new();
+                metaParam.SetValue(value);
+                value.IndentLevel++;
+                _subFieldsCache.Add(name.ToLower(), metaParam);
+                _parameters.Add(metaParam);
+                return value;
+            }
+        }
+
+        public override object Clone()
+        {
+            MetadataTemplate clone = new(this);
+            Clone(clone);
+            return clone;
+        }
+
+        public override string Exec()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
 
 }
