@@ -139,25 +139,6 @@ namespace IDCA.Bll.Template
             return parameter;
         }
 
-        /// <summary>
-        /// 如果特定用途参数的值是参数集合，尝试向参数列表的末尾添加新的元素
-        /// </summary>
-        /// <param name="value">添加的参数值</param>
-        /// <param name="usage">需要先其中添加的参数类型</param>
-        /// <param name="parameterUsage">需要添加参数的参数类型</param>
-        protected void TryPushParameter(object value, TemplateParameterUsage usage, TemplateParameterUsage parameterUsage)
-        {
-            TemplateParameter? parameter = _parameters[usage];
-            if (parameter is null)
-            {
-                parameter = _parameters.NewObject();
-                parameter.Usage = usage;
-                parameter.SetValue(new TemplateParameters(_parameters.Template));
-                _parameters.Add(parameter);
-            }
-            parameter.TryPushParam(value, parameterUsage);
-        }
-
     }
 
     /// <summary>
@@ -493,10 +474,25 @@ namespace IDCA.Bll.Template
         /// <summary>
         /// 向当前参数列表中添加循环体内容
         /// </summary>
-        /// <param name="value"></param>
-        public void PushScriptBody<BodyType>(object value)
+        /// <param name="value">单行的脚本内容</param>
+        public void PushScriptBody(object value)
         {
-            TryPushParameter(value, TemplateParameterUsage.ScriptBody, TemplateParameterUsage.ScriptBody);
+            TemplateParameter body = _parameters.NewObject();
+            body.Usage = TemplateParameterUsage.ScriptBody;
+            body.SetValue(value);
+            _parameters.Add(body);
+        }
+
+        /// <summary>
+        /// 向当前参数列表中添加循环体内容
+        /// </summary>
+        /// <param name="template">已知的模板对象</param>
+        public void PushScriptBody(Template template)
+        {
+            TemplateParameter body = _parameters.NewObject();
+            body.Usage = TemplateParameterUsage.ScriptBody;
+            body.SetValue(template.Exec());
+            _parameters.Add(body);
         }
 
         /// <summary>
@@ -516,18 +512,24 @@ namespace IDCA.Bll.Template
             parameter.SetValue(value);
         }
 
+        T?[] GetScriptBody<T>()
+        {
+            List<T?> values = new();
+            _parameters.All(param => values.Add(param.GetValue<T>() ?? default), TemplateParameterUsage.ScriptBody);
+            return values.ToArray();
+        }
+
         public override string Exec()
         {
             string result = string.Empty;
             string[]? totalVariables = _parameters[TemplateParameterUsage.ScriptLoopVariables]?.GetValue<string[]>();
-            TemplateParameter? bodyParam = _parameters[TemplateParameterUsage.ScriptBody];
             switch (_flag)
             {
                 case ScriptTemplateFlags.IfStatement:
                 case ScriptTemplateFlags.IfElseStatement:
                 case ScriptTemplateFlags.IfElseIfSatement:
                     {
-                        result = ScriptFactory.CreateIfElseScript(_indentLevel, bodyParam?.TryGetArray<(string, string[])>());
+                        result = ScriptFactory.CreateIfElseScript(_indentLevel, GetScriptBody<(string, string[])>());
                         break;
                     }
 
@@ -539,7 +541,7 @@ namespace IDCA.Bll.Template
                             totalVariables,
                             _parameters[TemplateParameterUsage.ScriptLowerBoundary]?.GetValue<string>(),
                             _parameters[TemplateParameterUsage.ScriptUpperBoundary]?.GetValue<string>(),
-                            bodyParam?.TryGetArray<string>());
+                            GetScriptBody<string>());
                         break;
                     }
 
@@ -550,7 +552,7 @@ namespace IDCA.Bll.Template
                             _parameters[TemplateParameterUsage.ScriptForVariable]?.GetValue<string>(),
                             totalVariables,
                             _parameters[TemplateParameterUsage.ScriptCollection]?.GetValue<string>(),
-                            bodyParam?.TryGetArray<string>());
+                            GetScriptBody<string>());
                         break;
                     }
 
@@ -560,7 +562,7 @@ namespace IDCA.Bll.Template
                             _indentLevel,
                             _parameters[TemplateParameterUsage.ScriptTest]?.GetValue<string>(),
                             totalVariables,
-                            bodyParam?.TryGetArray<string>());
+                            GetScriptBody<string>());
                         break;
                     }
 
@@ -570,7 +572,7 @@ namespace IDCA.Bll.Template
                             _indentLevel,
                             _parameters[TemplateParameterUsage.ScriptTest]?.GetValue<string>(),
                             totalVariables,
-                            bodyParam?.TryGetArray<string>());
+                            GetScriptBody<string>());
                         break;
                     }
 
@@ -580,7 +582,7 @@ namespace IDCA.Bll.Template
                             _indentLevel,
                             _parameters[TemplateParameterUsage.ScriptTest]?.GetValue<string>(),
                             totalVariables,
-                            bodyParam?.TryGetArray<string>());
+                            GetScriptBody<string>());
                         break;
                     }
 
@@ -590,7 +592,7 @@ namespace IDCA.Bll.Template
                             _indentLevel,
                             _parameters[TemplateParameterUsage.ScriptTest]?.GetValue<string>(),
                             totalVariables,
-                            bodyParam?.TryGetArray<string>());
+                            GetScriptBody<string>());
                         break;
                     }
 
@@ -600,7 +602,7 @@ namespace IDCA.Bll.Template
                             _indentLevel,
                             _parameters[TemplateParameterUsage.ScriptTest]?.GetValue<string>(),
                             totalVariables,
-                            bodyParam?.TryGetArray<string>());
+                            GetScriptBody<string>());
                         break;
                     }
             }
@@ -657,16 +659,6 @@ namespace IDCA.Bll.Template
         public FieldExpressionTemplate() : base(TemplateType.Field)
         {
             _flag = ExpressionTemplateFlags.Field;
-            // Top Level Field
-            var topLevelField = _parameters.NewObject();
-            topLevelField.Usage = TemplateParameterUsage.ScriptTopField;
-            topLevelField.SetValue("");
-            _parameters.Add(topLevelField);
-            // Sub Levels
-            var subLevelFields = _parameters.NewObject();
-            subLevelFields.Usage = TemplateParameterUsage.ScriptLevelField;
-            subLevelFields.SetValue(Array.Empty<(string, string)[]>());
-            _parameters.Add(subLevelFields);
         }
 
         protected FieldExpressionTemplate(FieldExpressionTemplate template) : base(template)
@@ -707,41 +699,22 @@ namespace IDCA.Bll.Template
         /// <param name="isCategorical">是否是Categorical类型</param>
         public void PushLevel(string codeName, string variableName, bool isCategorical)
         {
-            if (_parameters.Count == 0)
-            {
-                var topField = _parameters.NewObject();
-                topField.Usage = TemplateParameterUsage.ScriptTopField;
-                _parameters.Add(topField);
-            }
-            TemplateParameter? parameter = _parameters[TemplateParameterUsage.ScriptLevelField];
+            TemplateParameter subField = _parameters.NewObject();
+            subField.Usage = TemplateParameterUsage.ScriptLevelField;
             (string, string) item = new(variableName, isCategorical ? $"{{{codeName}}}" : codeName);
-            if (parameter == null)
-            {
-                parameter = _parameters.NewObject();
-                parameter.Usage = TemplateParameterUsage.ScriptLevelField;
-                parameter.SetValue(new (string, string)[] { item });
-                _parameters.Add(parameter);
-            }
-            else
-            {
-                parameter.TryPushParam(item, 0);
-            }
+            subField.SetValue(item);
+            _parameters.Add(subField);
         }
 
         public override string Exec()
         {
-            string topField = _parameters.Count > 0 ? (_parameters[0].GetValue<string>() ?? string.Empty) : string.Empty;
+            string topField = TopField;
             string result = topField;
-            TemplateParameter? topFieldParam = _parameters[TemplateParameterUsage.ScriptTopField];
-            TemplateParameter? levelFieldParam = _parameters[TemplateParameterUsage.ScriptLevelField];
-            if (topFieldParam != null)
+            if (_parameters[TemplateParameterUsage.ScriptLevelField] != null)
             {
-                (string, string)[]? levels = null;
-                if (levelFieldParam != null)
-                {
-                    levels = levelFieldParam.GetValue<(string, string)[]>();
-                }
-                result = ScriptFactory.CreateVariableTemplate(topField, levels);
+                List<(string, string)> levels = new();
+                _parameters.All(param => levels.Add(param.GetValue<(string, string)>()), TemplateParameterUsage.ScriptLevelField);
+                result = ScriptFactory.CreateVariableTemplate(topField, levels.ToArray());
             }
             return result;
         }

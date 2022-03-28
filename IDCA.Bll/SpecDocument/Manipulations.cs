@@ -124,7 +124,7 @@ namespace IDCA.Bll.SpecDocument
         /// </summary>
         /// <param name="value"></param>
         /// <param name="usage"></param>
-        public void TrySetParameterValue(object value, TemplateParameterUsage usage)
+        public void TrySetParameterValue(string value, TemplateParameterUsage usage)
         {
             if (_template != null)
             {

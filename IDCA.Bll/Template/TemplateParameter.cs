@@ -115,54 +115,12 @@ namespace IDCA.Bll.Template
         }
 
         /// <summary>
-        /// 尝试向当前值集合末尾添加新的参数对象
-        /// </summary>
-        /// <param name="value"></param>
-        public void TryPushParam(object value, TemplateParameterUsage usage)
-        {
-            if (_value is null)
-            {
-                _value = new TemplateParameters(_parameters.Template);
-            }
-
-            if (_value is TemplateParameters parameters)
-            {
-                var param = parameters.NewObject();
-                param.Usage = usage;
-                param.SetValue(value);
-                parameters.Add(param);
-            }
-        }
-
-        /// <summary>
         /// 获取当前模板参数值的字符串类型值
         /// </summary>
         /// <returns></returns>
         public OutType? GetValue<OutType>()
         {
             return _value is OutType outValue ? outValue : default;
-        }
-
-        /// <summary>
-        /// 尝试获取特定类型的参数值列表，如果没有符合类型的值，返回空列表
-        /// </summary>
-        /// <typeparam name="OutType">需要匹配的参数值类型</typeparam>
-        /// <returns></returns>
-        public OutType[] TryGetArray<OutType>(TemplateParameterUsage? usage = null)
-        {
-            List<OutType> array = new();
-            if (_value is TemplateParameters parameters)
-            {
-                parameters.All(param =>
-                {
-                    var value = param.GetValue<OutType>();
-                    if (value != null)
-                    {
-                        array.Add(value);
-                    }
-                }, usage);
-            }
-            return array.ToArray();
         }
 
         public object Clone()
@@ -285,16 +243,6 @@ namespace IDCA.Bll.Template
         public IEnumerator GetEnumerator()
         {
             return _parameters.GetEnumerator();
-        }
-
-        
-        public TemplateParameter? GetValue(TemplateParameterUsage usage)
-        {
-            if (!_usageCache.ContainsKey(usage))
-            {
-                return default;
-            }
-            return _usageCache[usage];
         }
 
         public object Clone()
