@@ -152,11 +152,17 @@ namespace IDCA.Bll.SpecDocument
         /// </summary>
         public string Title { get => _title; set => _title = value; }
 
-        string _banner = "banner";
+        readonly TemplateValue _banner = new();
         /// <summary>
-        /// 当前表格表头变量名，用于非Grid类型表格
+        /// 设置当前Table的表头定义数据和数据类型
         /// </summary>
-        public string Banner { get => _banner; set => _banner = value; }
+        /// <param name="banner"></param>
+        /// <param name="valueType"></param>
+        public void SetBanner(string banner, TemplateValueType valueType)
+        {
+            _banner.Value = banner;
+            _banner.ValueType = valueType;
+        }
 
         Axis? _headerAxis = null;
         /// <summary>
@@ -198,19 +204,20 @@ namespace IDCA.Bll.SpecDocument
                     side = _field.Exec();
                 }
 
+                TemplateValueType bannerType = _type == TableType.Grid ? TemplateValueType.String : _banner.ValueType;
                 if (_headerAxis != null && _headerAxis.Type == AxisType.Normal)
                 {
                     banner = _type == TableType.Grid ? $"{_field.TopField}{_headerAxis}" : $"{_banner}{_headerAxis}";
                 }
                 else
                 {
-                    banner = _type == TableType.Grid ? _field.TopField : ((_headerAxis != null && _headerAxis.Type == AxisType.AxisVariable) ? _headerAxis.ToString() : _banner);
+                    banner = _type == TableType.Grid ? _field.TopField : ((_headerAxis != null && _headerAxis.Type == AxisType.AxisVariable) ? _headerAxis.ToString() : _banner.ToString());
                 }
 
-                _template.SetFunctionParameterValue(side, TemplateParameterUsage.TableSideVariableName);
-                _template.SetFunctionParameterValue(banner, TemplateParameterUsage.TableTopVariableName);
-                _template.SetFunctionParameterValue(_tableLabel, TemplateParameterUsage.TableTitleText);
-                _template.SetFunctionParameterValue(_tableBase, TemplateParameterUsage.TableBaseText);
+                _template.SetFunctionParameterValue(side, TemplateValueType.String, TemplateParameterUsage.TableSideVariableName);
+                _template.SetFunctionParameterValue(banner, bannerType, TemplateParameterUsage.TableTopVariableName);
+                _template.SetFunctionParameterValue(_tableLabel, TemplateValueType.String, TemplateParameterUsage.TableTitleText);
+                _template.SetFunctionParameterValue(_tableBase, TemplateValueType.String, TemplateParameterUsage.TableBaseText);
                 return _template.Exec();
             }
 

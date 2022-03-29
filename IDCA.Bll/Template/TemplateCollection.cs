@@ -62,10 +62,9 @@ namespace IDCA.Bll.Template
                 throw new Exception("XML文件格式不正确，读取失败。");
             }
 
-            foreach (XElement element in root.Elements("template"))
-            {
-                LoadTemplate(element);
-            }
+            LoadNodeElements(root, "file", TemplateType.File);
+            LoadNodeElements(root, "folder", TemplateType.Folder);
+            LoadNodeElements(root, "function", TemplateType.Function);
         }
 
         static string TryReadTextFile(string path)
@@ -117,9 +116,20 @@ namespace IDCA.Bll.Template
             parameters.Add(param);
         }
 
-        void LoadTemplate(XElement element)
+        void LoadNodeElements(XElement root, string tagName, TemplateType type)
         {
-            TemplateType type = TryReadEnumValue<TemplateType>(element.Attribute("type"));
+            XElement? node = root.Element(tagName);
+            if (node != null)
+            {
+                foreach (XElement element in node.Elements("template"))
+                {
+                    LoadTemplate(element, type);
+                }
+            }
+        }
+
+        void LoadTemplate(XElement element, TemplateType type)
+        {
             Template? template = null;
             switch (type)
             {
@@ -166,6 +176,7 @@ namespace IDCA.Bll.Template
                     {
                         FunctionTemplateFlags functionFlag = TryReadEnumValue<FunctionTemplateFlags>(element.Attribute("flag"));
                         template = new FunctionTemplate { Flag = functionFlag };
+                        ((FunctionTemplate)template).SetFunctionName(TryReadStringValue(element.Attribute("name")));
                         SetTemplateValue(template, functionFlag, _functionTemplates);
                         break;
                     }
@@ -200,7 +211,18 @@ namespace IDCA.Bll.Template
 
             foreach (XElement param in element.Elements("param"))
             {
-                LoadParameter(template.Parameters, param);
+                if (type == TemplateType.Function)
+                {
+                    ((FunctionTemplate)template).PushFunctionParameter(
+                        TryReadStringValue(param.Attribute("name")), 
+                        TryReadStringValue(param.Attribute("default")), 
+                        TryReadEnumValue<TemplateValueType>(param.Attribute("valuetype")),
+                        TryReadEnumValue<TemplateParameterUsage>(param.Attribute("usage")));
+                }
+                else
+                {
+                    LoadParameter(template.Parameters, param);
+                }
             }
         }
 

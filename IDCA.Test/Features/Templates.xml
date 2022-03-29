@@ -1,16 +1,44 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <xml>
-	<template name="Job" type="1" flag="1" filename="Job.ini">
-		<param name="JobProjectPath" usage="101" />
-		<param name="JobMetaDataName" usage="102"/>
-		<param name="JobContextType" usage="103"/>
-		<param name="JobLanguageType" usage="104"/>
-	</template>
-	<template name="MddManipulation" type="1" flag="2" filename="MDD_Manipulation.mrs" />
-	<template name="Tab" type="1" flag="3" filename="Tab.mrs"/>
-	<template name="OnNextCase" type="1" flag="4" filename="OnNextCase.mrs" />
-	<template name="MetadataFile" type="1" flag="5" filename="sbMetadata.mrs" />
-	<template name="DmsMetadataFile" type="1" flag="6" filename="Metadata_dms.mrs" />
-	<template name="Library" type="99" path="Library" />
-	<template name="AddTableFunction" type="3" />
+	<file>
+		<template name="Job" flag="1" filename="Job.ini">
+			<param name="JobProjectPath" usage="101" />
+			<param name="JobMetaDataName" usage="102"/>
+			<param name="JobContextType" usage="103"/>
+			<param name="JobLanguageType" usage="104"/>
+		</template>
+		<template name="MddManipulation" flag="2" filename="MDD_Manipulation.mrs" />
+		<template name="Tab" flag="3" filename="Tab.mrs"/>
+		<template name="OnNextCase" flag="4" filename="OnNextCase.mrs" />
+		<template name="MetadataFile" flag="5" filename="sbMetadata.mrs" />
+		<template name="DmsMetadataFile" flag="6" filename="Metadata_dms.mrs" />
+	</file>
+	<folder>
+		<template name="Library" path="Library" />
+	</folder>
+	<function>
+		<template name="fnAddTable" flag="201">
+			<param name="TableDoc" usage="3012" valuetype="1" default="TableDoc" />
+			<param name="strSideSpec" usage="3032" valuetype="0" />
+			<param name="strTopSpec" usage="3022" valuetype="0" />
+			<param name="strTitleText" usage="3042" valuetype="1" default="Null" />
+			<param name="strBaseText" usage="3052" valuetype="0" default="" />
+		</template>
+		<template name="fnAddGrid" flag="202">
+			<param name="TableDoc" usage="3012" valuetype="1" default="TableDoc" />
+			<param name="strSideSpec" usage="3032" valuetype="0" />
+			<param name="strTopSpec" usage="3022" valuetype="0" />
+			<param name="strTitleText" usage="3042" valuetype="1" default="Null" />
+			<param name="strBaseText" usage="3052" valuetype="0" default="" />
+		</template>
+		<template name="fnAddGridSliceTables" flag="203">
+			<param name="TableDoc" usage="3012" valuetype="1" default="TableDoc" />
+			<param name="strGridName" usage="3032" valuetype="0" />
+			<param name="strTopSpec" usage="3022" valuetype="0" />
+			<param name="strTitleText" usage="3042" valuetype="1" default="Null" />
+			<param name="strBaseText" usage="3052" valuetype="0" default="" />
+			<param name="strShow" usage="3072" valuetype="1" default="Null" />
+			<param name="strSpec" usage="3082" valuetype="0" default="" />
+		</template>
+	</function>
 </xml>

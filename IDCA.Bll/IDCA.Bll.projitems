@@ -40,6 +40,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)SpecDocument\SpecObjectCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Template\Template.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Template\TemplateParameter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Template\TemplateValue.cs" />
     <Compile Include="..\IDCA.Bll\MDMDocument\IMDMDocument.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\IElement.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDMDocument\IField.cs" />

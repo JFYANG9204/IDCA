@@ -124,11 +124,11 @@ namespace IDCA.Bll.SpecDocument
         /// </summary>
         /// <param name="value"></param>
         /// <param name="usage"></param>
-        public void TrySetParameterValue(string value, TemplateParameterUsage usage)
+        public void TrySetParameterValue(string value, TemplateValueType valueType, TemplateParameterUsage usage)
         {
             if (_template != null)
             {
-                _template.SetFunctionParameterValue(value, usage);
+                _template.SetFunctionParameterValue(value, valueType, usage);
             }
         }
 

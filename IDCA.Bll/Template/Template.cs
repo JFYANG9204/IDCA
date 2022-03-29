@@ -46,33 +46,6 @@ namespace IDCA.Bll.Template
     }
 
     /// <summary>
-    /// 模板值类型，会影响文本替换的结果
-    /// </summary>
-    public enum TemplateValueType
-    {
-        /// <summary>
-        /// 字符串类型，替换后会被双引号包裹
-        /// </summary>
-        String,
-        /// <summary>
-        /// 变量名，不做修改
-        /// </summary>
-        Variable,
-        /// <summary>
-        /// 分类变量值类型，替换后会被花括号包裹
-        /// </summary>
-        Categorical,
-        /// <summary>
-        /// 数值，不做修改
-        /// </summary>
-        Number,
-        /// <summary>
-        /// 任意表达式，不做修改
-        /// </summary>
-        Expression,
-    }
-
-    /// <summary>
     /// 所有模板的基类，同时是虚类，无法被实例化，所有派生类都需要实现它的方法
     /// </summary>
     public abstract class Template : ICloneable
@@ -275,16 +248,16 @@ namespace IDCA.Bll.Template
     {
         None = 0,
 
-        ManipulateTitleLabel,
-        ManipulateSideLabel,
-        ManipulateSideAxis,
-        ManipulateTypeLabel,
+        ManipulateTitleLabel = 101,
+        ManipulateSideLabel = 102,
+        ManipulateSideAxis = 103,
+        ManipulateTypeLabel = 104,
 
-        TableNormal,
-        TableGrid,
-        TableGridSlice,
-        TableMeanSummary,
-        TableResponseSummary,
+        TableNormal = 201,
+        TableGrid = 202,
+        TableGridSlice = 203,
+        TableMeanSummary = 204,
+        TableResponseSummary = 205,
 
     }
 
@@ -297,7 +270,6 @@ namespace IDCA.Bll.Template
 
         public FunctionTemplate(FunctionTemplate template) : base(template)
         {
-            _flag = FunctionTemplateFlags.None;
         }
 
         FunctionTemplateFlags _flag;
@@ -312,7 +284,9 @@ namespace IDCA.Bll.Template
         /// <param name="functionName">函数名</param>
         public void SetFunctionName(string functionName)
         {
-            GetOrCreateParameter(TemplateParameterUsage.FunctionName).SetValue(functionName);
+            TemplateParameter nameParam = GetOrCreateParameter(TemplateParameterUsage.FunctionName);
+            nameParam.Name = "FunctionName";
+            nameParam.SetValue(functionName);
         }
 
         /// <summary>
@@ -330,37 +304,6 @@ namespace IDCA.Bll.Template
             return string.Empty;
         }
 
-        class FunctionParameterValue : ICloneable
-        {
-            public FunctionParameterValue(string value, TemplateValueType valueType)
-            {
-                _value = value;
-                _valueType = valueType;
-            }
-
-            string _value;
-            public string Value { get => _value; set => _value = value; }
-
-            TemplateValueType _valueType;
-            public TemplateValueType ValueType { get => _valueType; set => _valueType = value; }
-
-            public string GetValue()
-            {
-                return _valueType switch
-                {
-                    TemplateValueType.String => $"\"{_value}\"",
-                    TemplateValueType.Categorical => $"{{{_value}}}",
-                    _ => _value,
-                };
-            }
-
-            public object Clone()
-            {
-                return new FunctionParameterValue(_value, _valueType);
-            }
-        }
-
-        readonly Dictionary<string, TemplateParameter> _paramCache = new();
         /// <summary>
         /// 将新的函数参数模板添加进集合末尾
         /// </summary>
@@ -369,13 +312,12 @@ namespace IDCA.Bll.Template
         /// <param name="type"></param>
         public void PushFunctionParameter(string name, string value, TemplateValueType type, TemplateParameterUsage usage)
         {
-            if (!_paramCache.ContainsKey(name.ToLower()) && _parameters[usage] == null)
+            if (_parameters[usage] == null)
             {
                 TemplateParameter parameter = _parameters.NewObject();
                 parameter.Name = name;
                 parameter.Usage = usage;
-                parameter.SetValue(new FunctionParameterValue(value, type));
-                _paramCache.Add(name.ToLower(), parameter);
+                parameter.SetValue(new TemplateValue(value, type));
                 _parameters.Add(parameter);
             }
         }
@@ -385,13 +327,14 @@ namespace IDCA.Bll.Template
         /// </summary>
         /// <param name="value"></param>
         /// <param name="usage"></param>
-        public void SetFunctionParameterValue(string value, TemplateParameterUsage usage)
+        public void SetFunctionParameterValue(string value, TemplateValueType valueType, TemplateParameterUsage usage)
         {
             TemplateParameter? parameter = _parameters[usage];
-            FunctionParameterValue? paramValue;
-            if (parameter != null && (paramValue = parameter.GetValue<FunctionParameterValue>()) != null)
+            TemplateValue? paramValue;
+            if (parameter != null && (paramValue = parameter.GetValue<TemplateValue>()) != null)
             {
                 paramValue.Value = value;
+                paramValue.ValueType = valueType;
             }
         }
 
@@ -405,24 +348,26 @@ namespace IDCA.Bll.Template
         public override string Exec()
         {
             TemplateParameter? functionNameParam = _parameters[TemplateParameterUsage.FunctionName];
-            string functionName = functionNameParam?.ToString() ?? string.Empty;
+            string functionName = functionNameParam?.GetValue<string>() ?? string.Empty;
             StringBuilder result = new();
             result.Append(functionName);
             result.Append('(');
             int count = 0;
-            foreach (TemplateParameter parameter in _paramCache.Values)
-            {
-                FunctionParameterValue? paramValue = parameter.GetValue<FunctionParameterValue>();
-                if (paramValue != null)
+            _parameters.All(parameter =>
                 {
-                    if (count > 0)
+                    TemplateValue? paramValue = parameter.GetValue<TemplateValue>();
+                    if (paramValue != null)
                     {
-                        result.Append(", ");
+                        if (count > 0)
+                        {
+                            result.Append(", ");
+                        }
+                        result.Append(paramValue.ToString());
+                        count++;
                     }
-                    result.Append(paramValue.GetValue());
-                    count++;
-                }
-            }
+                },
+                parameter => (int)parameter.Usage > 1000 && (int)parameter.Usage % 10 == 2
+            );
             result.Append(')');
             return result.ToString();
         }
@@ -775,12 +720,12 @@ namespace IDCA.Bll.Template
         /// </summary>
         /// <param name="value"></param>
         /// <param name="usage"></param>
-        public void SetParameterValue(string value, TemplateParameterUsage usage)
+        public void SetParameterValue(string value, TemplateValueType valueType, TemplateParameterUsage usage)
         {
             FunctionTemplate? function = _parameters[TemplateParameterUsage.FunctionTemplate]?.GetValue<FunctionTemplate>();
             if (function != null)
             {
-                function.SetFunctionParameterValue(value, usage);
+                function.SetFunctionParameterValue(value, valueType, usage);
             }
         }
 

@@ -6,29 +6,36 @@ using System.Collections.Generic;
 namespace IDCA.Bll.Template
 {
     
+    // TemplateParameterUsage通过四位十进制值的最后一位来确定值的类别：
+    // 1 - 文件参数
+    // 2 - 函数参数
+
+
     public enum TemplateParameterUsage
     {
         None = 0,
 
-        JobProjectPath = 101,
-        JobMetaDataName = 102,
-        JobContextType = 103,
-        JobLanguageType = 104,
+        JobProjectPath = 1011,
+        JobMetaDataName = 1021,
+        JobContextType = 1031,
+        JobLanguageType = 1041,
         
-        ManipulateMDMDocument = 201,
-        ManipulateContextType = 202,
-        ManipulateLanguageType = 203,
-        ManipulateVariableName = 204,
-        ManipulateCodeName = 205,
-        ManipulateLabelText = 206,
-        ManipulateValue = 207,
+        ManipulateMDMDocument = 2012,
+        ManipulateContextType = 2022,
+        ManipulateLanguageType = 2032,
+        ManipulateVariableName = 2042,
+        ManipulateCodeName = 2052,
+        ManipulateLabelText = 2062,
+        ManipulateValue = 2072,
 
-        TableTopVariableName = 301,
-        TableSideVariableName = 302,
-        TableTitleText = 303,
-        TableBaseText = 304,
-        TableFilterText = 305,
-        TableExtraSettings = 306,
+        TableTableDocument = 3012,
+        TableTopVariableName = 3022,
+        TableSideVariableName = 3032,
+        TableTitleText = 3042,
+        TableBaseText = 3052,
+        TableFilterText = 3062,
+        TableGridSliceShowCodes = 3072,
+        TableGridSliceAdditionAxis = 3082,
 
         ScriptDeclaration = 401,
         ScriptLowerBoundary = 402,
@@ -227,6 +234,22 @@ namespace IDCA.Bll.Template
                 if (usage == null || _parameters[i].Usage == usage)
                 {
                     callback(_parameters[i], i);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 遍历列表中的所有元素，对所有元素执行回调函数，需要提供元素判断函数
+        /// </summary>
+        /// <param name="callback"></param>
+        /// <param name="verify"></param>
+        public void All(Action<TemplateParameter> callback, Func<TemplateParameter, bool> verify)
+        {
+            for (int i = 0; i < _parameters.Count; i++)
+            {
+                if (verify(_parameters[i]))
+                {
+                    callback(_parameters[i]);
                 }
             }
         }
