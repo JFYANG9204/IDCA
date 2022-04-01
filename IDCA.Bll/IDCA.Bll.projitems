@@ -10,7 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)FileBuilder\ITemplateEngine.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)IConfig.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Config.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Logger.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDM\Categories.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDM\CategoryMap.cs" />
@@ -30,13 +30,17 @@
     <Compile Include="$(MSBuildThisFileDirectory)MDM\Page.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDM\Script.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDM\Variable.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Spec\Assignment.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Spec\FileHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Spec\ScriptCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Spec\Axis.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Spec\Manipulations.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Spec\Metadata.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Spec\Script.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Spec\SpecConfig.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Spec\SpecDocument.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Spec\SpecElement.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Spec\Table.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Template\TemplateCollection.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Template\ScriptFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Spec\SpecObject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Spec\SpecObjectCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Template\Template.cs" />

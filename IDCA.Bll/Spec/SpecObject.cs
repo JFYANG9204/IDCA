@@ -45,7 +45,10 @@ namespace IDCA.Bll.Spec
         AxisElementTemplate,
         AxisParameter,
         Manipulation,
-        NewVariable,
+        Script,
+        Metadata,
+        MetadataProperty,
+        MetadataCategorical,
     }
 
 }

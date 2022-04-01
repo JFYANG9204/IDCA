@@ -7,16 +7,21 @@ namespace IDCA.Bll.Spec
 {
     public class SpecDocument : SpecObject
     {
-        public SpecDocument(string projectPath, string templateXmlPath) : base()
+        public SpecDocument(string projectPath, string templateXmlPath, Config config) : base()
         {
             _projectPath = projectPath;
             _objectType = SpecObjectType.Document;
             _tables = new Tables(this);
             _manipulations = new Manipulations(this);
-            _assignments = new Assignments(this);
+            _scripts = new ScriptCollection(this);
             _templates = new TemplateCollection();
             _templates.Load(templateXmlPath);
+            _config = config;
+            _dmsMetadata = new(this, config);
+            _metadata = new(this, config);
         }
+
+        readonly Config _config;
 
         string _projectPath;
         string _context = string.Empty;
@@ -30,6 +35,9 @@ namespace IDCA.Bll.Spec
         FileTemplate? _onNextCaseFile;
 
         MDMDocument? _mdmDocument;
+
+        MetadataCollection _dmsMetadata;
+        MetadataCollection _metadata;
 
         /// <summary>
         /// 初始化当前Spec文档，需要提供已载入的MDM文档对象和模板集合对象
@@ -65,11 +73,11 @@ namespace IDCA.Bll.Spec
         /// </summary>
         public Manipulations Manipulations => _manipulations;
 
-        readonly Assignments _assignments;
+        readonly ScriptCollection _scripts;
         /// <summary>
         /// 当前文档的赋值脚本语句集合
         /// </summary>
-        public Assignments Assignments => _assignments;
+        public ScriptCollection Scripts => _scripts;
 
     }
 }

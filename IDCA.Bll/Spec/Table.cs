@@ -67,7 +67,7 @@ namespace IDCA.Bll.Spec
         {
             _objectType = SpecObjectType.Table;
             _type = TableType.None;
-            _field = new FieldExpressionTemplate();
+            _field = new FieldScript(this);
         }
 
         string _name = string.Empty;
@@ -88,7 +88,7 @@ namespace IDCA.Bll.Spec
         /// </summary>
         public string TableBase { get => _tableBase; set => _tableBase = value; }
 
-        readonly FieldExpressionTemplate _field;
+        readonly FieldScript _field;
         FunctionTemplate? _template;
 
         /// <summary>
@@ -126,7 +126,7 @@ namespace IDCA.Bll.Spec
         /// <param name="variable">Top Level的变量名</param>
         public void SetTopLevelField(string variable)
         {
-            _field.SetTopField(variable);
+            
         }
 
         /// <summary>
@@ -135,9 +135,9 @@ namespace IDCA.Bll.Spec
         /// <param name="codeName">'[]'中的内容</param>
         /// <param name="variable">变量名，[..].后的内容</param>
         /// <param name="isCategorical">codeName是否是Categorical类型</param>
-        public void PushLevelField(string codeName, string variable, bool isCategorical)
+        public void PushLevelField(string variable, string? codeName, bool isCategorical = false)
         {
-            _field.PushLevel(codeName, variable, isCategorical);
+            _field.PushLevelField(variable, codeName, isCategorical);
         }
 
         TableType _type;
@@ -197,21 +197,21 @@ namespace IDCA.Bll.Spec
                 string side, banner;
                 if (_sideAxis != null)
                 {
-                    side = _sideAxis.Type == AxisType.AxisVariable ? _sideAxis.ToString() : $"{_field.Exec()}{_sideAxis}";
+                    side = _sideAxis.Type == AxisType.AxisVariable ? _sideAxis.ToString() : $"{_field.Export()}{_sideAxis}";
                 }
                 else
                 {
-                    side = _field.Exec();
+                    side = _field.Export();
                 }
 
                 TemplateValueType bannerType = _type == TableType.Grid ? TemplateValueType.String : _banner.ValueType;
                 if (_headerAxis != null && _headerAxis.Type == AxisType.Normal)
                 {
-                    banner = _type == TableType.Grid ? $"{_field.TopField}{_headerAxis}" : $"{_banner}{_headerAxis}";
+                    banner = _type == TableType.Grid ? $"{_field.TopLevel}{_headerAxis}" : $"{_banner}{_headerAxis}";
                 }
                 else
                 {
-                    banner = _type == TableType.Grid ? _field.TopField : ((_headerAxis != null && _headerAxis.Type == AxisType.AxisVariable) ? _headerAxis.ToString() : _banner.ToString());
+                    banner = _type == TableType.Grid ? _field.TopLevel : ((_headerAxis != null && _headerAxis.Type == AxisType.AxisVariable) ? _headerAxis.ToString() : _banner.ToString());
                 }
 
                 _template.SetFunctionParameterValue(side, TemplateValueType.String, TemplateParameterUsage.TableSideVariableName);

@@ -35,7 +35,6 @@ namespace IDCA.Bll.Template
         readonly List<FileTemplate> _otherUsefulFileTemplates = new();
         readonly Dictionary<FileTemplateFlags, Template> _fileTemplates = new();
         readonly Dictionary<FunctionTemplateFlags, Template> _functionTemplates = new();
-        readonly Dictionary<ScriptTemplateFlags, Template> _scriptTemplates = new();
 
         /// <summary>
         /// 当前模板集合中的Library部分文件模板
@@ -79,11 +78,6 @@ namespace IDCA.Bll.Template
         static string TryReadStringValue(XAttribute? attribute)
         {
             return attribute is null ? string.Empty : attribute.Value;
-        }
-
-        static int TryReadIntValue(XAttribute? attribute)
-        {
-            return (attribute != null && int.TryParse(attribute.Value, out int value)) ? value : 0;
         }
 
         static T TryReadEnumValue<T>(XAttribute? attribute)
@@ -160,18 +154,6 @@ namespace IDCA.Bll.Template
                         break;
                     }
 
-                case TemplateType.Script:
-                    {
-                        ScriptTemplateFlags scriptFlag = TryReadEnumValue<ScriptTemplateFlags>(element.Attribute("flag"));
-                        template = new ScriptTemplate
-                        {
-                            IndentLevel = TryReadIntValue(element.Attribute("indent")),
-                            Flag = scriptFlag
-                        };
-                        SetTemplateValue(template, scriptFlag, _scriptTemplates);
-                        break;
-                    }
-
                 case TemplateType.Function:
                     {
                         FunctionTemplateFlags functionFlag = TryReadEnumValue<FunctionTemplateFlags>(element.Attribute("flag"));
@@ -243,10 +225,6 @@ namespace IDCA.Bll.Template
             else if (flag is FunctionTemplateFlags functionFlag && type.Equals(typeof(FunctionTemplate)))
             {
                 return _functionTemplates.ContainsKey(functionFlag) ? (T)_functionTemplates[functionFlag].Clone() : null;
-            }
-            else if (flag is ScriptTemplateFlags scriptFlag && type.Equals(typeof(ScriptTemplate)))
-            {
-                return _scriptTemplates.ContainsKey(scriptFlag) ? (T)_scriptTemplates[scriptFlag].Clone() : null;
             }
             return null;
         }
