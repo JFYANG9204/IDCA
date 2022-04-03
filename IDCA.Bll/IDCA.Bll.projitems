@@ -30,7 +30,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)MDM\Page.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDM\Script.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDM\Variable.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Spec\FileHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Messages.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FileHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Spec\ScriptCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Spec\Axis.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Spec\Manipulations.cs" />

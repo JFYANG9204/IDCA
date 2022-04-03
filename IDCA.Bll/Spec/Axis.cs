@@ -49,7 +49,7 @@ namespace IDCA.Bll.Spec
         /// <returns></returns>
         public int CountIf(AxisElementType type)
         {
-            return _items.Select(item => item.Template.ElementType == type).Count();
+            return _items.Select(item => item.Template.ElementType == type).Count(val => val);
         }
 
         AxisElement AppendElement(AxisElementType type, string label, Action<AxisElement>? callback, params string[] parameters)
@@ -76,7 +76,7 @@ namespace IDCA.Bll.Spec
             return AppendElement(type, label, element => element.Name = $"{name}{CountIf(type) + 1}", parameters);
         }
 
-        AxisElement AppendMeanLike(AxisElementType type, string label, string name, string variable, string expression = "")
+        AxisElement AppendMeanLike(AxisElementType type, string label, string name, string variable = "", string expression = "")
         {
             if (string.IsNullOrEmpty(expression))
             {
@@ -145,7 +145,7 @@ namespace IDCA.Bll.Spec
         /// <param name="variable">基于的变量名</param>
         /// <param name="expression">可选的筛选器表达式</param>
         /// <returns></returns>
-        public AxisElement AppendNumeric(string label, string variable, string expression = "")
+        public AxisElement AppendNumeric(string label, string variable = "", string expression = "")
         {
             return AppendMeanLike(AxisElementType.Numeric, label, "numeric", variable, expression);
         }
@@ -168,7 +168,7 @@ namespace IDCA.Bll.Spec
         /// <param name="variable">基于的变量名</param>
         /// <param name="expression">可选的筛选器表达式</param>
         /// <returns></returns>
-        public AxisElement AppendMean(string label, string variable, string expression = "")
+        public AxisElement AppendMean(string label, string variable = "", string expression = "")
         {
             return AppendMeanLike(AxisElementType.Mean, label, "mean", variable, expression);
         }
@@ -180,7 +180,7 @@ namespace IDCA.Bll.Spec
         /// <param name="variable">基于的变量名</param>
         /// <param name="expression">可选的筛选器表达式</param>
         /// <returns></returns>
-        public AxisElement AppendStdErr(string label, string variable, string expression = "")
+        public AxisElement AppendStdErr(string label, string variable = "", string expression = "")
         {
             return AppendMeanLike(AxisElementType.StdErr, label, "stderr", variable, expression);
         }
@@ -192,7 +192,7 @@ namespace IDCA.Bll.Spec
         /// <param name="variable">基于的变量名</param>
         /// <param name="expression">可选的筛选器表达式</param>
         /// <returns></returns>
-        public AxisElement AppendStdDev(string label, string variable, string expression = "")
+        public AxisElement AppendStdDev(string label, string variable = "", string expression = "")
         {
             return AppendMeanLike(AxisElementType.StdDev, label, "stddev", variable, expression);
         }
@@ -224,7 +224,7 @@ namespace IDCA.Bll.Spec
         /// <param name="variable">基于的变量名</param>
         /// <param name="expression">可选的筛选器表达式</param>
         /// <returns></returns>
-        public AxisElement AppendMin(string label, string variable, string expression = "")
+        public AxisElement AppendMin(string label, string variable = "", string expression = "")
         {
             return AppendMeanLike(AxisElementType.Min, label, "min", variable, expression);
         }
@@ -236,7 +236,7 @@ namespace IDCA.Bll.Spec
         /// <param name="variable">基于的变量名</param>
         /// <param name="expression">可选的筛选器表达式</param>
         /// <returns></returns>
-        public AxisElement AppendMax(string label, string variable, string expression = "")
+        public AxisElement AppendMax(string label, string variable = "", string expression = "")
         {
             return AppendMeanLike(AxisElementType.Max, label, "max", variable, expression);
         }
@@ -270,7 +270,7 @@ namespace IDCA.Bll.Spec
         /// <param name="variable">基于的变量名</param>
         /// <param name="expression">可选的筛选器表达式</param>
         /// <returns></returns>
-        public AxisElement AppendSum(string label, string variable, string expression = "")
+        public AxisElement AppendSum(string label, string variable = "", string expression = "")
         {
             return AppendMeanLike(AxisElementType.Sum, label, "sum", variable, expression);
         }
@@ -282,7 +282,7 @@ namespace IDCA.Bll.Spec
         /// <param name="variable">基于的变量名</param>
         /// <param name="expression">可选的筛选器表达式</param>
         /// <returns></returns>
-        public AxisElement AppendMedian(string label, string variable, string expression = "")
+        public AxisElement AppendMedian(string label, string variable = "", string expression = "")
         {
             return AppendMeanLike(AxisElementType.Median, label, "med", variable, expression);
         }
@@ -307,7 +307,7 @@ namespace IDCA.Bll.Spec
         /// <param name="variable">基于的变量名</param>
         /// <param name="expression">可选的筛选器表达式</param>
         /// <returns></returns>
-        public AxisElement AppendMode(string label, string variable, string expression = "")
+        public AxisElement AppendMode(string label, string variable = "", string expression = "")
         {
             return AppendMeanLike(AxisElementType.Mode, label, "mode", variable, expression);
         }
@@ -340,6 +340,13 @@ namespace IDCA.Bll.Spec
             AppendElement(AxisElementType.InsertFunctionOrVariable, "", null, function.Exec());
         }
 
+        /// <summary>
+        /// 向当前集合末尾添加一个所有Category的表达式元素'..'
+        /// </summary>
+        public void AppendAllCategory()
+        {
+            AppendElement(AxisElementType.AllCategory, string.Empty, null);
+        }
     }
 
     public enum AxisType
@@ -396,13 +403,14 @@ namespace IDCA.Bll.Spec
         /// <returns></returns>
         public override string ToString()
         {
-            return _template.ElementType == AxisElementType.InsertFunctionOrVariable ? _template.ToString() : $"{_name} '{_description}' {_template}{_suffix}";
+            return $"{(string.IsNullOrEmpty(_name) ? "" : _name)}{(string.IsNullOrEmpty(_name) ? "" : $" '{_description}'")}{(string.IsNullOrEmpty(_name) ? "" : " ")}{_template}{_suffix}";
         }
     }
 
 
     public enum AxisElementType
     {
+        AllCategory,
         InsertFunctionOrVariable,
         Text,
         Base,
@@ -472,6 +480,7 @@ namespace IDCA.Bll.Spec
         {
             return _elementType switch
             {
+                AxisElementType.AllCategory => "..",
                 AxisElementType.InsertFunctionOrVariable => $"\" + {(_parameters.Count > 0 ? _parameters[0].ToString() : "")} + \"",
                 AxisElementType.Text => "text()",
                 AxisElementType.Base => $"base({(_parameters.Count > 0 ? $"'{_parameters[0]}'" : "")})",

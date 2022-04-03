@@ -80,14 +80,14 @@ namespace IDCA.Bll.Spec
         {
         }
 
-        Tuple<string, string?>[] _fields = Array.Empty<Tuple<string, string?>>();
+        Tuple<string, string>[] _fields = Array.Empty<Tuple<string, string>>();
         /// <summary>
         /// 向当前级别集合的末尾添加新的变量名和码号
         /// 如果Code为null，当只有一级时，是顶级变量，如果是下级Field，Code部分默认为..
         /// </summary>
         /// <param name="variable"></param>
         /// <param name="code"></param>
-        public void PushLevelField(string variable, string? code = null, bool isCategorical = false)
+        public void PushLevelField(string variable, string code = "", bool isCategorical = false)
         {
             if (!string.IsNullOrEmpty(variable))
             {
@@ -97,12 +97,25 @@ namespace IDCA.Bll.Spec
         }
 
         /// <summary>
+        /// 从字符串创建FieldScript对象，需要提供此对象的父级对象
+        /// </summary>
+        /// <param name="parent"></param>
+        /// <param name="field"></param>
+        /// <returns></returns>
+        public static FieldScript FromString(SpecObject parent, string? field)
+        {
+            var script = new FieldScript(parent);
+            script.FromString(field);
+            return script;
+        }
+
+        /// <summary>
         /// 从字符串读取Field脚本配置
         /// </summary>
         /// <param name="field"></param>
         public void FromString(string? field)
         {
-            _fields = Array.Empty<Tuple<string, string?>>();
+            _fields = Array.Empty<Tuple<string, string>>();
             if (string.IsNullOrEmpty(field))
             {
                 return;
@@ -175,6 +188,27 @@ namespace IDCA.Bll.Spec
                     return string.Empty;
                 }
                 return _fields[0].Item1;
+            }
+        }
+
+        /// <summary>
+        /// 获取下级变量和码号，ValueTuple的第一个值为变量名，第二个值为码号名。
+        /// 如果码号为空，默认为'..'
+        /// </summary>
+        public (string, string)[] SubLevels
+        {
+            get
+            {
+                if (_fields.Length == 1)
+                {
+                    return Array.Empty<(string, string)>();
+                }
+                var result = new (string, string)[_fields.Length - 1];
+                for (int i = 1; i < _fields.Length; i++)
+                {
+                    result[i - 1] = _fields[i].ToValueTuple();
+                }
+                return result;
             }
         }
 

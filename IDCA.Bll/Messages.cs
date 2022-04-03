@@ -1,0 +1,24 @@
+﻿
+namespace IDCA.Bll
+{
+    public class ExceptionMessages
+    {
+        // MDM 部分
+        public const string MDMFieldIsEmpty = "错误：MDM文档载入错误，未载入Fields集合。";
+        public const string MDMFieldIsNotFound = "错误：无法在MDM文档中找到名为'{0}'的Field。";
+        // Table 部分
+        public const string TableFieldIsNotSetted = "错误：未设定Table对象的Field信息，无法载入MDM文档Field对象。";
+        public const string TableFieldInvalid = "错误：Field'{0}'格式无效。";
+        // Tamplate 部分
+        public const string TemplateIsNotFind = "错误：未找到用于{0}的函数模板。";
+        // File
+        public const string FileWriteError = "错误：文本写入错误，路径：{0}";
+        // Spec
+        public const string SpecMDMIsNotInitialized = "警告：MDM文档未初始化。";
+    }
+
+    public class Messages
+    {
+        public const string FileWriteSuccess = "文件：'{0}'写入完成";
+    }
+}

@@ -13,10 +13,29 @@ namespace IDCA.Test
             string path = Path.Combine(Directory.GetCurrentDirectory(), @"..\..\..\Features\Templates.xml");
             SpecDocument spec = new("", path, new());
             FieldScript field = (FieldScript)spec.Scripts.NewScript(ScriptType.Field);
-            string fieldText = "A1[{_1}].Slice[2].Slice[";
+            string fieldText = "A1[{_1}].Slice[..].Column[{].";
             field.FromString(fieldText);
             string export = field.Export();
             System.Console.WriteLine(export);
+            Assert.AreEqual(export, "A1[{_1}].Slice[..].Column");
         }
+
+        [TestMethod]
+        public void AxisTest()
+        {
+            string path = Path.Combine(Directory.GetCurrentDirectory(), @"..\..\..\Features\Templates.xml");
+            SpecDocument spec = new("", path, new());
+            var manipulation = spec.Manipulations.NewObject();
+            manipulation.Axis.AppendTextElement();
+            manipulation.Axis.AppendBaseElement("Base : Total Respondent", "true");
+            manipulation.Axis.AppendTextElement();
+            manipulation.Axis.AppendAllCategory();
+            manipulation.Axis.AppendTextElement();
+            manipulation.Axis.AppendSubTotal("Sigma");
+            manipulation.Axis.AppendMean("Mean").Suffix.AppendIsHidden(true);
+            var result = manipulation.Axis.ToString();
+            System.Console.WriteLine(result);
+        }
+
     }
 }

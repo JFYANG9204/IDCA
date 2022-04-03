@@ -39,7 +39,22 @@ namespace IDCA.Bll.Spec
         /// <summary>
         /// 对应的MDM文档对象
         /// </summary>
-        public MDMDocument? MDMDocument => _mdmDocument;
+        public MDMDocument? MDMDocument
+        {
+            get
+            {
+                if (_mdmDocument == null)
+                {
+                    Logger.Warning("MDMDocumentNotInitialized", ExceptionMessages.SpecMDMIsNotInitialized);
+                }
+                return _mdmDocument;
+            }
+        }
+
+        /// <summary>
+        /// 当前文档的配置信息
+        /// </summary>
+        public Config Config => _config;
 
         readonly MetadataCollection _dmsMetadata;
         readonly MetadataCollection _metadata;

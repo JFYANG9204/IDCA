@@ -2,7 +2,7 @@
 using System;
 using System.IO;
 
-namespace IDCA.Bll.Spec
+namespace IDCA.Bll
 {
     internal class FileHelper
     {

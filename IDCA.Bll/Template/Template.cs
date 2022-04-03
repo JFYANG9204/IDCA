@@ -236,6 +236,8 @@ namespace IDCA.Bll.Template
         ManipulateSideLabel = 102,
         ManipulateSideAxis = 103,
         ManipulateTypeLabel = 104,
+        ManipulateAxisAverage = 105,
+        ManipulateAxisRebase = 106,
 
         TableNormal = 201,
         TableGrid = 202,

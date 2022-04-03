@@ -121,21 +121,12 @@ namespace IDCA.Bll.Spec
         }
 
         /// <summary>
-        /// 设置最上级变量名
-        /// </summary>
-        /// <param name="variable">Top Level的变量名</param>
-        public void SetTopLevelField(string variable)
-        {
-            
-        }
-
-        /// <summary>
         /// 向Field级别列表末尾添加新的下级别变量
         /// </summary>
         /// <param name="codeName">'[]'中的内容</param>
         /// <param name="variable">变量名，[..].后的内容</param>
         /// <param name="isCategorical">codeName是否是Categorical类型</param>
-        public void PushLevelField(string variable, string? codeName, bool isCategorical = false)
+        public void PushLevelField(string variable, string codeName = "", bool isCategorical = false)
         {
             _field.PushLevelField(variable, codeName, isCategorical);
         }
