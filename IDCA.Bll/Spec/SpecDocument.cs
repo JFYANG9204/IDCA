@@ -22,8 +22,7 @@ namespace IDCA.Bll.Spec
         }
 
         readonly Config _config;
-
-        string _projectPath;
+        readonly string _projectPath;
         string _context = string.Empty;
         string _language = string.Empty;
 
@@ -33,11 +32,17 @@ namespace IDCA.Bll.Spec
         FileTemplate? _mddManipulationFile;
         FileTemplate? _tabFile;
         FileTemplate? _onNextCaseFile;
+        FileTemplate? _dmsMetadataFile;
+        FileTemplate? _metadataFile;
 
         MDMDocument? _mdmDocument;
+        /// <summary>
+        /// 对应的MDM文档对象
+        /// </summary>
+        public MDMDocument? MDMDocument => _mdmDocument;
 
-        MetadataCollection _dmsMetadata;
-        MetadataCollection _metadata;
+        readonly MetadataCollection _dmsMetadata;
+        readonly MetadataCollection _metadata;
 
         /// <summary>
         /// 初始化当前Spec文档，需要提供已载入的MDM文档对象和模板集合对象
@@ -51,6 +56,8 @@ namespace IDCA.Bll.Spec
             _mddManipulationFile = _templates.TryGet<FileTemplate, FileTemplateFlags>(FileTemplateFlags.ManipulationFile);
             _tabFile = _templates.TryGet<FileTemplate, FileTemplateFlags>(FileTemplateFlags.TableFile);
             _onNextCaseFile = _templates.TryGet<FileTemplate, FileTemplateFlags>(FileTemplateFlags.OnNextCaseFile);
+            _dmsMetadataFile = _templates.TryGet<FileTemplate, FileTemplateFlags>(FileTemplateFlags.DmsMetadataFile);
+            _metadataFile = _templates.TryGet<FileTemplate, FileTemplateFlags>(FileTemplateFlags.MetadataFile);
             _context = mdm.Context;
             _language = mdm.Language;
         }
@@ -78,6 +85,18 @@ namespace IDCA.Bll.Spec
         /// 当前文档的赋值脚本语句集合
         /// </summary>
         public ScriptCollection Scripts => _scripts;
+
+        /// <summary>
+        /// 执行当前脚本配置，写入文件内容
+        /// </summary>
+        public void Exec()
+        {
+            _libraryFiles?.ForEach(file => FileHelper.WriteToFile(_projectPath, file));
+            _otherUsefulFiles?.ForEach(file => FileHelper.WriteToFile(_projectPath, file));
+            FileHelper.WriteToFile(_projectPath, _dmsMetadataFile, _dmsMetadata.Export());
+            FileHelper.WriteToFile(_projectPath, _metadataFile, _metadata.Export());
+            FileHelper.WriteToFile(_projectPath, _onNextCaseFile, _scripts.Export());
+        }
 
     }
 }

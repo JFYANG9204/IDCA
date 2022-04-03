@@ -83,14 +83,84 @@ namespace IDCA.Bll.Spec
         Tuple<string, string?>[] _fields = Array.Empty<Tuple<string, string?>>();
         /// <summary>
         /// 向当前级别集合的末尾添加新的变量名和码号
-        /// 如果Code为null，当只有一级是，是顶级变量，如果是下级Field，Code部分默认为..
+        /// 如果Code为null，当只有一级时，是顶级变量，如果是下级Field，Code部分默认为..
         /// </summary>
         /// <param name="variable"></param>
         /// <param name="code"></param>
         public void PushLevelField(string variable, string? code = null, bool isCategorical = false)
         {
-            Array.Resize(ref _fields, _fields.Length + 1);
-            _fields[^1] = new(variable, code is null ? code : (isCategorical ? $"{{{code}}}" : code));
+            if (!string.IsNullOrEmpty(variable))
+            {
+                Array.Resize(ref _fields, _fields.Length + 1);
+                _fields[^1] = new(variable, string.IsNullOrEmpty(code) ? code : (isCategorical ? $"{{{code}}}" : code));
+            }
+        }
+
+        /// <summary>
+        /// 从字符串读取Field脚本配置
+        /// </summary>
+        /// <param name="field"></param>
+        public void FromString(string? field)
+        {
+            _fields = Array.Empty<Tuple<string, string?>>();
+            if (string.IsNullOrEmpty(field))
+            {
+                return;
+            }
+
+            StringBuilder variable = new();
+            StringBuilder codes = new();
+            bool isCategorical = false;
+
+            int i = 0;
+            while (i < field.Length)
+            {
+                char c = field[i];
+                // []外部的字符是为变量名
+                if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '@' || c == '_' || c == '#' || (c >= '0' && c <= '9'))
+                {
+                    variable.Append(c);
+                }
+
+                if (c == '[' || i == field.Length - 1)
+                {
+                    PushLevelField(variable.ToString(), codes.ToString(), isCategorical);
+                    variable.Clear();
+                    codes.Clear();
+                    isCategorical = false;
+                    // 读取到'['时，开始读取下级变量码号，读取到'].'结束，需要[]内至少有一个字符
+                    if (c == '[' && i < field.Length - 3)
+                    {
+                        i++;
+                        // 开始Categorical
+                        if (field[i] == '{')
+                        {
+                            isCategorical = true;
+                            i++;
+                        }
+                        while (i < field.Length && field[i] != ']' && field[i] != '}')
+                        {
+                            codes.Append(field[i]);
+                            i++;
+                        }
+                        // 读取到结尾时，直接跳出，忽略当前码号
+                        if (i >= field.Length - 1)
+                        {
+                            break;
+                        }
+                        // 结束Categorical
+                        if (field[i] == '}')
+                        {
+                            i++;
+                        }
+                        // 跳过']'
+                        i++;
+                    }
+                }
+
+                i++;
+            }
+
         }
 
         /// <summary>
@@ -118,9 +188,9 @@ namespace IDCA.Bll.Spec
             }
             else
             {
-                for (int i = 1; i < _fields.Length - 1; i++)
+                for (int i = 1; i < _fields.Length; i++)
                 {
-                    builder.Append($"[{(_fields[i].Item2 is null ? ".." : $"{{{_fields[i].Item2}}}")}].{_fields[i].Item1}");
+                    builder.Append($"[{(string.IsNullOrEmpty(_fields[i].Item2) ? ".." : $"{_fields[i].Item2}")}].{_fields[i].Item1}");
                 }
             }
             return builder.ToString();

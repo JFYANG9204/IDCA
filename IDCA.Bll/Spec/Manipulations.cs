@@ -1,6 +1,7 @@
 ﻿
 
 using IDCA.Bll.Template;
+using System;
 
 namespace IDCA.Bll.Spec
 {
@@ -14,63 +15,20 @@ namespace IDCA.Bll.Spec
         }
 
         readonly TemplateCollection _templates;
-
-        Manipulation CreateManipulation(ManipulationType type)
+        /// <summary>
+        /// 创建空白的Manipulation对象，并添加进当前集合中
+        /// </summary>
+        /// <returns></returns>
+        public Manipulation CreateManipulation(string fieldName)
         {
             Manipulation manipulation = NewObject();
-            manipulation.Type = type;
             manipulation.Init(_templates);
             Add(manipulation);
             return manipulation;
         }
 
-        /// <summary>
-        /// 向当前集合末尾追加标题修改函数
-        /// </summary>
-        /// <returns></returns>
-        public Manipulation AppendFieldTitleManipulation()
-        {
-            return CreateManipulation(ManipulationType.Title);
-        }
-
-        /// <summary>
-        /// 向当前集合末尾追加轴表达式修改函数
-        /// </summary>
-        /// <returns></returns>
-        public Manipulation AppendAxisManipulation()
-        {
-            return CreateManipulation(ManipulationType.Axis);
-        }
-
-        /// <summary>
-        /// 向当前集合末尾追加表侧标签修改函数
-        /// </summary>
-        /// <returns></returns>
-        public Manipulation AppendResponseLabelManipulation()
-        {
-            return CreateManipulation(ManipulationType.ResponseLabel);
-        }
-
-        /// <summary>
-        /// 向当前集合末尾追加列表表侧标签修改函数
-        /// </summary>
-        /// <returns></returns>
-        public Manipulation AppendDifnitionLabelManipulation()
-        {
-            return CreateManipulation(ManipulationType.DefinitionLabel);
-        }
-
     }
 
-
-    public enum ManipulationType
-    {
-        None,
-        Title,
-        Axis,
-        ResponseLabel,
-        DefinitionLabel,
-    }
 
     /// <summary>
     /// 此类存储所有MDM文档修改相关函数内容，最后会合并到集合中，并写入到单独的文件里。
@@ -78,19 +36,17 @@ namespace IDCA.Bll.Spec
     public class Manipulation : SpecObject
     {
 
-        public Manipulation(SpecObject parent) : base(parent)
+        internal Manipulation(SpecObject parent) : base(parent)
         {
             _objectType = SpecObjectType.Manipulation;
         }
 
+        FunctionTemplate? _titleFunction;
+        FunctionTemplate? _axisFunction;
+        FunctionTemplate? _responseLabelFunction;
+        FunctionTemplate? _definitionLabelFunction;
 
-        ManipulationType _type = ManipulationType.None;
-        /// <summary>
-        /// 当前文档修改函数的类型
-        /// </summary>
-        public ManipulationType Type { get => _type; set => _type = value; }
-
-        FunctionTemplate? _template;
+        FunctionTemplate[] _templates = Array.Empty<FunctionTemplate>();
 
         /// <summary>
         /// 需要从已知的模板集合中读取所需类型的函数模板
@@ -98,45 +54,19 @@ namespace IDCA.Bll.Spec
         /// <param name="templates">已经读取完成的模板集合</param>
         public void Init(TemplateCollection templates)
         {
-            switch (_type)
-            {
-                case ManipulationType.None:
-                    break;
-                case ManipulationType.Title:
-                    _template = templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateTitleLabel);
-                    break;
-                case ManipulationType.Axis:
-                    _template = templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateSideAxis);
-                    break;
-                case ManipulationType.ResponseLabel:
-                    _template = templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateSideLabel);
-                    break;
-                case ManipulationType.DefinitionLabel:
-                    _template = templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateTypeLabel);
-                    break;
-                default:
-                    break;
-            }
+            _titleFunction = templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateTitleLabel);
+            _axisFunction = templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateSideAxis);
+            _responseLabelFunction = templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateSideLabel);
+            _definitionLabelFunction = templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateTypeLabel);
         }
 
-        /// <summary>
-        /// 尝试修改模板中参数的值，如果未载入模板，则忽略此次操作
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="usage"></param>
-        public void TrySetParameterValue(string value, TemplateValueType valueType, TemplateParameterUsage usage)
+        void Add(FunctionTemplate functionTemplate)
         {
-            if (_template != null)
-            {
-                _template.SetFunctionParameterValue(value, valueType, usage);
-            }
+            Array.Resize(ref _templates, _templates.Length + 1);
+            _templates[^1] = functionTemplate;
         }
 
 
-        public override string ToString()
-        {
-            return _template is null ? string.Empty : _template.Exec();
-        }
 
     }
 

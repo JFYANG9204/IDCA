@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IDCA.Bll.Template;
+using System;
 using System.IO;
 
 namespace IDCA.Bll.Spec
@@ -26,6 +27,7 @@ namespace IDCA.Bll.Spec
         {
             try
             {
+                FolderExist(Path.GetDirectoryName(filePath) ?? filePath);
                 StreamWriter stream = File.CreateText(filePath);
                 stream.WriteLine(content);
                 stream.Close();
@@ -35,6 +37,24 @@ namespace IDCA.Bll.Spec
             {
                 Logger.Error(e.Message, ExceptionMessages.FileWriteError, filePath);
             }
+        }
+
+        /// <summary>
+        /// 向当前文件模板写入内容，并写入到具体文件
+        /// </summary>
+        /// <param name="template"></param>
+        /// <param name="content"></param>
+        public static void WriteToFile(string projectPath, FileTemplate? template, string content = "")
+        {
+            if (template == null)
+            {
+                return;
+            }
+            if (!string.IsNullOrEmpty(content))
+            {
+                template.AppendLine(content);
+            }
+            WriteToFile(Path.Combine(projectPath, template.Directory, template.FileName), template.Exec());
         }
 
     }
