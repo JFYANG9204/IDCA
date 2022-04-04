@@ -1,4 +1,6 @@
 ﻿
+using System.Text;
+
 namespace IDCA.Bll.MDM
 {
     public class Field : Variable, IField
@@ -14,6 +16,23 @@ namespace IDCA.Bll.MDM
         IteratorType? _iteratorType;
         int? _upperBound;
         int? _lowerBound;
+
+        public string FullName
+        {
+            get
+            {
+                StringBuilder builder = new();
+                builder.Append(_name);
+                IMDMObject field = _parent.Parent.Parent;
+                while (field.ObjectType == MDMObjectType.Field)
+                {
+                    Field fieldObj = (Field)field;
+                    builder.Insert(0, $"{fieldObj.Name}{(fieldObj.IteratorType == MDM.IteratorType.Categorical ? "[..]" : "")}.");
+                    field = field.Parent.Parent.Parent;
+                }
+                return builder.ToString();
+            }
+        }
 
         public Variable? Reference
         {

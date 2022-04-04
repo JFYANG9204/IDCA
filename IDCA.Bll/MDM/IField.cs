@@ -4,6 +4,10 @@ namespace IDCA.Bll.MDM
     public interface IField : IMDMLabeledObject, IMDMRange
     {
         /// <summary>
+        /// 当前Field的完整名称，包含所有上级变量
+        /// </summary>
+        string FullName { get; }
+        /// <summary>
         /// 引用的对象，不引用返回null
         /// </summary>
         Variable? Reference { get; }

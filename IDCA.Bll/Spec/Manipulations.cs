@@ -42,6 +42,30 @@ namespace IDCA.Bll.Spec
             return manipulation;
         }
 
+        static void FromSingleField(Manipulation manipulation, Field field, string title)
+        {
+            manipulation.AppendTitleTextFunction(field.Name, title);
+            if (field.Categories != null)
+            {
+                foreach (Element category in field.Categories)
+                {
+                    manipulation.AppendResponseLabelFunction(category.Name, category.Label);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 从MDM Field列表对象创建基础的修改标签函数脚本
+        /// </summary>
+        /// <param name="type"></param>
+        public Manipulation FromField(Field field, string title)
+        {
+            Manipulation manipulation = CreateManipulation();
+            FromSingleField(manipulation, field, title);
+
+            return manipulation;
+        }
+
         /// <summary>
         /// 导出当前配置到字符串
         /// </summary>
@@ -152,21 +176,6 @@ namespace IDCA.Bll.Spec
             var template = (FunctionTemplate)_axisFunction.Clone();
             template.SetFunctionParameterValue(_field.Export(), TemplateValueType.String, TemplateParameterUsage.ManipulateFieldName);
             template.SetFunctionParameterValue(axis, TemplateValueType.String, TemplateParameterUsage.ManipulateSideAxis);
-            Add(template);
-        }
-
-        /// <summary>
-        /// 向模板集合末尾追加修改标题的函数模板
-        /// </summary>
-        public void AppendTitleFunction(string field, string title)
-        {
-            if (_titleFunction == null)
-            {
-                return;
-            }
-            var template = (FunctionTemplate)_titleFunction.Clone();
-            template.SetFunctionParameterValue(field, TemplateValueType.String, TemplateParameterUsage.ManipulateFieldName);
-            template.SetFunctionParameterValue(title, TemplateValueType.String, TemplateParameterUsage.ManipulateLabelText);
             Add(template);
         }
 
