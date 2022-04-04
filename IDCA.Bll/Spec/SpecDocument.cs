@@ -23,8 +23,6 @@ namespace IDCA.Bll.Spec
 
         readonly Config _config;
         readonly string _projectPath;
-        string _context = string.Empty;
-        string _language = string.Empty;
 
         List<FileTemplate>? _libraryFiles;
         List<FileTemplate>? _otherUsefulFiles;
@@ -52,6 +50,24 @@ namespace IDCA.Bll.Spec
         }
 
         /// <summary>
+        /// 修改当前MDM文档的上下文类型
+        /// </summary>
+        /// <param name="context"></param>
+        public void SetContext(string context)
+        {
+            _mdmDocument?.SetContext(context);
+        }
+
+        /// <summary>
+        /// 修改当前MDM文档的语言类型
+        /// </summary>
+        /// <param name="language"></param>
+        public void SetLanguage(string language)
+        {
+            _mdmDocument?.SetLanguage(language);
+        }
+
+        /// <summary>
         /// 当前文档的配置信息
         /// </summary>
         public Config Config => _config;
@@ -73,8 +89,6 @@ namespace IDCA.Bll.Spec
             _onNextCaseFile = _templates.TryGet<FileTemplate, FileTemplateFlags>(FileTemplateFlags.OnNextCaseFile);
             _dmsMetadataFile = _templates.TryGet<FileTemplate, FileTemplateFlags>(FileTemplateFlags.DmsMetadataFile);
             _metadataFile = _templates.TryGet<FileTemplate, FileTemplateFlags>(FileTemplateFlags.MetadataFile);
-            _context = mdm.Context;
-            _language = mdm.Language;
         }
 
         readonly Tables _tables;
@@ -111,6 +125,8 @@ namespace IDCA.Bll.Spec
             FileHelper.WriteToFile(_projectPath, _dmsMetadataFile, _dmsMetadata.Export());
             FileHelper.WriteToFile(_projectPath, _metadataFile, _metadata.Export());
             FileHelper.WriteToFile(_projectPath, _onNextCaseFile, _scripts.Export());
+            FileHelper.WriteToFile(_projectPath, _mddManipulationFile, _manipulations.Export());
+            FileHelper.WriteToFile(_projectPath, _tabFile, _tables.Export());
         }
 
     }

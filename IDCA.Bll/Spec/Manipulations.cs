@@ -42,9 +42,21 @@ namespace IDCA.Bll.Spec
             return manipulation;
         }
 
-        static void FromSingleField(Manipulation manipulation, Field field, string title)
+        /// <summary>
+        /// 从MDM Field列表对象创建基础的修改标签函数脚本，只添加本级Field的相关配置
+        /// </summary>
+        /// <param name="type"></param>
+        public Manipulation FromField(Field field, string title)
         {
-            manipulation.AppendTitleTextFunction(field.Name, title);
+            Manipulation manipulation = CreateManipulation();
+            manipulation.SetField(field.FullName);
+            manipulation.AppendTitleTextFunction(title);
+            // 如果是最下级变量，添加Axis轴表达式
+            if (field.Class == null)
+            {
+                manipulation.SetDefaultAxis();
+            }
+            // 添加Category元素的标签修改脚本
             if (field.Categories != null)
             {
                 foreach (Element category in field.Categories)
@@ -52,17 +64,6 @@ namespace IDCA.Bll.Spec
                     manipulation.AppendResponseLabelFunction(category.Name, category.Label);
                 }
             }
-        }
-
-        /// <summary>
-        /// 从MDM Field列表对象创建基础的修改标签函数脚本
-        /// </summary>
-        /// <param name="type"></param>
-        public Manipulation FromField(Field field, string title)
-        {
-            Manipulation manipulation = CreateManipulation();
-            FromSingleField(manipulation, field, title);
-
             return manipulation;
         }
 
@@ -130,6 +131,15 @@ namespace IDCA.Bll.Spec
         }
 
         /// <summary>
+        /// 配置当前对象的Field名
+        /// </summary>
+        /// <param name="field"></param>
+        public void SetField(string field)
+        {
+            _field.FromString(field);
+        }
+
+        /// <summary>
         /// 遍历所有当前集合中的模板元素，对每个元素执行回调函数
         /// </summary>
         /// <param name="callback"></param>
@@ -151,14 +161,14 @@ namespace IDCA.Bll.Spec
         /// 向模板集合末尾追加修改变量标题的函数模板
         /// </summary>
         /// <param name="title"></param>
-        public void AppendTitleTextFunction(string variable, string title)
+        public void AppendTitleTextFunction(string title)
         {
             if (_titleFunction == null)
             {
                 return;
             }
             var template = (FunctionTemplate)_titleFunction.Clone();
-            template.SetFunctionParameterValue(variable, TemplateValueType.String, TemplateParameterUsage.ManipulateFieldName);
+            template.SetFunctionParameterValue(_field.Export(), TemplateValueType.String, TemplateParameterUsage.ManipulateFieldName);
             template.SetFunctionParameterValue(title, TemplateValueType.String, TemplateParameterUsage.ManipulateLabelText);
             Add(template);
         }
@@ -233,12 +243,12 @@ namespace IDCA.Bll.Spec
         /// </summary>
         /// <param name="baseLabel"></param>
         /// <param name="baseFilter"></param>
-        public void SetDefaultAxis(string baseLabel = "", string baseFilter = "", bool addAverage = false, string averageVariable = "")
+        public void SetDefaultAxis(string baseFilter = "", bool addAverage = false, string averageVariable = "")
         {
             Config? config = Document?.Config;
             Axis axis = new(this, AxisType.Normal);
             axis.AppendTextElement();
-            axis.AppendBaseElement(baseLabel, baseFilter);
+            axis.AppendBaseElement(config?.TryGet<string>(SpecConfigKeys.AxisBaseLabel) ?? "", baseFilter);
             axis.AppendTextElement();
             axis.AppendAllCategory();
             axis.AppendTextElement();
