@@ -15,6 +15,8 @@ namespace IDCA.Bll
         public const string FileWriteError = "错误：文本写入错误，路径：{0}";
         // Spec
         public const string SpecMDMIsNotInitialized = "警告：MDM文档未初始化。";
+        // Settings
+        public const string SettingNetLikeRangeInvalid = "警告：Net/Combine码号配置格式错误，错误字符：'{0}'已跳过。";
     }
 
     public class Messages
