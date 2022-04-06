@@ -1,5 +1,6 @@
 ﻿using IDCA.Bll.MDM;
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace IDCA.Bll
@@ -14,7 +15,12 @@ namespace IDCA.Bll
 
         readonly MDMDocument _MDM;
         readonly Config _config;
-        TableSetting[] _settings = Array.Empty<TableSetting>();
+        readonly List<TableSetting> _settings = new();
+
+        /// <summary>
+        /// 当前配置集合中的元素数量
+        /// </summary>
+        public int Count => _settings.Count;
 
         /// <summary>
         /// 创建新的表格配置对象，并添加进当前集合中
@@ -29,13 +35,53 @@ namespace IDCA.Bll
                 Logger.Warning("MDMFieldIsNotFound", ExceptionMessages.TableFieldIsNotSetted, field);
                 return null;
             }
-            TableSetting setting = new(mdmField, _config);
-            Array.Resize(ref _settings, _settings.Length + 1);
-            _settings[^1] = setting;
+            TableSetting setting = new(this, mdmField, _config);
+            Add(setting);
             return setting;
         }
 
+        /// <summary>
+        /// 向当前集合的末尾追加新的元素
+        /// </summary>
+        /// <param name="setting"></param>
+        public void Add(TableSetting setting)
+        {
+            _settings.Add(setting);
+        }
 
+        /// <summary>
+        /// 移除特定索引位置的元素
+        /// </summary>
+        /// <param name="index"></param>
+        public void RemoveAt(int index)
+        {
+            if (index < 0 || index >= _settings.Count)
+            {
+                return;
+            }
+            _settings.RemoveAt(index);
+        }
+
+        /// <summary>
+        /// 移除特定名称的配置对象
+        /// </summary>
+        /// <param name="name"></param>
+        public void Remove(string name)
+        {
+            int index = -1;
+            for (int i = 0; i < _settings.Count; i++)
+            {
+                if (_settings[i].Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+                {
+                    index = i;
+                    break;
+                }
+            }
+            if (index > -1)
+            {
+                RemoveAt(index);
+            }
+        }
 
     }
 
@@ -50,19 +96,31 @@ namespace IDCA.Bll
 
     public class TableSetting
     {
-        public TableSetting(Field field, Config config)
+        public TableSetting(Setting setting, Field field, Config config)
         {
+            _setting = setting;
             _field = field;
             _config = config;
+            _name = $"TS{setting.Count + 1}";
         }
 
+        readonly Setting _setting;
         readonly Field _field;
         TableType _type = TableType.Normal;
         readonly Config _config;
+        readonly string _name;
         string _tableTitle = string.Empty;
         string _baseLabel = string.Empty;
         NetLikeSettingElement[] _net = Array.Empty<NetLikeSettingElement>();
 
+        /// <summary>
+        /// 当前配置元素的父级Setting集合对象
+        /// </summary>
+        public Setting Setting => _setting;
+        /// <summary>
+        /// 当前配置元素的对象名称
+        /// </summary>
+        public string Name => _name;
         /// <summary>
         /// 当前表格配置的表格类型
         /// </summary>
@@ -162,7 +220,7 @@ namespace IDCA.Bll
                 return;
             }
 
-            _name = $"net{_parent.Net.Length + 1}";
+            _name = $"n{_parent.Net.Length + 1}";
             string? netAheadLabel = _config.TryGet<string>(SpecConfigKeys.AxisNetAheadLabel);
             _label = $"{(string.IsNullOrEmpty(netAheadLabel) ? "" : $"{netAheadLabel}.")}{label}";
 

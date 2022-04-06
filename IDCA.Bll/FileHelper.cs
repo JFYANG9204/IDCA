@@ -1,6 +1,7 @@
 ﻿using IDCA.Bll.Template;
 using System;
 using System.IO;
+using System.Text;
 
 namespace IDCA.Bll
 {
@@ -56,6 +57,7 @@ namespace IDCA.Bll
             }
             WriteToFile(Path.Combine(projectPath, template.Directory, template.FileName), template.Exec());
         }
+
 
     }
 }

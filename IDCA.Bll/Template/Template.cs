@@ -1,6 +1,5 @@
 ﻿
 using System;
-using System.Collections.Generic;
 using System.Text;
 
 namespace IDCA.Bll.Template
@@ -167,6 +166,7 @@ namespace IDCA.Bll.Template
         string _fileName;
         FileTemplateFlags _flag;
         protected StringBuilder _content;
+        public Encoding _encoding = Encoding.GetEncoding("GB2312");
 
         /// <summary>
         /// 模板文件路径
@@ -184,6 +184,10 @@ namespace IDCA.Bll.Template
         /// 文件文本模板内容，所有需要替换的内容需要满足格式 ：$[variable]，变量名不区分大小写
         /// </summary>
         public string Content { get => _content.ToString(); }
+        /// <summary>
+        /// 当前文本的编码格式
+        /// </summary>
+        public Encoding Encoding { get => _encoding; set => _encoding = value; }
 
         /// <summary>
         /// 设置当前的文本内容，会清除之前已有的内容

@@ -50,4 +50,9 @@ namespace IDCA.Bll
         public const string AxisCombinePosition = "AxisCombinePosition";
     }
 
+    public class TemplateConfigKeys
+    {
+        public const string FileTemplateEncoding = "FileTemplateEncoding";
+    }
+
 }
