@@ -79,6 +79,38 @@ namespace IDCA.Bll.MDM
 
         new public MDMObjectType ObjectType => _objectType;
         public bool GlobalNamespace { get => _globalNamespace; internal set => _globalNamespace = value; }
+    
+        new public Field? this[string name]
+        {
+            get
+            {
+                string lowerName = name.ToLower();
+                if (_cache.ContainsKey(lowerName))
+                {
+                    return _cache[lowerName];
+                }
+                string[] fields = StringHelper.ReadFieldNames(name);
+                if (fields.Length > 1)
+                {
+                    Fields? sub = this;
+                    for (int i = 0; i < fields.Length; i++)
+                    {
+                        string field = fields[i];
+                        Field? subField = sub[field];
+                        if (i == field.Length - 1)
+                        {
+                            return subField;
+                        }
+                        if (subField == null || subField.Class == null || subField.Class.Fields == null)
+                        {
+                            return null;
+                        }
+                        sub = subField.Class.Fields;
+                    }
+                }
+                return null;
+            }
+        }
     }
 
 }

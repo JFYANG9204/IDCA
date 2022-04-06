@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 namespace IDCA.Bll
 {
@@ -44,6 +45,49 @@ namespace IDCA.Bll
             return startLength > 0 && source.Length == 0 ? "0" : source.ToString();
         }
 
+        /// <summary>
+        /// 从字符串读取所有Field名称，返回Field名组成的数组
+        /// </summary>
+        /// <param name="fieldName"></param>
+        /// <returns></returns>
+        internal static string[] ReadFieldNames(string? fieldName)
+        {
+            string[] fields = Array.Empty<string>();
+            if (string.IsNullOrEmpty(fieldName))
+            {
+                return fields;
+            }
+            StringBuilder builder = new();
+            int i = 0;
+            while (i < fieldName.Length)
+            {
+                char ch = fieldName[i];
 
+                if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '_' || ch == '@' || ch == '#' || (ch >= '0' && ch <= '9'))
+                {
+                    builder.Append(ch);
+                }
+
+                if (ch == '[')
+                {
+                    while (i <= fieldName.Length - 1 && ch != ']')
+                    {
+                        ch = fieldName[++i];
+                    }
+                    // 跳过']'
+                    ch = fieldName[++i];
+                }
+
+                if (ch == '.' || i >= fieldName.Length - 1)
+                {
+                    Array.Resize(ref fields, fields.Length + 1);
+                    fields[^1] = builder.ToString();
+                    builder.Clear();
+                }
+
+                i++;
+            }
+            return fields;
+        }
     }
 }
