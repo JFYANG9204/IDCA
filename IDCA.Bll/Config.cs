@@ -40,4 +40,14 @@ namespace IDCA.Bll
         }
     }
 
+    public class SpecConfigKeys
+    {
+        public const string MetadataCategoricalLabel = "MetadataCategoricalLabel";
+        public const string AxisBaseLabel = "AxisBaseLabel";
+        public const string AxisSigmaLabel = "AxisSigmaLabel";
+        public const string AxisNetAheadLabel = "AxisNetAheadLabel";
+        public const string AxisTopBottomBoxPositon = "AxisTopBottomBoxPositon";
+        public const string AxisCombinePosition = "AxisCombinePosition";
+    }
+
 }

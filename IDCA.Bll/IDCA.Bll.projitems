@@ -37,7 +37,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Spec\Manipulations.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Spec\Metadata.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Spec\Script.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Spec\SpecConfig.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Spec\SpecDocument.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Spec\Table.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)StringHelper.cs" />

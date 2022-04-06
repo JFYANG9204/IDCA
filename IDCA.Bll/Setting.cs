@@ -1,23 +1,130 @@
 ﻿using IDCA.Bll.MDM;
+using System;
 using System.Text;
 
 namespace IDCA.Bll
 {
     public class Setting
     {
+        public Setting(MDMDocument document, Config config)
+        {
+            _MDM = document;
+            _config = config;
+        }
+
+        readonly MDMDocument _MDM;
+        readonly Config _config;
+        TableSetting[] _settings = Array.Empty<TableSetting>();
+
+        /// <summary>
+        /// 创建新的表格配置对象，并添加进当前集合中
+        /// </summary>
+        /// <param name="field"></param>
+        /// <returns></returns>
+        public TableSetting? NewTableSetting(string field)
+        {
+            Field? mdmField = _MDM.Fields[field];
+            if (mdmField == null)
+            {
+                Logger.Warning("MDMFieldIsNotFound", ExceptionMessages.TableFieldIsNotSetted, field);
+                return null;
+            }
+            TableSetting setting = new(mdmField, _config);
+            Array.Resize(ref _settings, _settings.Length + 1);
+            _settings[^1] = setting;
+            return setting;
+        }
+
+
+
     }
 
-    public class NetLikeElement
+    public enum TableType
     {
-        public NetLikeElement(NetLikeType type)
+        Normal,
+        Grid,
+        GridSlice,
+        ResponseSummary,
+        MeanSummary
+    }
+
+    public class TableSetting
+    {
+        public TableSetting(Field field, Config config)
         {
-            _type = type;
+            _field = field;
+            _config = config;
+        }
+
+        readonly Field _field;
+        TableType _type = TableType.Normal;
+        readonly Config _config;
+        string _tableTitle = string.Empty;
+        string _baseLabel = string.Empty;
+        NetLikeSettingElement[] _net = Array.Empty<NetLikeSettingElement>();
+
+        /// <summary>
+        /// 当前表格配置的表格类型
+        /// </summary>
+        public TableType Type { get => _type; set => _type = value; }
+        /// <summary>
+        /// 当前表格配置的表格标题
+        /// </summary>
+        public string TableTitle { get => _tableTitle; set => _tableTitle = value; }
+        /// <summary>
+        /// 当前表格配置的基数行标签
+        /// </summary>
+        public string BaseLabel { get => _baseLabel; set => _baseLabel = value; }
+        /// <summary>
+        /// 当前表格配置的MDMField对象
+        /// </summary>
+        public Field Field => _field;
+        /// <summary>
+        /// 当前表格配置的Net/Combine配置集合
+        /// </summary>
+        public NetLikeSettingElement[] Net => _net;
+        /// <summary>
+        /// 向当前的Net集合中添加新的元素并将其返回
+        /// </summary>
+        /// <returns></returns>
+        public NetLikeSettingElement NewNetElement()
+        {
+            NetLikeSettingElement element = new(this, _config);
+            Array.Resize(ref _net, _net.Length + 1);
+            _net[^1] = element;
+            return element;
+        }
+
+    }
+
+    public enum NetLikeType
+    {
+        StandardNet,
+        CombineAhead,
+        CombineAfterAll,
+        CombineAfterSum,
+    }
+
+    public class NetLikeSettingElement
+    {
+        public NetLikeSettingElement(TableSetting parent, Config config)
+        {
+            _parent = parent;
+            _type = NetLikeType.StandardNet;
             _name = string.Empty;
             _label = string.Empty;
             _codes = new();
+            _field = parent.Field;
+            _config = config;
         }
 
-        readonly NetLikeType _type;
+        readonly TableSetting _parent;
+        /// <summary>
+        /// 当前NetLike配置的父级表格配置对象
+        /// </summary>
+        public TableSetting Parent => _parent;
+
+        NetLikeType _type;
         /// <summary>
         /// 当前元素的类型，是Combine还是Net
         /// </summary>
@@ -26,15 +133,17 @@ namespace IDCA.Bll
         string _name;
         string _label;
         readonly StringBuilder _codes;
+        readonly Field _field;
+        readonly Config _config;
 
         /// <summary>
         /// 当前Net或Combine元素的变量名
         /// </summary>
-        public string Name { get => _name; set => _name = value; }
+        public string Name => _name;
         /// <summary>
         /// 当前Net或Combine元素的标签
         /// </summary>
-        public string Label { get => _label; set => _label = value; }
+        public string Label => _label;
         /// <summary>
         /// 当前Net或Combine元素所需要的码号
         /// </summary>
@@ -43,20 +152,29 @@ namespace IDCA.Bll
         /// 从字符串读取码号
         /// </summary>
         /// <param name="source"></param>
-        public void FromString(Field field, string source)
+        public void FromString(string label, string source, bool isCombine = false)
         {
             _codes.Clear();
 
             // 如果field对象的Categories属性为null，由于缺少码号搜索的依据，直接返回
-            if (field.Categories == null)
+            if (_field.Categories == null)
             {
                 return;
+            }
+
+            _name = $"net{_parent.Net.Length + 1}";
+            string? netAheadLabel = _config.TryGet<string>(SpecConfigKeys.AxisNetAheadLabel);
+            _label = $"{(string.IsNullOrEmpty(netAheadLabel) ? "" : $"{netAheadLabel}.")}{label}";
+
+            if (isCombine)
+            {
+                _type = _config.TryGet<NetLikeType>(SpecConfigKeys.AxisCombinePosition);
             }
 
             string[] codes = source.Split(',');
             for (int i = 0; i < codes.Length; i++)
             {
-                string code = codes[i];
+                string code = codes[i].Trim();
                 if (string.IsNullOrEmpty(code))
                 {
                     continue;
@@ -77,7 +195,7 @@ namespace IDCA.Bll
                         continue;
                     }
 
-                    foreach (Element element in field.Categories)
+                    foreach (Element element in _field.Categories)
                     {
                         string numberAtRight = StringHelper.NumberAtRight(element.Name);
                         if (string.IsNullOrEmpty(numberAtRight) || !int.TryParse(numberAtRight, out int categoryValue))
@@ -94,7 +212,7 @@ namespace IDCA.Bll
                 else if (range.Length == 1)
                 {
                     string? codeName = null;
-                    Element? exactElement = field.Categories[code];
+                    Element? exactElement = _field.Categories[code];
                     if (exactElement != null)
                     {
                         codeName = exactElement.Name;
@@ -102,7 +220,7 @@ namespace IDCA.Bll
                     else
                     {
                         string sourceNumber = StringHelper.NumberAtRight(code);
-                        foreach (Element element in field.Categories)
+                        foreach (Element element in _field.Categories)
                         {
                             if (StringHelper.NumberAtRight(element.Name).Equals(sourceNumber))
                             {
@@ -123,12 +241,48 @@ namespace IDCA.Bll
             }
         }
 
-    }
+        /// <summary>
+        /// 添加Top/Bottom Box类型的Net元素，此方法默认将类型转变为Combine
+        /// </summary>
+        /// <param name="box">Top/Bottom码号的数量</param>
+        /// <param name="bottom">添加BottomBox，如果是false，添加TopBox</param>
+        /// <param name="reverse">码号顺序是否反转，如果是true，TopBox从第一个开始，否则从最后一个开始</param>
+        public void FromTopBottomBox(int box, bool bottom = false, bool reverse = false)
+        {
+            _codes.Clear();
 
-    public enum NetLikeType
-    {
-        Net,
-        Combine,
+            if (_field.Categories == null || box <= 0 || box >= _field.Categories.Count)
+            {
+                Logger.Warning("SettingCodeError", ExceptionMessages.SettingNetLikeRangeInvalid, $"{(bottom ? "Bottom" : "Top")} {box} Box");
+                return;
+            }
+
+            _name = $"{(bottom ? "b" : "t")}{box}b";
+            string? netAheadLabel = _config.TryGet<string>(SpecConfigKeys.AxisNetAheadLabel);
+            _label = $"{(string.IsNullOrEmpty(netAheadLabel) ? "" : $"{netAheadLabel}.")}{(bottom ? "Bottom" : "Top")} {box} Box";
+            _type = _config.TryGet<NetLikeType>(SpecConfigKeys.AxisTopBottomBoxPositon);
+
+            if (reverse)
+            {
+                int count = box;
+                while (count >= 0)
+                {
+                    int index = _field.Categories.Count - 1 - count;
+                    _codes.Append($"{(_codes.Length == 0 ? "" : ",")}{_field.Categories[index]!.Name}");
+                    count--;
+                }
+            }
+            else
+            {
+                for (int i = 0; i < box; i++)
+                {
+                    _codes.Append($"{(_codes.Length == 0 ? "" : ",")}{_field.Categories[i]!.Name}");
+                }
+            }
+
+
+        }
+
     }
 
 }

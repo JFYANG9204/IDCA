@@ -2,6 +2,7 @@
 using IDCA.Bll.MDM;
 using IDCA.Bll.Template;
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace IDCA.Bll.Spec
@@ -15,6 +16,7 @@ namespace IDCA.Bll.Spec
             _templates = document.Templates;
         }
 
+        readonly Dictionary<string, Manipulation> _nameCache = new();
         readonly TemplateCollection _templates;
         /// <summary>
         /// 创建空白的Manipulation对象，并添加进当前集合中
@@ -34,7 +36,15 @@ namespace IDCA.Bll.Spec
         /// <param name="type"></param>
         public Manipulation FromType(MDM.Type type)
         {
+            string lowerName = type.Name.ToLower();
+            if (_nameCache.ContainsKey(lowerName))
+            {
+                return _nameCache[lowerName];
+            }
+
             Manipulation manipulation = CreateManipulation();
+            manipulation.SetField(type.Name);
+            _nameCache.Add(lowerName, manipulation);
             foreach (Element category in type.Categories)
             {
                 manipulation.AppendDefinitionLabelFunction(category.Name, category.Label);
@@ -48,7 +58,14 @@ namespace IDCA.Bll.Spec
         /// <param name="type"></param>
         public Manipulation FromField(Field field, string title)
         {
+            string lowerName = field.FullName.ToLower();
+            if (_nameCache.ContainsKey(lowerName))
+            {
+                return _nameCache[lowerName];
+            }
+
             Manipulation manipulation = CreateManipulation();
+            _nameCache.Add(lowerName, manipulation);
             manipulation.SetField(field.FullName);
             manipulation.AppendTitleTextFunction(title);
             // 如果是最下级变量，添加Axis轴表达式

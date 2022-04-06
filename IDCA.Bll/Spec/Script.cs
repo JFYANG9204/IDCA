@@ -92,7 +92,7 @@ namespace IDCA.Bll.Spec
             if (!string.IsNullOrEmpty(variable))
             {
                 Array.Resize(ref _fields, _fields.Length + 1);
-                _fields[^1] = new(variable, string.IsNullOrEmpty(code) ? code : (isCategorical ? $"{{{code}}}" : code));
+                _fields[^1] = new(variable, string.IsNullOrEmpty(code) ? ".." : (isCategorical ? $"{{{code}}}" : code));
             }
         }
 
