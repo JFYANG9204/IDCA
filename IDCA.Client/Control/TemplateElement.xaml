@@ -19,7 +19,16 @@
                 <ColumnDefinition Width="10"/>
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="1">
-                
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="20"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <TextBlock x:Name="TemplateName" FontSize="15" VerticalAlignment="Center" FontStyle="Normal"/>
+                </Grid>
+                <Grid Grid.Row="1">
+                    <TextBlock x:Name="TemplateDescription" Width="110" Margin="20,0,0,0" FontSize="8" FontStyle="Italic" TextWrapping="Wrap"/>
+                </Grid>
             </Grid>
         </Grid>
     </Grid>
