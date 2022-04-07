@@ -35,8 +35,13 @@ namespace IDCA.Bll.Template
         readonly List<FileTemplate> _otherUsefulFileTemplates = new();
         readonly Dictionary<FileTemplateFlags, Template> _fileTemplates = new();
         readonly Dictionary<FunctionTemplateFlags, Template> _functionTemplates = new();
+        string _name = string.Empty;
         string _description = string.Empty;
 
+        /// <summary>
+        /// Template名称
+        /// </summary>
+        public string Name { get => _name; set => _name = value; }
         /// <summary>
         /// Template模板描述
         /// </summary>
@@ -74,7 +79,11 @@ namespace IDCA.Bll.Template
                 {
                     string name = TryReadStringValue(element.Attribute("name"));
                     string value = TryReadStringValue(element.Attribute("value"));
-                    if (name.Equals("Description"))
+                    if (name.Equals("Name"))
+                    {
+                        _name = value;
+                    }
+                    else if (name.Equals("Description"))
                     {
                         _description = value;
                     }

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <xml>
 	<properties>
-		<property name="Id" value="DimensionsMultiWaveTemplate"/>
+		<property name="Name" value="Dimensions多期模板"/>
 		<property name="Description" value="Dimensions多期模板"/>
 	</properties>
 	<file>

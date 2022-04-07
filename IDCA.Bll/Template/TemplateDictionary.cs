@@ -59,10 +59,10 @@ namespace IDCA.Bll.Template
                 }
                 TemplateCollection templateCollection = new();
                 templateCollection.Load(xmlPath);
-                string id = StringHelper.ConvertToHexString(templateCollection.Description);
+                string id = StringHelper.ConvertToHexString(templateCollection.Name);
                 if (string.IsNullOrEmpty(id))
                 {
-                    Logger.Warning("TemplateDescriptionCannotBeEmpty", ExceptionMessages.TemplateDefinitionXmlFileIsNotExist, template);
+                    Logger.Warning("TemplateNameCannotBeEmpty", ExceptionMessages.TemplateNameCannotBeEmpty, template);
                     continue;
                 }
                 if (_templates.ContainsKey(id))

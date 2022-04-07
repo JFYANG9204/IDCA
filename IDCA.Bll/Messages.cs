@@ -13,7 +13,7 @@ namespace IDCA.Bll
         public const string TemplateRootFolderIsNotExist = "错误：模板根文件夹不存在，所需路径：{0}";
         public const string TemplateIsNotFind = "错误：未找到用于{0}的函数模板。";
         public const string TemplateDefinitionXmlFileIsNotExist = "警告：模板'{0}'缺少定义文件Template.xml。";
-        public const string TemplateDescriptionCannotBeEmpty = "错误：模板'{0}'中XML定义文件中的模板描述不可为空。";
+        public const string TemplateNameCannotBeEmpty = "错误：模板'{0}'中XML定义文件中的模板名不可为空。";
         // File
         public const string FileWriteError = "错误：文本写入错误，路径：{0}";
         // Spec
