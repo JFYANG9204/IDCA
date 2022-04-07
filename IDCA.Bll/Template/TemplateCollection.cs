@@ -35,6 +35,12 @@ namespace IDCA.Bll.Template
         readonly List<FileTemplate> _otherUsefulFileTemplates = new();
         readonly Dictionary<FileTemplateFlags, Template> _fileTemplates = new();
         readonly Dictionary<FunctionTemplateFlags, Template> _functionTemplates = new();
+        string _description = string.Empty;
+
+        /// <summary>
+        /// Template模板描述
+        /// </summary>
+        public string Description { get => _description; set => _description = value; }
 
         /// <summary>
         /// 当前模板集合中的Library部分文件模板
@@ -59,6 +65,20 @@ namespace IDCA.Bll.Template
             if (root is null)
             {
                 throw new Exception("XML文件格式不正确，读取失败。");
+            }
+
+            XElement? properties = root.Element("properties");
+            if (properties != null)
+            {
+                foreach (XElement element in properties.Elements("property"))
+                {
+                    string name = TryReadStringValue(element.Attribute("name"));
+                    string value = TryReadStringValue(element.Attribute("value"));
+                    if (name.Equals("Description"))
+                    {
+                        _description = value;
+                    }
+                }
             }
 
             LoadNodeElements(root, "file", TemplateType.File);

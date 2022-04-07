@@ -44,6 +44,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Spec\SpecObject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Spec\SpecObjectCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Template\Template.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Template\TemplateDictionary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Template\TemplateParameter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Template\TemplateValue.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDM\IMDMDocument.cs" />

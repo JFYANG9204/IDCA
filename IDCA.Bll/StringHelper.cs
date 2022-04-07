@@ -89,5 +89,21 @@ namespace IDCA.Bll
             }
             return fields;
         }
+        /// <summary>
+        /// 将字符串转换为16进制数字字符串值
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        internal static string ConvertToHexString(string source)
+        {
+            StringBuilder result = new();
+            byte[] buffer = Encoding.UTF8.GetBytes(source);
+            for (int i = 0; i < buffer.Length; i++)
+            {
+                result.Append(Convert.ToString(buffer[i], 16));
+            }
+            return result.ToString();
+        }
+
     }
 }

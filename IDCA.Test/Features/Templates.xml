@@ -1,5 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <xml>
+	<properties>
+		<property name="Id" value="DimensionsMultiWaveTemplate"/>
+		<property name="Description" value="Dimensions多期模板"/>
+	</properties>
 	<file>
 		<template name="Job" flag="1" filename="Job.ini">
 			<param name="JobProjectPath" usage="101" />

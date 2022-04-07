@@ -17,5 +17,14 @@ namespace IDCA.Test
                 System.Console.WriteLine(item);
             }
         }
+
+        [TestMethod]
+        public void Convert()
+        {
+            string test = "";
+            string hex = StringHelper.ConvertToHexString(test);
+            System.Console.WriteLine(hex);
+        }
+
     }
 }
