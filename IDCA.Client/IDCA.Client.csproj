@@ -9,8 +9,6 @@
 
   <Import Project="..\IDCA.Bll\IDCA.Bll.projitems" Label="Shared" />
 
-  <Import Project="..\IDCA.Mvvm\IDCA.Mvvm.projitems" Label="Shared" />
-
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
@@ -36,6 +34,14 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ViewModel\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Toolkit.Mvvm" Version="7.1.2" />
   </ItemGroup>
 
 </Project>
