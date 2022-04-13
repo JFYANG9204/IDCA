@@ -5,9 +5,9 @@ using System.Text;
 
 namespace IDCA.Bll
 {
-    public class Setting
+    public class TableSettingCollection
     {
-        public Setting(MDMDocument document, Config config)
+        public TableSettingCollection(MDMDocument document, Config config)
         {
             _MDM = document;
             _config = config;
@@ -138,7 +138,7 @@ namespace IDCA.Bll
 
     public class TableSetting
     {
-        public TableSetting(Setting setting, Field field, Config config)
+        public TableSetting(TableSettingCollection setting, Field field, Config config)
         {
             _setting = setting;
             _field = field;
@@ -146,7 +146,7 @@ namespace IDCA.Bll
             _name = $"TS{setting.Count + 1}";
         }
 
-        readonly Setting _setting;
+        readonly TableSettingCollection _setting;
         readonly Field _field;
         TableType _type = TableType.Normal;
         readonly Config _config;
@@ -158,7 +158,7 @@ namespace IDCA.Bll
         /// <summary>
         /// 当前配置元素的父级Setting集合对象
         /// </summary>
-        public Setting Setting => _setting;
+        public TableSettingCollection Setting => _setting;
         /// <summary>
         /// 当前配置元素的对象名称
         /// </summary>

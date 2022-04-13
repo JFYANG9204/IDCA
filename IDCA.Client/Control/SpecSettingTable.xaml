@@ -3,19 +3,77 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:IDCA.Client.Control"
+             xmlns:control="clr-namespace:IDCA.Client.Control"
+             xmlns:viewmodel="clr-namespace:IDCA.Client.ViewModel"
+             d:DataContext="{d:DesignInstance Type=viewmodel:SpecSettingTableViewModel}"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="800"
+             Background="#FFEEEEF2">
+    <UserControl.DataContext>
+        <viewmodel:SpecSettingTableViewModel/>
+    </UserControl.DataContext>
+    <UserControl.Resources>
+        <DataTemplate DataType="{x:Type viewmodel:SpecSettingElementViewModel}">
+            <control:SpecSettingElement/>
+        </DataTemplate>
+    </UserControl.Resources>
     <Grid ScrollViewer.CanContentScroll="True">
         <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="50"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
-            <StackPanel Orientation="Vertical" x:Name="SpecSettingItemsPanel"/>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="120"/>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="100"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="1" 
+                       Text="变量名"
+                       FontFamily="思源黑体"
+                       FontSize="20"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"/>
+            <TextBlock Grid.Column="2"
+                       Text="标题"
+                       FontFamily="思源黑体"
+                       FontSize="20"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"/>
+            <TextBlock Grid.Column="3"
+                       Text="Base标签"
+                       FontFamily="思源黑体"
+                       FontSize="20"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"/>
+            <TextBlock Grid.Column="4"
+                       Text="Filter"
+                       FontFamily="思源黑体"
+                       FontSize="20"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"/>
+            <TextBlock Grid.Column="5"
+                       Text="Axis"
+                       FontFamily="思源黑体"
+                       FontSize="20"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"/>
         </Grid>
-        <Grid Grid.Row="1">
-            <Button x:Name="SpecAddNewItemButton" Width="40" Height="40">
+        <Grid Grid.Row="1" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <StackPanel HorizontalAlignment="Left">
+                <ItemsControl ItemsSource="{Binding TableElements}"/>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="2">
+            <Button x:Name="SpecAddNewItemButton" 
+                    Width="80" 
+                    Height="40"
+                    Command="{Binding AppendNewElement}">
+                <TextBlock Text="添加" FontSize="20"/>
             </Button>
         </Grid>
     </Grid>

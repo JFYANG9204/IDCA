@@ -3,10 +3,101 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <Style x:Key="BaseStyle">
-            <Style.Setters>
-                <Setter Property="Control.Background" Value="White"/>
-            </Style.Setters>
+        <Style x:Key="WindowShadowStyle" TargetType="Window">
+            <Setter Property="Background" Value="#FFEEEEF2"/>
+            <Setter Property="AllowsTransparency" Value="True"/>
+            <Setter Property="BorderThickness" Value="10"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect ShadowDepth="0" Opacity="0.7" BlurRadius="10"/>
+                </Setter.Value>
+            </Setter>
         </Style>
+        <Style x:Key="GuidLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="思源黑体"/>
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style x:Key="GuidTextBoxStyle" TargetType="TextBox">
+            <Setter Property="Height" Value="35"/>
+            <Setter Property="Width" Value="590"/>
+            <Setter Property="FontFamily" Value="思源黑体"/>
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style x:Key="BaseStyle">
+            <Setter Property="Control.Background" Value="#FFEEEEF2"/>
+        </Style>
+        <Style x:Key="TableSettingTextBoxStyle">
+            <Setter Property="TextBlock.Height" Value="42"/>
+            <Setter Property="TextBlock.FontFamily" Value="思源黑体" />
+            <Setter Property="TextBlock.FontSize" Value="25"/>
+            <Setter Property="TextBlock.VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style x:Key="HeaderSizeStyle" TargetType="Button" BasedOn="{StaticResource ResourceKey=BaseStyle}">
+            <Setter Property="Width" Value="60"/>
+            <Setter Property="Height" Value="40"/>
+        </Style>
+        <Style x:Key="ButtonBaseStyle" TargetType="Button" BasedOn="{StaticResource HeaderSizeStyle}">
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="LightGray"/>
+                    <Setter Property="Foreground" Value="Black"/>
+                </Trigger>
+                <EventTrigger RoutedEvent="PreviewMouseLeftButtonDown">
+                    <EventTrigger.Actions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <ColorAnimation Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)"
+                                                To="SteelBlue"
+                                                Duration="0:0:0.200"/>
+                                <ColorAnimation Storyboard.TargetProperty="(Button.Foreground).(SolidColorBrush.Color)"
+                                                To="White"
+                                                Duration="0:0:0.200"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger.Actions>
+                </EventTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="ButtonCloseStyle" TargetType="Button" BasedOn="{StaticResource HeaderSizeStyle}">
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Trigger.Setters>
+                        <Setter Property="Background" Value="Red"/>
+                        <Setter Property="Foreground" Value="White"/>
+                    </Trigger.Setters>
+                </Trigger>
+                <EventTrigger RoutedEvent="PreviewMouseLeftButtonDown">
+                    <EventTrigger.Actions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <ColorAnimation Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)" 
+                                                To="DarkRed"
+                                                Duration="0:0:0.200"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger.Actions>
+                </EventTrigger>
+            </Style.Triggers>
+        </Style>
+        <ControlTemplate x:Key="CrossButtonTemplate">
+            <Canvas Width="60" Height="40" Background="{Binding Path=Background, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}">
+                <Line X1="25" Y1="15" X2="35" Y2="25" 
+                      StrokeThickness="1.5"
+                      Stroke="{Binding Path=Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}"/>
+                <Line X1="25" Y1="25" X2="35" Y2="15"
+                      StrokeThickness="1.5"
+                      Stroke="{Binding Path=Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}"/>
+            </Canvas>
+        </ControlTemplate>
+        <ControlTemplate x:Key="MinimizeButtonTemplate">
+            <Canvas Width="60" Height="40" Background="{Binding Path=Background, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}">
+                <Line X1="25" Y1="20" X2="35" Y2="20"
+                      StrokeThickness="1.5"
+                      Stroke="{Binding Path=Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}"/>
+            </Canvas>
+        </ControlTemplate>
     </Application.Resources>
 </Application>

@@ -1,5 +1,7 @@
-﻿using IDCA.Bll.Spec;
+﻿using IDCA.Bll;
+using IDCA.Bll.Spec;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.IO;
 
 namespace IDCA.Test
@@ -35,6 +37,18 @@ namespace IDCA.Test
             manipulation.Axis.AppendMean("Mean").Suffix.AppendIsHidden(true);
             var result = manipulation.Axis.ToString();
             System.Console.WriteLine(result);
+        }
+
+        [TestMethod]
+        public void TypeTest()
+        {
+            Type keyType = typeof(SpecConfigKeys);
+            var propertyInfos = keyType.GetFields();
+            foreach (var propertyInfo in propertyInfos)
+            {
+                Console.WriteLine(propertyInfo.Name);
+            }
+            Console.WriteLine("End");
         }
 
     }

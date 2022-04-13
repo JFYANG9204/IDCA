@@ -14,5 +14,26 @@ namespace IDCA.Client
             InitializeComponent();
         }
 
+        private void CloseButtonClick(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
+        private void MinimizeButtonClick(object sender, RoutedEventArgs e)
+        {
+            if (WindowState != WindowState.Minimized)
+            {
+                WindowState = WindowState.Minimized;
+            }
+        }
+
+        private void HeaderMouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                DragMove();
+            }
+        }
+
     }
 }

@@ -3,10 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:IDCA.Client.Control"
+             xmlns:viewmodel="clr-namespace:IDCA.Client.ViewModel" 
+             d:DataContext="{d:DesignInstance Type=viewmodel:TemplateElementViewModel}"
              mc:Ignorable="d" 
-             d:DesignHeight="60" d:DesignWidth="150">
-    <Grid Width="150" Height="60" Background="GhostWhite">
+             d:DesignHeight="60" d:DesignWidth="360">
+    <UserControl.DataContext>
+        <viewmodel:TemplateElementViewModel/>
+    </UserControl.DataContext>
+    <Grid Width="360" Height="60">
         <Grid.RowDefinitions>
             <RowDefinition Height="10"/>
             <RowDefinition Height="40"/>
@@ -14,9 +18,9 @@
         </Grid.RowDefinitions>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="10"/>
-                <ColumnDefinition Width="130"/>
-                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="40"/>
+                <ColumnDefinition Width="280"/>
+                <ColumnDefinition Width="40"/>
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="1">
                 <Grid.RowDefinitions>
@@ -24,10 +28,19 @@
                     <RowDefinition Height="20"/>
                 </Grid.RowDefinitions>
                 <Grid Grid.Row="0">
-                    <TextBlock x:Name="TemplateName" FontSize="15" VerticalAlignment="Center" FontStyle="Normal"/>
+                    <TextBlock x:Name="TemplateName" 
+                               FontSize="15" 
+                               VerticalAlignment="Center" 
+                               FontStyle="Normal"
+                               Text="{Binding TemplateName}"/>
                 </Grid>
                 <Grid Grid.Row="1">
-                    <TextBlock x:Name="TemplateDescription" Width="110" Margin="20,0,0,0" FontSize="8" FontStyle="Italic" TextWrapping="Wrap"/>
+                    <TextBlock x:Name="TemplateDescription" 
+                               Margin="20,0,0,0" 
+                               FontSize="8" 
+                               FontStyle="Italic" 
+                               TextWrapping="Wrap"
+                               Text="{Binding TemplateDescription}"/>
                 </Grid>
             </Grid>
         </Grid>

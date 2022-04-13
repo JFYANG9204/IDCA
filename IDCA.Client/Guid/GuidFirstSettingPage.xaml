@@ -1,0 +1,87 @@
+﻿<Page x:Class="IDCA.Client.Guid.GuidFirstSettingPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:vm="clr-namespace:IDCA.Client.ViewModel"
+      mc:Ignorable="d" 
+      d:DesignHeight="500" 
+      d:DesignWidth="1000"
+      Title="">
+    <Page.DataContext>
+        <vm:GuidFirstSettingViewModel/>
+    </Page.DataContext>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="350"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="1" 
+                       Text="配置新项目"
+                       FontSize="40"
+                       VerticalAlignment="Center"/>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="600"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" 
+                       Grid.Column="1" 
+                       Text="项目名称" 
+                       Style="{StaticResource GuidLabelStyle}"/>
+            <TextBox Grid.Row="1" 
+                     Grid.Column="1" 
+                     Style="{StaticResource GuidTextBoxStyle}" 
+                     Text="{Binding FileName}"/>
+            <TextBlock Grid.Row="2" 
+                       Grid.Column="1" 
+                       Text="项目目录" 
+                       Style="{StaticResource GuidLabelStyle}"/>
+            <TextBox Grid.Row="3" 
+                     Grid.Column="1" 
+                     Style="{StaticResource GuidTextBoxStyle}" 
+                     Text="{Binding ProjectRootPath}"/>
+            <Button Grid.Row="3" 
+                    Grid.Column="2" 
+                    Height="35" 
+                    Width="35"
+                    HorizontalAlignment="Left"
+                    Background="White"
+                    Command="{Binding SelectProjectPathCommand}">
+                <TextBlock VerticalAlignment="Bottom" FontSize="30" Text="..."/>
+            </Button>
+            <TextBlock Grid.Row="4" 
+                       Grid.Column="1" 
+                       Text="Excel配置文件（可选）" 
+                       Style="{StaticResource GuidLabelStyle}"/>
+            <TextBox Grid.Row="5"
+                     Grid.Column="1" 
+                     Style="{StaticResource GuidTextBoxStyle}" 
+                     Text="{Binding ExcelSettingFilePath}"/>
+            <Button Grid.Row="5" 
+                    Grid.Column="2" 
+                    Height="35" 
+                    Width="35"
+                    HorizontalAlignment="Left"
+                    Background="White"
+                    Command="{Binding SelectExcelSettingFilePathCommand}">
+                <TextBlock VerticalAlignment="Bottom" FontSize="30" Text="..."/>
+            </Button>
+        </Grid>
+    </Grid>
+</Page>

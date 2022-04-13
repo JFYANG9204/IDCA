@@ -3,34 +3,99 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:IDCA.Client.Control"
+             xmlns:viewmodel="clr-namespace:IDCA.Client.ViewModel" 
+             d:DataContext="{d:DesignInstance Type=viewmodel:SpecSettingElementViewModel}"
              mc:Ignorable="d" 
-             d:DesignHeight="50" d:DesignWidth="620">
-    <Grid Height="50" Width="620" ScrollViewer.CanContentScroll="True">
+             d:DesignHeight="45" d:DesignWidth="700">
+    <UserControl.DataContext>
+        <viewmodel:SpecSettingElementViewModel/>
+    </UserControl.DataContext>
+    <Grid Height="45" Width="700" ScrollViewer.CanContentScroll="True">
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="30"/>
             <ColumnDefinition Width="100"/>
             <ColumnDefinition Width="200"/>
             <ColumnDefinition Width="120"/>
             <ColumnDefinition Width="100"/>
             <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="50"/>
         </Grid.ColumnDefinitions>
-        <Grid Grid.Column="0" Margin="5,7.5,5,7.5">
-            <TextBox Name="TableFieldNameTextBox" Height="35" Width="90"/>
+        <Grid Grid.Column="0">
+            <StackPanel>
+                <Button Height="22.5" Width="30" Name="MoveUpButton">
+                    <Button.Template>
+                        <ControlTemplate>
+                            <Canvas Height="22.5" Width="30">
+                                <Polyline Points="15,2.5 2,12.5 10,12.5 10,20.5 20,20.5 20,12.5 28,12.5 15,2.5" 
+                                          Fill="White" 
+                                          Stroke="LightGray" 
+                                          StrokeThickness="0.5" />
+                            </Canvas>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+                <Button Height="22.5" Width="30" Name="MoveDownButton">
+                    <Button.Template>
+                        <ControlTemplate>
+                            <Canvas Height="22.5" Width="30">
+                                <Polyline Points="10,2 10,10 2,10 15,20 28,10 20,10 20,2 10,2" 
+                                          Fill="White" 
+                                          Stroke="LightGray" 
+                                          StrokeThickness="0.5" />
+                            </Canvas>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+            </StackPanel>
         </Grid>
-        <Grid Grid.Column="1" Margin="5,7.5,5,7.5">
-            <TextBox x:Name="TableTitleTextBox" Height="35" Width="190"/>
+        <Grid Grid.Column="1">
+            <TextBox Name="TableFieldNameTextBox" 
+                     Style="{StaticResource ResourceKey=TableSettingTextBoxStyle}" 
+                     Text="{Binding FieldName}"/>
         </Grid>
-        <Grid Grid.Column="2" Margin="5,7.5,5,7.5">
-            <TextBox x:Name="TableBaseTextBox" Height="35" Width="110"/>
+        <Grid Grid.Column="2">
+            <TextBox x:Name="TableTitleTextBox" 
+                     Style="{StaticResource ResourceKey=TableSettingTextBoxStyle}" 
+                     Text="{Binding TableTitle}"/>
         </Grid>
-        <Grid Grid.Column="3" Margin="5,7.5,5,7.5">
-            <TextBox x:Name="TableBaseFilterTextBox" Height="35" Width="90"/>
+        <Grid Grid.Column="3">
+            <TextBox x:Name="TableBaseTextBox" 
+                     Style="{StaticResource ResourceKey=TableSettingTextBoxStyle}" 
+                     Text="{Binding BaseLabel}"/>
         </Grid>
-        <Grid Grid.Column="4" Margin="5,7.5,5,7.5">
-            <Button Background="WhiteSmoke" Height="35" Width="90">
+        <Grid Grid.Column="4">
+            <TextBox x:Name="TableBaseFilterTextBox" 
+                     Style="{StaticResource ResourceKey=TableSettingTextBoxStyle}" 
+                     Text="{Binding BaseFilter}"/>
+        </Grid>
+        <Grid Grid.Column="5">
+            <Button Height="42" Background="WhiteSmoke">
                 <Grid>
-                    <TextBlock Text="配置轴表达式"/>
+                    <TextBlock Text="配置轴表达式" FontSize="15"/>
                 </Grid>
+            </Button>
+        </Grid>
+        <Grid Grid.Column="6">
+            <Button Name="RemoveElementButton" Command="{Binding RemoveElementCommand}">
+                <Button.Template>
+                    <ControlTemplate>
+                        <Canvas Width="35" 
+                                Height="35"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
+                            <Ellipse Width="35" 
+                                     Height="35" 
+                                     StrokeThickness="3" 
+                                     Stroke="Red"/>
+                            <Line X1="6" Y1="6" X2="29" Y2="29"
+                                  StrokeThickness="3"
+                                  Stroke="Red"/>
+                            <Line X1="29" Y1="6" X2="6" Y2="29"
+                                  StrokeThickness="3"
+                                  Stroke="Red"/>
+                        </Canvas>
+                    </ControlTemplate>
+                </Button.Template>
             </Button>
         </Grid>
     </Grid>
