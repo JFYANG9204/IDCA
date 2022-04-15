@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+﻿using IDCA.Client.ViewModel.Common;
 using System.Windows;
 using System.Windows.Input;
 
@@ -12,6 +12,7 @@ namespace IDCA.Client
         public MainWindow()
         {
             InitializeComponent();
+            WindowManager.Register<TableMainWindow>("TableMainWindow");
         }
 
         private void CloseButtonClick(object sender, RoutedEventArgs e)

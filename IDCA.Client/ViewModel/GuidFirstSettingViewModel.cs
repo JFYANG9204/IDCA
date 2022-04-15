@@ -1,8 +1,8 @@
 ﻿
 using IDCA.Client.Singleton;
+using IDCA.Client.ViewModel.Common;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
-using System.Windows.Forms;
 using System.Windows.Input;
 
 namespace IDCA.Client.ViewModel
@@ -35,10 +35,10 @@ namespace IDCA.Client.ViewModel
 
         void SelectProjectPath()
         {
-            FolderBrowserDialog dialog = new();
-            if (dialog.ShowDialog() == DialogResult.OK)
+            object? dialogResult = WindowManager.ShowDialog("FolderBrowserDialog");
+            if (dialogResult != null && dialogResult is string folderPath)
             {
-                ProjectRootPath = dialog.SelectedPath;
+                ProjectRootPath = folderPath;
             }
         }
 
@@ -57,17 +57,35 @@ namespace IDCA.Client.ViewModel
 
         void SelectExcelSettingFilePath()
         {
-            FileDialog dialog = new OpenFileDialog { 
-                Multiselect = false,
-                Filter = "Excel File|*.xlsx"
-            };
-            if (dialog.ShowDialog() == DialogResult.OK)
+            object? dialogResult = WindowManager.ShowDialog("FileDialog", "Excel File|*.xlsx");
+            if (dialogResult != null && dialogResult is string filePath)
             {
-                ExcelSettingFilePath = dialog.FileName;
+                ExcelSettingFilePath = filePath;
             }
         }
 
         public ICommand SelectExcelSettingFilePathCommand => new RelayCommand(SelectExcelSettingFilePath);
+
+        string _mdmDocumentPath = GlobalConfig.Instance.MdmDocumentPath;
+        public string MdmDocumentPath
+        {
+            get { return _mdmDocumentPath; }
+            set {
+                SetProperty(ref _mdmDocumentPath, value);
+                GlobalConfig.Instance.MdmDocumentPath = value;
+            }
+        }
+
+        void SelectMdmDocumentPath()
+        {
+            object? dialogResult = WindowManager.ShowDialog("FileDialog", "MDM Document|*.mdd");
+            if (dialogResult != null && dialogResult is string filePath)
+            {
+                MdmDocumentPath = filePath;
+            }
+        }
+
+        public ICommand SelectMdmDocumentPathCommand => new RelayCommand(SelectMdmDocumentPath);
 
     }
 }

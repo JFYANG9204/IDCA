@@ -8,6 +8,7 @@ namespace IDCA.Client.Singleton
     {
         public GlobalConfig() 
         {
+            _templateDictionary = new TemplateDictionary();
             _mdmDocument = new MDMDocument();
             _config = new Config();
             _tableSettingCollection = new TableSettingCollection(_mdmDocument, _config);
@@ -66,6 +67,24 @@ namespace IDCA.Client.Singleton
         /// 当前项目的表格配置集合
         /// </summary>
         public TableSettingCollection TableSettings => _tableSettingCollection;
+
+        string _mdmDocumentPath = string.Empty;
+        /// <summary>
+        /// 当前项目的MDM文档路径
+        /// </summary>
+        public string MdmDocumentPath { get => _mdmDocumentPath; set => _mdmDocumentPath = value; }
+
+        int _templateSelectIndex = 0;
+        /// <summary>
+        /// 获取或配置当前模板集合的选中索引
+        /// </summary>
+        public int TemplateSelectIndex { get => _templateSelectIndex; set => _templateSelectIndex = value; }
+
+        readonly TemplateDictionary _templateDictionary;
+        /// <summary>
+        /// 当前读取到的模板字典
+        /// </summary>
+        public TemplateDictionary TemplateDictionary => _templateDictionary;
 
     }
 }

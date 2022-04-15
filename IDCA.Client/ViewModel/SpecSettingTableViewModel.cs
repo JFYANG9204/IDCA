@@ -8,9 +8,13 @@ namespace IDCA.Client.ViewModel
 {
     public class SpecSettingTableViewModel : ObservableObject
     {
-        public SpecSettingTableViewModel() { }
+        public SpecSettingTableViewModel() 
+        {
+            _tableElements = new();
+            _tableElements.Add(new SpecSettingElementViewModel());
+        }
 
-        ObservableCollection<SpecSettingElementViewModel> _tableElements = new();
+        ObservableCollection<SpecSettingElementViewModel> _tableElements;
 
         public ObservableCollection<SpecSettingElementViewModel> TableElements
         {

@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:control="clr-namespace:IDCA.Client.Control"
              xmlns:viewmodel="clr-namespace:IDCA.Client.ViewModel"
              d:DataContext="{d:DesignInstance Type=viewmodel:SpecSettingTableViewModel}"
              mc:Ignorable="d" 
@@ -14,18 +13,51 @@
     </UserControl.DataContext>
     <UserControl.Resources>
         <DataTemplate DataType="{x:Type viewmodel:SpecSettingElementViewModel}">
-            <control:SpecSettingElement/>
+            <Grid Height="31">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="60"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="100"/>
+                </Grid.ColumnDefinitions>
+                <TextBox Grid.Column="1" 
+                         Text="{Binding FieldName}"
+                         Width="98"
+                         Height="30"
+                         FontSize="16"
+                         Style="{StaticResource TextBoxAlignmentStyle}"/>
+                <TextBox Grid.Column="2"
+                         Text="{Binding TableTitle}"
+                         Width="198"
+                         Height="30"
+                         FontSize="16"
+                         Style="{StaticResource TextBoxAlignmentStyle}"/>
+                <TextBox Grid.Column="3"
+                         Text="{Binding BaseLabel}"
+                         Width="118"
+                         Height="30"
+                         FontSize="16"
+                         Style="{StaticResource TextBoxAlignmentStyle}"/>
+                <TextBox Grid.Column="4"
+                         Text="{Binding BaseFilter}"
+                         Width="98"
+                         Height="30"
+                         FontSize="16"
+                         Style="{StaticResource TextBoxAlignmentStyle}"/>
+            </Grid>
         </DataTemplate>
     </UserControl.Resources>
     <Grid ScrollViewer.CanContentScroll="True">
         <Grid.RowDefinitions>
-            <RowDefinition Height="50"/>
+            <RowDefinition Height="30"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="50"/>
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0">
+        <Grid Grid.Row="0" >
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="68"/>
                 <ColumnDefinition Width="100"/>
                 <ColumnDefinition Width="200"/>
                 <ColumnDefinition Width="120"/>
@@ -34,46 +66,41 @@
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="1" 
                        Text="变量名"
-                       FontFamily="思源黑体"
-                       FontSize="20"
-                       HorizontalAlignment="Center"
+                       Style="{StaticResource BaseLabelFontFamilyStyle}"
+                       FontSize="18"
                        VerticalAlignment="Center"/>
             <TextBlock Grid.Column="2"
                        Text="标题"
-                       FontFamily="思源黑体"
-                       FontSize="20"
-                       HorizontalAlignment="Center"
+                       Style="{StaticResource BaseLabelFontFamilyStyle}"
+                       FontSize="18"
                        VerticalAlignment="Center"/>
             <TextBlock Grid.Column="3"
                        Text="Base标签"
-                       FontFamily="思源黑体"
-                       FontSize="20"
-                       HorizontalAlignment="Center"
+                       Style="{StaticResource BaseLabelFontFamilyStyle}"
+                       FontSize="18"
                        VerticalAlignment="Center"/>
             <TextBlock Grid.Column="4"
                        Text="Filter"
-                       FontFamily="思源黑体"
-                       FontSize="20"
-                       HorizontalAlignment="Center"
+                       Style="{StaticResource BaseLabelFontFamilyStyle}"
+                       FontSize="18"
                        VerticalAlignment="Center"/>
             <TextBlock Grid.Column="5"
                        Text="Axis"
-                       FontFamily="思源黑体"
-                       FontSize="20"
-                       HorizontalAlignment="Center"
+                       Style="{StaticResource BaseLabelFontFamilyStyle}"
+                       FontSize="18"
                        VerticalAlignment="Center"/>
         </Grid>
-        <Grid Grid.Row="1" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto">
-            <StackPanel HorizontalAlignment="Left">
+        <Grid Grid.Row="1">
+            <ListView Style="{StaticResource ResourceKey=BaseStyle}" >
                 <ItemsControl ItemsSource="{Binding TableElements}"/>
-            </StackPanel>
+            </ListView>
         </Grid>
         <Grid Grid.Row="2">
             <Button x:Name="SpecAddNewItemButton" 
-                    Width="80" 
-                    Height="40"
+                    Width="70" 
+                    Height="28"
                     Command="{Binding AppendNewElement}">
-                <TextBlock Text="添加" FontSize="20"/>
+                <TextBlock Text="添加" FontSize="15"/>
             </Button>
         </Grid>
     </Grid>

@@ -1,4 +1,5 @@
 ﻿
+using IDCA.Client.ViewModel.Common;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using System.Windows.Input;
@@ -9,6 +10,7 @@ namespace IDCA.Client.ViewModel
     {
         public MainWindowViewModel()
         {
+            _nextButtonText = _nextButtonTexts[0];
         }
 
         string _projectPath = string.Empty;
@@ -27,6 +29,19 @@ namespace IDCA.Client.ViewModel
             "Guid/GuidFirstSettingPage.xaml"
         };
 
+        readonly static string[] _nextButtonTexts =
+        {
+            "下一步",
+            "完成"
+        };
+
+        string _nextButtonText;
+        public string NextButtonText
+        {
+            get { return _nextButtonText; }
+            set { SetProperty(ref _nextButtonText, value); }
+        }
+
         int _pageIndex = 0;
 
         string _framePageSource = _pages[0];
@@ -44,6 +59,7 @@ namespace IDCA.Client.ViewModel
             }
             _pageIndex--;
             FramePageSource = _pages[_pageIndex];
+            NextButtonText = _nextButtonTexts[0];
             if (_pageIndex == 0)
             {
                 LastStepEnabled = false;
@@ -55,10 +71,16 @@ namespace IDCA.Client.ViewModel
             LastStepEnabled = true;
             if (_pageIndex >= _pages.Length - 1)
             {
+                WindowManager.Show("TableMainWindow");
+                MainWindowToClose = true;
                 return;
             }
             _pageIndex++;
             FramePageSource = _pages[_pageIndex];
+            if (_pageIndex == _pages.Length - 1)
+            {
+                NextButtonText = _nextButtonTexts[1];
+            }
         }
 
         public ICommand LastStepCommand => new RelayCommand(LastStep);
@@ -69,6 +91,14 @@ namespace IDCA.Client.ViewModel
         {
             get { return _lastStepEnabled; }
             set { SetProperty(ref _lastStepEnabled, value); }
+        }
+
+
+        bool _mainWindowToClose = false;
+        public bool MainWindowToClose
+        {
+            get { return _mainWindowToClose; }
+            set { SetProperty(ref _mainWindowToClose, value); }
         }
 
     }

@@ -5,8 +5,8 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:vm="clr-namespace:IDCA.Client.ViewModel"
       mc:Ignorable="d" 
-      d:DesignHeight="500" 
-      d:DesignWidth="1000"
+      d:DesignHeight="450" 
+      d:DesignWidth="850"
       Title="">
     <Page.DataContext>
         <vm:GuidFirstSettingViewModel/>
@@ -34,11 +34,15 @@
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="40"/>
+                <RowDefinition Height="30"/>
                 <RowDefinition Height="40"/>
+                <RowDefinition Height="30"/>
                 <RowDefinition Height="40"/>
+                <RowDefinition Height="30"/>
                 <RowDefinition Height="40"/>
+                <RowDefinition Height="30"/>
                 <RowDefinition Height="40"/>
-                <RowDefinition Height="40"/>
+                <RowDefinition Height="30"/>
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0" 
                        Grid.Column="1" 
@@ -58,12 +62,12 @@
                      Text="{Binding ProjectRootPath}"/>
             <Button Grid.Row="3" 
                     Grid.Column="2" 
-                    Height="35" 
-                    Width="35"
+                    Height="30" 
+                    Width="30"
                     HorizontalAlignment="Left"
                     Background="White"
                     Command="{Binding SelectProjectPathCommand}">
-                <TextBlock VerticalAlignment="Bottom" FontSize="30" Text="..."/>
+                <TextBlock VerticalAlignment="Bottom" FontSize="20" Text="..."/>
             </Button>
             <TextBlock Grid.Row="4" 
                        Grid.Column="1" 
@@ -75,12 +79,29 @@
                      Text="{Binding ExcelSettingFilePath}"/>
             <Button Grid.Row="5" 
                     Grid.Column="2" 
-                    Height="35" 
-                    Width="35"
+                    Height="30" 
+                    Width="30"
                     HorizontalAlignment="Left"
                     Background="White"
                     Command="{Binding SelectExcelSettingFilePathCommand}">
-                <TextBlock VerticalAlignment="Bottom" FontSize="30" Text="..."/>
+                <TextBlock VerticalAlignment="Bottom" FontSize="20" Text="..."/>
+            </Button>
+            <TextBlock Grid.Row="6" 
+                       Grid.Column="1" 
+                       Text="MDM文档" 
+                       Style="{StaticResource GuidLabelStyle}"/>
+            <TextBox Grid.Row="7"
+                     Grid.Column="1" 
+                     Style="{StaticResource GuidTextBoxStyle}" 
+                     Text="{Binding MdmDocumentPath}"/>
+            <Button Grid.Row="7" 
+                    Grid.Column="2" 
+                    Height="30" 
+                    Width="30"
+                    HorizontalAlignment="Left"
+                    Background="White"
+                    Command="{Binding SelectMdmDocumentPathCommand}">
+                <TextBlock VerticalAlignment="Bottom" FontSize="20" Text="..."/>
             </Button>
         </Grid>
     </Grid>
