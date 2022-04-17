@@ -16,7 +16,7 @@
     <Window.DataContext>
         <viewmodel:TableMainWindowViewModel/>
     </Window.DataContext>
-    <Grid>
+    <Grid x:Name="MainGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="40"/>
             <RowDefinition Height="*"/>

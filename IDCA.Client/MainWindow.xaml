@@ -21,7 +21,20 @@
     <i:Interaction.Behaviors>
         <c:MainWindowBehavior Close="{Binding MainWindowToClose}"/>
     </i:Interaction.Behaviors>
-    <Grid>
+    <Window.Triggers>
+        <EventTrigger RoutedEvent="Loaded">
+            <BeginStoryboard Storyboard="{StaticResource ResourceKey=ShowWindow}"/>
+        </EventTrigger>
+    </Window.Triggers>
+    <Grid x:Name="MainGrid">
+        <Grid.RenderTransform>
+            <TransformGroup>
+                <ScaleTransform ScaleX="1" ScaleY="1"/>
+                <SkewTransform/>
+                <RotateTransform/>
+                <TranslateTransform/>
+            </TransformGroup>
+        </Grid.RenderTransform>
         <Grid.RowDefinitions>
             <RowDefinition Height="40"/>
             <RowDefinition Height="450"/>
