@@ -1,6 +1,7 @@
 ﻿using IDCA.Bll;
 using IDCA.Bll.MDM;
 using IDCA.Bll.Template;
+using System.Collections.Generic;
 
 namespace IDCA.Client.Singleton
 {
@@ -11,7 +12,7 @@ namespace IDCA.Client.Singleton
             _templateDictionary = new TemplateDictionary();
             _mdmDocument = new MDMDocument();
             _config = new Config();
-            _tableSettingCollection = new TableSettingCollection(_mdmDocument, _config);
+            _currentTableSetting = new TableSettingCollection(_mdmDocument, _config);
             LoadConfigs();
         }
 
@@ -58,7 +59,7 @@ namespace IDCA.Client.Singleton
         public TemplateCollection? Templates { get => _templates; set => _templates = value; }
 
         readonly MDMDocument _mdmDocument;
-        readonly TableSettingCollection _tableSettingCollection;
+        readonly TableSettingCollection _currentTableSetting;
         /// <summary>
         /// 当前项目的MDM文档对象，此对象需要手动初始化
         /// </summary>
@@ -66,7 +67,50 @@ namespace IDCA.Client.Singleton
         /// <summary>
         /// 当前项目的表格配置集合
         /// </summary>
-        public TableSettingCollection TableSettings => _tableSettingCollection;
+        public TableSettingCollection CurrentTableSetting => _currentTableSetting;
+
+        readonly Dictionary<string, TableSettingCollection> _tableSettings = new();
+        /// <summary>
+        /// 验证是否是可用的名称
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public bool ValidateTableName(string name)
+        {
+            return !_tableSettings.ContainsKey(name.ToLower());
+        }
+        /// <summary>
+        /// 尝试获取指定名称的表格配置集合，如果不存在，返回null
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public TableSettingCollection? TryGetTableSetting(string name)
+        {
+            string lowerName = name.ToLower();
+            return _tableSettings.ContainsKey(lowerName) ? _tableSettings[lowerName] : null;
+        }
+        /// <summary>
+        /// 创建新的表格配置集合，如果忽略名称，默认配置"tab+序号"的名称
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public TableSettingCollection NewTableSetting(string name = "")
+        {
+            string tabName = name.ToLower();
+            if (string.IsNullOrEmpty(name) || _tableSettings.ContainsKey(tabName))
+            {
+                tabName = $"tab{_tableSettings.Count + 1}";
+            }
+            TableSettingCollection table = new(MDMDocument, Config);
+            _tableSettings.Add(tabName, table);
+            return table;
+        }
+
+        int _tableSettingSelectIndex = 0;
+        /// <summary>
+        /// 当前项目表格配置选定配置条目的索引
+        /// </summary>
+        public int TableSettingSelectIndex { get => _tableSettingSelectIndex; set => _tableSettingSelectIndex = value; }
 
         string _mdmDocumentPath = string.Empty;
         /// <summary>

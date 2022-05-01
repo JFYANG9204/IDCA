@@ -9,17 +9,17 @@
         Title="TableMainWindow" 
         Height="450" 
         Width="800"
-        WindowStyle="None"
-        ResizeMode="CanResizeWithGrip"
+        ResizeMode="CanResize"
         MouseLeftButtonDown="HeaderMouseMove"
-        Style="{StaticResource ResourceKey=WindowShadowStyle}">
+        Style="{StaticResource ResourceKey=WindowStyle}">
     <Window.DataContext>
         <viewmodel:TableMainWindowViewModel/>
     </Window.DataContext>
-    <Grid x:Name="MainGrid">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="40"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
         <!-- 标题栏 -->
         <Grid Grid.Row="0">
@@ -44,17 +44,17 @@
                                     <Polyline x:Name="MaximizeImage"
                                               Visibility="{Binding Path=MaximizedImageVisibility, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
                                               Points="24.3,15 35,15 35,25 25,25 25,14.3"
-                                              StrokeThickness="1.5"
+                                              StrokeThickness="1"
                                               Stroke="{Binding Path=Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}"/>
                                     <Polyline x:Name="ResizeBaseImage"
                                               Visibility="{Binding Path=NormalImageVisibility, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
                                               Points="24.3,18 32,18 32,25 25,25 25,17.3"
-                                              StrokeThickness="1.5"
+                                              StrokeThickness="1"
                                               Stroke="{Binding Path=Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}"/>
                                     <Polyline x:Name="ResizeOutImage"
                                               Visibility="{Binding Path=NormalImageVisibility, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
                                               Points="28,18 28,15 35,15 35,22 32,22"
-                                              StrokeThickness="1.5"
+                                              StrokeThickness="1"
                                               Stroke="{Binding Path=Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}"/>
                                 </Canvas>
                             </ControlTemplate>
@@ -66,6 +66,8 @@
                 </StackPanel>
             </Grid>
         </Grid>
+        <TabControl Grid.Row="1">
+        </TabControl>
         <control:SpecSettingTable Grid.Row="1"/>
     </Grid>
 </Window>

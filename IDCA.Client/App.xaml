@@ -3,13 +3,15 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <Style x:Key="WindowShadowStyle" TargetType="Window">
+        <Style x:Key="WindowStyle" TargetType="Window">
             <Setter Property="Background" Value="#FFEEEEF2"/>
-            <Setter Property="AllowsTransparency" Value="True"/>
-            <Setter Property="BorderThickness" Value="5"/>
-            <Setter Property="Effect">
+            <Setter Property="WindowChrome.WindowChrome">
                 <Setter.Value>
-                    <DropShadowEffect ShadowDepth="0" Opacity="0.7" BlurRadius="5"/>
+                    <WindowChrome CaptionHeight="5"
+                                  CornerRadius="0"
+                                  GlassFrameThickness="1" 
+                                  UseAeroCaptionButtons="False" 
+                                  NonClientFrameEdges="None"/>
                 </Setter.Value>
             </Setter>
         </Style>
@@ -49,6 +51,7 @@
             <Setter Property="Height" Value="40"/>
         </Style>
         <Style x:Key="ButtonBaseStyle" TargetType="Button" BasedOn="{StaticResource HeaderSizeStyle}">
+            <Setter Property="IsHitTestVisible" Value="True"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Background" Value="LightGray"/>
@@ -71,6 +74,7 @@
             </Style.Triggers>
         </Style>
         <Style x:Key="ButtonCloseStyle" TargetType="Button" BasedOn="{StaticResource HeaderSizeStyle}">
+            <Setter Property="IsHitTestVisible" Value="True"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Trigger.Setters>
@@ -93,30 +97,79 @@
         </Style>
         <ControlTemplate x:Key="CrossButtonTemplate">
             <Canvas Width="60" Height="40" Background="{Binding Path=Background, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}">
-                <Line X1="25" Y1="15" X2="35" Y2="25" 
-                      StrokeThickness="1.5"
+                <Line X1="25" Y1="15" X2="35" Y2="25"
+                      StrokeThickness="1"
                       Stroke="{Binding Path=Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}"/>
                 <Line X1="25" Y1="25" X2="35" Y2="15"
-                      StrokeThickness="1.5"
+                      StrokeThickness="1"
                       Stroke="{Binding Path=Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}"/>
             </Canvas>
         </ControlTemplate>
         <ControlTemplate x:Key="MinimizeButtonTemplate">
             <Canvas Width="60" Height="40" Background="{Binding Path=Background, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}">
                 <Line X1="25" Y1="20" X2="35" Y2="20"
-                      StrokeThickness="1.5"
+                      StrokeThickness="1"
                       Stroke="{Binding Path=Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}"/>
             </Canvas>
         </ControlTemplate>
-        <Storyboard x:Key="ShowWindow">
-            <DoubleAnimation Duration="0:0:0.3" From="0" To="1" Storyboard.TargetProperty="Opacity" FillBehavior="Stop"/>
-            <DoubleAnimation Duration="0:0:0.3" From="0.8" To="1" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(ScaleX)" FillBehavior="Stop" Storyboard.TargetName="MainGrid"/>
-            <DoubleAnimation Duration="0:0:0.3" From="0.8" To="1" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(ScaleY)" FillBehavior="Stop" Storyboard.TargetName="MainGrid"/>
-        </Storyboard>
-        <Storyboard x:Key="HideWindow">
-            <DoubleAnimation Duration="0:0:0.3" From="1" To="0" Storyboard.TargetProperty="Opacity" FillBehavior="Stop"/>
-            <DoubleAnimation Duration="0:0:0.3" From="1" To="0.8" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(ScaleX)" FillBehavior="Stop" Storyboard.TargetName="MainGrid"/>
-            <DoubleAnimation Duration="0:0:0.3" From="1" To="0.8" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(ScaleY)" FillBehavior="Stop" Storyboard.TargetName="MainGrid"/>
-        </Storyboard>
+        <!-- DateGrid 样式 -->
+        <Style TargetType="DataGrid">
+            <Setter Property="AlternationCount" Value="2"/>
+            <Setter Property="RowHeaderWidth" Value="20"/>
+            <Setter Property="AutoGenerateColumns" Value="False"/>
+            <Setter Property="CanUserSortColumns" Value="False"/>
+            <Setter Property="CanUserResizeColumns" Value="False"/>
+            <Setter Property="CanUserResizeRows" Value="True"/>
+            <Setter Property="CanUserAddRows" Value="True"/>
+            <Setter Property="Background" Value="#FFEEEEF2"/>
+            <Setter Property="BorderBrush" Value="#FFEEEEF2"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="#FFEEEEF2"/>
+            <Setter Property="VerticalGridLinesBrush" Value="#FFEEEEF2"/>
+            <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
+        </Style>
+        <Style TargetType="DataGridColumnHeader">
+            <Setter Property="FontFamily" Value="微软雅黑"/>
+            <Setter Property="UseLayoutRounding" Value="True"/>
+            <Setter Property="MinWidth" Value="0"/>
+            <Setter Property="MinHeight" Value="35"/>
+            <Setter Property="Background" Value="#FFEEEEF2"/>
+            <Setter Property="Foreground" Value="#FF111111"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Margin" Value="10,0,0,0"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="BorderBrush" Value="LightGray"/>
+        </Style>
+        <!-- DataGrid 行样式 -->
+        <Style TargetType="DataGridRow">
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="Foreground" Value="#FF666666"/>
+            <Style.Triggers>
+                <Trigger Property="AlternationIndex" Value="0">
+                    <Setter Property="Background" Value="#FFFAFAFA"/>
+                </Trigger>
+                <Trigger Property="AlternationIndex" Value="1">
+                    <Setter Property="Background" Value="#FFF5F5F7"/>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="LightGray"/>
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#FFE3E3E5"/>
+                    <Setter Property="Foreground" Value="#FF111111"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="DataGridCell">
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="LightGray"/>
+                    <Setter Property="Foreground" Value="#FF464646"/>
+                    <Setter Property="BorderBrush" Value="LightGray"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </Application.Resources>
 </Application>

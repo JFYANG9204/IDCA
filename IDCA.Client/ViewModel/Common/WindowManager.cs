@@ -49,6 +49,18 @@ namespace IDCA.Client.ViewModel.Common
             }
         }
 
+        public static void ShowAxisSettingDialog()
+        {
+            if (_registerWindow.ContainsKey("SpecAxisSettingDialog"))
+            {
+                var typeInstance = Activator.CreateInstance((Type)_registerWindow["SpecAxisSettingDialog"]!);
+                if (typeInstance is Window window)
+                {
+                    window.ShowDialog();
+                }
+            }
+        }
+
         public static object? ShowDialog(string key, params string[] parameters)
         {
             if (_registerWindow.ContainsKey(key))
@@ -72,6 +84,10 @@ namespace IDCA.Client.ViewModel.Common
                     {
                         return openFileDialog.FileName;
                     }
+                }
+                else if (typeInstance is Window window)
+                {
+                    return window.ShowDialog();
                 }
             }
             return null;

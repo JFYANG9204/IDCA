@@ -1,7 +1,9 @@
 ﻿
+using IDCA.Client.Singleton;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
+using System.Data;
 using System.Windows.Input;
 
 namespace IDCA.Client.ViewModel
@@ -10,42 +12,77 @@ namespace IDCA.Client.ViewModel
     {
         public SpecSettingTableViewModel() 
         {
-            _tableElements = new();
-            _tableElements.Add(new SpecSettingElementViewModel());
         }
 
-        ObservableCollection<SpecSettingElementViewModel> _tableElements;
-
-        public ObservableCollection<SpecSettingElementViewModel> TableElements
+        ObservableCollection<SpecSettingTableElementViewModel> _elementList = new();
+        public ObservableCollection<SpecSettingTableElementViewModel> ElementList
         {
-            get { return _tableElements; }
-            set { SetProperty(ref _tableElements, value); }
+            get { return _elementList; }
+            set { SetProperty(ref _elementList, value); }
         }
 
-        public ICommand AppendNewElement => new RelayCommand(NewElement);
-        /// <summary>
-        /// 移除固定位置的子类元素
-        /// </summary>
-        /// <param name="index"></param>
-        public void RemoveElementAt(int index)
+        public void Push()
         {
-            if (index < 0 || index >= _tableElements.Count)
+            var element = new SpecSettingTableElementViewModel
             {
-                return;
-            }
-            _tableElements.RemoveAt(index);
-        }
-
-
-        public void NewElement()
-        {
-            var element = new SpecSettingElementViewModel
-            {
-                ParentObject = this,
-                Index = _tableElements.Count
+                Index = ElementList.Count
             };
-            _tableElements.Add(element);
+            ElementList.Add(element);
         }
 
     }
+
+    public class SpecSettingTableElementViewModel : ObservableObject
+    {
+        public SpecSettingTableElementViewModel() { }
+
+        string _variableName = string.Empty;
+        public string VariableName
+        {
+            get { return _variableName; }
+            set { SetProperty(ref _variableName, value); }
+        }
+
+        string _title = string.Empty;
+        public string Title
+        {
+            get { return _title; }
+            set { SetProperty(ref _title, value); }
+        }
+
+        string _baseText = string.Empty;
+        public string BaseText
+        {
+            get { return _baseText; }
+            set { SetProperty(ref _baseText, value); }
+        }
+
+        string _baseFilter = string.Empty;
+        public string BaseFilter
+        {
+            get { return _baseFilter; }
+            set { SetProperty(ref _baseFilter, value); }
+        }
+
+        int _index = 0;
+        public int Index { get => _index; set => _index = value; }
+
+        public bool IsEmpty
+        {
+            get
+            {
+                return string.IsNullOrEmpty(_variableName);
+            }
+        }
+
+
+        public ICommand AxisSettingCommand => new RelayCommand(ShowAxisSettingDialog);
+        void ShowAxisSettingDialog()
+        {
+            Common.WindowManager.ShowDialog("SpecAxisSettingDialog");
+        }
+
+    }
+
+
 }

@@ -11,97 +11,32 @@
     <UserControl.DataContext>
         <viewmodel:SpecSettingTableViewModel/>
     </UserControl.DataContext>
-    <UserControl.Resources>
-        <DataTemplate DataType="{x:Type viewmodel:SpecSettingElementViewModel}">
-            <Grid Height="31">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="60"/>
-                    <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="200"/>
-                    <ColumnDefinition Width="120"/>
-                    <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="100"/>
-                </Grid.ColumnDefinitions>
-                <TextBox Grid.Column="1" 
-                         Text="{Binding FieldName}"
-                         Width="98"
-                         Height="30"
-                         FontSize="16"
-                         Style="{StaticResource TextBoxAlignmentStyle}"/>
-                <TextBox Grid.Column="2"
-                         Text="{Binding TableTitle}"
-                         Width="198"
-                         Height="30"
-                         FontSize="16"
-                         Style="{StaticResource TextBoxAlignmentStyle}"/>
-                <TextBox Grid.Column="3"
-                         Text="{Binding BaseLabel}"
-                         Width="118"
-                         Height="30"
-                         FontSize="16"
-                         Style="{StaticResource TextBoxAlignmentStyle}"/>
-                <TextBox Grid.Column="4"
-                         Text="{Binding BaseFilter}"
-                         Width="98"
-                         Height="30"
-                         FontSize="16"
-                         Style="{StaticResource TextBoxAlignmentStyle}"/>
-            </Grid>
-        </DataTemplate>
-    </UserControl.Resources>
     <Grid ScrollViewer.CanContentScroll="True">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="30"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="50"/>
-        </Grid.RowDefinitions>
-        <Grid Grid.Row="0" >
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="68"/>
-                <ColumnDefinition Width="100"/>
-                <ColumnDefinition Width="200"/>
-                <ColumnDefinition Width="120"/>
-                <ColumnDefinition Width="100"/>
-                <ColumnDefinition Width="100"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="1" 
-                       Text="变量名"
-                       Style="{StaticResource BaseLabelFontFamilyStyle}"
-                       FontSize="18"
-                       VerticalAlignment="Center"/>
-            <TextBlock Grid.Column="2"
-                       Text="标题"
-                       Style="{StaticResource BaseLabelFontFamilyStyle}"
-                       FontSize="18"
-                       VerticalAlignment="Center"/>
-            <TextBlock Grid.Column="3"
-                       Text="Base标签"
-                       Style="{StaticResource BaseLabelFontFamilyStyle}"
-                       FontSize="18"
-                       VerticalAlignment="Center"/>
-            <TextBlock Grid.Column="4"
-                       Text="Filter"
-                       Style="{StaticResource BaseLabelFontFamilyStyle}"
-                       FontSize="18"
-                       VerticalAlignment="Center"/>
-            <TextBlock Grid.Column="5"
-                       Text="Axis"
-                       Style="{StaticResource BaseLabelFontFamilyStyle}"
-                       FontSize="18"
-                       VerticalAlignment="Center"/>
-        </Grid>
-        <Grid Grid.Row="1">
-            <ListView Style="{StaticResource ResourceKey=BaseStyle}" >
-                <ItemsControl ItemsSource="{Binding TableElements}"/>
-            </ListView>
-        </Grid>
-        <Grid Grid.Row="2">
-            <Button x:Name="SpecAddNewItemButton" 
-                    Width="70" 
-                    Height="28"
-                    Command="{Binding AppendNewElement}">
-                <TextBlock Text="添加" FontSize="15"/>
-            </Button>
-        </Grid>
+        <DataGrid 
+            Name="MainGrid"
+            ColumnHeaderHeight="30" 
+            ScrollViewer.CanContentScroll="True"
+            ItemsSource="{Binding ElementList}"
+            d:ItemsSource="{d:SampleData ItemCount=5}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="变量名" Width="100" Binding="{Binding VariableName}"/>
+                <DataGridTextColumn Header="标题" Width="140" Binding="{Binding Title}"/>
+                <DataGridTextColumn Header="基数标签" Width="140" Binding="{Binding BaseText}"/>
+                <DataGridTextColumn Header="基数筛选器" Width="140" Binding="{Binding BaseFilter}"/>
+                <DataGridTemplateColumn Header="轴表达式配置" Width="120">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Canvas>
+                                <Button Content="配置" 
+                                        Width="120" 
+                                        Height="26" 
+                                        HorizontalAlignment="Center"
+                                        Command="{Binding AxisSettingCommand}"/>
+                            </Canvas>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
     </Grid>
 </UserControl>

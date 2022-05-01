@@ -1,16 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
+﻿using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace IDCA.Client.Dialog
 {
@@ -22,6 +11,27 @@ namespace IDCA.Client.Dialog
         public SpecAxisSettingDialog()
         {
             InitializeComponent();
+        }
+
+        private void CloseButtonClick(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
+        private void MinimizeButtonClick(object sender, RoutedEventArgs e)
+        {
+            if (WindowState != WindowState.Minimized)
+            {
+                WindowState = WindowState.Minimized;
+            }
+        }
+
+        private void HeaderMouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                DragMove();
+            }
         }
     }
 }

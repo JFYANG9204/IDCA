@@ -68,5 +68,28 @@ namespace IDCA.Bll.Spec
             return _constructor(this);
         }
 
+        /// <summary>
+        /// 调换两个索引位置的内容，如果是无效索引，此方法将直接返回，不做任何操作
+        /// </summary>
+        /// <param name="sourceIndex"></param>
+        /// <param name="targetIndex"></param>
+        public void Swap(int sourceIndex, int targetIndex)
+        {
+            CollectionHelper.Swap(_items, sourceIndex, targetIndex);
+        }
+
+        /// <summary>
+        /// 移除特定位置的元素，此方法不会抛出错误
+        /// </summary>
+        /// <param name="index"></param>
+        public void RemoveAt(int index)
+        {
+            if (index < 0 || index >= _items.Count)
+            {
+                return;
+            }
+            _items.RemoveAt(index);
+        }
+
     }
 }

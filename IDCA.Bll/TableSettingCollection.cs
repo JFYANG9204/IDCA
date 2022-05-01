@@ -90,13 +90,7 @@ namespace IDCA.Bll
         /// <param name="targetIndex"></param>
         public void Swap(int sourceIndex, int targetIndex)
         {
-            if (sourceIndex < 0 || sourceIndex > _settings.Count || 
-                targetIndex < 0 || targetIndex > _settings.Count || 
-                sourceIndex == targetIndex)
-            {
-                return;
-            }
-            (_settings[sourceIndex], _settings[targetIndex]) = (_settings[targetIndex], _settings[sourceIndex]);
+            CollectionHelper.Swap(_settings, sourceIndex, targetIndex);
         }
 
         /// <summary>
