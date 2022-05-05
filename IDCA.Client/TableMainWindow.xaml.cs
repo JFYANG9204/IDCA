@@ -12,16 +12,16 @@ namespace IDCA.Client
         public TableMainWindow()
         {
             InitializeComponent();
-            if (WindowState == WindowState.Maximized)
-            {
-                MaximizedImageVisibility = Visibility.Hidden;
-                NormalImageVisibility = Visibility.Visible;
-            }
-            else
-            {
-                MaximizedImageVisibility = Visibility.Visible;
-                NormalImageVisibility = Visibility.Hidden;
-            }
+            //if (WindowState == WindowState.Maximized)
+            //{
+            //    MaximizedImageVisibility = Visibility.Hidden;
+            //    NormalImageVisibility = Visibility.Visible;
+            //}
+            //else
+            //{
+            //    MaximizedImageVisibility = Visibility.Visible;
+            //    NormalImageVisibility = Visibility.Hidden;
+            //}
         }
 
         private void CloseButtonClick(object sender, RoutedEventArgs e)
@@ -45,38 +45,38 @@ namespace IDCA.Client
             }
         }
 
-        private void MaximizeButtonClick(object sender, RoutedEventArgs e)
-        {
-            if (WindowState == WindowState.Normal)
-            {
-                WindowState = WindowState.Maximized;
-                MaximizedImageVisibility = Visibility.Hidden;
-                NormalImageVisibility = Visibility.Visible;
-            }
-            else
-            {
-                WindowState = WindowState.Normal;
-                MaximizedImageVisibility = Visibility.Visible;
-                NormalImageVisibility = Visibility.Hidden;
-            }
-        }
+        //private void MaximizeButtonClick(object sender, RoutedEventArgs e)
+        //{
+        //    if (WindowState == WindowState.Normal)
+        //    {
+        //        WindowState = WindowState.Maximized;
+        //        MaximizedImageVisibility = Visibility.Hidden;
+        //        NormalImageVisibility = Visibility.Visible;
+        //    }
+        //    else
+        //    {
+        //        WindowState = WindowState.Normal;
+        //        MaximizedImageVisibility = Visibility.Visible;
+        //        NormalImageVisibility = Visibility.Hidden;
+        //    }
+        //}
 
-        public readonly static DependencyProperty MaximizedVisibility =
-            DependencyProperty.Register("MaximizedImageVisibility", typeof(Visibility), typeof(TableMainWindow));
-        public readonly static DependencyProperty NormalVisbility =
-            DependencyProperty.Register("NormalImageVisibility", typeof(Visibility), typeof(TableMainWindow));
+        //public readonly static DependencyProperty MaximizedVisibility =
+        //    DependencyProperty.Register("MaximizedImageVisibility", typeof(Visibility), typeof(TableMainWindow));
+        //public readonly static DependencyProperty NormalVisbility =
+        //    DependencyProperty.Register("NormalImageVisibility", typeof(Visibility), typeof(TableMainWindow));
 
-        public Visibility MaximizedImageVisibility
-        {
-            get { return (Visibility)GetValue(MaximizedVisibility); }
-            set { SetValue(MaximizedVisibility, value); }
-        }
+        //public Visibility MaximizedImageVisibility
+        //{
+        //    get { return (Visibility)GetValue(MaximizedVisibility); }
+        //    set { SetValue(MaximizedVisibility, value); }
+        //}
 
-        public Visibility NormalImageVisibility
-        {
-            get { return (Visibility)GetValue(NormalVisbility); }
-            set { SetValue(NormalVisbility, value); }
-        }
+        //public Visibility NormalImageVisibility
+        //{
+        //    get { return (Visibility)GetValue(NormalVisbility); }
+        //    set { SetValue(NormalVisbility, value); }
+        //}
 
     }
 }
