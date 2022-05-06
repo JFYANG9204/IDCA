@@ -3,7 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace IDCA.Bll.Spec
+namespace IDCA.Model.Spec
 {
     public class SpecObjectCollection<T> : SpecObject where T : SpecObject
     {

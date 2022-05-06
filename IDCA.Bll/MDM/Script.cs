@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace IDCA.Bll.MDM
+namespace IDCA.Model.MDM
 {
     public class Script : MDMObject, IScript
     {

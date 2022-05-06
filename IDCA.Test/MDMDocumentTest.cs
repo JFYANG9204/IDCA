@@ -1,4 +1,4 @@
-using IDCA.Bll.MDM;
+using IDCA.Model.MDM;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;

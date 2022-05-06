@@ -1,5 +1,5 @@
 ﻿
-namespace IDCA.Bll.Spec
+namespace IDCA.Model.Spec
 {
     public abstract class SpecObject
     {

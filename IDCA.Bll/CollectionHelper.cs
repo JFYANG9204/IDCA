@@ -1,7 +1,7 @@
 ﻿
 using System.Collections.Generic;
 
-namespace IDCA.Bll
+namespace IDCA.Model
 {
     public static class CollectionHelper
     {

@@ -1,4 +1,5 @@
 ﻿using IDCA.Client.ViewModel.Common;
+using MahApps.Metro.Controls;
 using System.Windows;
 using System.Windows.Input;
 
@@ -7,12 +8,11 @@ namespace IDCA.Client
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : MetroWindow
     {
         public MainWindow()
         {
             InitializeComponent();
-            WindowManager.Register<TableMainWindow>("TableMainWindow");
         }
 
         private void CloseButtonClick(object sender, RoutedEventArgs e)

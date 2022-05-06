@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace IDCA.Bll
+namespace IDCA.Model
 {
     internal class StringHelper
     {

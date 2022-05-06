@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace IDCA.Bll.Spec
+namespace IDCA.Model.Spec
 {
 
     public enum MetadataType

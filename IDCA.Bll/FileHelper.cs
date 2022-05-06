@@ -1,9 +1,9 @@
-﻿using IDCA.Bll.Template;
+﻿using IDCA.Model.Template;
 using System;
 using System.IO;
 using System.Text;
 
-namespace IDCA.Bll
+namespace IDCA.Model
 {
     internal class FileHelper
     {

@@ -1,10 +1,10 @@
 ﻿
-using IDCA.Bll.Template;
+using IDCA.Model.Template;
 using System;
 using System.Linq;
 using System.Text;
 
-namespace IDCA.Bll.Spec
+namespace IDCA.Model.Spec
 {
     public class Axis : SpecObjectCollection<AxisElement>
     {

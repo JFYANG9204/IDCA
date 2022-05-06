@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace IDCA.Bll
+namespace IDCA.Model
 {
 
     public class Config

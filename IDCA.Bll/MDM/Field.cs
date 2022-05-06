@@ -1,7 +1,7 @@
 ﻿
 using System.Text;
 
-namespace IDCA.Bll.MDM
+namespace IDCA.Model.MDM
 {
     public class Field : Variable, IField
     {

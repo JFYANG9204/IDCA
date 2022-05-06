@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Xml.Linq;
 
-namespace IDCA.Bll.Template
+namespace IDCA.Model.Template
 {
 
     // 模板由XML文件定义

@@ -1,7 +1,7 @@
 ﻿
 using System;
 
-namespace IDCA.Bll.Template
+namespace IDCA.Model.Template
 {
 
     /// <summary>

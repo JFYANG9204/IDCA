@@ -1,11 +1,11 @@
 ﻿
-using IDCA.Bll.MDM;
-using IDCA.Bll.Template;
+using IDCA.Model.MDM;
+using IDCA.Model.Template;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace IDCA.Bll.Spec
+namespace IDCA.Model.Spec
 {
     public class Manipulations : SpecObjectCollection<Manipulation>
     {

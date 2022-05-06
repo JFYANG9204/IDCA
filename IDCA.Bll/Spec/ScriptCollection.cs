@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace IDCA.Bll.Spec
+namespace IDCA.Model.Spec
 {
 
     public class ScriptCollection : SpecObject

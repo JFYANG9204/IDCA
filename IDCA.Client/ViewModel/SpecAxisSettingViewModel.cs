@@ -1,5 +1,5 @@
-﻿using IDCA.Bll;
-using IDCA.Bll.Spec;
+﻿using IDCA.Model;
+using IDCA.Model.Spec;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using System;

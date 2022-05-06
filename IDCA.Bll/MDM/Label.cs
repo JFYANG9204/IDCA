@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace IDCA.Bll.MDM
+namespace IDCA.Model.MDM
 {
     public class Label : MDMObject, ILabel
     {

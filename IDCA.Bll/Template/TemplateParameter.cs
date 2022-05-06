@@ -3,7 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace IDCA.Bll.Template
+namespace IDCA.Model.Template
 {
     
     // TemplateParameterUsage通过四位十进制值的最后一位来确定值的类别：

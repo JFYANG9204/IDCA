@@ -1,9 +1,9 @@
-﻿using IDCA.Bll.MDM;
+﻿using IDCA.Model.MDM;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace IDCA.Bll
+namespace IDCA.Model
 {
     public class TableSettingCollection
     {

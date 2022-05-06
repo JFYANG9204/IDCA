@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Xml.Linq;
 
-namespace IDCA.Bll.MDM
+namespace IDCA.Model.MDM
 {
     public class MDMDocument : IMDMDocument
     {

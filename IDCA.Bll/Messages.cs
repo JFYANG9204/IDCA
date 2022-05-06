@@ -1,5 +1,5 @@
 ﻿
-namespace IDCA.Bll
+namespace IDCA.Model
 {
     public class ExceptionMessages
     {

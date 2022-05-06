@@ -2,7 +2,7 @@
 using System;
 using System.Text;
 
-namespace IDCA.Bll.Template
+namespace IDCA.Model.Template
 {
     /// <summary>
     /// 模板类型，标记模板的基础用途

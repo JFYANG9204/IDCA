@@ -1,6 +1,6 @@
-﻿using IDCA.Bll;
-using IDCA.Bll.MDM;
-using IDCA.Bll.Template;
+﻿using IDCA.Model;
+using IDCA.Model.MDM;
+using IDCA.Model.Template;
 using System.Collections.Generic;
 
 namespace IDCA.Client.Singleton

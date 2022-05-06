@@ -1,9 +1,9 @@
 ﻿
-using IDCA.Bll.MDM;
-using IDCA.Bll.Template;
+using IDCA.Model.MDM;
+using IDCA.Model.Template;
 using System.Collections.Generic;
 
-namespace IDCA.Bll.Spec
+namespace IDCA.Model.Spec
 {
     public class SpecDocument : SpecObject
     {

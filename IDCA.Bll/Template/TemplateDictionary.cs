@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace IDCA.Bll.Template
+namespace IDCA.Model.Template
 {
     public class TemplateDictionary
     {

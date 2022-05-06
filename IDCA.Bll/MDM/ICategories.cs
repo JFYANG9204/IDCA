@@ -1,7 +1,7 @@
 ﻿
 using System.Collections;
 
-namespace IDCA.Bll.MDM
+namespace IDCA.Model.MDM
 {
     public interface ICategories : IMDMNamedCollection<Element>, IMDMObject, IEnumerable
     {

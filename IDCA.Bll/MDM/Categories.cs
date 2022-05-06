@@ -1,6 +1,6 @@
 ﻿
 
-namespace IDCA.Bll.MDM
+namespace IDCA.Model.MDM
 {
     public class Categories : MDMNamedCollection<Element>, ICategories
     {

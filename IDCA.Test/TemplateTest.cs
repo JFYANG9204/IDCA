@@ -1,4 +1,4 @@
-﻿using IDCA.Bll.Template;
+﻿using IDCA.Model.Template;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;

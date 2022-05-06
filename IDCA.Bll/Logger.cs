@@ -1,7 +1,7 @@
 ﻿
 using System;
 
-namespace IDCA.Bll
+namespace IDCA.Model
 {
 
     public delegate void LogExceptionEventHandler(string reason, string message);

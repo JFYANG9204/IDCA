@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace IDCA.Bll.MDM
+namespace IDCA.Model.MDM
 {
     public class MDMCollection<T> : IMDMCollection<T> where T : MDMObject
     {

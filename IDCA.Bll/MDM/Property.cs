@@ -1,5 +1,5 @@
 ﻿
-namespace IDCA.Bll.MDM
+namespace IDCA.Model.MDM
 {
     public class Property : MDMNamedObject, IProperty
     {

@@ -1,9 +1,9 @@
 ﻿
-using IDCA.Bll.Template;
+using IDCA.Model.Template;
 using System.Collections.Generic;
 using System.Text;
 
-namespace IDCA.Bll.Spec
+namespace IDCA.Model.Spec
 {
     /// <summary>
     /// SpecDocument对象创建的表格集合
