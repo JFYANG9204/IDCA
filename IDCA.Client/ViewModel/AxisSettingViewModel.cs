@@ -10,9 +10,9 @@ using System.Windows.Input;
 
 namespace IDCA.Client.ViewModel
 {
-    public class SpecAxisSettingViewModel : ObservableObject
+    public class AxisSettingViewModel : ObservableObject
     {
-        public SpecAxisSettingViewModel() 
+        public AxisSettingViewModel() 
         {
         }
 
@@ -58,54 +58,54 @@ namespace IDCA.Client.ViewModel
             set { SetProperty(ref _axisAvalibleElements, value); }
         }
 
-        ObservableCollection<string> _axisSelectedElements = new();
-        public ObservableCollection<string> AxisSelectedElements
+        ObservableCollection<string> _axisCurrentElements = new();
+        public ObservableCollection<string> AxisCurrentElements
         {
-            get { return _axisSelectedElements; }
-            set { SetProperty(ref _axisSelectedElements, value); }
+            get { return _axisCurrentElements; }
+            set { SetProperty(ref _axisCurrentElements, value); }
         }
 
-        int _axisElementSelectIndex = 0;
-        public int AxisElementSelectIndex
+        int _axisAvalibleElementsSelectIndex = 0;
+        public int AxisAvalibleElementsSelectIndex
         {
-            get { return _axisElementSelectIndex; }
-            set { SetProperty(ref _axisElementSelectIndex, value); }
+            get { return _axisAvalibleElementsSelectIndex; }
+            set { SetProperty(ref _axisAvalibleElementsSelectIndex, value); }
         }
 
-        int _axisSelectedElementSelectIndex = 0;
-        public int AxisSelectedElementSelectIndex
+        int _axisCurrentElementsSelectIndex = 0;
+        public int AxisCurrentElementsSelectIndex
         {
-            get { return _axisSelectedElementSelectIndex; }
+            get { return _axisCurrentElementsSelectIndex; }
             set { 
-                SetProperty(ref _axisSelectedElementSelectIndex, value);
+                SetProperty(ref _axisCurrentElementsSelectIndex, value);
                 UpdateElementSettings();
             }
         }
 
-        readonly List<ObservableCollection<SpecAxisElementDetailSettingViewModel>> _axisElementDetailList = new();
-        readonly List<ObservableCollection<SpecAxisTailingElementSettingViewModel>> _axisTailingElementList = new();
+        readonly List<ObservableCollection<AxisElementDetailSettingViewModel>> _axisElementDetailList = new();
+        readonly List<ObservableCollection<AxisTailingElementSettingViewModel>> _axisTailingElementList = new();
 
         void UpdateElementSettings()
         {
-            if (_axisSelectedElementSelectIndex < 0 ||
-                _axisSelectedElementSelectIndex >= _axisTailingElementList.Count ||
-                _axisSelectedElementSelectIndex >= _axisElementDetailList.Count)
+            if (_axisCurrentElementsSelectIndex < 0 ||
+                _axisCurrentElementsSelectIndex >= _axisTailingElementList.Count ||
+                _axisCurrentElementsSelectIndex >= _axisElementDetailList.Count)
             {
                 return;
             }
-            CurrentAxisTailingElementSetting = _axisTailingElementList[_axisSelectedElementSelectIndex];
-            CurrentAxisElementDetailSetting = _axisElementDetailList[_axisSelectedElementSelectIndex];
+            CurrentAxisTailingElementSetting = _axisTailingElementList[_axisCurrentElementsSelectIndex];
+            CurrentAxisElementDetailSetting = _axisElementDetailList[_axisCurrentElementsSelectIndex];
         }
 
-        ObservableCollection<SpecAxisTailingElementSettingViewModel> _currentAxisTailingElementSetting = new();
-        public ObservableCollection<SpecAxisTailingElementSettingViewModel> CurrentAxisTailingElementSetting
+        ObservableCollection<AxisTailingElementSettingViewModel> _currentAxisTailingElementSetting = new();
+        public ObservableCollection<AxisTailingElementSettingViewModel> CurrentAxisTailingElementSetting
         {
             get { return _currentAxisTailingElementSetting; }
             set { SetProperty(ref _currentAxisTailingElementSetting, value); }
         }
 
-        ObservableCollection<SpecAxisElementDetailSettingViewModel> _currentAxisElementDetailSetting = new();
-        public ObservableCollection<SpecAxisElementDetailSettingViewModel> CurrentAxisElementDetailSetting
+        ObservableCollection<AxisElementDetailSettingViewModel> _currentAxisElementDetailSetting = new();
+        public ObservableCollection<AxisElementDetailSettingViewModel> CurrentAxisElementDetailSetting
         {
             get { return _currentAxisElementDetailSetting; }
             set { SetProperty(ref _currentAxisElementDetailSetting, value); }
@@ -135,7 +135,7 @@ namespace IDCA.Client.ViewModel
                 return;
             }
 
-            switch (_axisElementSelectIndex)
+            switch (_axisAvalibleElementsSelectIndex)
             {
                 case 0:  _axis.AppendAllCategory();           break;
                 case 1:  _axis.AppendInsertFunction();        break;
@@ -166,7 +166,7 @@ namespace IDCA.Client.ViewModel
 
         void InitSingleTailingElement(string label, Type type, AxisElementSuffixType suffixType, params string[] values)
         {
-            SpecAxisTailingElementSettingViewModel element = new();
+            AxisTailingElementSettingViewModel element = new();
             element.TailingElementLabel = label;
             element.ValueType = type;
             element.Type = suffixType;
@@ -195,7 +195,7 @@ namespace IDCA.Client.ViewModel
 
         void InitSingleDetailElement(string label, bool canSelect)
         {
-            SpecAxisElementDetailSettingViewModel element = new()
+            AxisElementDetailSettingViewModel element = new()
             {
                 Label = label,
                 CanSelectVariable = canSelect
@@ -211,7 +211,7 @@ namespace IDCA.Client.ViewModel
         void InitDetailElements()
         {
             AppendAxisElement();
-            switch (_axisElementSelectIndex)
+            switch (_axisAvalibleElementsSelectIndex)
             {
                 case 0:
                     InitSingleDetailElement("排除码号", false);
@@ -277,11 +277,11 @@ namespace IDCA.Client.ViewModel
 
         void AddElement()
         {
-            if (_axisElementSelectIndex >= 0 &&
-                _axisElementSelectIndex < _axisAvalibleElements.Count)
+            if (_axisAvalibleElementsSelectIndex >= 0 &&
+                _axisAvalibleElementsSelectIndex < _axisAvalibleElements.Count)
             {
-                AxisSelectedElements.Add(_axisAvalibleElements[_axisElementSelectIndex]);
-                AxisSelectedElementSelectIndex = AxisSelectedElements.Count - 1;
+                AxisCurrentElements.Add(_axisAvalibleElements[_axisAvalibleElementsSelectIndex]);
+                AxisCurrentElementsSelectIndex = AxisCurrentElements.Count - 1;
                 AddAndInitDetailElements();
                 AddAndInitTailingElements();
                 UpdateAxisText();
@@ -291,14 +291,14 @@ namespace IDCA.Client.ViewModel
 
         void RemoveElement()
         {
-            if (_axisSelectedElementSelectIndex >= 0 && 
-                _axisSelectedElements.Count > 0 &&
-                _axisSelectedElementSelectIndex < _axisSelectedElements.Count)
+            if (_axisCurrentElementsSelectIndex >= 0 && 
+                _axisCurrentElements.Count > 0 &&
+                _axisCurrentElementsSelectIndex < _axisCurrentElements.Count)
             {
-                _axisSelectedElements.RemoveAt(_axisSelectedElementSelectIndex);
-                _axis?.RemoveAt(_axisSelectedElementSelectIndex);
-                _axisTailingElementList.RemoveAt(_axisSelectedElementSelectIndex);
-                _axisElementDetailList.RemoveAt(_axisSelectedElementSelectIndex);
+                _axisCurrentElements.RemoveAt(_axisCurrentElementsSelectIndex);
+                _axis?.RemoveAt(_axisCurrentElementsSelectIndex);
+                _axisTailingElementList.RemoveAt(_axisCurrentElementsSelectIndex);
+                _axisElementDetailList.RemoveAt(_axisCurrentElementsSelectIndex);
                 UpdateAxisText();
             }
         }
@@ -306,7 +306,7 @@ namespace IDCA.Client.ViewModel
 
         public void Swap(int sourceIndex, int targetIndex)
         {
-            CollectionHelper.Swap(_axisSelectedElements, sourceIndex, targetIndex);
+            CollectionHelper.Swap(_axisCurrentElements, sourceIndex, targetIndex);
             CollectionHelper.Swap(_axisTailingElementList, sourceIndex, targetIndex);
             CollectionHelper.Swap(_axisElementDetailList, sourceIndex, targetIndex);
             _axis?.Swap(sourceIndex, targetIndex);
@@ -314,25 +314,25 @@ namespace IDCA.Client.ViewModel
 
         void MoveUp()
         {
-            Swap(_axisSelectedElementSelectIndex, _axisSelectedElementSelectIndex - 1);
-            _axisSelectedElementSelectIndex--;
+            Swap(_axisCurrentElementsSelectIndex, _axisCurrentElementsSelectIndex - 1);
+            _axisCurrentElementsSelectIndex--;
             UpdateAxisText();
         }
         public ICommand MoveUpCommand => new RelayCommand(MoveUp);
 
         void MoveDown()
         {
-            Swap(_axisSelectedElementSelectIndex, _axisSelectedElementSelectIndex + 1);
-            _axisSelectedElementSelectIndex++;
+            Swap(_axisCurrentElementsSelectIndex, _axisCurrentElementsSelectIndex + 1);
+            _axisCurrentElementsSelectIndex++;
             UpdateAxisText();
         }
         public ICommand MoveDownCommand => new RelayCommand(MoveDown);
 
     }
 
-    public class SpecAxisTailingElementSettingViewModel : ObservableObject
+    public class AxisTailingElementSettingViewModel : ObservableObject
     {
-        public SpecAxisTailingElementSettingViewModel() { }
+        public AxisTailingElementSettingViewModel() { }
 
         AxisElementSuffixType _type = AxisElementSuffixType.None;
         public AxisElementSuffixType Type
@@ -531,10 +531,10 @@ namespace IDCA.Client.ViewModel
 
     }
 
-    public class SpecAxisElementDetailSettingViewModel : ObservableObject
+    public class AxisElementDetailSettingViewModel : ObservableObject
     {
 
-        public SpecAxisElementDetailSettingViewModel() { }
+        public AxisElementDetailSettingViewModel() { }
 
         string _label = "";
         public string Label

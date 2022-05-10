@@ -1,0 +1,16 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <FontFamily x:Key="IDCA.Font.Family.English">Calibri</FontFamily>
+    <FontFamily x:Key="IDCA.Font.Family">微软雅黑</FontFamily>
+    
+    <sys:Double x:Key="IDCA.Font.Size.Start.Title">20</sys:Double>
+    <sys:Double x:Key="IDCA.Font.Size.TextBlock.Label">15</sys:Double>
+    <sys:Double x:Key="IDCA.Font.Size.Content">14</sys:Double>
+
+    <Style TargetType="TextBox">
+        <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family.English}"/>
+    </Style>
+    
+</ResourceDictionary>

@@ -40,11 +40,11 @@ namespace IDCA.Client.Singleton
         /// </summary>
         public string ProjectRootPath { get => _projectRootPath; set => _projectRootPath = value; }
 
-        string _fileName = string.Empty;
+        string _projectName = string.Empty;
         /// <summary>
         /// 获取或配置当前项目的名称
         /// </summary>
-        public string FileName { get => _fileName; set => _fileName = value; }
+        public string ProjectName { get => _projectName; set => _projectName = value; }
 
         string _excelSettingFilePath = string.Empty;
         /// <summary>

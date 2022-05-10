@@ -1,7 +1,17 @@
 ﻿<Application x:Class="IDCA.Client.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             StartupUri="MainWindow.xaml">
+             StartupUri="View/StartWindow.xaml">
     <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Custom -->
+                <ResourceDictionary Source="View/Style/Font.xaml"/>
+                <ResourceDictionary Source="View/Style/Colors.xaml"/>
+                <ResourceDictionary Source="View/Style/Button.xaml"/>
+                <ResourceDictionary Source="View/Style/TextBox.xaml"/>
+                <ResourceDictionary Source="View/Style/Window.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

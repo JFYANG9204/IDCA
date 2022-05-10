@@ -8,14 +8,14 @@ using System.Windows.Input;
 
 namespace IDCA.Client.ViewModel
 {
-    public class SpecSettingTableViewModel : ObservableObject
+    public class TableSettingViewModel : ObservableObject
     {
-        public SpecSettingTableViewModel() 
+        public TableSettingViewModel() 
         {
         }
 
-        ObservableCollection<SpecSettingTableElementViewModel> _elementList = new();
-        public ObservableCollection<SpecSettingTableElementViewModel> ElementList
+        ObservableCollection<TableSettingElementViewModel> _elementList = new();
+        public ObservableCollection<TableSettingElementViewModel> ElementList
         {
             get { return _elementList; }
             set { SetProperty(ref _elementList, value); }
@@ -23,7 +23,7 @@ namespace IDCA.Client.ViewModel
 
         public void Push()
         {
-            var element = new SpecSettingTableElementViewModel
+            var element = new TableSettingElementViewModel
             {
                 Index = ElementList.Count
             };
@@ -32,9 +32,9 @@ namespace IDCA.Client.ViewModel
 
     }
 
-    public class SpecSettingTableElementViewModel : ObservableObject
+    public class TableSettingElementViewModel : ObservableObject
     {
-        public SpecSettingTableElementViewModel() { }
+        public TableSettingElementViewModel() { }
 
         string _variableName = string.Empty;
         public string VariableName

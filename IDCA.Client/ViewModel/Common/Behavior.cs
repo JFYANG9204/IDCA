@@ -3,11 +3,11 @@ using System.Windows;
 
 namespace IDCA.Client.ViewModel.Common
 {
-    public class MainWindowBehavior : Behavior<Window>
+    public class WindowBehavior : Behavior<Window>
     {
 
         public static readonly DependencyProperty CloseProperty =
-            DependencyProperty.Register("Close", typeof(bool), typeof(MainWindowBehavior), new PropertyMetadata(false, OnCloseChanged));
+            DependencyProperty.Register("Close", typeof(bool), typeof(WindowBehavior), new PropertyMetadata(false, OnCloseChanged));
 
         public bool Close
         {
@@ -17,7 +17,7 @@ namespace IDCA.Client.ViewModel.Common
 
         static void OnCloseChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var window = ((MainWindowBehavior)d).AssociatedObject;
+            var window = ((WindowBehavior)d).AssociatedObject;
             var newValue = (bool)e.NewValue;
             if (newValue)
             {

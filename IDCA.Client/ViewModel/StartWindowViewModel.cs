@@ -3,22 +3,57 @@ using IDCA.Client.Singleton;
 using IDCA.Client.ViewModel.Common;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
+using System.Collections.ObjectModel;
 using System.Windows.Input;
 
 namespace IDCA.Client.ViewModel
 {
-    public class GuidFirstSettingViewModel : ObservableObject
+    public class StartWindowViewModel : ObservableObject
     {
-        public GuidFirstSettingViewModel() { }
-
-        string _fileName = string.Empty;
-        public string FileName
+        public StartWindowViewModel()
         {
-            get { return _fileName; }
+            _templateItems = new ObservableCollection<TemplateElementViewModel>();
+            var template = new TemplateElementViewModel
+            {
+                TemplateName = "默认模板",
+                TemplateDescription = "普通的多期模板"
+            };
+            _templateItems.Add(template);
+        }
+
+        bool _mainWindowToClose = false;
+        public bool MainWindowToClose
+        {
+            get { return _mainWindowToClose; }
+            set { SetProperty(ref _mainWindowToClose, value); }
+        }
+
+        ObservableCollection<TemplateElementViewModel> _templateItems;
+        public ObservableCollection<TemplateElementViewModel> TemplateItems
+        {
+            get { return _templateItems; }
+            set { SetProperty(ref _templateItems, value); }
+        }
+
+        int _templateSelectedIndex = GlobalConfig.Instance.TemplateSelectIndex;
+        public int TemplateSelectedIndex
+        {
+            get { return _templateSelectedIndex; }
             set
             {
-                SetProperty(ref _fileName, value);
-                GlobalConfig.Instance.FileName = value;
+                SetProperty(ref _templateSelectedIndex, value);
+                GlobalConfig.Instance.TemplateSelectIndex = value;
+            }
+        }
+
+        string _projectName = string.Empty;
+        public string ProjectName
+        {
+            get { return _projectName; }
+            set
+            {
+                SetProperty(ref _projectName, value);
+                GlobalConfig.Instance.ProjectName = value;
             }
         }
 
@@ -70,7 +105,8 @@ namespace IDCA.Client.ViewModel
         public string MdmDocumentPath
         {
             get { return _mdmDocumentPath; }
-            set {
+            set
+            {
                 SetProperty(ref _mdmDocumentPath, value);
                 GlobalConfig.Instance.MdmDocumentPath = value;
             }
