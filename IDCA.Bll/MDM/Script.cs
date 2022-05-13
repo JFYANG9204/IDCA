@@ -4,9 +4,9 @@ using System.Collections.Generic;
 
 namespace IDCA.Model.MDM
 {
-    public class Script : MDMObject, IScript
+    public class Script : MDMObject
     {
-        internal Script(IMDMObject parent) : base(parent.Document, parent)
+        internal Script(MDMObject? parent) : base(parent?.Document, parent)
         {
             _objectType = MDMObjectType.Script;
         }
@@ -21,9 +21,18 @@ namespace IDCA.Model.MDM
         public string Text { get => _text; internal set => _text = value; }
     }
 
-    public class ScriptType : MDMObjectCollection<Script>, IScriptType
+    public enum InterviewModes
     {
-        internal ScriptType(IMDMObject parent) : base(parent.Document, parent, collection => new Script(collection))
+        Default = -1,
+        Web = 0,
+        Phone = 1,
+        Local = 2,
+        DataEntry = 3,
+    }
+
+    public class ScriptType : MDMObjectCollection<Script>
+    {
+        internal ScriptType(MDMObject? parent) : base(parent?.Document, parent, collection => new Script(collection))
         {
             _objectType = MDMObjectType.ScriptType;
         }
@@ -40,9 +49,9 @@ namespace IDCA.Model.MDM
         public bool UseKeyCodes { get => _useKeyCodes; internal set => _useKeyCodes = value; }
     }
 
-    public class Scripts : MDMObject, IMDMObjectCollection<ScriptType>
+    public class Scripts : MDMObject
     {
-        internal Scripts(IMDMObject parent) : base(parent.Document, parent)
+        internal Scripts(MDMObject? parent) : base(parent?.Document, parent)
         {
             _objectType = MDMObjectType.Scripts;
         }
@@ -74,9 +83,9 @@ namespace IDCA.Model.MDM
         }
     }
 
-    public class RoutingItem : MDMObject, IRoutingItem
+    public class RoutingItem : MDMObject
     {
-        internal RoutingItem(IMDMObject parent) : base(parent.Document, parent)
+        internal RoutingItem(MDMObject? parent) : base(parent?.Document, parent)
         {
             _objectType = MDMObjectType.RoutingItem;
         }
@@ -89,9 +98,9 @@ namespace IDCA.Model.MDM
         new public MDMObjectType ObjectType => _objectType;
     }
 
-    public class Routing : MDMObject, IRouting
+    public class Routing : MDMObject
     {
-        internal Routing(IMDMObject parent) : base(parent.Document, parent)
+        internal Routing(MDMObject? parent) : base(parent?.Document, parent)
         {
             _objectType = MDMObjectType.Routing;
         }
@@ -130,19 +139,17 @@ namespace IDCA.Model.MDM
         }
     }
 
-    public class Routings : MDMObject, IRoutings<Routing, ScriptType>
+    public class Routings : MDMObject
     {
-        internal Routings(IMDMObject parent) : base(parent.Document, parent)
+        internal Routings(MDMObject? parent) : base(parent?.Document, parent)
         {
             _objectType = MDMObjectType.Routings;
         }
 
         readonly List<Routing> _items = new();
-        IMDMObjectCollection<ScriptType>? _scripts;
+        Scripts? _scripts;
 
-        new public MDMObjectType ObjectType => _objectType;
-
-        public IMDMObjectCollection<ScriptType>? Scripts { get => _scripts; internal set => _scripts = value; }
+        public Scripts? Scripts { get => _scripts; internal set => _scripts = value; }
         public int Count => _items.Count;
         public Routing? this[int index] => index >= 0 && index < _items.Count ? _items[index] : null;
 

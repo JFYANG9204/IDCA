@@ -1,15 +1,18 @@
-﻿<Window 
+﻿<mah:MetroWindow
     x:Class="IDCA.Client.View.StartWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewmodel="clr-namespace:IDCA.Client.ViewModel" 
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     d:DataContext="{d:DesignInstance Type=viewmodel:StartWindowViewModel}"
     mc:Ignorable="d"
     Height="500" 
     Width="900"
-    Style="{StaticResource IDCA.Window.Normal}">
+    ResizeMode="CanMinimize"
+    Background="{StaticResource IDCA.Brushes.Window.Background}"
+    >
 
     <Window.DataContext>
         <viewmodel:StartWindowViewModel/>
@@ -43,15 +46,16 @@
             <ListBox Grid.Row="2"
                      Margin="20 8 80 50"
                      Width="300"
-                     BorderBrush="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=Background}"
+                     BorderThickness="0"
                      Background="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=Background}" 
                      ItemsSource="{Binding TemplateItems}"
-                     SelectedIndex="{Binding TemplateSelectedIndex}"   
+                     SelectedIndex="{Binding TemplateSelectedIndex}"
                      d:ItemsSource="{d:SampleData ItemCount=5}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Grid Width="280"
-                              Background="{StaticResource IDCA.Colors.ListBox.Item.Dark}">
+                        <Grid Width="250"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="35"/>
                                 <RowDefinition Height="40"/>
@@ -80,6 +84,32 @@
 
         <Grid Grid.Column="2">
 
+            <Grid.Resources>
+                <Style x:Key="IDCA.Window.Start.DialogButton" 
+                       TargetType="Button"
+                       BasedOn="{StaticResource MahApps.Styles.Button}">
+                    <Setter Property="Height" Value="30"/>
+                    <Setter Property="Width" Value="30"/>
+                    <Setter Property="Margin" Value="5"/>
+                    <Setter Property="Content" Value="..."/>
+                    <Setter Property="Background" Value="{StaticResource IDCA.Brushes.Button.Background}"/>
+                    <Setter Property="VerticalContentAlignment" Value="Bottom"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                </Style>
+                <Style TargetType="TextBlock">
+                    <Setter Property="VerticalAlignment" Value="Bottom"/>
+                    <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
+                    <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.TextBlock.Label}"/>
+                </Style>
+                <Style TargetType="TextBox" BasedOn="{StaticResource MahApps.Styles.TextBox}">
+                    <Setter Property="Width" Value="340"/>
+                    <Setter Property="Height" Value="30"/>
+                    <Setter Property="FontSize" Value="15"/>
+                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                    <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
+                </Style>
+            </Grid.Resources>
+            
             <Grid.RowDefinitions>
                 <RowDefinition Height="80"/>
                 <RowDefinition Height="30"/>
@@ -93,82 +123,42 @@
                 <RowDefinition Height="100"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="1"
-                       VerticalAlignment="Bottom"
-                       FontFamily="{StaticResource IDCA.Font.Family}"
-                       Text="项目名称"
-                       FontSize="15"/>
-            <StackPanel Grid.Row="2"
-                        Orientation="Horizontal">
-                <TextBox Width="340"
-                         Height="30"
-                         FontSize="15"
-                         Text="{Binding ProjectName}"
-                         VerticalContentAlignment="Center"
-                         FontFamily="{StaticResource IDCA.Font.Family}"/>
+            <TextBlock Grid.Row="1">项目名称</TextBlock>
+            <StackPanel Grid.Row="2" Orientation="Horizontal">
+                <TextBox Text="{Binding ProjectName}"/>
             </StackPanel>
 
-            <TextBlock Grid.Row="3"
-                       VerticalAlignment="Bottom"
-                       FontFamily="{StaticResource IDCA.Font.Family}"
-                       Text="项目路径"
-                       FontSize="15"/>
-            <StackPanel Grid.Row="4" 
-                        Orientation="Horizontal">
-                <TextBox Width="340"
-                         Height="30"
-                         FontSize="15"
-                         Text="{Binding ProjectRootPath}"
-                         VerticalContentAlignment="Center"
-                         FontFamily="{StaticResource IDCA.Font.Family}"/>
-                <Button Style="{StaticResource IDCA.Button.Start.OpenDialog}"
+            <TextBlock Grid.Row="3">项目路径</TextBlock>
+            <StackPanel Grid.Row="4" Orientation="Horizontal">
+                <TextBox Text="{Binding ProjectRootPath}"/>
+                <Button Style="{StaticResource IDCA.Window.Start.DialogButton}" 
                         Command="{Binding SelectProjectPathCommand}"/>
             </StackPanel>
 
-            <TextBlock Grid.Row="5"
-                       VerticalAlignment="Bottom"
-                       FontFamily="{StaticResource IDCA.Font.Family}"
-                       Text="MDM文档路径"
-                       FontSize="15"/>
-            <StackPanel Grid.Row="6" 
-                        Orientation="Horizontal">
-                <TextBox Width="340"
-                         Height="30"
-                         FontSize="15"
-                         Text="{Binding MdmDocumentPath}"
-                         VerticalContentAlignment="Center"
-                         FontFamily="{StaticResource IDCA.Font.Family}"/>
-                <Button Style="{StaticResource IDCA.Button.Start.OpenDialog}"
+            <TextBlock Grid.Row="5">MDM文档路径</TextBlock>
+            <StackPanel Grid.Row="6" Orientation="Horizontal">
+                <TextBox Text="{Binding MdmDocumentPath}"/>
+                <Button Style="{StaticResource IDCA.Window.Start.DialogButton}" 
                         Command="{Binding SelectMdmDocumentPathCommand}"/>
             </StackPanel>
 
-            <TextBlock Grid.Row="7"
-                       VerticalAlignment="Bottom"
-                       FontFamily="{StaticResource IDCA.Font.Family}"
-                       Text="Excel配置文档路径（可选）"
-                       FontSize="15"/>
-            <StackPanel Grid.Row="8" 
-                        Orientation="Horizontal">
-                <TextBox Width="340"
-                         Height="30"
-                         FontSize="15"
-                         Text="{Binding ExcelSettingFilePath}"
-                         VerticalContentAlignment="Center"
-                         FontFamily="{StaticResource IDCA.Font.Family}"/>
-                <Button Style="{StaticResource IDCA.Button.Start.OpenDialog}"
+            <TextBlock Grid.Row="7">Excel配置文档路径（可选）</TextBlock>
+            <StackPanel Grid.Row="8" Orientation="Horizontal">
+                <TextBox Text="{Binding ExcelSettingFilePath}"/>
+                <Button Style="{StaticResource IDCA.Window.Start.DialogButton}" 
                         Command="{Binding SelectExcelSettingFilePathCommand}"/>
             </StackPanel>
 
             <Button Grid.Row="9"
                     Width="80"
-                    Height="30"
+                    Height="35"
                     Margin="30"
+                    FontSize="15"
                     HorizontalAlignment="Right"
-                    Background="#FFF3F3F3"
+                    Command="{Binding ConfirmCommand}"
+                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}}"
                     >完成</Button>
 
         </Grid>
-        
     </Grid>
-    
-</Window >
+</mah:MetroWindow>

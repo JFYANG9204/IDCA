@@ -4,9 +4,9 @@ using System.Collections.Generic;
 
 namespace IDCA.Model.MDM
 {
-    public class DataSource : MDMObject, IDataSource
+    public class DataSource : MDMObject
     {
-        internal DataSource(IMDMDocument document, IMDMObject parent) : base(document, parent)
+        internal DataSource(MDMDocument? document, MDMObject? parent) : base(document, parent)
         {
             _objectType = MDMObjectType.DataSource;
         }
@@ -24,40 +24,18 @@ namespace IDCA.Model.MDM
         public string Id { get => _id; internal set => _id = value; }
     }
 
-    public class DataSources : MDMObject, IMDMObjectCollection<DataSource>
+    public class DataSources : MDMObjectCollection<DataSource>
     {
-        internal DataSources(IMDMDocument document) : base(document, document)
+        internal DataSources(MDMDocument? document) : base(document, document, collection => new DataSource(collection.Document, collection))
         {
             _objectType = MDMObjectType.DataSources;
         }
 
         string _default = string.Empty;
-        readonly List<DataSource> _items = new();
 
         public string Default { get => _default; internal set => _default = value; }
-        public DataSource? this[int index] => index >= 0 && index < _items.Count ? _items[index] : null;
-        public int Count => _items.Count;
         new public MDMObjectType ObjectType => _objectType;
 
-        public void Add(DataSource item)
-        {
-            _items.Add(item);
-        }
-
-        public IEnumerator GetEnumerator()
-        {
-            return _items.GetEnumerator();
-        }
-
-        public DataSource NewObject()
-        {
-            return new DataSource(_document, this);
-        }
-
-        public void Clear()
-        {
-            _items.Clear();
-        }
     }
 
 }

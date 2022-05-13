@@ -4,32 +4,23 @@ using System.Collections.Generic;
 
 namespace IDCA.Model.MDM
 {
-    public class MDMCollection<T> : IMDMCollection<T> where T : MDMObject
+    public class MDMCollection<T> : MDMObject where T : MDMObject
     {
-        protected MDMCollection(IMDMDocument document, IMDMObject parent)
+        protected MDMCollection(MDMDocument? document, MDMObject? parent) : base(document, parent)
         {
-            _document = document;
-            _parent = parent;
             _constructor = constructor => (T)new MDMObject(document, parent);
         }
 
-        internal MDMCollection(IMDMDocument document, IMDMObject parent, Func<IMDMCollection<T>, T> constructor)
+        internal MDMCollection(MDMDocument? document, MDMObject? parent, Func<MDMCollection<T>, T> constructor) : base(document, parent)
         {
-            _document = document;
-            _parent = parent;
             _constructor = constructor;
         }
 
-        protected readonly IMDMDocument _document;
-        protected readonly IMDMObject _parent;
-        protected readonly Func<IMDMCollection<T>, T> _constructor;
+        protected readonly Func<MDMCollection<T>, T> _constructor;
 
         protected List<T> _items = new();
         public T? this[int index] => index >= 0 && index < _items.Count ? _items[index] : default;
         public int Count => _items.Count;
-
-        public IMDMDocument Document => _document;
-        public IMDMObject Parent => _parent;
 
         public virtual void Add(T item)
         {
@@ -52,27 +43,19 @@ namespace IDCA.Model.MDM
         }
     }
 
-    public class MDMObjectCollection<T> : MDMCollection<T>, IMDMObjectCollection<T> where T : MDMObject
+    public class MDMObjectCollection<T> : MDMCollection<T> where T : MDMObject
     {
-        protected MDMObjectCollection(IMDMDocument document, IMDMObject parent) : base(document, parent)
+        protected MDMObjectCollection(MDMDocument? document, MDMObject? parent) : base(document, parent)
         {
             _objectConstructor = constructor => (T)new MDMObject(document, parent);
         }
 
-        internal MDMObjectCollection(IMDMDocument document, IMDMObject parent, Func<IMDMObjectCollection<T>, T> constructor) : base(document, parent)
+        internal MDMObjectCollection(MDMDocument? document, MDMObject? parent, Func<MDMObjectCollection<T>, T> constructor) : base(document, parent)
         { 
             _objectConstructor = constructor;
         }
 
-        protected readonly Func<IMDMObjectCollection<T>, T> _objectConstructor;
-
-        protected MDMObjectType _objectType;
-        protected Properties? _properties;
-        protected Properties? _templates;
-
-        public MDMObjectType ObjectType { get => _objectType; internal set => _objectType = value; }
-        public Properties? Properties { get => _properties; internal set => _properties = value; }
-        public Properties? Templates { get => _templates; internal set => _templates = value; }
+        protected readonly Func<MDMObjectCollection<T>, T> _objectConstructor;
 
         public override T NewObject()
         {
@@ -81,16 +64,16 @@ namespace IDCA.Model.MDM
 
     }
 
-    public class MDMNamedCollection<T> : MDMObjectCollection<T>, IMDMNamedCollection<T>, IMDMObject where T : MDMNamedObject
+    public class MDMNamedCollection<T> : MDMObjectCollection<T> where T : MDMNamedObject
     {
-        internal MDMNamedCollection(IMDMDocument document, IMDMObject parent, Func<IMDMNamedCollection<T>, T> constructor) : base(document, parent)
+        internal MDMNamedCollection(MDMDocument? document, MDMObject? parent, Func<MDMNamedCollection<T>, T> constructor) : base(document, parent)
         {
             _namedConstructor = constructor;
         }
 
-        protected readonly Func<IMDMNamedCollection<T>, T> _namedConstructor;
+        protected readonly Func<MDMNamedCollection<T>, T> _namedConstructor;
 
-        protected readonly Dictionary<string, IElement> _itemCache = new();
+        protected readonly Dictionary<string, Element> _itemCache = new();
         protected readonly Dictionary<string, T> _cache = new();
         protected readonly Dictionary<string, T> _idCache = new();
 
@@ -109,7 +92,7 @@ namespace IDCA.Model.MDM
         {
             get
             {
-                if (_labels != null)
+                if (_labels != null && _document != null)
                 {
                     var label = _labels[_document.Language, _document.Context];
                     if (label != null)

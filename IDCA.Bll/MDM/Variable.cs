@@ -1,9 +1,9 @@
 ﻿
 namespace IDCA.Model.MDM
 {
-    public class Variable : MDMLabeledObject, IVariable
+    public class Variable : MDMLabeledObject
     {
-        internal Variable(IMDMDocument document, IMDMObject parent) : base(document, parent)
+        internal Variable(MDMDocument? document, MDMObject? parent) : base(document, parent)
         {
             _objectType = MDMObjectType.Variable;
         }
@@ -39,9 +39,9 @@ namespace IDCA.Model.MDM
         public bool Versioned { get => _versioned; internal set => _versioned = value; }
     }
 
-    public class Variables : MDMNamedCollection<Variable>, IMDMObject
+    public class Variables : MDMNamedCollection<Variable>
     {
-        internal Variables(IMDMDocument document, IMDMObject? parent = null) : base(document, parent ?? document, collection => new Variable(document, collection))
+        internal Variables(MDMDocument? document, MDMObject? parent = null) : base(document, parent ?? document, collection => new Variable(document, collection))
         {
             _objectType = MDMObjectType.Variables;
         }
@@ -52,37 +52,57 @@ namespace IDCA.Model.MDM
         public bool GlobalNamespace { get => _globalNamespace; internal set => _globalNamespace = value; }
     }
 
-    public class VariableInstance : MDMObject, IVariableInstance
+    public class VariableInstance : MDMObject
     {
-        internal VariableInstance(IMDMObject parent) : base(parent.Document, parent) 
+        internal VariableInstance(MDMObject parent) : base(parent.Document, parent) 
         { 
             _objectType = MDMObjectType.VariableInstance;
         }
 
-        new readonly MDMObjectType _objectType;
-
         string _name = string.Empty;
         string _fullName = string.Empty;
-        IVariable? _variable;
+        Variable? _variable;
         string _expression = string.Empty;
         SourceType _sourceType = SourceType.None;
 
         public string Name { get => _name; internal set => _name = value; }
         public string FullName { get => _fullName; internal set => _fullName = value; }
-        public IVariable? Variable { get => _variable; internal set => _variable = value; }
+        public Variable? Variable { get => _variable; internal set => _variable = value; }
         public string Expression { get => _expression; internal set => _expression = value; }
         public SourceType SourceType { get => _sourceType; internal set => _sourceType = value; }
-        new public MDMObjectType ObjectType => _objectType;
     }
 
     public class Mapping : MDMObjectCollection<VariableInstance>
     {
-        internal Mapping(IMDMDocument document) : base(document, document, collection => new VariableInstance(collection))
+        internal Mapping(MDMDocument? document) : base(document, document, collection => new VariableInstance(collection))
         {
             _objectType = MDMObjectType.Mapping;
         }
+    }
 
-        new public MDMObjectType ObjectType => _objectType;
+    public enum VariableUsage
+    {
+        Variable = 0,
+        HelperField = 0x10,
+        SourceFile = 272,
+        Coding = 528,
+        OtherSpecify = 1040,
+        Multiplier = 2064,
+        Grid = 1,
+        Compound = 2,
+        Class = 4,
+        Array = 8,
+        Filter = 0x1000,
+        Weight = 0x2000
+    }
+
+    public enum SourceType
+    {
+        DataField = 1,
+        Expression = 2,
+        Expressions = 4,
+        NoCaseData = 9,
+        None = 0x1000
     }
 
 }

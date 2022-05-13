@@ -1,9 +1,9 @@
 ﻿
 namespace IDCA.Model.MDM
 {
-    public class Property : MDMNamedObject, IProperty
+    public class Property : MDMNamedObject
     {
-        internal Property(IMDMObject parent) : base(parent.Document, parent)
+        internal Property(MDMObject? parent) : base(parent?.Document, parent)
         {
             _name = "";
             _value = "";
@@ -20,10 +20,36 @@ namespace IDCA.Model.MDM
         public string Context { get => _context; internal set => _context = value; }
     }
 
-
-    public class Properties : MDMNamedCollection<Property>, IProperties
+    /// <summary>
+    /// 属性值类型，可以是整数、实数、字符串、集合和布尔类型，其中，布尔类型时，-1为true，0为false
+    /// </summary>
+    public enum PropertyValueType
     {
-        internal Properties(IMDMObject parent) : base(parent.Document, parent, collection => new Property(collection))
+        /// <summary>
+        /// 整数数值类型
+        /// </summary>
+        Integer = 3,
+        /// <summary>
+        /// 浮点数类型
+        /// </summary>
+        Decimal = 5,
+        /// <summary>
+        /// 字符串
+        /// </summary>
+        Text = 8,
+        /// <summary>
+        /// 次级属性集合
+        /// </summary>
+        Collection = 9,
+        /// <summary>
+        /// 布尔类型，XML数据中，-1为true，0为false
+        /// </summary>
+        Bool = 11,
+    }
+
+    public class Properties : MDMNamedCollection<Property>
+    {
+        internal Properties(MDMObject? parent) : base(parent?.Document, parent, collection => new Property(collection))
         {
             _objectType = MDMObjectType.Properties;
         }

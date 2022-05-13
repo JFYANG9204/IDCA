@@ -1,9 +1,9 @@
 ﻿
 namespace IDCA.Model.MDM
 {
-    public class Page : MDMLabeledObject, IPage
+    public class Page : MDMLabeledObject
     {
-        internal Page(IMDMObject parent) : base(parent.Document, parent)
+        internal Page(MDMObject? parent) : base(parent?.Document, parent)
         {
             _objectType = MDMObjectType.Page;
             _items = new Variables(_document, this);
@@ -15,9 +15,9 @@ namespace IDCA.Model.MDM
         public Variables? Items => _items;
     }
 
-    public class Pages : MDMNamedCollection<Page>, IPages<Page>
+    public class Pages : MDMNamedCollection<Page>
     {
-        internal Pages(IMDMObject parent) : base(parent.Document, parent, collection => new Page(collection))
+        internal Pages(MDMObject? parent) : base(parent?.Document, parent, collection => new Page(collection))
         {
             _objectType = MDMObjectType.Pages;
         }

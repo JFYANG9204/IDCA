@@ -1,10 +1,35 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Color x:Key="IDCA.Colors.ListBox.Item.Dark">#FFF3F3F3</Color>
+    <Color x:Key="IDCA.Colors.ListBox.Item.Selected">DarkGray</Color>
+    <Color x:Key="IDCA.Colors.Window.Background">#FFFBFBFB</Color>
+    <Color x:Key="IDCA.Colors.Window.Background.Toolbar">#FFFBFBFB</Color>
+    <Color x:Key="IDCA.Colors.Window.Borderbrush">LightGray</Color>
+    <Color x:Key="IDCA.Colors.Window.HeaderButton.Minimize.Background">CornflowerBlue</Color>
+    <Color x:Key="IDCA.Colors.Window.HeaderButton.Minimize.Background.Click">LightSkyBlue</Color>
+    <Color x:Key="IDCA.Colors.Window.HeaderButton.Close.Background">Red</Color>
+    <Color x:Key="IDCA.Colors.Window.HeaderButton.Close.Background.Click">DarkRed</Color>
+    <Color x:Key="IDCA.Colors.Window.HeaderButton.Foreground">Gray</Color>
+    <Color x:Key="IDCA.Colors.Window.HeaderButton.Foreground.Click">White</Color>
+
+    <Color x:Key="IDCA.Colors.Button.Background">#FFF3F3F3</Color>
+    <Color x:Key="IDCA.Colors.Button.Background.Click">LightGray</Color>
     
-    <SolidColorBrush x:Key="IDCA.Colors.Window.Background" Color="White"/>
-    <SolidColorBrush x:Key="IDCA.Colors.ListBox.Item.Dark" Color="#FFF3F3F3"/>
-    <SolidColorBrush x:Key="IDCA.Colors.Window.HeaderButton" Color="Gray"/>
-    <SolidColorBrush x:Key="IDCA.Colors.Window.ToolBar.Background" Color="#FFFBFBFB"/>
-    <SolidColorBrush x:Key="IDCA.Colors.Window.BorderBrush" Color="LightGray"/>
+    <SolidColorBrush x:Key="IDCA.Brushes.ListBox.Item.Dark" Color="{StaticResource IDCA.Colors.ListBox.Item.Dark}"/>
+    <SolidColorBrush x:Key="IDCA.Brushes.ListBox.Item.Selected" Color="{StaticResource IDCA.Colors.ListBox.Item.Selected}"/>
+
+    <SolidColorBrush x:Key="IDCA.Brushes.Window.Background" Color="{StaticResource IDCA.Colors.Window.Background}"/>
+    <SolidColorBrush x:Key="IDCA.Brushes.Window.HeaderButton.Minimize.Background" Color="{StaticResource IDCA.Colors.Window.HeaderButton.Minimize.Background}"/>
+    <SolidColorBrush x:Key="IDCA.Brushes.Window.HeaderButton.Minimize.Background.Click" Color="{StaticResource IDCA.Colors.Window.HeaderButton.Minimize.Background.Click}"/>
+    <SolidColorBrush x:Key="IDCA.Brushes.Window.HeaderButton.Close.Background" Color="{StaticResource IDCA.Colors.Window.HeaderButton.Close.Background}"/>
+    <SolidColorBrush x:Key="IDCA.Brushes.Window.HeaderButton.Close.Background.Click" Color="{StaticResource IDCA.Colors.Window.HeaderButton.Close.Background.Click}"/>
+    <SolidColorBrush x:Key="IDCA.Brushes.Window.HeaderButton.Foreground" Color="{StaticResource IDCA.Colors.Window.HeaderButton.Foreground}"/>
+    <SolidColorBrush x:Key="IDCA.Brushes.Window.HeaderButton.Foreground.Click" Color="{StaticResource IDCA.Colors.Window.HeaderButton.Foreground.Click}"/>
+    <SolidColorBrush x:Key="IDCA.Brushes.Window.Background.ToolBar" Color="{StaticResource IDCA.Colors.Window.Background.Toolbar}"/>
+    <SolidColorBrush x:Key="IDCA.Brushes.Window.BorderBrush" Color="{StaticResource IDCA.Colors.Window.Borderbrush}"/>
+    
+    <SolidColorBrush x:Key="IDCA.Brushes.Button.Background" Color="{StaticResource IDCA.Colors.Button.Background}"/>
+    <SolidColorBrush x:Key="IDCA.Brushes.Button.Background.Click" Color="{StaticResource IDCA.Colors.Button.Background.Click}"/>
 
 </ResourceDictionary>

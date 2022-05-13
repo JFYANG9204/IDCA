@@ -1,0 +1,160 @@
+﻿<UserControl x:Class="IDCA.Client.View.TableSettingView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:viewModel="clr-namespace:IDCA.Client.ViewModel"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:iconPack="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             mc:Ignorable="d" 
+             d:DesignHeight="550" 
+             d:DesignWidth="1200">
+
+    <UserControl.DataContext>
+        <viewModel:TableSettingViewModel/>
+    </UserControl.DataContext>
+
+    <Grid>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal" Margin="20 0 0 0">
+
+            <StackPanel.Resources>
+                <Style TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button}">
+                    <Setter Property="Width" Value="80"/>
+                    <Setter Property="Height" Value="30"/>
+                    <Setter Property="Margin" Value="5"/>
+                    <Setter Property="FontSize" Value="13"/>
+                </Style>
+            </StackPanel.Resources>
+            
+            <mah:DropDownButton Width="80" Height="30" Margin="5">
+            </mah:DropDownButton>
+            <Button Command="{Binding PushNewElementCommand}">添加表格</Button>
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="1">
+            <ItemsControl ItemsSource="{Binding ElementList}" d:ItemsSource="{d:SampleData ItemCount=5}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Height="100" 
+                                Width="1150"
+                                BorderThickness="0 0 0 1"
+                                BorderBrush="{StaticResource IDCA.Brushes.Window.BorderBrush}">
+                            <Grid>
+
+                                <Grid.Resources>
+                                    <Style TargetType="TextBox" BasedOn="{StaticResource MahApps.Styles.TextBox}">
+                                        <Setter Property="Width" Value="120"/>
+                                        <Setter Property="Height" Value="30"/>
+                                        <Setter Property="Margin" Value="5"/>
+                                        <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
+                                        <Setter Property="FontSize" Value="14"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                    </Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button}">
+                                        <Setter Property="Width" Value="80"/>
+                                        <Setter Property="Height" Value="30"/>
+                                        <Setter Property="FontSize" Value="14"/>
+                                        <Setter Property="Margin" Value="5"/>
+                                        <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                    </Style>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource MahApps.Styles.TextBlock}">
+                                        <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
+                                        <Setter Property="FontSize" Value="15"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="Margin" Value="5"/>
+                                    </Style>
+                                    <Style TargetType="GridSplitter">
+                                        <Setter Property="Height" Value="30"/>
+                                        <Setter Property="Width" Value="1"/>
+                                    </Style>
+                                </Grid.Resources>
+                                
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="10"/>
+                                    <RowDefinition Height="40"/>
+                                    <RowDefinition Height="40"/>
+                                    <RowDefinition Height="10"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="20"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="130"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
+
+                                    <GridSplitter/>
+
+                                    <TextBlock Grid.Row="1" Grid.Column="1">变量名</TextBlock>
+                                    <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding VariableName}"/>
+
+                                    <GridSplitter/>
+
+                                    <TextBlock Grid.Row="1" Grid.Column="3">标题</TextBlock>
+                                    <TextBox Grid.Row="1" Grid.Column="4" Text="{Binding Title}"/>
+
+                                    <GridSplitter/>
+
+                                    <TextBlock Grid.Row="1" Grid.Column="5">基数标签</TextBlock>
+                                    <TextBox Grid.Row="1" Grid.Column="6" Text="{Binding BaseText}"/>
+
+                                    <GridSplitter/>
+
+                                    <TextBlock Grid.Row="1" Grid.Column="7">基数筛选器</TextBlock>
+                                    <TextBox Grid.Row="1" Grid.Column="8" Text="{Binding BaseFilter}"/>
+
+                                    <GridSplitter/>
+
+                                    <TextBlock Grid.Row="1" Grid.Column="9">表格筛选器</TextBlock>
+                                    <TextBox Grid.Row="1" Grid.Column="10" Text="{Binding TableFilter}"/>
+
+                                    <GridSplitter/>
+
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
+                                    <GridSplitter/>
+                                    <Button Width="120" Command="{Binding AxisSettingCommand}">配置轴表达式</Button>
+                                    <GridSplitter/>
+                                </StackPanel>
+                                
+                                <Button Grid.Row="1"
+                                        Grid.RowSpan="2"
+                                        Grid.Column="11"
+                                        Width="25"
+                                        Height="25"
+                                        Command="{Binding RemoveCommand}"
+                                        Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"
+                                        Foreground="Red"
+                                        HorizontalAlignment="Left"
+                                        Margin="25"
+                                        Cursor="Hand">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Grid Background="{TemplateBinding Background}">
+                                                <iconPack:PackIconMaterialDesign Kind="Close"
+                                                                                 Height="25"
+                                                                                 Width="25"/>
+                                            </Grid>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+        
+    </Grid>
+    
+</UserControl>

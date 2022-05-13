@@ -1,31 +1,31 @@
 ﻿
 namespace IDCA.Model.MDM
 {
-    public class MDMObject : IMDMObject
+    public class MDMObject
     {
-        internal MDMObject(IMDMDocument document, IMDMObject parent)
+        internal MDMObject(MDMDocument? document, MDMObject? parent)
         {
             _parent = parent;
             _document = document;
         }
 
-        readonly protected IMDMObject _parent;
-        readonly protected IMDMDocument _document;
+        readonly protected MDMObject? _parent;
+        readonly protected MDMDocument? _document;
 
         protected MDMObjectType _objectType = MDMObjectType.Unknown;
         protected Properties? _properties;
         protected Properties? _templates;
 
         public MDMObjectType ObjectType { get => _objectType; internal set => _objectType = value; }
-        public IMDMObject Parent => _parent;
-        public IMDMDocument Document => _document;
+        public MDMObject? Parent => _parent;
+        public MDMDocument? Document => _document;
         public Properties? Properties { get => _properties; internal set => _properties = value; }
         public Properties? Templates { get => _templates; internal set => _templates = value; }
     }
 
-    public class MDMNamedObject : MDMObject, IMDMNamedObject
+    public class MDMNamedObject : MDMObject
     {
-        internal MDMNamedObject(IMDMDocument document, IMDMObject parent) : base(document, parent)
+        internal MDMNamedObject(MDMDocument? document, MDMObject? parent) : base(document, parent)
         {
         }
 
@@ -40,9 +40,9 @@ namespace IDCA.Model.MDM
         public bool IsSystem { get => _isSystem; internal set => _isSystem = value; }
     }
 
-    public class MDMLabeledObject : MDMNamedObject, IMDMLabeledObject
+    public class MDMLabeledObject : MDMNamedObject
     {
-        internal MDMLabeledObject(IMDMDocument document, IMDMObject parent) : base(document, parent)
+        internal MDMLabeledObject(MDMDocument? document, MDMObject? parent) : base(document, parent)
         {
         }
 
@@ -58,7 +58,7 @@ namespace IDCA.Model.MDM
         {
             get
             {
-                if (_labels == null)
+                if (_labels == null || _document == null)
                 {
                     return string.Empty;
                 }
@@ -68,5 +68,63 @@ namespace IDCA.Model.MDM
         }
 
     }
+
+
+    public enum MDMDataType
+    {
+        None = -1,
+        Info = 0,
+        Long = 1,
+        Text = 2,
+        Categorical = 3,
+        Date = 5,
+        Double = 6,
+        Boolean = 7,
+    }
+
+    public enum MDMObjectType
+    {
+        Unknown,
+        Variable,
+        Grid,
+        Class,
+        Element,
+        Elements,
+        Categories,
+        Label,
+        Labels,
+        Field,
+        HelperFields,
+        Fields,
+        Type,
+        Types,
+        Property,
+        Properties,
+        Routing,
+        Routings,
+        Context,
+        Contexts,
+        Language,
+        Languages,
+        VariableInstance,
+        RoutingItem,
+        Compound,
+        RoutingItems,
+        Variables,
+        Mapping,
+        Script,
+        Scripts,
+        ScriptType,
+        ScriptTypes,
+        Page,
+        Pages,
+        SaveLog,
+        SaveLogs,
+        CategoryMap,
+        DataSource,
+        DataSources,
+        Document
+    }
+
 
 }

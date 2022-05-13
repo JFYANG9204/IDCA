@@ -5,9 +5,35 @@ using System.Collections.Generic;
 
 namespace IDCA.Model.MDM
 {
-    public class SaveLog : MDMObject, ISaveLog
+
+    /// <summary>
+    /// 存储时的用户信息
+    /// </summary>
+    public class MDMUser : MDMObject
     {
-        internal SaveLog(IMDMObjectCollection<SaveLog> parent) : base(parent.Document, parent)
+        internal MDMUser(MDMDocument? document, MDMObject? parent) : base(document, parent)
+        {
+            Name = string.Empty;
+            FileVersion = string.Empty;
+            Comment = string.Empty;
+        }
+        /// <summary>
+        /// 用户名
+        /// </summary>
+        public string Name { get; set; }
+        /// <summary>
+        /// 用户文件版本
+        /// </summary>
+        public string FileVersion { get; set; }
+        /// <summary>
+        /// 用户添加的注释
+        /// </summary>
+        public string Comment { get; set; }
+    }
+
+    public class SaveLog : MDMObject
+    {
+        internal SaveLog(MDMObjectCollection<SaveLog> parent) : base(parent.Document, parent)
         {
             _objectType = MDMObjectType.SaveLog;
         }
@@ -49,9 +75,9 @@ namespace IDCA.Model.MDM
         }
     }
 
-    public class SaveLogs : MDMObjectCollection<SaveLog>, IMDMObjectCollection<SaveLog>
+    public class SaveLogs : MDMObjectCollection<SaveLog>
     {
-        internal SaveLogs(IMDMDocument document) : base(document, document, collection => new SaveLog(collection))
+        internal SaveLogs(MDMDocument document) : base(document, document, collection => new SaveLog(collection))
         {
             _objectType = MDMObjectType.SaveLogs;
         }

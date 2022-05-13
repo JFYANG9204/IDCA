@@ -405,9 +405,9 @@ namespace IDCA.Model.MDM
     }
 
 
-    public class Language : MDMNamedObject, ILanguage
+    public class Language : MDMNamedObject
     {
-        internal Language(IMDMObject parent) : base(parent.Document, parent)
+        internal Language(MDMObject? parent) : base(parent?.Document, parent)
         {
             _longCode = "";
             _shortCode = "";
@@ -415,7 +415,7 @@ namespace IDCA.Model.MDM
             _objectType = MDMObjectType.Language;
         }
 
-        internal Language(string longCode, IMDMObject parent) : base(parent.Document, parent)
+        internal Language(string longCode, MDMObject? parent) : base(parent?.Document, parent)
         {
             _longCode = longCode;
             _name = LanguageHelper.GetNameFromLongCode(longCode);
@@ -428,34 +428,31 @@ namespace IDCA.Model.MDM
 
         public string ShortCode => _shortCode;
         public string LongCode => _longCode;
-        new public MDMObjectType ObjectType => _objectType;
+
+        public static Language Default => new(null) { _isDefault = true };
 
         public void SetLongCode(string longCode)
         {
             _longCode = longCode;
             _name = LanguageHelper.GetNameFromLongCode(_longCode);
-            _shortCode= LanguageHelper.GetShortCodeFromLongCode(_longCode);
+            _shortCode = LanguageHelper.GetShortCodeFromLongCode(_longCode);
         }
 
-        public bool IsDefault => string.IsNullOrEmpty(_longCode);
+        bool _isDefault = false;
+        public bool IsDefault { get => _isDefault; private set => _isDefault = value; }
     }
 
-    public class Languages : MDMNamedCollection<Language>, ILanguages<Language>
+    public class Languages : MDMNamedCollection<Language>
     {
 
-        internal Languages(IMDMDocument document, string @base) : base(document, document, collection => new Language(collection))
+        internal Languages(MDMDocument document, string @base) : base(document, document, collection => new Language(collection))
         {
             _base = @base;
-            _default = new Language(this);
             _objectType = MDMObjectType.Languages;
         }
 
         string _base;
-        readonly ILanguage _default;
-
         public string Base { get => _base; internal set => _base = value; }
-        public ILanguage Default => _default;
-        new public MDMObjectType ObjectType => _objectType;
 
         public override void Add(Language item)
         {

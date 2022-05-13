@@ -4,9 +4,9 @@ using System.Collections.Generic;
 namespace IDCA.Model.MDM
 {
 
-    public class ContextAlternatives : IContextAlternatives
+    public class ContextAlternatives
     {
-        internal ContextAlternatives(IContext parent)
+        internal ContextAlternatives(Context parent)
         {
             _parent = parent;
         }
@@ -14,10 +14,10 @@ namespace IDCA.Model.MDM
         public string this[int index] => index >= 0 && index < _alternatives.Count ? _alternatives[index] : "";
 
         readonly List<string> _alternatives = new();
-        readonly IContext _parent;
+        readonly Context _parent;
 
         public int Count => _alternatives.Count;
-        public IContext Parent => _parent;
+        public Context Parent => _parent;
 
         public void Add(string item)
         {
@@ -43,45 +43,47 @@ namespace IDCA.Model.MDM
         }
     }
 
-    public class Context : MDMNamedObject, IContext
+    public class Context : MDMNamedObject
     {
-        internal Context(IMDMObject parent) : base(parent.Document, parent)
+        internal Context(MDMObject? parent) : base(parent?.Document, parent)
         {
             _objectType = MDMObjectType.Context;
         }
 
-        IContextAlternatives? _alternatives = null;
+        public static Context Default => new(null) { _isDefault = true };
+
+        ContextAlternatives? _alternatives = null;
         string _description = string.Empty;
         ContextUsage _usage = ContextUsage.Properties;
 
-        public IContextAlternatives? Alternatives => _alternatives;
+        public ContextAlternatives? Alternatives => _alternatives;
         public string Description { get => _description; internal set => _description = value; }
         public ContextUsage Usage { get => _usage; internal set => _usage = value; }
-        public bool IsDefault => string.IsNullOrEmpty(_name);
 
-        public IContextAlternatives NewAlternatives()
+        bool _isDefault = false;
+        public bool IsDefault { get => _isDefault; private set => _isDefault = value; }
+
+
+        public ContextAlternatives NewAlternatives()
         {
             return _alternatives = new ContextAlternatives(this);
         }
     }
 
-    public class Contexts : MDMObjectCollection<Context>, IContexts<Context>
+    public class Contexts : MDMObjectCollection<Context>
     {
-        internal Contexts(IMDMDocument document, string @base) : base(document, document, collection => new Context(collection))
+        internal Contexts(MDMDocument? document, string @base) : base(document, document, collection => new Context(collection))
         {
             _base = @base;
-            _default = new Context(this);
             _objectType = MDMObjectType.Contexts;
         }
 
-        public IContext? this[string name] => _cache.ContainsKey(name.ToLower()) ? _cache[name.ToLower()] : null;
+        public Context? this[string name] => _cache.ContainsKey(name.ToLower()) ? _cache[name.ToLower()] : null;
 
-        readonly Dictionary<string, IContext> _cache = new();
+        readonly Dictionary<string, Context> _cache = new();
         string _base;
-        readonly IContext _default;
 
         public string Base { get => _base; internal set => _base = value; }
-        public IContext Default => _default;
 
         public override void Add(Context item)
         {
@@ -94,4 +96,11 @@ namespace IDCA.Model.MDM
 
 
     }
+    public enum ContextUsage
+    {
+        Routings,
+        Labels,
+        Properties,
+    }
+
 }

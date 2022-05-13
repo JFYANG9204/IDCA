@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace IDCA.Model.MDM
 {
-    public class CategoryMap : MDMObject, ICategoryMap
+    public class CategoryMap : MDMObject
     {
-        internal CategoryMap(IMDMDocument document) : base(document, document)
+        internal CategoryMap(MDMDocument? document) : base(document, document)
         {
             _objectType = MDMObjectType.CategoryMap;
         }
@@ -30,4 +30,11 @@ namespace IDCA.Model.MDM
             }
         }
     }
+
+    public struct CategoryId
+    {
+        public string Name;
+        public string Value;
+    }
+
 }

@@ -2,6 +2,7 @@
 using IDCA.Model.MDM;
 using IDCA.Model.Template;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace IDCA.Client.Singleton
 {
@@ -12,7 +13,8 @@ namespace IDCA.Client.Singleton
             _templateDictionary = new TemplateDictionary();
             _mdmDocument = new MDMDocument();
             _config = new Config();
-            _currentTableSetting = new TableSettingCollection(_mdmDocument, _config);
+            _tableSettings = new Dictionary<string, TableSettingCollection>();
+            _currentTableSetting = NewTableSetting();
             LoadConfigs();
         }
 
@@ -59,7 +61,7 @@ namespace IDCA.Client.Singleton
         public TemplateCollection? Templates { get => _templates; set => _templates = value; }
 
         readonly MDMDocument _mdmDocument;
-        readonly TableSettingCollection _currentTableSetting;
+        TableSettingCollection _currentTableSetting;
         /// <summary>
         /// 当前项目的MDM文档对象，此对象需要手动初始化
         /// </summary>
@@ -69,7 +71,7 @@ namespace IDCA.Client.Singleton
         /// </summary>
         public TableSettingCollection CurrentTableSetting => _currentTableSetting;
 
-        readonly Dictionary<string, TableSettingCollection> _tableSettings = new();
+        readonly Dictionary<string, TableSettingCollection> _tableSettings;
         /// <summary>
         /// 验证是否是可用的名称
         /// </summary>
@@ -106,11 +108,31 @@ namespace IDCA.Client.Singleton
             return table;
         }
 
-        int _tableSettingSelectIndex = 0;
+        /// <summary>
+        /// 设置当前的表格配置集合
+        /// </summary>
+        /// <param name="name"></param>
+        public void SetCurrentTableSetting(string name)
+        {
+            if (_tableSettings.ContainsKey(name))
+            {
+                _currentTableSetting = _tableSettings[name];
+            }
+        }
+        /// <summary>
+        /// 获取当前配置中的所有表格名称
+        /// </summary>
+        /// <returns></returns>
+        public string[] GetTableNames()
+        {
+            return _tableSettings.Keys.ToArray();
+        }
+
+        int _currentTableSettingIndex = 0;
         /// <summary>
         /// 当前项目表格配置选定配置条目的索引
         /// </summary>
-        public int TableSettingSelectIndex { get => _tableSettingSelectIndex; set => _tableSettingSelectIndex = value; }
+        public int CurrentTableSettingIndex { get => _currentTableSettingIndex; set => _currentTableSettingIndex = value; }
 
         string _mdmDocumentPath = string.Empty;
         /// <summary>

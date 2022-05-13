@@ -2,14 +2,14 @@
 
 namespace IDCA.Model.MDM
 {
-    public class Element : MDMLabeledObject, IElement
+    public class Element : MDMLabeledObject
     {
-        internal Element(IMDMObject parent) : base(parent.Document, parent)
+        internal Element(MDMObject? parent) : base(parent?.Document, parent)
         {
             _objectType = MDMObjectType.Element;
         }
 
-        IElement? _reference;
+        Element? _reference;
         ElementType _type = ElementType.Category;
         CategoryFlag _flag = CategoryFlag.None;
         Variable? _otherReference;
@@ -22,7 +22,7 @@ namespace IDCA.Model.MDM
         bool _isMultiplierLocal = false;
         bool _versioned = false;
 
-        public IElement? Reference { get => _reference; internal set => _reference = value; }
+        public Element? Reference { get => _reference; internal set => _reference = value; }
         public ElementType ElementType { get => _type; internal set => _type = value; }
         public CategoryFlag Flag { get => _flag; internal set => _flag = value; }
         public Variable? OtherReference { get => _otherReference; internal set => _otherReference = value; }
@@ -36,14 +36,52 @@ namespace IDCA.Model.MDM
         public bool Versioned { get => _versioned; internal set => _versioned = value; }
     }
 
-    public class Elements : MDMNamedCollection<Element>, IElements
+    public class Elements : MDMNamedCollection<Element>
     {
-        internal Elements(IMDMObject parent) : base(parent.Document, parent, ctor => new Element(ctor))
+        internal Elements(MDMObject? parent) : base(parent?.Document, parent, ctor => new Element(ctor))
         {
             _objectType = MDMObjectType.Elements;
         }
-
-        new public MDMObjectType ObjectType => _objectType;
     }
 
+    public enum ElementType
+    {
+        Category = 0,
+        AnalysisSubheading = 1,
+        AnalysisBase = 2,
+        AnalysisSubtotal = 3,
+        AnalysisSummaryData = 4,
+        AnalysisDerived = 5,
+        AnalysisTotal = 6,
+        AnalysisMean = 7,
+        AnalysisStdDev = 8,
+        AnalysisStdErr = 9,
+        AnalysisSampleVariance = 10,
+        AnalysisMinimun = 11,
+        AnalysisMaximun = 12,
+        AnalysisCategory = 14,
+    }
+
+    public enum CategoryFlag
+    {
+        None,
+        User,
+        DontKnow,
+        Refuse,
+        Noanswer,
+        Other,
+        Multiplier,
+        Exclusive,
+        FixedPosition,
+        NoFilter,
+        Inline
+    }
+
+    public enum FactorType
+    {
+        None = 0,
+        Long = 3,
+        Double = 5,
+        Text = 8,
+    }
 }

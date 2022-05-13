@@ -2,38 +2,38 @@
 
 namespace IDCA.Model.MDM
 {
-    public class Label : MDMObject, ILabel
+    public class Label : MDMObject
     {
-        internal Label(Labels parent, IContexts<Context> contexts, ILanguages<Language> languages) : base(parent.Document, parent)
+        internal Label(Labels? parent, Contexts? contexts, Languages? languages) : base(parent?.Document, parent)
         {
             _contexts = contexts;
-            _context = _contexts.Default;
+            _context = Context.Default;
             _languages = languages;
-            _language = _languages.Default;
+            _language = Language.Default;
             _text = string.Empty;
             _objectType = MDMObjectType.Label;
         }
 
-        readonly IContexts<Context> _contexts;
-        readonly ILanguages<Language> _languages;
+        readonly Contexts? _contexts;
+        readonly Languages? _languages;
 
         string _text;
-        IContext _context;
-        ILanguage _language;
+        Context _context;
+        Language _language;
 
         public string Text { get => _text; internal set => _text = value; }
-        public IContext Context => _context;
-        public ILanguage Language => _language;
+        public Context Context => _context;
+        public Language Language => _language;
 
         public void Set(string context, string language, string text)
         {
-            IContext targetContext = _contexts[context] ?? _contexts.Default;
+            Context targetContext = _contexts?[context] ?? Context.Default;
             if (!targetContext.IsDefault)
             {
                 _context = targetContext;
             }
 
-            ILanguage targetLanguage = _languages[language] ?? _languages.Default;
+            Language targetLanguage = _languages?[language] ?? Language.Default;
             if (!targetLanguage.IsDefault)
             {
                 _language = targetLanguage;
@@ -44,15 +44,15 @@ namespace IDCA.Model.MDM
 
     }
 
-    public class Labels : MDMCollection<Label>, ILabels<Label>
+    public class Labels : MDMCollection<Label>
     {
-        internal Labels(IMDMObject parent, IMDMDocument document, string context) : base(parent.Document, parent)
+        internal Labels(MDMObject? parent, MDMDocument? document, string context) : base(parent?.Document, parent)
         {
-            _currentContext = document.Contexts[context] ?? document.Contexts.Default;
+            _currentContext = document?.Contexts[context] ?? Context.Default;
         }
 
         readonly Dictionary<string, Dictionary<string, Label>> _languageLabelsCache = new();
-        IContext _currentContext;
+        Context _currentContext;
 
         new public Label? this[int index] => index >= 0 && index < _items.Count ? _items[index] : null;
 
@@ -85,10 +85,7 @@ namespace IDCA.Model.MDM
                 return null;
             }
         }
-        public IContext Context { get => _currentContext; internal set => _currentContext = value; }
-        public Properties? Properties { get; internal set; } = null;
-        public MDMObjectType ObjectType => MDMObjectType.Labels;
-        public Properties? Templates { get; internal set; } = null;
+        public Context Context { get => _currentContext; internal set => _currentContext = value; }
 
         public override void Add(Label item)
         {
@@ -116,7 +113,7 @@ namespace IDCA.Model.MDM
 
         public override Label NewObject()
         {
-            return new Label(this, _document.Contexts, _document.Languages);
+            return new Label(this, _document?.Contexts, _document?.Languages);
         }
     }
 

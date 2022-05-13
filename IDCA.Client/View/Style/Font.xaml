@@ -9,8 +9,4 @@
     <sys:Double x:Key="IDCA.Font.Size.TextBlock.Label">15</sys:Double>
     <sys:Double x:Key="IDCA.Font.Size.Content">14</sys:Double>
 
-    <Style TargetType="TextBox">
-        <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family.English}"/>
-    </Style>
-    
 </ResourceDictionary>

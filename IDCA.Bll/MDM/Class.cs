@@ -1,9 +1,9 @@
 ﻿
 namespace IDCA.Model.MDM
 {
-    public class Class : MDMLabeledObject, IClass
+    public class Class : MDMLabeledObject
     {
-        internal Class(IField field) : base(field.Document, field)
+        internal Class(Field field) : base(field.Document, field)
         {
             _objectType = MDMObjectType.Class;
         }

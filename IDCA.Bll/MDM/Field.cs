@@ -3,10 +3,10 @@ using System.Text;
 
 namespace IDCA.Model.MDM
 {
-    public class Field : Variable, IField
+    public class Field : Variable
     {
 
-        internal Field(IMDMObject parent) : base(parent.Document, parent)
+        internal Field(MDMObject parent) : base(parent?.Document, parent)
         {
             _objectType = MDMObjectType.Field;
         }
@@ -23,12 +23,12 @@ namespace IDCA.Model.MDM
             {
                 StringBuilder builder = new();
                 builder.Append(_name);
-                IMDMObject field = _parent.Parent.Parent;
-                while (field.ObjectType == MDMObjectType.Field)
+                MDMObject? field = _parent?.Parent?.Parent;
+                while (field != null && field.ObjectType == MDMObjectType.Field)
                 {
                     Field fieldObj = (Field)field;
                     builder.Insert(0, $"{fieldObj.Name}{(fieldObj.IteratorType == MDM.IteratorType.Categorical ? "[..]" : "")}.");
-                    field = field.Parent.Parent.Parent;
+                    field = field?.Parent?.Parent?.Parent;
                 }
                 return builder.ToString();
             }
@@ -68,9 +68,9 @@ namespace IDCA.Model.MDM
         public int? UpperBound { get => _upperBound; internal set => _upperBound = value; }
     }
 
-    public class Fields : MDMNamedCollection<Field>, IMDMNamedCollection<Field>
+    public class Fields : MDMNamedCollection<Field>
     {
-        internal Fields(IMDMDocument document, IMDMObject? parent = null) : base(document, parent ?? document, collection => new Field(collection))
+        internal Fields(MDMDocument? document, MDMObject? parent = null) : base(document, parent ?? document, collection => new Field(collection))
         {
             _objectType = MDMObjectType.Fields;
         }
@@ -111,6 +111,13 @@ namespace IDCA.Model.MDM
                 return null;
             }
         }
+    }
+
+    public enum IteratorType
+    {
+        None = 0,
+        Categorical = 2,
+        NumericRanges = 3,
     }
 
 }

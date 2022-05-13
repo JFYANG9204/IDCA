@@ -2,11 +2,11 @@
 namespace IDCA.Model.MDM
 {
 
-    public class Type : MDMLabeledObject, IType
+    public class Type : MDMLabeledObject
     {
-        internal Type(IMDMObject parent) : base(parent.Document, parent)
+        internal Type(MDMObject? parent) : base(parent?.Document, parent)
         {
-            _categories = new Categories(_parent.Document, _parent);
+            _categories = new Categories(_parent?.Document, _parent);
             _objectType = MDMObjectType.Type;
         }
 
@@ -17,9 +17,9 @@ namespace IDCA.Model.MDM
         public bool GlobalNamespace { get => _globalNamespace; internal set => _globalNamespace = value; }
     }
 
-    public class Types : MDMNamedCollection<Type>, ITypes<Type>
+    public class Types : MDMNamedCollection<Type>
     {
-        internal Types(IMDMDocument document, IMDMObject? parent = null) : base(document, parent ?? document, collection => new Type(collection))
+        internal Types(MDMDocument? document, MDMObject? parent = null) : base(document, parent ?? document, collection => new Type(collection))
         {
             _objectType = MDMObjectType.Types;
         }

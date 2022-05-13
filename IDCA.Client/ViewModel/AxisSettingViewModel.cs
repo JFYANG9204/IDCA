@@ -1,4 +1,5 @@
-﻿using IDCA.Model;
+﻿using IDCA.Client.ViewModel.Common;
+using IDCA.Model;
 using IDCA.Model.Spec;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
@@ -30,8 +31,8 @@ namespace IDCA.Client.ViewModel
             "插入变量或函数",
             "文本行(text)",
             "基数(base)",
-            "未加权的基数(unweightedbase)",
-            "有效的基数(effectivebase)",
+            "未加权基数(unweightedbase)",
+            "有效基数(effectivebase)",
             "表达式(expression)",
             "数值(numeric)",
             "自定义计算(derived)",
@@ -76,7 +77,8 @@ namespace IDCA.Client.ViewModel
         public int AxisCurrentElementsSelectIndex
         {
             get { return _axisCurrentElementsSelectIndex; }
-            set { 
+            set 
+            { 
                 SetProperty(ref _axisCurrentElementsSelectIndex, value);
                 UpdateElementSettings();
             }
@@ -295,10 +297,23 @@ namespace IDCA.Client.ViewModel
                 _axisCurrentElements.Count > 0 &&
                 _axisCurrentElementsSelectIndex < _axisCurrentElements.Count)
             {
-                _axisCurrentElements.RemoveAt(_axisCurrentElementsSelectIndex);
+                var tempIndex = _axisCurrentElementsSelectIndex;
                 _axis?.RemoveAt(_axisCurrentElementsSelectIndex);
                 _axisTailingElementList.RemoveAt(_axisCurrentElementsSelectIndex);
                 _axisElementDetailList.RemoveAt(_axisCurrentElementsSelectIndex);
+                _axisCurrentElements.RemoveAt(_axisCurrentElementsSelectIndex);
+                tempIndex--;
+                if (_axisCurrentElements.Count > 0 && tempIndex < _axisCurrentElements.Count)
+                {
+                    if (tempIndex > 0)
+                    {
+                        AxisCurrentElementsSelectIndex = tempIndex;
+                    }
+                    else
+                    {
+                        AxisCurrentElementsSelectIndex = 0;
+                    }
+                }
                 UpdateAxisText();
             }
         }
@@ -314,19 +329,34 @@ namespace IDCA.Client.ViewModel
 
         void MoveUp()
         {
+            int tempIndex = _axisCurrentElementsSelectIndex - 1;
             Swap(_axisCurrentElementsSelectIndex, _axisCurrentElementsSelectIndex - 1);
-            _axisCurrentElementsSelectIndex--;
+            AxisCurrentElementsSelectIndex = tempIndex >= 0 ? tempIndex : 0;
             UpdateAxisText();
         }
         public ICommand MoveUpCommand => new RelayCommand(MoveUp);
 
         void MoveDown()
         {
+            int tempIndex = _axisCurrentElementsSelectIndex + 1;
             Swap(_axisCurrentElementsSelectIndex, _axisCurrentElementsSelectIndex + 1);
-            _axisCurrentElementsSelectIndex++;
+            AxisCurrentElementsSelectIndex = tempIndex >= _axisCurrentElements.Count ? _axisCurrentElements.Count - 1 : tempIndex;
             UpdateAxisText();
         }
         public ICommand MoveDownCommand => new RelayCommand(MoveDown);
+
+        void Confirm(object? sender)
+        {
+            WindowManager.CloseWindow(sender);
+        }
+        public ICommand ConfirmCommand => new RelayCommand<object?>(Confirm);
+
+
+        void Cancel(object? sender)
+        {
+            WindowManager.CloseWindow(sender);
+        }
+        public ICommand CancelCommand => new RelayCommand<object?>(Cancel);
 
     }
 

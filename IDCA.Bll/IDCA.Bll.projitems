@@ -17,16 +17,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)MDM\Class.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDM\Context.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDM\DataSource.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MDM\IClass.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MDM\IPage.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MDM\IScript.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDM\MDMDocument.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDM\Element.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDM\Field.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MDM\ICategories.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MDM\ICategoryMap.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MDM\IContext.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MDM\IDataSource.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDM\Page.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDM\Script.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDM\Variable.cs" />
@@ -48,14 +41,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Template\TemplateDictionary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Template\TemplateParameter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Template\TemplateValue.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MDM\IMDMDocument.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MDM\IElement.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MDM\IField.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MDM\ILabel.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MDM\ILanguage.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MDM\IMDMCollection.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MDM\IMDMObject.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MDM\IProperty.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDM\Label.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDM\Language.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDM\MDMCollection.cs" />
@@ -63,9 +48,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)MDM\Property.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDM\SaveLogs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDM\Style.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MDM\ITypes.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MDM\IVariable.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MDM\ISaveLogs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDM\Types.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MDM\XmlHelper.cs" />
   </ItemGroup>

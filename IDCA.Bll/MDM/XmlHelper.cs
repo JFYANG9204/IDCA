@@ -100,10 +100,15 @@ namespace IDCA.Model.MDM
 
         internal static Labels ReadLabels(Labels labels, XElement element)
         {
+            if (labels.Document == null || labels.Document.Context == null)
+            {
+                return labels;
+            }
+
             if (labels.Context.IsDefault && labels.Document.Contexts.Count > 0)
             {
                 string context = ReadPropertyStringValue(element, "context");
-                IContext? current;
+                Context? current;
                 if (!string.IsNullOrEmpty(context) && (current = labels.Document.LabelTypes[context]) != null)
                 {
                     labels.Context = current;
@@ -276,7 +281,7 @@ namespace IDCA.Model.MDM
         {
             variableInstance.Name = ReadPropertyStringValue(element, "name");
             variableInstance.SourceType = ReadPropertyEnumValue<SourceType>(element.Attribute("sourcetype"));
-            variableInstance.Variable = variableInstance.Document.Variables.GetById(ReadPropertyStringValue(element, "variable"));
+            variableInstance.Variable = variableInstance.Document?.Variables.GetById(ReadPropertyStringValue(element, "variable"));
             variableInstance.FullName = ReadPropertyStringValue(element, "fullname");
             return variableInstance;
         }
@@ -589,13 +594,13 @@ namespace IDCA.Model.MDM
         {
             XAttribute? refAttr = element.Attribute("categoriesref");
             Type? type;
-            if (refAttr == null || (type = categories.Document.Types.GetById(refAttr.Value)) == null)
+            if (refAttr == null || (type = categories?.Document?.Types.GetById(refAttr.Value)) == null)
             {
                 return;
             }
             foreach (Element cat in type.Categories)
             {
-                categories.Add(cat);
+                categories?.Add(cat);
             }
         }
 
@@ -663,7 +668,7 @@ namespace IDCA.Model.MDM
                     {
                         variable.HelperFields = new Variables(variable.Document, variable);
                     }
-                    Variable? exist = variable.Document.Variables.GetById(ReadPropertyStringValue(v, "ref"));
+                    Variable? exist = variable.Document?.Variables.GetById(ReadPropertyStringValue(v, "ref"));
                     if (exist != null)
                     {
                         variable.HelperFields.Add(exist);
@@ -703,7 +708,7 @@ namespace IDCA.Model.MDM
             types.GlobalNamespace = ReadPropertyBoolValue(element, "global-name-space");
             ForEachChild(element, "categories", e =>
             {
-                Type? reference = types.Document.Types.GetById(ReadPropertyStringValue(e, "ref"));
+                Type? reference = types.Document?.Types.GetById(ReadPropertyStringValue(e, "ref"));
                 if (reference != null)
                 {
                     types.Add(reference);
@@ -717,10 +722,10 @@ namespace IDCA.Model.MDM
             pages.GlobalNamespace = ReadPropertyBoolValue(element, "global-name-space");
             ForEachChild(element, "page", e =>
             {
-                Page? reference = pages.Document.Pages.GetById(ReadPropertyStringValue(e, "ref"));
+                Page? reference = pages?.Document?.Pages.GetById(ReadPropertyStringValue(e, "ref"));
                 if (reference != null)
                 {
-                    pages.Add(reference);
+                    pages?.Add(reference);
                 }
             });
             return pages;
@@ -741,8 +746,8 @@ namespace IDCA.Model.MDM
             XAttribute? refAttr = element.Attribute("ref");
             if (refAttr != null)
             {
-                field.Reference = field.Document.Variables.GetById(refAttr.Value);
-                return field;
+                field.Reference = field?.Document?.Variables.GetById(refAttr.Value);
+                return field!;
             }
             field.IteratorType = ReadPropertyEnumValue<IteratorType>(element.Attribute("iteratortype"));
             FirstChild(element, "categories", e => field.Categories = ReadCategories(new Categories(field.Document, field), e));

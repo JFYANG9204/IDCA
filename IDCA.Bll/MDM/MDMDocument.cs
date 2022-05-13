@@ -6,9 +6,9 @@ using System.Xml.Linq;
 
 namespace IDCA.Model.MDM
 {
-    public class MDMDocument : IMDMDocument
+    public class MDMDocument : MDMObject
     {
-        public MDMDocument()
+        public MDMDocument() : base(null, null)
         {
             _properties = new Properties(this);
             _templates = new Properties(this);
@@ -28,6 +28,7 @@ namespace IDCA.Model.MDM
             _scriptTypes = new Contexts(this, "");
             _categoryMap = new CategoryMap(this);
             _saveLogs = new SaveLogs(this);
+            _objectType = MDMObjectType.Document;
         }
 
         string _url = string.Empty;
@@ -41,8 +42,9 @@ namespace IDCA.Model.MDM
         string _context = string.Empty;
         string _language = string.Empty;
 
-        readonly Properties _properties;
-        readonly Properties _templates;
+        new readonly Properties _properties;
+        new readonly Properties _templates;
+
         readonly DataSources _dataSources;
         readonly Labels _labels;
         readonly Variables _variables;
@@ -72,11 +74,10 @@ namespace IDCA.Model.MDM
         public string Context { get => _context; }
         public string Language { get => _language; }
 
-        public IMDMObject Parent => this;
-        public IMDMDocument Document => this;
-
-        public Properties Properties => _properties;
-        public Properties Templates => _templates;
+        public new Properties Properties => _properties;
+        public new Properties Templates => _templates;
+        public new MDMObject Parent => this;
+        public new MDMDocument Document => this;
         public DataSources DataSources => _dataSources;
         public Labels Labels => _labels;
         public Variables Variables => _variables;
@@ -94,13 +95,11 @@ namespace IDCA.Model.MDM
         public CategoryMap CategoryMap => _categoryMap;
         public List<string> Atoms => _atoms;
         public SaveLogs SaveLogs => _saveLogs;
-        public MDMObjectType ObjectType => MDMObjectType.Document;
-
 
         private void Clear()
         {
-            _properties.Clear();
-            _templates.Clear();
+            _properties?.Clear();
+            _templates?.Clear();
             _dataSources.Clear();
             _labels.Clear();
             _variables.Clear();
@@ -200,7 +199,7 @@ namespace IDCA.Model.MDM
 
         public void SetContext(string context)
         {
-            IContext? ctx = Contexts[context];
+            Context? ctx = Contexts[context];
             if (ctx != null)
             {
                 _context = ctx.Name;
@@ -209,7 +208,7 @@ namespace IDCA.Model.MDM
 
         public void SetLanguage(string language)
         {
-            ILanguage? lng = _languages[language];
+            Language? lng = _languages[language];
             if (lng != null)
             {
                 _language = lng.Name;

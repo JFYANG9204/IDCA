@@ -123,5 +123,12 @@ namespace IDCA.Client.ViewModel
 
         public ICommand SelectMdmDocumentPathCommand => new RelayCommand(SelectMdmDocumentPath);
 
+        void Confirm(object? sender)
+        {
+            WindowManager.Show("TableSettingWindow");
+            WindowManager.CloseWindow(sender);
+        }
+        public ICommand ConfirmCommand => new RelayCommand<object?>(Confirm);
+
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Windows;
 using System.Windows.Forms;
+using System.Windows.Media;
 
 namespace IDCA.Client.ViewModel.Common
 {
@@ -35,6 +36,11 @@ namespace IDCA.Client.ViewModel.Common
             {
                 _registerWindow.Remove(key);
             }
+        }
+
+        public static void Warn(string message)
+        {
+            System.Windows.MessageBox.Show(message);
         }
 
         public static void Show(string key)
@@ -93,6 +99,23 @@ namespace IDCA.Client.ViewModel.Common
             return null;
         }
 
+        public static T? FindVisualParent<T>(DependencyObject? obj) where T : class
+        {
+            while (obj != null)
+            {
+                if (obj is T)
+                {
+                    return obj as T;
+                }
+                obj = VisualTreeHelper.GetParent(obj);
+            }
+            return null;
+        }
+
+        public static void CloseWindow(object? sender)
+        {
+            FindVisualParent<Window>(sender as DependencyObject)?.Close();
+        }
 
     }
 }
