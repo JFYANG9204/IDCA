@@ -1,4 +1,5 @@
 ﻿using IDCA.Model.MDM;
+using IDCA.Model.Spec;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,35 +8,57 @@ namespace IDCA.Model
 {
     public class TableSettingCollection
     {
-        public TableSettingCollection(MDMDocument document, Config config)
+        public TableSettingCollection(MDMDocument document, SpecDocument spec, Config config)
         {
             _MDM = document;
+            _spec = spec;
             _config = config;
         }
 
         readonly MDMDocument _MDM;
+        readonly SpecDocument _spec;
         readonly Config _config;
         readonly List<TableSetting> _settings = new();
+        int _index;
 
+        /// <summary>
+        /// 当前集合在SpecDocument对象中的索引
+        /// </summary>
+        public int Index { get => _index; set => _index = value; }
         /// <summary>
         /// 当前配置集合中的元素数量
         /// </summary>
         public int Count => _settings.Count;
 
         /// <summary>
+        /// 当前配置的MDM文档
+        /// </summary>
+        public MDMDocument MDMDocument => _MDM;
+
+        /// <summary>
         /// 创建新的表格配置对象，并添加进当前集合中
         /// </summary>
         /// <param name="field"></param>
         /// <returns></returns>
-        public TableSetting? NewTableSetting(string field)
+        public TableSetting? NewTableSetting(int collectionIndex, string field = "")
         {
-            Field? mdmField = _MDM.Fields[field];
-            if (mdmField == null)
+            Tables? tables = _spec.GetTables(collectionIndex);
+            if (tables == null)
             {
-                Logger.Warning("MDMFieldIsNotFound", ExceptionMessages.TableFieldIsNotSetted, field);
                 return null;
             }
-            TableSetting setting = new(this, mdmField, _config);
+
+            Field? mdmField = null;
+            if (!string.IsNullOrEmpty(field))
+            {
+                mdmField = _MDM.Fields[field];
+                if (mdmField == null)
+                {
+                    Logger.Warning("MDMFieldIsNotFound", ExceptionMessages.TableFieldIsNotSetted, field);
+                    return null;
+                }
+            }
+            TableSetting setting = new(this, mdmField, _config, tables);
             Add(setting);
             return setting;
         }
@@ -88,35 +111,36 @@ namespace IDCA.Model
         /// </summary>
         /// <param name="sourceIndex"></param>
         /// <param name="targetIndex"></param>
-        public void Swap(int sourceIndex, int targetIndex)
+        public void Swap(int collectionIndex, int sourceIndex, int targetIndex)
         {
             CollectionHelper.Swap(_settings, sourceIndex, targetIndex);
+            _spec.GetTables(collectionIndex)?.Swap(sourceIndex, targetIndex);
         }
 
         /// <summary>
         /// 将指定索引的值向前移动一个位置
         /// </summary>
-        /// <param name="index"></param>
-        public void MoveUp(int index)
+        /// <param name="itemIndex"></param>
+        public void MoveUp(int collectionIndex, int itemIndex)
         {
-            if (index > _settings.Count || index <= 0)
+            if (itemIndex > _settings.Count || itemIndex <= 0)
             {
                 return;
             }
-            Swap(index, index - 1);
+            Swap(collectionIndex, itemIndex, itemIndex - 1);
         }
 
         /// <summary>
         /// 将指定索引的值向后移动一个位置
         /// </summary>
-        /// <param name="index"></param>
-        public void MoveDown(int index)
+        /// <param name="itemIndex"></param>
+        public void MoveDown(int collectionIndex, int itemIndex)
         {
-            if (index >= _settings.Count - 1)
+            if (itemIndex >= _settings.Count - 1)
             {
                 return;
             }
-            Swap(index, index + 1);
+            Swap(collectionIndex, itemIndex, itemIndex + 1);
         }
 
     }
@@ -132,27 +156,33 @@ namespace IDCA.Model
 
     public class TableSetting
     {
-        public TableSetting(TableSettingCollection setting, Field field, Config config)
+        public TableSetting(TableSettingCollection setting, Field? field, Config config, Tables tables)
         {
             _setting = setting;
             _field = field;
             _config = config;
             _name = $"TS{setting.Count + 1}";
+            _table = tables.NewTable(Spec.TableType.Normal);
         }
 
         readonly TableSettingCollection _setting;
-        readonly Field _field;
+        Field? _field;
         TableType _type = TableType.Normal;
         readonly Config _config;
         readonly string _name;
         string _tableTitle = string.Empty;
         string _baseLabel = string.Empty;
         NetLikeSettingElement[] _net = Array.Empty<NetLikeSettingElement>();
+        readonly Table _table;
 
         /// <summary>
         /// 当前配置元素的父级Setting集合对象
         /// </summary>
         public TableSettingCollection Setting => _setting;
+        /// <summary>
+        /// 当前配置所对应的SpecDocument配置元素
+        /// </summary>
+        public Table Table => _table;
         /// <summary>
         /// 当前配置元素的对象名称
         /// </summary>
@@ -172,7 +202,7 @@ namespace IDCA.Model
         /// <summary>
         /// 当前表格配置的MDMField对象
         /// </summary>
-        public Field Field => _field;
+        public Field? Field { get => _field; set => _field = value; }
         /// <summary>
         /// 当前表格配置的Net/Combine配置集合
         /// </summary>
@@ -187,6 +217,18 @@ namespace IDCA.Model
             Array.Resize(ref _net, _net.Length + 1);
             _net[^1] = element;
             return element;
+        }
+        /// <summary>
+        /// 从当前MDM文档配置当前配置的Field对象
+        /// </summary>
+        /// <param name="field">Field名称</param>
+        public void LoadField(string field)
+        {
+            var mdmField = _setting.MDMDocument.Fields[field];
+            if (mdmField != null)
+            {
+                _field = mdmField;
+            }
         }
 
     }
@@ -227,7 +269,7 @@ namespace IDCA.Model
         string _name;
         string _label;
         readonly StringBuilder _codes;
-        readonly Field _field;
+        readonly Field? _field;
         readonly Config _config;
 
         /// <summary>
@@ -251,7 +293,7 @@ namespace IDCA.Model
             _codes.Clear();
 
             // 如果field对象的Categories属性为null，由于缺少码号搜索的依据，直接返回
-            if (_field.Categories == null)
+            if (_field?.Categories == null)
             {
                 return;
             }
@@ -345,7 +387,7 @@ namespace IDCA.Model
         {
             _codes.Clear();
 
-            if (_field.Categories == null || box <= 0 || box >= _field.Categories.Count)
+            if (_field?.Categories == null || box <= 0 || box >= _field.Categories.Count)
             {
                 Logger.Warning("SettingCodeError", ExceptionMessages.SettingNetLikeRangeInvalid, $"{(bottom ? "Bottom" : "Top")} {box} Box");
                 return;

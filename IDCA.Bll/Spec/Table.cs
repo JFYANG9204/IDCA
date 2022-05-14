@@ -14,12 +14,25 @@ namespace IDCA.Model.Spec
         {
             _document = spec;
             _templates = spec.Templates;
+            _topBreaks = new List<string>();
         }
         
         public Table? this[string name] => _nameCache.ContainsKey(name) ? _nameCache[name] : null;
 
         readonly Dictionary<string, Table> _nameCache = new();
         readonly TemplateCollection _templates;
+
+        readonly List<string> _topBreaks;
+        /// <summary>
+        /// 当前Table集合需要对应的表头列表
+        /// </summary>
+        public List<string> TopBreaks => _topBreaks;
+
+        string _name = string.Empty;
+        /// <summary>
+        /// 当前表格配置集合的名称，应该对应mrs文件名
+        /// </summary>
+        public string Name { get => _name; set => _name = value; }
 
         /// <summary>
         /// 创建新的Table对象，并返回

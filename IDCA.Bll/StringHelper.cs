@@ -38,7 +38,7 @@ namespace IDCA.Model
         internal static string RemoveAheadZero(StringBuilder source)
         {
             int startLength = source.Length;
-            while (source.Length > 0 && source[0] == '0')
+            while (source.Length > 1 && source[0] == '0')
             {
                 source.Remove(0, 1);
             }

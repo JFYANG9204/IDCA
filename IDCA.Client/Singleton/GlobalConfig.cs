@@ -1,5 +1,6 @@
 ﻿using IDCA.Model;
 using IDCA.Model.MDM;
+using IDCA.Model.Spec;
 using IDCA.Model.Template;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,7 @@ namespace IDCA.Client.Singleton
             _templateDictionary = new TemplateDictionary();
             _mdmDocument = new MDMDocument();
             _config = new Config();
+            _specDocument = new SpecDocument(ProjectRootPath, _config);
             _tableSettings = new Dictionary<string, TableSettingCollection>();
             _currentTableSetting = NewTableSetting();
             LoadConfigs();
@@ -60,8 +62,13 @@ namespace IDCA.Client.Singleton
         /// </summary>
         public TemplateCollection? Templates { get => _templates; set => _templates = value; }
 
+        readonly SpecDocument _specDocument;
         readonly MDMDocument _mdmDocument;
         TableSettingCollection _currentTableSetting;
+        /// <summary>
+        /// 当前Spec文档配置对象
+        /// </summary>
+        public SpecDocument SpecDocument => _specDocument;
         /// <summary>
         /// 当前项目的MDM文档对象，此对象需要手动初始化
         /// </summary>
@@ -103,7 +110,7 @@ namespace IDCA.Client.Singleton
             {
                 tabName = $"tab{_tableSettings.Count + 1}";
             }
-            TableSettingCollection table = new(MDMDocument, Config);
+            TableSettingCollection table = new(MDMDocument, SpecDocument, Config);
             _tableSettings.Add(tabName, table);
             return table;
         }

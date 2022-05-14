@@ -3,7 +3,6 @@ using IDCA.Client.Singleton;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
-using System.Data;
 using System.Windows.Input;
 
 namespace IDCA.Client.ViewModel
@@ -47,7 +46,7 @@ namespace IDCA.Client.ViewModel
             };
             element.Removing += RemoveElementAt;
             ElementList.Add(element);
-            
+            GlobalConfig.Instance.CurrentTableSetting.NewTableSetting();
         }
 
         void RemoveElementAt(int index)

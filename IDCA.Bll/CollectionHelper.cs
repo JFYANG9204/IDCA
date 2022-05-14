@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Collections.Generic;
 
 namespace IDCA.Model
@@ -23,6 +24,20 @@ namespace IDCA.Model
             }
             (collection[targetIndex], collection[sourceIndex]) = (collection[sourceIndex], collection[targetIndex]);
         }
+        /// <summary>
+        /// 遍历集合中的各元素并执行回调函数
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="collection"></param>
+        /// <param name="callback"></param>
+        public static void ForEach<T>(ICollection<T> collection, Action<T> callback)
+        {
+            foreach (var child in collection)
+            {
+                callback(child);
+            }
+        }
 
     }
+
 }
