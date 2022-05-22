@@ -14,6 +14,7 @@ namespace IDCA.Client.ViewModel
     {
         public TableSettingViewModel() 
         {
+            _tableNames = new ObservableCollection<string>(GlobalConfig.Instance.GetTableNames());
         }
 
         ObservableCollection<string> _topbreaks = new();
@@ -23,7 +24,7 @@ namespace IDCA.Client.ViewModel
             set { SetProperty(ref _topbreaks, value); }
         }
 
-        ObservableCollection<string> _tableNames = new();
+        ObservableCollection<string> _tableNames;
         public ObservableCollection<string> TableNames
         {
             get { return _tableNames; }

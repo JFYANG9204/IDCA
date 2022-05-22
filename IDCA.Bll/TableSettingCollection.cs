@@ -2,29 +2,30 @@
 using IDCA.Model.Spec;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace IDCA.Model
 {
     public class TableSettingCollection
     {
-        public TableSettingCollection(MDMDocument document, SpecDocument spec, Config config)
+        public TableSettingCollection(MDMDocument document, Config config, Tables specTables)
         {
             _MDM = document;
-            _spec = spec;
             _config = config;
+            _specTables = specTables;
+            _settings = new List<TableSetting>();
         }
 
         readonly MDMDocument _MDM;
-        readonly SpecDocument _spec;
         readonly Config _config;
-        readonly List<TableSetting> _settings = new();
-        int _index;
+        readonly List<TableSetting> _settings;
+        readonly Tables _specTables;
 
         /// <summary>
-        /// 当前集合在SpecDocument对象中的索引
+        /// 当前集合在SpecDocument对象中所对应的Tables对象
         /// </summary>
-        public int Index { get => _index; set => _index = value; }
+        public Tables SpecTables => _specTables;
         /// <summary>
         /// 当前配置集合中的元素数量
         /// </summary>
@@ -40,14 +41,8 @@ namespace IDCA.Model
         /// </summary>
         /// <param name="field"></param>
         /// <returns></returns>
-        public TableSetting? NewTableSetting(int collectionIndex, string field = "")
+        public TableSetting? NewTableSetting(string field = "")
         {
-            Tables? tables = _spec.GetTables(collectionIndex);
-            if (tables == null)
-            {
-                return null;
-            }
-
             Field? mdmField = null;
             if (!string.IsNullOrEmpty(field))
             {
@@ -58,7 +53,7 @@ namespace IDCA.Model
                     return null;
                 }
             }
-            TableSetting setting = new(this, mdmField, _config, tables);
+            var setting = new TableSetting(this, mdmField, _config, SpecTables);
             Add(setting);
             return setting;
         }
@@ -111,36 +106,36 @@ namespace IDCA.Model
         /// </summary>
         /// <param name="sourceIndex"></param>
         /// <param name="targetIndex"></param>
-        public void Swap(int collectionIndex, int sourceIndex, int targetIndex)
+        public void Swap(int sourceIndex, int targetIndex)
         {
             CollectionHelper.Swap(_settings, sourceIndex, targetIndex);
-            _spec.GetTables(collectionIndex)?.Swap(sourceIndex, targetIndex);
+            SpecTables.Swap(sourceIndex, targetIndex);
         }
 
         /// <summary>
         /// 将指定索引的值向前移动一个位置
         /// </summary>
         /// <param name="itemIndex"></param>
-        public void MoveUp(int collectionIndex, int itemIndex)
+        public void MoveUp(int itemIndex)
         {
             if (itemIndex > _settings.Count || itemIndex <= 0)
             {
                 return;
             }
-            Swap(collectionIndex, itemIndex, itemIndex - 1);
+            Swap(itemIndex, itemIndex - 1);
         }
 
         /// <summary>
         /// 将指定索引的值向后移动一个位置
         /// </summary>
         /// <param name="itemIndex"></param>
-        public void MoveDown(int collectionIndex, int itemIndex)
+        public void MoveDown(int itemIndex)
         {
             if (itemIndex >= _settings.Count - 1)
             {
                 return;
             }
-            Swap(collectionIndex, itemIndex, itemIndex + 1);
+            Swap(itemIndex, itemIndex + 1);
         }
 
     }
@@ -163,6 +158,8 @@ namespace IDCA.Model
             _config = config;
             _name = $"TS{setting.Count + 1}";
             _table = tables.NewTable(Spec.TableType.Normal);
+            _tempAxis = new Axis(_table, AxisType.Normal);
+            _tableAxisNetType = TableAxisNetType.StandardNet;
         }
 
         readonly TableSettingCollection _setting;
@@ -172,9 +169,18 @@ namespace IDCA.Model
         readonly string _name;
         string _tableTitle = string.Empty;
         string _baseLabel = string.Empty;
+        string _baseFilter = string.Empty;
+        string _tableFilter = string.Empty;
         NetLikeSettingElement[] _net = Array.Empty<NetLikeSettingElement>();
         readonly Table _table;
+        TableAxisNetType _tableAxisNetType;
+        bool _addSigma = true;
 
+        readonly Axis _tempAxis;
+        /// <summary>
+        /// 用于保存临时修改信息的轴表达式对象
+        /// </summary>
+        public Axis TemporaryAxis => _tempAxis;
         /// <summary>
         /// 当前配置元素的父级Setting集合对象
         /// </summary>
@@ -200,6 +206,14 @@ namespace IDCA.Model
         /// </summary>
         public string BaseLabel { get => _baseLabel; set => _baseLabel = value; }
         /// <summary>
+        /// 当前表格轴表达式中base()元素中的参数内容
+        /// </summary>
+        public string BaseFilter { get => _baseFilter; set => _baseFilter = value; }
+        /// <summary>
+        /// 当前表格在Table.mrs中的额外筛选器条件
+        /// </summary>
+        public string TableFilter { get => _tableFilter; set => _tableFilter = value; }
+        /// <summary>
         /// 当前表格配置的MDMField对象
         /// </summary>
         public Field? Field { get => _field; set => _field = value; }
@@ -208,15 +222,36 @@ namespace IDCA.Model
         /// </summary>
         public NetLikeSettingElement[] Net => _net;
         /// <summary>
+        /// 表格表侧轴表达式元素的Net类型，用于配置Net使用net元素还是combine元素以及出示位置
+        /// </summary>
+        public TableAxisNetType TableAxisNetType { get => _tableAxisNetType; set => _tableAxisNetType = value; }
+        /// <summary>
+        /// 表格表侧轴表达式是否在末尾添加subtotal()作为小计
+        /// </summary>
+        public bool AddSigma { get => _addSigma; set => _addSigma = value; }
+        /// <summary>
         /// 向当前的Net集合中添加新的元素并将其返回
         /// </summary>
         /// <returns></returns>
         public NetLikeSettingElement NewNetElement()
         {
-            NetLikeSettingElement element = new(this, _config);
+            var element = new NetLikeSettingElement(this, _config);
             Array.Resize(ref _net, _net.Length + 1);
             _net[^1] = element;
             return element;
+        }
+        /// <summary>
+        /// 创建基础的表侧轴表达式
+        /// </summary>
+        public void CreateBaseAxisExpression()
+        {
+            _tempAxis.Clear();
+            _tempAxis.AppendTextElement();
+            _tempAxis.AppendBaseElement(_baseLabel, _baseFilter);
+            _tempAxis.AppendTextElement();
+            _tempAxis.AppendAllCategory();
+            _tempAxis.AppendTextElement();
+            _tempAxis.AppendSubTotal(_config.TryGet<string>(SpecConfigKeys.AxisSigmaLabel) ?? "");
         }
         /// <summary>
         /// 从当前MDM文档配置当前配置的Field对象
@@ -231,14 +266,104 @@ namespace IDCA.Model
             }
         }
 
+        void ApplyTopBottomBox()
+        {
+            _net.Where(ele => ele.IsTopBottomBox)
+                .ToList()
+                .ForEach(ele => _tempAxis.AppendNamedCombine(ele.Name, ele.Label, ele.Codes));
+        }
+
+        void ApplyAxisSide()
+        {
+            if (_net.Length == 0)
+            {
+                _tempAxis.AppendAllCategory();
+                return;
+            }
+
+            if (_tableAxisNetType == TableAxisNetType.StandardNet)
+            {
+                bool insertEmptyLine = _config.TryGet<bool>(SpecConfigKeys.AxisNetInsertEmptyLine);
+                for (int i = 0; i < _net.Length; i++)
+                {
+                    var netElement = _net[i];
+                    _tempAxis.AppendNet(netElement.Label, netElement.Codes);
+                    if (insertEmptyLine && i < _net.Length - 1)
+                    {
+                        _tempAxis.AppendTextElement();
+                    }
+                }
+            }
+            else
+            {
+                AxisTopBottomBoxPosition position = 
+                    Converter.ConvertToAxisTopBottomBoxPosition(
+                        _config.TryGet<int>(SpecConfigKeys.AxisTopBottomBoxPositon));
+
+                if (position == AxisTopBottomBoxPosition.BeforeAllCategory)
+                {
+                    ApplyTopBottomBox();
+                    var subtotal = _tempAxis.AppendSubTotal();
+                    subtotal.Suffix.AppendIsHidden(true);
+                    _tempAxis.AppendTextElement();
+                }
+
+                _tempAxis.AppendAllCategory();
+                _tempAxis.AppendTextElement();
+
+                if (position == AxisTopBottomBoxPosition.BetweenAllCategoryAndSigma)
+                {
+                    ApplyTopBottomBox();
+                    var beforeSigmaSubtotal = _tempAxis.AppendSubTotal();
+                    beforeSigmaSubtotal.Suffix.AppendIsHidden(true);
+                    var exactSigamNet = _tempAxis.AppendNet("", "..");
+                    exactSigamNet.Suffix.AppendIsHidden(true);
+                }
+
+                if (_addSigma)
+                {
+                    _tempAxis.AppendSubTotal(_config.TryGet<string>(SpecConfigKeys.AxisSigmaLabel) ?? "Sigma");
+                }
+
+                if (position == AxisTopBottomBoxPosition.AfterSigma)
+                {
+                    if (_tempAxis[^1].Template.ElementType != AxisElementType.Text)
+                    {
+                        _tempAxis.AppendTextElement();
+                    }
+                    ApplyTopBottomBox();
+                }
+
+            }
+
+        }
+
+        /// <summary>
+        /// 应用当前保存的轴表达式配置
+        /// </summary>
+        public void ApplyAxis()
+        {
+            Axis sideAxis = _table.SideAxis ?? _table.CreateSideAxis(_tempAxis.Type);
+            sideAxis.FromAxis(_tempAxis);
+        }
+        /// <summary>
+        /// 将当前配置应用到Table对象中
+        /// </summary>
+        public void Apply()
+        {
+            _table.TableTitle = _tableTitle;
+            _table.TableBase = _baseLabel;
+            ApplyAxis();
+        }
+
     }
 
-    public enum NetLikeType
+    public enum TableAxisNetType
     {
         StandardNet,
-        CombineAhead,
-        CombineAfterAll,
-        CombineAfterSum,
+        CombineBeforeAllCategory,
+        CombineBetweenAllCategoryAndSigma,
+        CombineAfterSigma
     }
 
     public class NetLikeSettingElement
@@ -246,10 +371,9 @@ namespace IDCA.Model
         public NetLikeSettingElement(TableSetting parent, Config config)
         {
             _parent = parent;
-            _type = NetLikeType.StandardNet;
             _name = string.Empty;
             _label = string.Empty;
-            _codes = new();
+            _codes = new StringBuilder();
             _field = parent.Field;
             _config = config;
         }
@@ -260,11 +384,11 @@ namespace IDCA.Model
         /// </summary>
         public TableSetting Parent => _parent;
 
-        NetLikeType _type;
+        bool _isTopBottomBox = false;
         /// <summary>
-        /// 当前元素的类型，是Combine还是Net
+        /// 当前的Net配置的是否是Top/Bottom Box
         /// </summary>
-        public NetLikeType Type => _type;
+        public bool IsTopBottomBox => _isTopBottomBox;
 
         string _name;
         string _label;
@@ -288,7 +412,7 @@ namespace IDCA.Model
         /// 从字符串读取码号
         /// </summary>
         /// <param name="source"></param>
-        public void FromString(string label, string source, bool isCombine = false)
+        public void FromString(string label, string source)
         {
             _codes.Clear();
 
@@ -301,11 +425,6 @@ namespace IDCA.Model
             _name = $"n{_parent.Net.Length + 1}";
             string? netAheadLabel = _config.TryGet<string>(SpecConfigKeys.AxisNetAheadLabel);
             _label = $"{(string.IsNullOrEmpty(netAheadLabel) ? "" : $"{netAheadLabel}.")}{label}";
-
-            if (isCombine)
-            {
-                _type = _config.TryGet<NetLikeType>(SpecConfigKeys.AxisCombinePosition);
-            }
 
             string[] codes = source.Split(',');
             for (int i = 0; i < codes.Length; i++)
@@ -385,6 +504,8 @@ namespace IDCA.Model
         /// <param name="reverse">码号顺序是否反转，如果是true，TopBox从第一个开始，否则从最后一个开始</param>
         public void FromTopBottomBox(int box, bool bottom = false, bool reverse = false)
         {
+            _isTopBottomBox = true;
+
             _codes.Clear();
 
             if (_field?.Categories == null || box <= 0 || box >= _field.Categories.Count)
@@ -396,7 +517,6 @@ namespace IDCA.Model
             _name = $"{(bottom ? "b" : "t")}{box}b";
             string? netAheadLabel = _config.TryGet<string>(SpecConfigKeys.AxisNetAheadLabel);
             _label = $"{(string.IsNullOrEmpty(netAheadLabel) ? "" : $"{netAheadLabel}.")}{(bottom ? "Bottom" : "Top")} {box} Box";
-            _type = _config.TryGet<NetLikeType>(SpecConfigKeys.AxisTopBottomBoxPositon);
 
             if (reverse)
             {

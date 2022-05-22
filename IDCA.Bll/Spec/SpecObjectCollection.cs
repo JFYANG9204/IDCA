@@ -5,8 +5,15 @@ using System.Collections.Generic;
 
 namespace IDCA.Model.Spec
 {
-    public class SpecObjectCollection<T> : SpecObject where T : SpecObject
+    public class SpecObjectCollection<T> : SpecObject, IEnumerable where T : SpecObject
     {
+
+        internal SpecObjectCollection(Func<SpecObject, T> constructor) : base()
+        {
+            _objectType = SpecObjectType.Collection;
+            _constructor = constructor;
+        }
+
         internal SpecObjectCollection(SpecObject parent, Func<SpecObject, T> constructor) : base(parent)
         {
             _objectType = SpecObjectType.Collection;

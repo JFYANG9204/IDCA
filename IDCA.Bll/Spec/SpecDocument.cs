@@ -1,9 +1,9 @@
 ﻿
 using IDCA.Model.MDM;
 using IDCA.Model.Template;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace IDCA.Model.Spec
 {
@@ -12,6 +12,9 @@ namespace IDCA.Model.Spec
 
         public SpecDocument(string projectPath, Config config) : base()
         {
+            _globalTables = new List<Tables>();
+            _tableNames = new List<string>();
+
             _projectPath = projectPath;
             _objectType = SpecObjectType.Document;
             _manipulations = new Manipulations(this);
@@ -52,6 +55,36 @@ namespace IDCA.Model.Spec
                 }
                 return _mdmDocument;
             }
+        }
+
+        Action<Tables>? _tablesRemoved;
+        Action<Tables>? _tablesAdded;
+        /// <summary>
+        /// 表格集合移除时触发的事件
+        /// </summary>
+        public event Action<Tables>? TablesRemoved
+        {
+            add { _tablesRemoved += value; }
+            remove { _tablesRemoved -= value; }
+        }
+        /// <summary>
+        /// 新表格集合添加时触发的事件
+        /// </summary>
+        public event Action<Tables>? TablesAdded
+        {
+            add { _tablesAdded += value; }
+            remove { _tablesAdded -= value; }
+        }
+
+
+        void OnTablesRemoved(Tables tables)
+        {
+            _tablesRemoved?.Invoke(tables);
+        }
+
+        void OnTablesAdded(Tables tables)
+        {
+            _tablesAdded?.Invoke(tables);
         }
 
         /// <summary>
@@ -105,7 +138,35 @@ namespace IDCA.Model.Spec
             _templates.Load(templateXmlPath);
         }
 
-        readonly Dictionary<string, Tables> _globalTables = new();
+        readonly List<Tables> _globalTables;
+        readonly List<string> _tableNames;
+
+        /// <summary>
+        /// 判断是否是可用的名称，不区分大小写
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns>如果可用返回true，已存在相同名称返回false</returns>
+        public bool ValidateTablesName(string name)
+        {
+            return !_tableNames.Exists(ele => ele.Equals(name, StringComparison.OrdinalIgnoreCase));
+        }
+
+        void RemoveTablesName(string name)
+        {
+            _tableNames.RemoveAll(ele => ele.Equals(name, StringComparison.OrdinalIgnoreCase));
+        }
+
+        bool OnTablesRename(Tables tables, string newName)
+        {
+            if (!ValidateTablesName(newName))
+            {
+                return false;
+            }
+            RemoveTablesName(tables.Name);
+            _tableNames.Add(newName);
+            return true;
+        }
+
         /// <summary>
         /// 创建新的表格配置集合，如果不提供名称，将以"Tab"+索引序号自动命名
         /// </summary>
@@ -115,10 +176,10 @@ namespace IDCA.Model.Spec
         {
             var tables = new Tables(this);
             string tabName = name.ToLower();
-            if (string.IsNullOrEmpty(tabName) || _globalTables.ContainsKey(tabName))
+            if (string.IsNullOrEmpty(tabName) || !ValidateTablesName(tabName))
             {
                 int index = _globalTables.Count;
-                while (_globalTables.ContainsKey($"tab{index}"))
+                while (!ValidateTablesName($"tab{index}"))
                 {
                     index++;
                 }
@@ -128,7 +189,9 @@ namespace IDCA.Model.Spec
             {
                 tables.Name = tabName;
             }
-            _globalTables.Add(tables.Name, tables);
+            tables.Rename += OnTablesRename;
+            _globalTables.Add(tables);
+            OnTablesAdded(tables);
             return tables;
         }
         /// <summary>
@@ -142,7 +205,7 @@ namespace IDCA.Model.Spec
             {
                 return null;
             }
-            return _globalTables.Values.ElementAt(index);
+            return _globalTables[index];
         }
         /// <summary>
         /// 根据表格文件名获取表格集合对象，如果名称不存在，返回Null
@@ -151,8 +214,7 @@ namespace IDCA.Model.Spec
         /// <returns></returns>
         public Tables? GetTables(string name)
         {
-            string lowerName = name.ToLower();
-            return _globalTables.ContainsKey(lowerName) ? _globalTables[lowerName] : null;
+            return _globalTables.Find(table => table.Name == name);
         }
         /// <summary>
         /// 移除特定名称的表格集合对象
@@ -160,9 +222,16 @@ namespace IDCA.Model.Spec
         /// <param name="name"></param>
         public void RemoveTables(string name)
         {
-            if (_globalTables.ContainsKey(name.ToLower()))
+            if (!ValidateTablesName(name))
             {
-                _globalTables.Remove(name.ToLower());
+                int index = _globalTables.FindIndex(table => table.Name == name);
+                if (index > -1)
+                {
+                    var tables = _globalTables[index];
+                    _globalTables.RemoveAt(index);
+                    RemoveTablesName(name);
+                    OnTablesRemoved(tables);
+                }
             }
         }
         /// <summary>
@@ -175,7 +244,10 @@ namespace IDCA.Model.Spec
             {
                 return;
             }
-            _globalTables.Remove(_globalTables.Keys.ElementAt(index));
+            var tables = _globalTables[index];
+            _globalTables.RemoveAt(index);
+            RemoveTablesName(_globalTables[index].Name);
+            OnTablesRemoved(tables);
         }
 
         readonly TemplateCollection _templates;
@@ -207,7 +279,7 @@ namespace IDCA.Model.Spec
             FileHelper.WriteToFile(_projectPath, _metadataFile, _metadata.Export());
             FileHelper.WriteToFile(_projectPath, _onNextCaseFile, _scripts.Export());
             FileHelper.WriteToFile(_projectPath, _mddManipulationFile, _manipulations.Export());
-            CollectionHelper.ForEach(_globalTables.Values, tables => FileHelper.WriteToFile(Path.Combine(_projectPath, tables.Name), tables.Export()));
+            CollectionHelper.ForEach(_globalTables, tables => FileHelper.WriteToFile(Path.Combine(_projectPath, tables.Name), tables.Export()));
         }
 
     }

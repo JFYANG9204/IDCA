@@ -37,8 +37,10 @@ namespace IDCA.Model.Template
         TableTitleText = 3042,
         TableBaseText = 3052,
         TableFilterText = 3062,
-        TableGridSliceShowCodes = 3072,
-        TableGridSliceAdditionAxis = 3082,
+        TableLabelText = 3072,
+        TableGridSliceShowCodes = 3082,
+        TableGridSliceAdditionAxis = 3092,
+        TableTypeSpecifyWord = 3102,
 
         ScriptDeclaration = 401,
         ScriptLowerBoundary = 402,

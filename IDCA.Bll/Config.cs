@@ -86,14 +86,26 @@ namespace IDCA.Model
         }
     }
 
+    public enum AxisTopBottomBoxPosition
+    {
+        BeforeAllCategory = 0,
+        BetweenAllCategoryAndSigma = 1,
+        AfterSigma = 2
+    }
+
     public class SpecConfigKeys
     {
         public const string MetadataCategoricalLabel = "MetadataCategoricalLabel";
         public const string AxisBaseLabel = "AxisBaseLabel";
         public const string AxisSigmaLabel = "AxisSigmaLabel";
         public const string AxisNetAheadLabel = "AxisNetAheadLabel";
+        public const string AxisNetInsertEmptyLine = "AxisNetInsertEmptyLine";
+        /// <summary>
+        /// 配置Top/Bottom Box的位置，其int值需要与AxisTopBottomBoxPosition的值相同
+        /// </summary>
         public const string AxisTopBottomBoxPositon = "AxisTopBottomBoxPositon";
         public const string AxisCombinePosition = "AxisCombinePosition";
+        public const string TableSummaryLabel = "TableSummaryLabel";
     }
 
 }

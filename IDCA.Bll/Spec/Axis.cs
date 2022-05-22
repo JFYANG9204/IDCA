@@ -14,6 +14,18 @@ namespace IDCA.Model.Spec
             _type = axisType;
         }
 
+        internal Axis(Axis axisObject) : base(collection => new AxisElement(collection))
+        {
+            _parent = axisObject.Parent;
+            _document = axisObject.Document;
+            _objectType = axisObject.SpecObjectType;
+            _type = axisObject.Type;
+            foreach (AxisElement ele in axisObject)
+            {
+                _items.Add(new AxisElement(ele));
+            }
+        }
+
         AxisType _type;
         /// <summary>
         /// 轴表达式类型
@@ -31,7 +43,20 @@ namespace IDCA.Model.Spec
         /// 轴表达式的标签，如果表达式类型为AxisVariable，会以 as name 'label'的格式放在最后
         /// </summary>
         public string Label { get => _label; internal set => _label = value; }
-
+        /// <summary>
+        /// 从已有的轴表达式对象复制数据
+        /// </summary>
+        /// <param name="axis"></param>
+        public void FromAxis(Axis axis)
+        {
+            _name = axis.Name;
+            _label = axis.Label;
+            _type = axis.Type;
+            foreach (AxisElement element in axis)
+            {
+                Add(new AxisElement(element));
+            }
+        }
         /// <summary>
         /// 转换为字符串
         /// </summary>
@@ -253,7 +278,7 @@ namespace IDCA.Model.Spec
         }
 
         /// <summary>
-        /// 向集合末尾添加一个Combine类型的轴表达式元素，必须提供码号参数，字符串中间由逗号分隔
+        /// 向集合末尾添加一个Combine类型的轴表达式元素，提供码号参数，字符串中间由逗号分隔
         /// </summary>
         /// <param name="label">可添加的描述</param>
         /// <param name="codes">需要包含的码号</param>
@@ -263,6 +288,17 @@ namespace IDCA.Model.Spec
             return AppendNamedElement(AxisElementType.Combine, label, "com", codes);
         }
 
+        /// <summary>
+        /// 向集合末尾添加一个Combine类型的轴表达式元素，元素名不可忽略
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="label"></param>
+        /// <param name="codes"></param>
+        /// <returns></returns>
+        public AxisElement AppendNamedCombine(string name, string label = "", string codes = "")
+        {
+            return AppendElement(AxisElementType.Combine, label, combine => combine.Name = name, codes);
+        }
         /// <summary>
         /// 向当前集合的末尾添加一个Sum类型的轴表达式元素，可以添加标签描述
         /// </summary>
@@ -363,6 +399,13 @@ namespace IDCA.Model.Spec
 
     public class AxisElement : SpecObject
     {
+        internal AxisElement(AxisElement axisElement) : base()
+        {
+            _parent = axisElement.Parent;
+            _template = new AxisElementTemplate(axisElement.Template);
+            _suffix = new AxisElementSuffixCollection(axisElement.Suffix);
+        }
+
         internal AxisElement(SpecObject parent) : base(parent)
         {
             _objectType = SpecObjectType.AxisElement;
@@ -440,6 +483,17 @@ namespace IDCA.Model.Spec
     /// </summary>
     public class AxisElementTemplate : SpecObject
     {
+        internal AxisElementTemplate(AxisElementTemplate template) : base()
+        {
+            _parent = template.Parent;
+            _objectType = template.SpecObjectType;
+            _parameters = new SpecObjectCollection<AxisElementParameter>(collection => new AxisElementParameter(collection));
+            foreach (AxisElementParameter parameter in template._parameters)
+            {
+                _parameters.Add(new AxisElementParameter(parameter));
+            }
+        }
+
         internal AxisElementTemplate(SpecObject parent) : base(parent)
         {
             _objectType = SpecObjectType.AxisElementTemplate;
@@ -512,6 +566,14 @@ namespace IDCA.Model.Spec
 
     public class AxisElementParameter : SpecObject
     {
+        internal AxisElementParameter(AxisElementParameter parameter) : base()
+        {
+            _parent = parameter.Parent;
+            _objectType = parameter.SpecObjectType;
+            _document = parameter.Document;
+            _value = parameter._value;
+        }
+
         internal AxisElementParameter(SpecObject parent) : base(parent)
         {
             _objectType = SpecObjectType.AxisParameter;
@@ -543,6 +605,17 @@ namespace IDCA.Model.Spec
     /// </summary>
     public class AxisElementSuffixCollection : SpecObjectCollection<AxisElementSuffix>
     {
+
+        internal AxisElementSuffixCollection(AxisElementSuffixCollection suffixes) : base(collection => new AxisElementSuffix(collection))
+        {
+            _parent = suffixes.Parent;
+            _objectType = suffixes.SpecObjectType;
+            _document = suffixes.Document;
+            foreach (AxisElementSuffix ele in suffixes)
+            {
+                Add(new AxisElementSuffix(ele));
+            }
+        }
 
         internal AxisElementSuffixCollection(SpecObject parent) : base(parent, collection => new AxisElementSuffix(collection))
         {
@@ -742,6 +815,13 @@ namespace IDCA.Model.Spec
     /// </summary>
     public class AxisElementSuffix : SpecObject
     {
+        internal AxisElementSuffix(AxisElementSuffix suffix) : base()
+        {
+            _parent = suffix.Parent;
+            _type = suffix.Type;
+            _value = suffix.Value;
+        }
+
         internal AxisElementSuffix(SpecObject parent) : base(parent)
         {
             _type = AxisElementSuffixType.None;

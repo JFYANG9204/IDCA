@@ -11,13 +11,13 @@ namespace IDCA.Client.Singleton
     {
         public GlobalConfig() 
         {
+            _config = new Config();
+            LoadConfigs();
             _templateDictionary = new TemplateDictionary();
             _mdmDocument = new MDMDocument();
-            _config = new Config();
             _specDocument = new SpecDocument(ProjectRootPath, _config);
             _tableSettings = new Dictionary<string, TableSettingCollection>();
             _currentTableSetting = NewTableSetting();
-            LoadConfigs();
         }
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace IDCA.Client.Singleton
         /// </summary>
         public MDMDocument MDMDocument => _mdmDocument;
         /// <summary>
-        /// 当前项目的表格配置集合
+        /// 项目当前配置界面对应的表格配置集合
         /// </summary>
         public TableSettingCollection CurrentTableSetting => _currentTableSetting;
 
@@ -110,7 +110,8 @@ namespace IDCA.Client.Singleton
             {
                 tabName = $"tab{_tableSettings.Count + 1}";
             }
-            TableSettingCollection table = new(MDMDocument, SpecDocument, Config);
+            var tables = _specDocument.NewCollection(name);
+            var table = new TableSettingCollection(MDMDocument, Config, tables);
             _tableSettings.Add(tabName, table);
             return table;
         }

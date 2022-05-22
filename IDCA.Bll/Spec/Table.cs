@@ -1,5 +1,6 @@
 ﻿
 using IDCA.Model.Template;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -16,10 +17,19 @@ namespace IDCA.Model.Spec
             _templates = spec.Templates;
             _topBreaks = new List<string>();
         }
-        
-        public Table? this[string name] => _nameCache.ContainsKey(name) ? _nameCache[name] : null;
 
-        readonly Dictionary<string, Table> _nameCache = new();
+        Func<Tables, string, bool>? _rename;
+        public event Func<Tables, string, bool>? Rename
+        {
+            add { _rename += value; }
+            remove { _rename -= value; }
+        }
+
+        private bool OnRename(string originName)
+        {
+            return _rename == null || _rename.Invoke(this, originName);
+        }
+
         readonly TemplateCollection _templates;
 
         readonly List<string> _topBreaks;
@@ -32,7 +42,17 @@ namespace IDCA.Model.Spec
         /// <summary>
         /// 当前表格配置集合的名称，应该对应mrs文件名
         /// </summary>
-        public string Name { get => _name; set => _name = value; }
+        public string Name 
+        {
+            get => _name;
+            set 
+            {
+                if (!_name.Equals(value, StringComparison.OrdinalIgnoreCase) && OnRename(value))
+                {
+                    _name = value;
+                }
+            }
+        }
 
         /// <summary>
         /// 创建新的Table对象，并返回
@@ -43,13 +63,40 @@ namespace IDCA.Model.Spec
             var table = NewObject();
             table.Name = $"T{Count + 1}";
             table.Type = type;
+            table.IndexAt = Count;
             table.LoadTemplate(_templates);
             Add(table);
-            if (!_nameCache.ContainsKey(table.Name))
-            {
-                _nameCache.Add(table.Name, table);
-            }
             return table;
+        }
+
+        /// <summary>
+        /// 将索引位置的Table对象在集合中向前移动一个位置
+        /// </summary>
+        /// <param name="index"></param>
+        public void MoveUp(int index)
+        {
+            if (index <= 0 || index >= Count)
+            {
+                return;
+            }
+            var table = _items[index];
+            table.IndexAt--;
+            Swap(index, index - 1);
+        }
+
+        /// <summary>
+        /// 将索引位置的Table对象在集合中向后移动一个位置
+        /// </summary>
+        /// <param name="index"></param>
+        public void MoveDown(int index)
+        {
+            if (index < 0 || index >= Count - 1)
+            {
+                return;
+            }
+            var table = _items[index];
+            table.IndexAt--;
+            Swap(index, index + 1);
         }
 
         /// <summary>
@@ -83,17 +130,23 @@ namespace IDCA.Model.Spec
             _field = new FieldScript(this);
         }
 
+        int _indexAt = -1;
+        /// <summary>
+        /// 当前对象在集合中的索引，需要创建时初始化
+        /// </summary>
+        internal int IndexAt { get => _indexAt; set => _indexAt = value; }
+
         string _name = string.Empty;
         /// <summary>
         /// 表格的对象名称
         /// </summary>
         public string Name { get => _name; set => _name = value; }
 
-        string _tableLabel = string.Empty;
+        string _tableTitle = string.Empty;
         /// <summary>
         /// 表格的名称标签
         /// </summary>
-        public string TableLabel { get => _tableLabel; set => _tableLabel = value; }
+        public string TableTitle { get => _tableTitle; set => _tableTitle = value; }
 
         string _tableBase = string.Empty;
         /// <summary>
@@ -102,7 +155,9 @@ namespace IDCA.Model.Spec
         public string TableBase { get => _tableBase; set => _tableBase = value; }
 
         readonly FieldScript _field;
-        FunctionTemplate? _template;
+        FunctionTemplate? _tableFunctionTemplate;
+        FunctionTemplate? _tableFilterTemplate;
+        FunctionTemplate? _tableLabelTemplate;
 
         /// <summary>
         /// 从已载入完成的模板集合中载入所需要的模板
@@ -113,24 +168,26 @@ namespace IDCA.Model.Spec
             switch (_type)
             {
                 case TableType.Normal:
-                    _template = collection.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.TableNormal);
+                    _tableFunctionTemplate = collection.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.TableNormal);
                     break;
                 case TableType.Grid:
-                    _template = collection.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.TableGrid);
+                    _tableFunctionTemplate = collection.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.TableGrid);
                     break;
                 case TableType.GridSlice:
-                    _template = collection.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.TableGridSlice);
+                    _tableFunctionTemplate = collection.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.TableGridSlice);
                     break;
                 case TableType.MeanSummary:
-                    _template = collection.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.TableMeanSummary);
+                    _tableFunctionTemplate = collection.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.TableMeanSummary);
                     break;
                 case TableType.ResponseSummary:
-                    _template = collection.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.TableResponseSummary);
+                    _tableFunctionTemplate = collection.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.TableResponseSummary);
                     break;
                 case TableType.None:
                 default:
                     break;
             }
+            _tableFilterTemplate = collection.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.TableFilter);
+            _tableLabelTemplate = collection.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.TableLabel);
         }
 
         /// <summary>
@@ -150,11 +207,29 @@ namespace IDCA.Model.Spec
         /// </summary>
         public TableType Type { get => _type; set => _type = value; }
 
-        string _title = "Null";
+        string _titleInTableFile = "Null";
         /// <summary>
-        /// 当前表格的标题
+        /// 当前表格在Table.mrs文件中的标题
         /// </summary>
-        public string Title { get => _title; set => _title = value; }
+        public string TitleInTableFile { get => _titleInTableFile; set => _titleInTableFile = value; }
+
+        string _baseInTableFile = string.Empty;
+        /// <summary>
+        /// 当前表格在Table.mrs文件中的Base标签
+        /// </summary>
+        public string BaseInTableFile { get => _baseInTableFile; set => _baseInTableFile = value; }
+
+        string _filterInTableFile = string.Empty;
+        /// <summary>
+        /// 当前表格在Table.mrs文件中的筛选器条件
+        /// </summary>
+        public string FilterInTableFile { get => _filterInTableFile; set => _filterInTableFile = value; }
+
+        string _labelInTableFile = string.Empty;
+        /// <summary>
+        /// 当前表格在Table.mrs文件中的额外追加标签
+        /// </summary>
+        public string LabelInTableFile { get => _labelInTableFile; set => _labelInTableFile = value; }
 
         readonly TemplateValue _banner = new();
         /// <summary>
@@ -170,6 +245,10 @@ namespace IDCA.Model.Spec
 
         Axis? _headerAxis = null;
         /// <summary>
+        /// 当前表格的表头轴表达式配置
+        /// </summary>
+        public Axis? HeaderAxis => _headerAxis;
+        /// <summary>
         /// 创建表头变量的轴表达式
         /// </summary>
         /// <returns></returns>
@@ -177,9 +256,23 @@ namespace IDCA.Model.Spec
         {
             return _headerAxis = new Axis(this, AxisType.Normal);
         }
+        /// <summary>
+        /// 配置当前的表头轴表达式配置，只能配置父级对象为此对象的轴对象
+        /// </summary>
+        /// <param name="axis"></param>
+        public void SetHeaderAxis(Axis axis)
+        {
+            if (axis.Parent == this)
+            {
+                _headerAxis = axis;
+            }
+        }
 
         Axis? _sideAxis = null;
-
+        /// <summary>
+        /// 当前表格的表侧轴表达式配置
+        /// </summary>
+        public Axis? SideAxis => _sideAxis;
         /// <summary>
         /// 创建表侧的轴表达式
         /// </summary>
@@ -189,14 +282,25 @@ namespace IDCA.Model.Spec
         {
             return _sideAxis = new Axis(this, type);
         }
-
+        /// <summary>
+        /// 配置当前表侧轴表达式配置，只能配置父级对象为此对象的轴对象
+        /// </summary>
+        /// <param name="axis"></param>
+        public void SetSideAxis(Axis axis)
+        {
+            if (axis.Parent == this)
+            {
+                _sideAxis = axis;
+            }
+        }
         /// <summary>
         /// 导入当前设置到字符串
         /// </summary>
         /// <returns></returns>
         public string Export()
         {
-            if (_template != null)
+            var result = new StringBuilder();
+            if (_tableFunctionTemplate != null)
             {
                 string side, banner;
                 if (_sideAxis != null)
@@ -217,15 +321,57 @@ namespace IDCA.Model.Spec
                 {
                     banner = _type == TableType.Grid ? _field.TopLevel : ((_headerAxis != null && _headerAxis.Type == AxisType.AxisVariable) ? _headerAxis.ToString() : _banner.ToString());
                 }
-
-                _template.SetFunctionParameterValue(side, TemplateValueType.String, TemplateParameterUsage.TableSideVariableName);
-                _template.SetFunctionParameterValue(banner, bannerType, TemplateParameterUsage.TableTopVariableName);
-                _template.SetFunctionParameterValue(_tableLabel, TemplateValueType.String, TemplateParameterUsage.TableTitleText);
-                _template.SetFunctionParameterValue(_tableBase, TemplateValueType.String, TemplateParameterUsage.TableBaseText);
-                return _template.Exec();
+                // table function side parameter
+                _tableFunctionTemplate.SetFunctionParameterValue(
+                    side, 
+                    TemplateValueType.String, 
+                    TemplateParameterUsage.TableSideVariableName);
+                // table function top parameter
+                _tableFunctionTemplate.SetFunctionParameterValue(
+                    banner,
+                    bannerType, 
+                    TemplateParameterUsage.TableTopVariableName);
+                // table function title parameter
+                _tableFunctionTemplate.SetFunctionParameterValue(
+                    _tableTitle, 
+                    TemplateValueType.String, 
+                    TemplateParameterUsage.TableTitleText);
+                // table function base text parameter
+                _tableFunctionTemplate.SetFunctionParameterValue(
+                    _tableBase, 
+                    TemplateValueType.String, 
+                    TemplateParameterUsage.TableBaseText);
+                result.AppendLine(_tableFunctionTemplate.Exec());
+                // table label
+                if (!string.IsNullOrEmpty(_labelInTableFile) && 
+                    _tableLabelTemplate != null)
+                {
+                    // 表格类型参数，用以区分Grid和非Grid表格
+                    _tableLabelTemplate.SetFunctionParameterValue(
+                        _type == TableType.Grid ? "TG" : "T",
+                        TemplateValueType.String,
+                        TemplateParameterUsage.TableTypeSpecifyWord);
+                    // 表格追加标签内容
+                    _tableLabelTemplate.SetFunctionParameterValue(
+                        _labelInTableFile,
+                        TemplateValueType.String,
+                        TemplateParameterUsage.TableLabelText);
+                    result.AppendLine(_tableLabelTemplate.Exec());
+                }
+                // table filter
+                if (!string.IsNullOrEmpty(_filterInTableFile) &&
+                    _tableFilterTemplate != null)
+                {
+                    // 添加Filter条件
+                    _tableFilterTemplate.SetFunctionParameterValue(
+                        _filterInTableFile,
+                        TemplateValueType.String,
+                        TemplateParameterUsage.TableFilterText);
+                    result.AppendLine(_tableFilterTemplate.Exec());
+                }
             }
 
-            return string.Empty;
+            return result.ToString();
         }
 
     }

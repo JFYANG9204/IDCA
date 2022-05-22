@@ -249,6 +249,9 @@ namespace IDCA.Model.Template
         TableMeanSummary = 204,
         TableResponseSummary = 205,
 
+        TableFilter = 301,
+        TableLabel = 302,
+
     }
 
     public class FunctionTemplate : Template
