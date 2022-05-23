@@ -36,13 +36,13 @@ namespace IDCA.Model.Template
         public Template(TemplateType type)
         {
             _type = type;
-            _parameters = new(this);
+            _parameters = new TemplateParameters(this);
         }
 
         protected Template(Template template)
         {
             _type = template.Type;
-            _parameters = new(this);
+            _parameters = new TemplateParameters(this);
         }
 
         protected readonly TemplateType _type;
@@ -151,7 +151,9 @@ namespace IDCA.Model.Template
             _directory = "";
             _fileName = "";
             _flag = FileTemplateFlags.None;
-            _content = new();
+            _content = new StringBuilder();
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            _encoding = Encoding.GetEncoding("GB2312");
         }
 
         protected FileTemplate(FileTemplate template) : base(template)
@@ -159,14 +161,16 @@ namespace IDCA.Model.Template
             _directory = template.Directory;
             _fileName = template.FileName;
             _flag = FileTemplateFlags.None;
-            _content = new();
+            _content = new StringBuilder();
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            _encoding = Encoding.GetEncoding("GB2312");
         }
 
         string _directory;
         string _fileName;
         FileTemplateFlags _flag;
         protected StringBuilder _content;
-        public Encoding _encoding = Encoding.GetEncoding("GB2312");
+        Encoding _encoding;
 
         /// <summary>
         /// 模板文件路径

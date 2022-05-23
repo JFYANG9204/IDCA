@@ -164,6 +164,19 @@ namespace IDCA.Model.Spec
         }
 
         /// <summary>
+        /// 向当前集合的末尾添加一个Expression类型的轴表达式元素，此方法可以自定义变量名，
+        /// 可以用于后续计算
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="label"></param>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public AxisElement AppendNamedExpression(string name, string label = "", string expression = "")
+        {
+            return AppendElement(AxisElementType.Expression, label, e => e.Name = name, expression);
+        }
+
+        /// <summary>
         /// 向当前集合的末尾添加一个Numeric类型的轴表达式元素，可以添加标签描述
         /// </summary>
         /// <param name="label">可添加的描述</param>
@@ -184,6 +197,19 @@ namespace IDCA.Model.Spec
         public AxisElement AppendDerived(string label = "", string expression = "")
         {
             return AppendNamedElement(AxisElementType.Derived, label, "dev", expression);
+        }
+
+        /// <summary>
+        /// 向当前集合的末尾添加一个Derived类型的轴表达式元素，可以自定义元素的名称，
+        /// 可以用于后续添加表达式
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="label"></param>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public AxisElement AppendNamedDerived(string name, string label = "", string expression = "")
+        {
+            return AppendElement(AxisElementType.Derived, label, d => d.Name = name, expression);
         }
 
         /// <summary>
@@ -383,6 +409,305 @@ namespace IDCA.Model.Spec
         {
             AppendElement(AxisElementType.AllCategory, string.Empty, null);
         }
+
+        /// <summary>
+        /// 从已有的轴表达式读取元素并存入集合
+        /// </summary>
+        /// <param name="expression"></param>
+        public void FromString(string expression)
+        {
+            Clear();
+            if (expression.Length <= 2 || 
+                !(expression.StartsWith('{') && expression.EndsWith('}')))
+            {
+                return;
+            }
+
+            string innerExpr = expression[1..^1];
+            int pos = 0;
+
+            var tempElement = new AxisElement(this);
+            while (pos < innerExpr.Length)
+            {
+                char c = innerExpr[pos];
+
+                if (ValidateCharacter(c))
+                {
+                    string word = ReadWord(innerExpr, ref pos);
+                    SkipSpace(innerExpr, ref pos);
+                    // 读取参数字符
+                    if (innerExpr[pos] == '(')
+                    {
+                        tempElement.Template.ElementType = TryGetElementType(word);
+                        pos++;
+                        AxisElementParameter parameter = tempElement.Template.NewParameter();
+                        while (pos < innerExpr.Length && innerExpr[pos] != ')')
+                        {
+                            char ch = innerExpr[pos];
+                            // 遇到单引号，读取字符串 
+                            if (ch == '\'')
+                            {
+                                parameter.SetValue(ReadString(innerExpr, ref pos));
+                            }
+                            // 遇到合法名称字符，读取名称字符串
+                            else if (ValidateCharacter(ch))
+                            {
+                                parameter.SetValue(ReadWord(innerExpr, ref pos));
+                            }
+                            // 遇到逗号，加入当前临时参数，并更新临时参数为空白对象
+                            else if (ch == ',')
+                            {
+                                tempElement.Template.PushParameter(parameter);
+                                parameter = tempElement.Template.NewParameter();
+                                pos++;
+                            }
+                            // 跳过空格
+                            else if (ch == ' ')
+                            {
+                                pos++;
+                            }
+                        }
+                        // 加入最后的临时参数
+                        tempElement.Template.PushParameter(parameter);
+                        // 跳过')'
+                        pos++;
+                    }
+                    // 不是函数，将值更新到AxisElement.Name属性
+                    else
+                    {
+                        tempElement.Name = word;
+                    }
+                }
+                // 遇到单引号，读取字符串并更新给临时对象的Description属性
+                else if (c == '\'')
+                {
+                    tempElement.Description = ReadString(innerExpr, ref pos);
+                }
+                // 遇到左方括号，开始读取后缀配置
+                else if (c == '[')
+                {
+                    // 跳过'['
+                    pos++;
+
+                    var suffix = tempElement.Suffix.NewObject();
+                    while (pos < innerExpr.Length && innerExpr[pos] != ']')
+                    {
+                        // 读取属性类型
+                        if (ValidateCharacter(innerExpr[pos]))
+                        {
+                            var word = ReadWord(innerExpr, ref pos);
+                            suffix.Type = TryGetSuffixType(word);
+                        }
+                        // 读取属性值
+                        else if (innerExpr[pos] == '=')
+                        {
+                            // 跳过'='
+                            pos++;
+                            // 跳过空格
+                            SkipSpace(innerExpr, ref pos);
+                            if (ValidateCharacter(innerExpr[pos]))
+                            {
+                                var valueWord = ReadWord(innerExpr, ref pos);
+                                switch (suffix.Type)
+                                {
+                                    case AxisElementSuffixType.CalculationScope:
+                                        suffix.Value = TryGetCalculationScope(valueWord);
+                                        break;
+                                    case AxisElementSuffixType.CountsOnly:
+                                    case AxisElementSuffixType.IsHidden:
+                                    case AxisElementSuffixType.IsFixed:
+                                    case AxisElementSuffixType.IsHiddenWhenColumn:
+                                    case AxisElementSuffixType.IsHiddenWhenRow:
+                                    case AxisElementSuffixType.IncludeInBase:
+                                    case AxisElementSuffixType.IsUnweighted:
+                                        if (bool.TryParse(valueWord, out bool boolValue))
+                                        {
+                                            suffix.Value = boolValue;
+                                        }
+                                        break;
+                                    case AxisElementSuffixType.Decimals:
+                                        if (int.TryParse(valueWord, out int intValue))
+                                        {
+                                            suffix.Value = intValue;
+                                        }
+                                        break;
+                                    case AxisElementSuffixType.Factor:
+                                        if (double.TryParse(valueWord, out double doubleValue))
+                                        {
+                                            suffix.Value = doubleValue;
+                                        }
+                                        break;
+                                    case AxisElementSuffixType.Multiplier:
+                                    case AxisElementSuffixType.Weight:
+                                        suffix.Value = valueWord;
+                                        break;
+                                    case AxisElementSuffixType.None:
+                                    default:
+                                        break;
+                                }
+                            }
+                        }
+                        // 遇到逗号，加入临时后缀，并更新临时后缀为空白对象
+                        else if (innerExpr[pos] == ',')
+                        {
+                            tempElement.Suffix.Add(suffix);
+                            suffix = tempElement.Suffix.NewObject();
+                            pos++;
+                        }
+                        // 跳过空格
+                        else if (innerExpr[pos] == ' ')
+                        {
+                            pos++;
+                        }
+                    }
+                    // 加入最后的临时后缀
+                    tempElement.Suffix.Add(suffix);
+                    // 跳过']'
+                    pos++;
+                }
+                // '..'为AllCategory类型
+                else if (c == '.' && pos + 1 < innerExpr.Length && innerExpr[pos + 1] == '.')
+                {
+                    tempElement.Template.ElementType = AxisElementType.AllCategory;
+                    // 跳过..
+                    pos += 2;
+                }
+                // 如果遇到逗号，加入当前的临时元素，并更新当前元素为空白对象
+                else if (c == ',')
+                {
+                    Add(tempElement);
+                    tempElement = new AxisElement(this);
+                    // 跳过','
+                    pos++;
+                }
+                // 跳过空格
+                else if (c == ' ')
+                {
+                    pos++;
+                }
+
+            }
+
+            // 加入最后一个元素
+            if (!tempElement.IsEmpty)
+            {
+                Add(tempElement);
+            }
+
+        }
+
+        static void SkipSpace(string expression, ref int pos)
+        {
+            while (pos < expression.Length && expression[pos] == ' ')
+            {
+                ++pos;
+            }
+        }
+
+        static bool ValidateCharacter(char ch)
+        {
+            return (ch >= '0' && ch <= '9') ||
+                (ch >= 'A' && ch <= 'Z') ||
+                (ch >= 'a' && ch <= 'z') ||
+                (ch >= 0x4e00 && ch <= 0x9fbb) ||
+                ch == '_' || ch == '@' || ch == '#';
+        }
+
+        static string ReadWord(string expression, ref int pos)
+        {
+            var builder = new StringBuilder();
+
+            while (pos < expression.Length)
+            {
+                builder.Append(expression[pos]);
+                pos++;
+                // 遇到不合法字符或长度越限，跳出循环
+                if (pos >= expression.Length || !ValidateCharacter(expression[pos]))
+                {
+                    break;
+                }
+            }
+            return builder.ToString();
+        }
+
+        static string ReadString(string expression, ref int pos)
+        {
+            var builder = new StringBuilder();
+            // 跳过开头的单引号
+            pos++;
+            while (pos < expression.Length && expression[pos] != '\'')
+            {
+                builder.Append(expression[pos]);
+                pos++;
+            }
+            // 跳过'''
+            pos++;
+            return builder.ToString();
+        }
+
+        static AxisElementType TryGetElementType(string element)
+        {
+            return element.ToLower() switch
+            {
+                ".." => AxisElementType.AllCategory,
+                "text" => AxisElementType.Text,
+                "base" => AxisElementType.Base,
+                "unweightedbase" => AxisElementType.UnweightedBase,
+                "effectivebase" => AxisElementType.EffectiveBase,
+                "expression" => AxisElementType.Expression,
+                "numeric" => AxisElementType.Numeric,
+                "derived" => AxisElementType.Derived,
+                "mean" => AxisElementType.Mean,
+                "stderr" => AxisElementType.StdErr,
+                "stddev" => AxisElementType.StdDev,
+                "total" => AxisElementType.Total,
+                "subtotal" => AxisElementType.SubTotal,
+                "min" => AxisElementType.Min,
+                "max" => AxisElementType.Max,
+                "net" => AxisElementType.Net,
+                "combine" => AxisElementType.Combine,
+                "sum" => AxisElementType.Sum,
+                "median" => AxisElementType.Median,
+                "percentile" => AxisElementType.Percentile,
+                "mode" => AxisElementType.Mode,
+                "ntd" => AxisElementType.Ntd,
+                _ => AxisElementType.None
+            };
+        }
+
+        static AxisElementSuffixType TryGetSuffixType(string suffix)
+        {
+            return suffix.ToLower() switch
+            {
+                "calculationscope" => AxisElementSuffixType.CalculationScope,
+                "countsonly" => AxisElementSuffixType.CountsOnly,
+                "decimals" => AxisElementSuffixType.Decimals,
+                "factor" => AxisElementSuffixType.Factor,
+                "isfixed" => AxisElementSuffixType.IsFixed,
+                "ishidden" => AxisElementSuffixType.IsHidden,
+                "ishiddenwhencolumn" => AxisElementSuffixType.IsHiddenWhenColumn,
+                "ishiddenwhenrow" => AxisElementSuffixType.IsHiddenWhenRow,
+                "includeinbase" => AxisElementSuffixType.IncludeInBase,
+                "isunweighted" => AxisElementSuffixType.IsUnweighted,
+                "multiplier" => AxisElementSuffixType.Multiplier,
+                "weight" => AxisElementSuffixType.Weight,
+                _ => AxisElementSuffixType.None
+            };
+        }
+
+        static AxisElementSuffixCalculationScope TryGetCalculationScope(string type)
+        {
+            var lowerType = type.ToLower();
+            if (lowerType == "precedingelements")
+            {
+                return AxisElementSuffixCalculationScope.PrecedingElements;
+            }
+            else
+            {
+                return AxisElementSuffixCalculationScope.AllElements;
+            }
+        }
+
     }
 
     public enum AxisType
@@ -439,6 +764,10 @@ namespace IDCA.Model.Spec
         /// 当前元素的后缀配置集合
         /// </summary>
         public AxisElementSuffixCollection Suffix => _suffix;
+        /// <summary>
+        /// 是否是空对象，判断标准是Name属性是否是空
+        /// </summary>
+        public bool IsEmpty => string.IsNullOrEmpty(_name);
 
         /// <summary>
         /// 转换为字符串
@@ -453,6 +782,7 @@ namespace IDCA.Model.Spec
 
     public enum AxisElementType
     {
+        None,
         AllCategory,
         InsertFunctionOrVariable,
         Text,
@@ -500,7 +830,7 @@ namespace IDCA.Model.Spec
             _parameters = new SpecObjectCollection<AxisElementParameter>(this, collection => new AxisElementParameter(collection));
         }
 
-        AxisElementType _elementType = AxisElementType.Text;
+        AxisElementType _elementType = AxisElementType.None;
         readonly SpecObjectCollection<AxisElementParameter> _parameters;
 
         /// <summary>
@@ -749,7 +1079,7 @@ namespace IDCA.Model.Spec
 
         public override string ToString()
         {
-            if (Count > 0)
+            if (_items.Where(suffix => suffix.Type != AxisElementSuffixType.None).Any())
             {
                 StringBuilder builder = new();
                 builder.Append(" [");
@@ -818,13 +1148,16 @@ namespace IDCA.Model.Spec
         internal AxisElementSuffix(AxisElementSuffix suffix) : base()
         {
             _parent = suffix.Parent;
+            _document = suffix.Document;
             _type = suffix.Type;
             _value = suffix.Value;
+            _objectType = SpecObjectType.AxisElementSuffix;
         }
 
         internal AxisElementSuffix(SpecObject parent) : base(parent)
         {
             _type = AxisElementSuffixType.None;
+            _objectType = SpecObjectType.AxisElementSuffix;
         }
 
         AxisElementSuffixType _type;

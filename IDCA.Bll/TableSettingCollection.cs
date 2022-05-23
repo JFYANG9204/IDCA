@@ -160,6 +160,7 @@ namespace IDCA.Model
             _table = tables.NewTable(Spec.TableType.Normal);
             _tempAxis = new Axis(_table, AxisType.Normal);
             _tableAxisNetType = TableAxisNetType.StandardNet;
+            _net = new List<NetLikeSettingElement>();
         }
 
         readonly TableSettingCollection _setting;
@@ -171,10 +172,43 @@ namespace IDCA.Model
         string _baseLabel = string.Empty;
         string _baseFilter = string.Empty;
         string _tableFilter = string.Empty;
-        NetLikeSettingElement[] _net = Array.Empty<NetLikeSettingElement>();
+        List<NetLikeSettingElement> _net;
         readonly Table _table;
         TableAxisNetType _tableAxisNetType;
         bool _addSigma = true;
+        bool _addNps = false;
+        int _npsTopBox = 2;
+        int _npsBottomBox = 7;
+
+        // 事件回调
+        Action? _tableTitleChanged;
+        Action? _tableFilterChanged;
+        Action? _baseLabelChanged;
+        Action? _baseFilterChanged;
+
+        public event Action? TableTitleChanged
+        {
+            add { _tableTitleChanged += value; }
+            remove { _tableTitleChanged -= value; }
+        }
+
+        public event Action? TableFilterChanged
+        {
+            add { _tableFilterChanged += value; }
+            remove { _tableFilterChanged -= value; }
+        }
+
+        public event Action? BaseLabelChanged
+        {
+            add { _baseLabelChanged += value; }
+            remove { _baseLabelChanged -= value; }
+        }
+
+        public event Action? BaseFilterChanged
+        {
+            add { _baseFilterChanged += value; }
+            remove { _baseFilterChanged -= value; }
+        }
 
         readonly Axis _tempAxis;
         /// <summary>
@@ -200,19 +234,63 @@ namespace IDCA.Model
         /// <summary>
         /// 当前表格配置的表格标题
         /// </summary>
-        public string TableTitle { get => _tableTitle; set => _tableTitle = value; }
+        public string TableTitle
+        {
+            get
+            {
+                return _tableTitle;
+            }
+            set
+            {
+                _tableTitle = value;
+                _tableTitleChanged?.Invoke();
+            }
+        }
         /// <summary>
         /// 当前表格配置的基数行标签
         /// </summary>
-        public string BaseLabel { get => _baseLabel; set => _baseLabel = value; }
+        public string BaseLabel
+        {
+            get
+            {
+                return _baseLabel;
+            }
+            set
+            {
+                _baseLabel = value;
+                _baseLabelChanged?.Invoke();
+            }
+        }
         /// <summary>
         /// 当前表格轴表达式中base()元素中的参数内容
         /// </summary>
-        public string BaseFilter { get => _baseFilter; set => _baseFilter = value; }
+        public string BaseFilter
+        {
+            get
+            {
+                return _baseFilter;
+            }
+            set
+            {
+                _baseFilter = value;
+                _baseFilterChanged?.Invoke();
+            }
+        }
         /// <summary>
         /// 当前表格在Table.mrs中的额外筛选器条件
         /// </summary>
-        public string TableFilter { get => _tableFilter; set => _tableFilter = value; }
+        public string TableFilter 
+        { 
+            get
+            {
+                return _tableFilter;
+            }
+            set
+            {
+                _tableFilter = value;
+                _tableFilterChanged?.Invoke();
+            } 
+        }
         /// <summary>
         /// 当前表格配置的MDMField对象
         /// </summary>
@@ -220,7 +298,7 @@ namespace IDCA.Model
         /// <summary>
         /// 当前表格配置的Net/Combine配置集合
         /// </summary>
-        public NetLikeSettingElement[] Net => _net;
+        public List<NetLikeSettingElement> Net => _net;
         /// <summary>
         /// 表格表侧轴表达式元素的Net类型，用于配置Net使用net元素还是combine元素以及出示位置
         /// </summary>
@@ -230,14 +308,25 @@ namespace IDCA.Model
         /// </summary>
         public bool AddSigma { get => _addSigma; set => _addSigma = value; }
         /// <summary>
+        /// 表格是否出示NPS
+        /// </summary>
+        public bool AddNps { get => _addNps; set => _addNps = value; }
+        /// <summary>
+        /// 当前表格计算NPS的TopBox选项数量
+        /// </summary>
+        public int NpsTopBox { get => _npsTopBox; set => _npsTopBox = value; }
+        /// <summary>
+        /// 当前表格计算NPS的BottomBox选项数量
+        /// </summary>
+        public int NpsBottomBox { get => _npsBottomBox; set => _npsBottomBox = value; }
+        /// <summary>
         /// 向当前的Net集合中添加新的元素并将其返回
         /// </summary>
         /// <returns></returns>
         public NetLikeSettingElement NewNetElement()
         {
             var element = new NetLikeSettingElement(this, _config);
-            Array.Resize(ref _net, _net.Length + 1);
-            _net[^1] = element;
+            _net.Add(element);
             return element;
         }
         /// <summary>
@@ -273,22 +362,52 @@ namespace IDCA.Model
                 .ForEach(ele => _tempAxis.AppendNamedCombine(ele.Name, ele.Label, ele.Codes));
         }
 
-        void ApplyAxisSide()
+        void ApplyNps()
         {
-            if (_net.Length == 0)
+            if (!_addNps)
+            {
+                return;
+            }
+
+            if (_net.Find(ele => ele.Name.Equals($"t{_npsTopBox}b", StringComparison.OrdinalIgnoreCase)) == null)
+            {
+                var npsTopBoxNet = new NetLikeSettingElement(this, _config);
+                npsTopBoxNet.FromTopBottomBox(_npsTopBox);
+                var npsTopBoxElement = _tempAxis.AppendNamedCombine(npsTopBoxNet.Name, npsTopBoxNet.Label, npsTopBoxNet.Codes);
+                npsTopBoxElement.Suffix.AppendIsHidden(true);
+                npsTopBoxElement.Suffix.AppendIsFixed(true);
+            }
+
+            if (_net.Find(ele => ele.Name.Equals($"b{_npsTopBox}b", StringComparison.OrdinalIgnoreCase)) == null)
+            {
+                var npsBottomBoxNet = new NetLikeSettingElement(this, _config);
+                npsBottomBoxNet.FromTopBottomBox(_npsBottomBox);
+                var npsBottomBoxElement = _tempAxis.AppendNamedCombine(npsBottomBoxNet.Name, npsBottomBoxNet.Label, npsBottomBoxNet.Codes);
+                npsBottomBoxElement.Suffix.AppendIsHidden(true);
+                npsBottomBoxElement.Suffix.AppendIsFixed(true);
+            }
+
+            _tempAxis.AppendNamedDerived("nps", $"NPS(T{_npsTopBox}B-B{_npsBottomBox}B)", $"t{_npsTopBox}b-b{_npsBottomBox}b");
+        }
+
+        void ApplyMaybeNetElements()
+        {
+            if (_net.Count == 0)
             {
                 _tempAxis.AppendAllCategory();
                 return;
             }
 
+            int topBottomCount = _net.Count(ele => ele.IsTopBottomBox);
+
             if (_tableAxisNetType == TableAxisNetType.StandardNet)
             {
                 bool insertEmptyLine = _config.TryGet<bool>(SpecConfigKeys.AxisNetInsertEmptyLine);
-                for (int i = 0; i < _net.Length; i++)
+                for (int i = 0; i < _net.Count; i++)
                 {
                     var netElement = _net[i];
                     _tempAxis.AppendNet(netElement.Label, netElement.Codes);
-                    if (insertEmptyLine && i < _net.Length - 1)
+                    if (insertEmptyLine && i < _net.Count - 1)
                     {
                         _tempAxis.AppendTextElement();
                     }
@@ -300,20 +419,27 @@ namespace IDCA.Model
                     Converter.ConvertToAxisTopBottomBoxPosition(
                         _config.TryGet<int>(SpecConfigKeys.AxisTopBottomBoxPositon));
 
-                if (position == AxisTopBottomBoxPosition.BeforeAllCategory)
+                if (topBottomCount > 0 && position == AxisTopBottomBoxPosition.BeforeAllCategory)
                 {
                     ApplyTopBottomBox();
+                    ApplyNps();
                     var subtotal = _tempAxis.AppendSubTotal();
                     subtotal.Suffix.AppendIsHidden(true);
                     _tempAxis.AppendTextElement();
+                }
+                
+                if (_tableAxisNetType == TableAxisNetType.CombineBeforeAllCategory)
+                {
+
                 }
 
                 _tempAxis.AppendAllCategory();
                 _tempAxis.AppendTextElement();
 
-                if (position == AxisTopBottomBoxPosition.BetweenAllCategoryAndSigma)
+                if (topBottomCount > 0 && position == AxisTopBottomBoxPosition.BetweenAllCategoryAndSigma)
                 {
                     ApplyTopBottomBox();
+                    ApplyNps();
                     var beforeSigmaSubtotal = _tempAxis.AppendSubTotal();
                     beforeSigmaSubtotal.Suffix.AppendIsHidden(true);
                     var exactSigamNet = _tempAxis.AppendNet("", "..");
@@ -325,13 +451,14 @@ namespace IDCA.Model
                     _tempAxis.AppendSubTotal(_config.TryGet<string>(SpecConfigKeys.AxisSigmaLabel) ?? "Sigma");
                 }
 
-                if (position == AxisTopBottomBoxPosition.AfterSigma)
+                if (topBottomCount > 0 && position == AxisTopBottomBoxPosition.AfterSigma)
                 {
                     if (_tempAxis[^1].Template.ElementType != AxisElementType.Text)
                     {
                         _tempAxis.AppendTextElement();
                     }
                     ApplyTopBottomBox();
+                    ApplyNps();
                 }
 
             }
@@ -422,7 +549,7 @@ namespace IDCA.Model
                 return;
             }
 
-            _name = $"n{_parent.Net.Length + 1}";
+            _name = $"n{_parent.Net.Count + 1}";
             string? netAheadLabel = _config.TryGet<string>(SpecConfigKeys.AxisNetAheadLabel);
             _label = $"{(string.IsNullOrEmpty(netAheadLabel) ? "" : $"{netAheadLabel}.")}{label}";
 

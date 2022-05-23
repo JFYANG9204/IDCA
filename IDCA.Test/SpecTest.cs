@@ -18,7 +18,7 @@ namespace IDCA.Test
             string fieldText = "A1[{_1}].Slice[..].Column[{].";
             field.FromString(fieldText);
             string export = field.Export();
-            System.Console.WriteLine(export);
+            Console.WriteLine(export);
             Assert.AreEqual(export, "A1[{_1}].Slice[..].Column");
         }
 
@@ -36,7 +36,7 @@ namespace IDCA.Test
             manipulation.Axis.AppendSubTotal("Sigma");
             manipulation.Axis.AppendMean("Mean").Suffix.AppendIsHidden(true);
             var result = manipulation.Axis.ToString();
-            System.Console.WriteLine(result);
+            Console.WriteLine(result);
         }
 
         [TestMethod]
@@ -49,6 +49,17 @@ namespace IDCA.Test
                 Console.WriteLine(propertyInfo.Name);
             }
             Console.WriteLine("End");
+        }
+
+        [TestMethod]
+        public void AxisFromStringTest()
+        {
+            string path = Path.Combine(Directory.GetCurrentDirectory(), @"..\..\..\Features\Templates.xml");
+            SpecDocument spec = new("", path, new());
+            var manipulation = spec.Manipulations.NewObject();
+            string axisExpression = "{e1 '' text(), base 'Base : Total Respondent' base('True'), e2 '' text(), .., e3 '' text(), sigma 'Sigma' subtotal(), mean 'Mean' mean() [Ishidden=True, Isfixed=True]}";
+            manipulation.Axis.FromString(axisExpression);
+            Console.WriteLine(manipulation.Axis.ToString());
         }
 
     }

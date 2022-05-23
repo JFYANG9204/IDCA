@@ -43,6 +43,7 @@ namespace IDCA.Model.Spec
         Axis,
         AxisElement,
         AxisElementTemplate,
+        AxisElementSuffix,
         AxisParameter,
         Manipulation,
         Script,
