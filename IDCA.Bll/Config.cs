@@ -106,6 +106,10 @@ namespace IDCA.Model
         public const string AxisTopBottomBoxPositon = "AxisTopBottomBoxPositon";
         public const string AxisCombinePosition = "AxisCombinePosition";
         public const string TableSummaryLabel = "TableSummaryLabel";
+        // Table Setting
+        public const string TableSettingNetLabelCodeSeparater = "TableSettingNetLabelCodeSeparater";
+        public const string TableSettingNetCodeSeparater = "TableSettingNetCodeSeparater";
+        public const string TableSettingNetCodeRangeSeparater = "TableSettingNetCodeRangeSeparater";
     }
 
 }

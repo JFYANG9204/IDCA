@@ -12,7 +12,7 @@ namespace IDCA.Client.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.1.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.2.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -31,6 +31,102 @@ namespace IDCA.Client.Properties {
             }
             set {
                 this["Templates"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("V")]
+        public string MetadataCategoricalLabel {
+            get {
+                return ((string)(this["MetadataCategoricalLabel"]));
+            }
+            set {
+                this["MetadataCategoricalLabel"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Base : ")]
+        public string AxisBaseLabel {
+            get {
+                return ((string)(this["AxisBaseLabel"]));
+            }
+            set {
+                this["AxisBaseLabel"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Sigma")]
+        public string AxisSigmaLabel {
+            get {
+                return ((string)(this["AxisSigmaLabel"]));
+            }
+            set {
+                this["AxisSigmaLabel"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Net.")]
+        public string AxisNetAheadLabel {
+            get {
+                return ((string)(this["AxisNetAheadLabel"]));
+            }
+            set {
+                this["AxisNetAheadLabel"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AxisNetInsertEmptyLine {
+            get {
+                return ((bool)(this["AxisNetInsertEmptyLine"]));
+            }
+            set {
+                this["AxisNetInsertEmptyLine"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int AxisTopBottomBoxPositon {
+            get {
+                return ((int)(this["AxisTopBottomBoxPositon"]));
+            }
+            set {
+                this["AxisTopBottomBoxPositon"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int AxisCombinePosition {
+            get {
+                return ((int)(this["AxisCombinePosition"]));
+            }
+            set {
+                this["AxisCombinePosition"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(" - Summary")]
+        public string TableSummaryLabel {
+            get {
+                return ((string)(this["TableSummaryLabel"]));
+            }
+            set {
+                this["TableSummaryLabel"] = value;
             }
         }
     }

@@ -172,7 +172,7 @@ namespace IDCA.Model
         string _baseLabel = string.Empty;
         string _baseFilter = string.Empty;
         string _tableFilter = string.Empty;
-        List<NetLikeSettingElement> _net;
+        readonly List<NetLikeSettingElement> _net;
         readonly Table _table;
         TableAxisNetType _tableAxisNetType;
         bool _addSigma = true;
@@ -279,8 +279,8 @@ namespace IDCA.Model
         /// <summary>
         /// 当前表格在Table.mrs中的额外筛选器条件
         /// </summary>
-        public string TableFilter 
-        { 
+        public string TableFilter
+        {
             get
             {
                 return _tableFilter;
@@ -289,7 +289,7 @@ namespace IDCA.Model
             {
                 _tableFilter = value;
                 _tableFilterChanged?.Invoke();
-            } 
+            }
         }
         /// <summary>
         /// 当前表格配置的MDMField对象
@@ -319,6 +319,21 @@ namespace IDCA.Model
         /// 当前表格计算NPS的BottomBox选项数量
         /// </summary>
         public int NpsBottomBox { get => _npsBottomBox; set => _npsBottomBox = value; }
+        /// <summary>
+        /// 获取当前临时轴表达式的文本内容或者通过配置轴表达式文本读取轴元素
+        /// </summary>
+        public string AxisExpression
+        {
+            get
+            {
+                return _tempAxis.ToString();
+            }
+            set
+            {
+                _tempAxis.FromString(value);
+
+            }
+        }
         /// <summary>
         /// 向当前的Net集合中添加新的元素并将其返回
         /// </summary>
@@ -390,6 +405,14 @@ namespace IDCA.Model
             _tempAxis.AppendNamedDerived("nps", $"NPS(T{_npsTopBox}B-B{_npsBottomBox}B)", $"t{_npsTopBox}b-b{_npsBottomBox}b");
         }
 
+        void ApplyCombineElements(IEnumerable<NetLikeSettingElement> elements)
+        {
+            foreach (NetLikeSettingElement ele in elements)
+            {
+                _tempAxis.AppendCombine(ele.Label, ele.Codes);
+            }
+        }
+
         void ApplyMaybeNetElements()
         {
             if (_net.Count == 0)
@@ -415,9 +438,11 @@ namespace IDCA.Model
             }
             else
             {
-                AxisTopBottomBoxPosition position = 
+                AxisTopBottomBoxPosition position =
                     Converter.ConvertToAxisTopBottomBoxPosition(
                         _config.TryGet<int>(SpecConfigKeys.AxisTopBottomBoxPositon));
+
+                var nets = _net.Where(ele => !ele.IsTopBottomBox);
 
                 if (topBottomCount > 0 && position == AxisTopBottomBoxPosition.BeforeAllCategory)
                 {
@@ -427,10 +452,13 @@ namespace IDCA.Model
                     subtotal.Suffix.AppendIsHidden(true);
                     _tempAxis.AppendTextElement();
                 }
-                
+
                 if (_tableAxisNetType == TableAxisNetType.CombineBeforeAllCategory)
                 {
-
+                    ApplyCombineElements(nets);
+                    var subtotal = _tempAxis.AppendSubTotal();
+                    subtotal.Suffix.AppendIsHidden(true);
+                    _tempAxis.AppendTextElement();
                 }
 
                 _tempAxis.AppendAllCategory();
@@ -440,10 +468,25 @@ namespace IDCA.Model
                 {
                     ApplyTopBottomBox();
                     ApplyNps();
-                    var beforeSigmaSubtotal = _tempAxis.AppendSubTotal();
-                    beforeSigmaSubtotal.Suffix.AppendIsHidden(true);
-                    var exactSigamNet = _tempAxis.AppendNet("", "..");
-                    exactSigamNet.Suffix.AppendIsHidden(true);
+                    if (_addSigma)
+                    {
+                        var beforeSigmaSubtotal = _tempAxis.AppendSubTotal();
+                        beforeSigmaSubtotal.Suffix.AppendIsHidden(true);
+                        var exactSigamNet = _tempAxis.AppendNet("", "..");
+                        exactSigamNet.Suffix.AppendIsHidden(true);
+                    }
+                }
+
+                if (_tableAxisNetType == TableAxisNetType.CombineBetweenAllCategoryAndSigma)
+                {
+                    ApplyCombineElements(nets);
+                    if (_addSigma)
+                    {
+                        var beforeSigmaSubtotal = _tempAxis.AppendSubTotal();
+                        beforeSigmaSubtotal.Suffix.AppendIsHidden(true);
+                        var exactSigamNet = _tempAxis.AppendNet("", "..");
+                        exactSigamNet.Suffix.AppendIsHidden(true);
+                    }
                 }
 
                 if (_addSigma)
@@ -459,6 +502,11 @@ namespace IDCA.Model
                     }
                     ApplyTopBottomBox();
                     ApplyNps();
+                }
+
+                if (_tableAxisNetType == TableAxisNetType.CombineAfterSigma)
+                {
+                    ApplyCombineElements(nets);
                 }
 
             }
@@ -481,6 +529,27 @@ namespace IDCA.Model
             _table.TableTitle = _tableTitle;
             _table.TableBase = _baseLabel;
             ApplyAxis();
+        }
+        /// <summary>
+        /// 从配置字符串载入元素配置
+        /// </summary>
+        /// <param name="source"></param>
+        public void ReadNetElementsFromString(string source)
+        {
+            _net.Clear();
+
+            foreach (var netSetting in source.Split('\n'))
+            {
+                var netElement = new NetLikeSettingElement(this, _config);
+                netElement.FromString(netSetting);
+                _net.Add(netElement);
+            }
+
+            _tempAxis.Clear();
+            _tempAxis.AppendTextElement();
+            _tempAxis.AppendBaseElement(_baseLabel, _baseFilter);
+            _tempAxis.AppendTextElement();
+            ApplyMaybeNetElements();
         }
 
     }
@@ -539,29 +608,37 @@ namespace IDCA.Model
         /// 从字符串读取码号
         /// </summary>
         /// <param name="source"></param>
-        public void FromString(string label, string source)
+        public void FromString(string source)
         {
             _codes.Clear();
 
-            // 如果field对象的Categories属性为null，由于缺少码号搜索的依据，直接返回
-            if (_field?.Categories == null)
+            string labelSeparater = _config.TryGet<string>(SpecConfigKeys.TableSettingNetLabelCodeSeparater) ?? ",";
+            string codeSeparater = _config.TryGet<string>(SpecConfigKeys.TableSettingNetCodeSeparater) ?? ",";
+            string codeRangeSeparater = _config.TryGet<string>(SpecConfigKeys.TableSettingNetCodeRangeSeparater) ?? "-";
+
+            string[] setting = source.Split(labelSeparater);
+            string label = setting[0];
+
+            if (string.IsNullOrEmpty(label) || setting.Length == 1)
             {
                 return;
             }
+
+            string codePart = setting[1];
 
             _name = $"n{_parent.Net.Count + 1}";
             string? netAheadLabel = _config.TryGet<string>(SpecConfigKeys.AxisNetAheadLabel);
             _label = $"{(string.IsNullOrEmpty(netAheadLabel) ? "" : $"{netAheadLabel}.")}{label}";
 
-            string[] codes = source.Split(',');
+            string[] codes = codePart.Split(codeSeparater);
             for (int i = 0; i < codes.Length; i++)
             {
                 string code = codes[i].Trim();
-                if (string.IsNullOrEmpty(code))
+                if (string.IsNullOrEmpty(code) || _field?.Categories == null)
                 {
                     continue;
                 }
-                string[] range = code.Split('-');
+                string[] range = code.Split(codeRangeSeparater);
                 if (range.Length == 2)
                 {
 
