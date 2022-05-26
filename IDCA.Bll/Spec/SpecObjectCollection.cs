@@ -98,5 +98,32 @@ namespace IDCA.Model.Spec
             _items.RemoveAt(index);
         }
 
+        /// <summary>
+        /// 根据回调函数的结果删除所有返回值为True的列表元素。
+        /// </summary>
+        /// <param name="checkIfFunc"></param>
+        public void RemoveIf(Func<T, bool> checkIfFunc)
+        {
+            var removeIndex = new List<int>();
+            
+            for (int i = 0; i < _items.Count; i++)
+            {
+                if (checkIfFunc(_items[i]))
+                {
+                    removeIndex.Add(i);
+                }
+            }
+
+            if (removeIndex.Count == 0)
+            {
+                return;
+            }
+
+            for (int i = removeIndex.Count - 1; i <= 0; i--)
+            {
+                _items.RemoveAt(removeIndex[i]);
+            }
+        }
+
     }
 }
