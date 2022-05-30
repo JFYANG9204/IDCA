@@ -30,19 +30,19 @@ namespace IDCA.Model.Spec
         /// <summary>
         /// 轴表达式类型
         /// </summary>
-        public AxisType Type { get => _type; internal set => _type = value; }
+        public AxisType Type { get => _type; set => _type = value; }
 
         string _name = string.Empty;
         /// <summary>
         /// 轴表达式的名称，如果表达式类型为AxisVariable，会以 as name 'label'的格式放在最后
         /// </summary>
-        public string Name { get => _name; internal set => _name = value; }
+        public string Name { get => _name; set => _name = value; }
 
         string _label = string.Empty;
         /// <summary>
         /// 轴表达式的标签，如果表达式类型为AxisVariable，会以 as name 'label'的格式放在最后
         /// </summary>
-        public string Label { get => _label; internal set => _label = value; }
+        public string Label { get => _label; set => _label = value; }
         /// <summary>
         /// 从已有的轴表达式对象复制数据
         /// </summary>
@@ -388,18 +388,18 @@ namespace IDCA.Model.Spec
         /// 向当前集合末尾添加一个插入的新本地变量轴表达元素，只需要设置变量名，最终会以字符串拼接的形式写入文件。
         /// </summary>
         /// <param name="variable"></param>
-        public void AppendInsertVariable(string variable = "")
+        public AxisElement AppendInsertVariable(string variable = "")
         {
-            AppendElement(AxisElementType.InsertFunctionOrVariable, "", null, variable);
+            return AppendElement(AxisElementType.InsertFunctionOrVariable, "", null, variable);
         }
 
         /// <summary>
         /// 向当前集合末尾添加一个插入的新本地函数调用表达式元素，需要已知的函数模板，最终会以字符串拼接的形式写入文件。
         /// </summary>
         /// <param name="function"></param>
-        public void AppendInsertFunction(FunctionTemplate? function = null)
+        public AxisElement AppendInsertFunction(FunctionTemplate? function = null)
         {
-            AppendElement(AxisElementType.InsertFunctionOrVariable, "", null, function == null ? "" : function.Exec());
+            return AppendElement(AxisElementType.InsertFunctionOrVariable, "", null, function == null ? "" : function.Exec());
         }
 
         /// <summary>
@@ -407,7 +407,28 @@ namespace IDCA.Model.Spec
         /// </summary>
         public void AppendAllCategory()
         {
-            AppendElement(AxisElementType.AllCategory, string.Empty, null);
+            AppendElement(AxisElementType.CategoryRange, string.Empty, null);
+        }
+
+        /// <summary>
+        /// 向当前集合末尾添加单个Category元素
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="label"></param>
+        public AxisElement AppendCategory(string name, string label = "")
+        {
+            return AppendElement(AxisElementType.Category, label, null, name, label);
+        }
+
+        /// <summary>
+        /// 向当前集合末尾添加单个Category区间元素，可以提供上限和下限
+        /// </summary>
+        /// <param name="upper">区间上限</param>
+        /// <param name="lower">区间下限</param>
+        /// <returns></returns>
+        public AxisElement AppentCategoryRange(string upper, string lower)
+        {
+            return AppendElement(AxisElementType.CategoryRange, "", null, upper, lower);
         }
 
         /// <summary>
@@ -457,18 +478,20 @@ namespace IDCA.Model.Spec
         }
 
         string _name = string.Empty;
-        string _description = string.Empty;
+        string? _description;
         readonly AxisElementTemplate _template;
         readonly AxisElementSuffixCollection _suffix;
+
+        bool _exclude = false;
 
         /// <summary>
         /// 轴表达式元素的名称
         /// </summary>
-        public string Name { get => _name; internal set => _name = value; }
+        public string Name { get => _name; set => _name = value; }
         /// <summary>
         /// 轴表达式元素的描述
         /// </summary>
-        public string Description { get => _description; internal set => _description = value; }
+        public string? Description { get => _description; set => _description = value; }
         /// <summary>
         /// 轴表达式元素模板
         /// </summary>
@@ -478,9 +501,9 @@ namespace IDCA.Model.Spec
         /// </summary>
         public AxisElementSuffixCollection Suffix => _suffix;
         /// <summary>
-        /// 是否是空对象，判断标准是Name属性是否是空
+        /// 当前的轴元素是否是被排除在外的
         /// </summary>
-        public bool IsEmpty => string.IsNullOrEmpty(_name);
+        public bool Exclude { get => _exclude; internal set => _exclude = value; }
 
         /// <summary>
         /// 转换为字符串
@@ -488,7 +511,7 @@ namespace IDCA.Model.Spec
         /// <returns></returns>
         public override string ToString()
         {
-            return $"{(string.IsNullOrEmpty(_name) ? "" : _name)}{(string.IsNullOrEmpty(_name) ? "" : $" '{_description}'")}{(string.IsNullOrEmpty(_name) ? "" : " ")}{_template}{_suffix}";
+            return $"{(_exclude ? "^" : "")}{(string.IsNullOrEmpty(_name) ? "" : _name)}{(_description == null ? "" : $" '{_description}'")}{(string.IsNullOrEmpty(_name) ? "" : " ")}{_template}{_suffix}";
         }
     }
 
@@ -496,7 +519,8 @@ namespace IDCA.Model.Spec
     public enum AxisElementType
     {
         None,
-        AllCategory,
+        Category,
+        CategoryRange,
         InsertFunctionOrVariable,
         Text,
         Base,
@@ -518,7 +542,7 @@ namespace IDCA.Model.Spec
         Median,
         Percentile,
         Mode,
-        Ntd
+        Ntd,
     }
 
     /// <summary>
@@ -549,7 +573,7 @@ namespace IDCA.Model.Spec
         /// <summary>
         /// 元素的类型
         /// </summary>
-        public AxisElementType ElementType { get => _elementType; internal set => _elementType = value; }
+        public AxisElementType ElementType { get => _elementType; set => _elementType = value; }
 
         /// <summary>
         /// 创建新的表达式元素参数
@@ -570,6 +594,21 @@ namespace IDCA.Model.Spec
         }
 
         /// <summary>
+        /// 获取指定索引位置的参数对象，如果不存在，返回null
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public AxisElementParameter? GetParameter(int index)
+        {
+            return index > 0 && index < _parameters.Count ? _parameters[index] : null;
+        }
+
+        /// <summary>
+        /// 当前模板中参数的数量
+        /// </summary>
+        public int Count => _parameters.Count;
+
+        /// <summary>
         /// 转换为字符串
         /// </summary>
         /// <returns></returns>
@@ -579,29 +618,30 @@ namespace IDCA.Model.Spec
             _parameters.RemoveIf(e => string.IsNullOrEmpty(e.ToString()));
             return _elementType switch
             {
-                AxisElementType.AllCategory => "..",
-                AxisElementType.InsertFunctionOrVariable => $"\" + {(_parameters.Count > 0 ? _parameters[0].ToString() : "")} + \"",
+                AxisElementType.InsertFunctionOrVariable => $"\" + {(_parameters.Count > 0 ? _parameters[0] : "")} + \"",
                 AxisElementType.Text => "text()",
                 AxisElementType.Base => $"base({(_parameters.Count > 0 ? $"'{_parameters[0]}'" : "")})",
                 AxisElementType.UnweightedBase => $"unweightedbase({(_parameters.Count > 0 ? $"'{_parameters[0]}'" : "")})",
-                AxisElementType.Mean => $"mean({(_parameters.Count > 0 ? _parameters[0].ToString() : "")}{(_parameters.Count > 1 ? $", '{_parameters[1]}'" : "")})",
-                AxisElementType.StdDev => $"stddev({(_parameters.Count > 0 ? _parameters[0].ToString() : "")}{(_parameters.Count > 1 ? $", '{_parameters[1]}'" : "")})",
-                AxisElementType.StdErr => $"stderr({(_parameters.Count > 0 ? _parameters[0].ToString() : "")}{(_parameters.Count > 1 ? $", '{_parameters[1]}'" : "")})",
+                AxisElementType.Mean => $"mean({(_parameters.Count > 0 ? _parameters[0] : "")}{(_parameters.Count > 1 ? $", '{_parameters[1]}'" : "")})",
+                AxisElementType.StdDev => $"stddev({(_parameters.Count > 0 ? _parameters[0] : "")}{(_parameters.Count > 1 ? $", '{_parameters[1]}'" : "")})",
+                AxisElementType.StdErr => $"stderr({(_parameters.Count > 0 ? _parameters[0] : "")}{(_parameters.Count > 1 ? $", '{_parameters[1]}'" : "")})",
                 AxisElementType.Total => "total()",
                 AxisElementType.SubTotal => "subtotal()",
-                AxisElementType.Min => $"min({(_parameters.Count > 0 ? _parameters[0].ToString() : "")}{(_parameters.Count > 1 ? $", '{_parameters[1]}'" : "")})",
-                AxisElementType.Max => $"max({(_parameters.Count > 0 ? _parameters[0].ToString() : "")}{(_parameters.Count > 1 ? $", '{_parameters[1]}'" : "")})",
+                AxisElementType.Min => $"min({(_parameters.Count > 0 ? _parameters[0] : "")}{(_parameters.Count > 1 ? $", '{_parameters[1]}'" : "")})",
+                AxisElementType.Max => $"max({(_parameters.Count > 0 ? _parameters[0] : "")}{(_parameters.Count > 1 ? $", '{_parameters[1]}'" : "")})",
                 AxisElementType.Net => $"net({{{string.Join(',', _parameters)}}})",
                 AxisElementType.Combine => $"combine({{{string.Join(',', _parameters)}}})",
-                AxisElementType.Expression => $"expression('{(_parameters.Count > 0 ? _parameters[0].ToString() : "")}')",
-                AxisElementType.Numeric => $"numeric({(_parameters.Count > 0 ? _parameters[0].ToString() : "")}{(_parameters.Count > 1 ? $", '{_parameters[1]}'" : "")})",
-                AxisElementType.Derived => $"derived('{(_parameters.Count > 0 ? _parameters[0].ToString() : "")}')",
-                AxisElementType.Sum => $"sum({(_parameters.Count > 0 ? _parameters[0].ToString() : "")}{(_parameters.Count > 1 ? $", '{_parameters[1]}'" : "")})",
+                AxisElementType.Expression => $"expression('{(_parameters.Count > 0 ? _parameters[0] : "")}')",
+                AxisElementType.Numeric => $"numeric({(_parameters.Count > 0 ? _parameters[0] : "")}{(_parameters.Count > 1 ? $", '{_parameters[1]}'" : "")})",
+                AxisElementType.Derived => $"derived('{(_parameters.Count > 0 ? _parameters[0] : "")}')",
+                AxisElementType.Sum => $"sum({(_parameters.Count > 0 ? _parameters[0] : "")}{(_parameters.Count > 1 ? $", '{_parameters[1]}'" : "")})",
                 AxisElementType.EffectiveBase => "effectivebase()",
-                AxisElementType.Median => $"median({(_parameters.Count > 0 ? _parameters[0].ToString() : "")}{(_parameters.Count > 1 ? $", '{_parameters[1]}'" : "")})",
-                AxisElementType.Percentile => $"percentile({(_parameters.Count > 0 ? _parameters[0].ToString() : "")}{(_parameters.Count > 1 ? $", {_parameters[1]}" : "")}{(_parameters.Count > 2 ? $", '{_parameters[2]}'" : "")})",
-                AxisElementType.Mode => $"mode({(_parameters.Count > 0 ? _parameters[0].ToString() : "")}{(_parameters.Count > 1 ? $", '{_parameters[1]}'" : "")})",
+                AxisElementType.Median => $"median({(_parameters.Count > 0 ? _parameters[0] : "")}{(_parameters.Count > 1 ? $", '{_parameters[1]}'" : "")})",
+                AxisElementType.Percentile => $"percentile({(_parameters.Count > 0 ? _parameters[0] : "")}{(_parameters.Count > 1 ? $", {_parameters[1]}" : "")}{(_parameters.Count > 2 ? $", '{_parameters[2]}'" : "")})",
+                AxisElementType.Mode => $"mode({(_parameters.Count > 0 ? _parameters[0] : "")}{(_parameters.Count > 1 ? $", '{_parameters[1]}'" : "")})",
                 AxisElementType.Ntd => "ntd()",
+                AxisElementType.Category => "",
+                AxisElementType.CategoryRange => $"{(_parameters.Count > 0 ? _parameters[0] : "")}..{(_parameters.Count > 1 ? _parameters[1] : "")}",
                 _ => string.Empty,
             };
         }
@@ -633,6 +673,15 @@ namespace IDCA.Model.Spec
         public void SetValue(object value)
         {
             _value = value;
+        }
+
+        /// <summary>
+        /// 获取当前的参数值
+        /// </summary>
+        /// <returns></returns>
+        public object GetValue()
+        {
+            return _value;
         }
 
         /// <summary>

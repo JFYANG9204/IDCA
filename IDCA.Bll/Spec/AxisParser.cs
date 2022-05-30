@@ -22,6 +22,8 @@ namespace IDCA.Model.Spec
         int _length = 0;
         ParserElementType _type = ParserElementType.None;
 
+        bool _exclude = false;
+
         enum ParserElementType
         {
             None,
@@ -41,6 +43,8 @@ namespace IDCA.Model.Spec
             Equal,
 
             Dotdot,
+
+            Caret
         }
 
         void SkipSpace()
@@ -204,6 +208,12 @@ namespace IDCA.Model.Spec
                 _current = "..";
                 _type = ParserElementType.Dotdot;
             }
+            else if (c == '^')
+            {
+                _pos++;
+                _current = "^";
+                _type = ParserElementType.Caret;
+            }
             else
             {
                 _pos++;
@@ -266,18 +276,52 @@ namespace IDCA.Model.Spec
 
         AxisElement ReadElement(SpecObject parent)
         {
-            var element = new AxisElement(parent);
-            // ..
+
+            if (_type == ParserElementType.Caret)
+            {
+                _exclude = true;
+                Next();
+            }
+
+            var element = new AxisElement(parent) { Exclude = _exclude };
+            _exclude = false;
+            // ..[Upper]
             if (_type == ParserElementType.Dotdot)
             {
-                element.Template.ElementType = AxisElementType.AllCategory;
+                element.Template.ElementType = AxisElementType.CategoryRange;
                 Next();
+                if (_type == ParserElementType.ElementName)
+                {
+                    var parameter = element.Template.NewParameter();
+                    parameter.SetValue(_current);
+                    element.Template.PushParameter(parameter);
+                    Next();
+                }
                 return element;
             }
 
             if (_type != ParserElementType.ElementName)
             {
                 SkipUntil(ParserElementType.None);
+                return element;
+            }
+            // Lower .. [Upper]
+            if (LookAhead() == ParserElementType.Dotdot)
+            {
+                element.Template.ElementType = AxisElementType.CategoryRange;
+                var parameter = element.Template.NewParameter();
+                parameter.SetValue(_current);
+                element.Template.PushParameter(parameter);
+                // 跳过'..'
+                Next();
+                if (LookAhead() == ParserElementType.ElementName)
+                {
+                    Next();
+                    parameter = element.Template.NewParameter();
+                    parameter.SetValue(_current);
+                    element.Template.PushParameter(parameter);
+                    Next();
+                }
                 return element;
             }
 
@@ -297,6 +341,11 @@ namespace IDCA.Model.Spec
                 element.Template.ElementType = Converter.ConvertToAxisElementType(_current);
                 Next();
                 ReadTemplate(element);
+            }
+            else
+            {
+                element.Template.ElementType = AxisElementType.Category;
+                Next();
             }
 
             if (_type == ParserElementType.LeftBracket)

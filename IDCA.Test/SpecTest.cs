@@ -57,7 +57,7 @@ namespace IDCA.Test
             string path = Path.Combine(Directory.GetCurrentDirectory(), @"..\..\..\Features\Templates.xml");
             SpecDocument spec = new("", path, new());
             var manipulation = spec.Manipulations.NewObject();
-            string axisExpression = "{e1 '' text(), base 'Base : Total Respondent' base('True'), e2 '' text(), .., e3 '' text(), sigma 'Sigma' subtotal(), mean 'Mean' mean() [Ishidden=True, Isfixed=True]}";
+            string axisExpression = "{e1 '' text(), base 'Base : Total Respondent' base('True'), e2 '' text(), ..A1,^A2 [IncludeInBase=True],^A3..A4, e3 '' text(), sigma 'Sigma' subtotal(), mean 'Mean' mean() [Ishidden=True, Isfixed=True]}";
             manipulation.Axis.FromString(axisExpression);
             Console.WriteLine(manipulation.Axis.ToString());
         }

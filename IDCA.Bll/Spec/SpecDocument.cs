@@ -14,6 +14,7 @@ namespace IDCA.Model.Spec
         {
             _globalTables = new List<Tables>();
             _tableNames = new List<string>();
+            _headerNames = new List<string>();
 
             _projectPath = projectPath;
             _objectType = SpecObjectType.Document;
@@ -140,6 +141,7 @@ namespace IDCA.Model.Spec
 
         readonly List<Tables> _globalTables;
         readonly List<string> _tableNames;
+        readonly List<string> _headerNames;
 
         /// <summary>
         /// 判断是否是可用的名称，不区分大小写
@@ -149,6 +151,16 @@ namespace IDCA.Model.Spec
         public bool ValidateTablesName(string name)
         {
             return !_tableNames.Exists(ele => ele.Equals(name, StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
+        /// 判断是否是可用的表头名称，不区分大小写
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public bool ValidateHeaderName(string name)
+        {
+            return !_headerNames.Exists(header => header.Equals(name, StringComparison.OrdinalIgnoreCase));
         }
 
         void RemoveTablesName(string name)
@@ -168,22 +180,39 @@ namespace IDCA.Model.Spec
         }
 
         /// <summary>
+        /// 创建新的表头变量并添加到元数据集合，如果忽略name参数，将以"Topbreak_"+索引自动命名
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public Metadata NewHeader(string name = "")
+        {
+            string headerName = name;
+            if (string.IsNullOrEmpty(headerName))
+            {
+                headerName = $"TopBreak_{_metadata}";
+            }
+            var metadata = _metadata.NewMetadata(headerName, MetadataType.Categorical);
+            _headerNames.Add(headerName);
+            return metadata;
+        }
+
+        /// <summary>
         /// 创建新的表格配置集合，如果不提供名称，将以"Tab"+索引序号自动命名
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public Tables NewCollection(string name = "")
+        public Tables NewTables(string name = "")
         {
             var tables = new Tables(this);
             string tabName = name.ToLower();
             if (string.IsNullOrEmpty(tabName) || !ValidateTablesName(tabName))
             {
                 int index = _globalTables.Count;
-                while (!ValidateTablesName($"tab{index}"))
+                while (!ValidateTablesName($"tab_{index}"))
                 {
                     index++;
                 }
-                tables.Name = $"tab{index}";
+                tables.Name = $"tab_{index}";
             }
             else
             {

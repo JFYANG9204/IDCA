@@ -71,9 +71,9 @@
 
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="40"/>
+                        <!--<ColumnDefinition Width="40"/>-->
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="40"/>
+                        <!--<ColumnDefinition Width="40"/>-->
                     </Grid.ColumnDefinitions>
 
                     <StackPanel Grid.Column="0">
@@ -92,14 +92,40 @@
                                  BorderThickness="0"
                                  FontSize="13"
                                  Background="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=Background}"
-                                 ItemsSource="{Binding AxisAvalibleElements}"
-                                 SelectedIndex="{Binding AxisAvalibleElementsSelectIndex}"
+                                 ItemsSource="{Binding AvailableElements}"
+                                 SelectedIndex="{Binding AvailableSelectedIndex}"
                                  d:ItemsSource="{d:SampleData ItemCount=5}">
                             <ListBox.Resources>
                                 <Style TargetType="ListBoxItem">
                                     <Setter Property="Background" Value="{Binding RelativeSource={RelativeSource AncestorType=ListBox}, Path=Background}"/>
                                 </Style>
                             </ListBox.Resources>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Height="20">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="20"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Name}"/>
+                                        <Button Grid.Column="1" Command="{Binding AddCommand}">
+                                            <Button.Template>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Grid Height="20"
+                                                          Width="20"
+                                                          Background="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem, Mode=FindAncestor}, Path=Background}">
+                                                        <iconPacks:PackIconMaterialDesign Kind="Add"
+                                                                                          Height="13"
+                                                                                          Width="13"
+                                                                                          VerticalAlignment="Center"
+                                                                                          HorizontalAlignment="Center"/>
+                                                    </Grid>
+                                                </ControlTemplate>
+                                            </Button.Template>
+                                        </Button>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
                         </ListBox>
 
                         <GridSplitter Width="{Binding RelativeSource={RelativeSource AncestorType=ListBox}, Path=Width}" Height="1" />
@@ -117,7 +143,7 @@
 
                         <GridSplitter Width="{Binding RelativeSource={RelativeSource AncestorType=ListBox}, Path=Width}" Height="1" />
 
-                        <ListBox Margin="10 5"
+                        <!--<ListBox Margin="10 5"
                                  Height="250"
                                  FontSize="13"
                                  BorderThickness="0"
@@ -130,27 +156,143 @@
                                     <Setter Property="Background" Value="{Binding RelativeSource={RelativeSource AncestorType=ListBox}, Path=Background}"/>
                                 </Style>
                             </ListBox.Resources>
-                        </ListBox>
+                        </ListBox>-->
 
+                        <TreeView Margin="10 5"
+                                  Height="250"
+                                  FontSize="13"
+                                  BorderThickness="0"
+                                  Background="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=Background}"
+                                  ItemsSource="{Binding Tree}"
+                                  d:ItemsSource="{d:SampleData ItemCount=5}">
+                            <TreeView.ItemContainerStyle>
+                                <Style TargetType="TreeViewItem" BasedOn="{StaticResource MahApps.Styles.TreeViewItem}">
+                                    <Setter Property="Background" Value="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=Background}"/>
+                                    <Setter Property="IsSelected" Value="{Binding IsSelected}"/>
+                                </Style>
+                            </TreeView.ItemContainerStyle>
+                            <TreeView.ItemTemplate>
+                                <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                                    <Grid Height="25">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="80"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" 
+                                                   HorizontalAlignment="Left" 
+                                                   VerticalAlignment="Center"
+                                                   Text="{Binding Name}"/>
+                                        <Grid Grid.Column="1"
+                                              Width="80"
+                                              HorizontalAlignment="Right">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="20"/>
+                                                <ColumnDefinition Width="20"/>
+                                                <ColumnDefinition Width="20"/>
+                                                <ColumnDefinition Width="20"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Button Grid.Column="0" 
+                                                    Height="25" 
+                                                    Width="20" 
+                                                    Cursor="Hand"
+                                                    Visibility="{Binding AllowChildren, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                    Command="{Binding AddChildCommand}">
+                                                <Button.Template>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <Grid Height="25"
+                                                              Width="20"
+                                                              Background="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem}, Path=Background}">
+                                                            <iconPacks:PackIconMaterialDesign Kind="Add"
+                                                                                              Height="13"
+                                                                                              Width="13"
+                                                                                              VerticalAlignment="Center"
+                                                                                              HorizontalAlignment="Center"/>
+                                                        </Grid>
+                                                    </ControlTemplate>
+                                                </Button.Template>
+                                            </Button>
+                                            <Button Grid.Column="1" 
+                                                    Height="25" 
+                                                    Width="20" 
+                                                    Cursor="Hand"
+                                                    Command="{Binding MoveUpCommand}">
+                                                <Button.Template>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <Grid Height="25"
+                                                              Width="20"
+                                                              Background="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem}, Path=Background}">
+                                                            <iconPacks:PackIconMaterialDesign Kind="ArrowUpward"
+                                                                                              Height="13"
+                                                                                              Width="13"
+                                                                                              VerticalAlignment="Center"
+                                                                                              HorizontalAlignment="Center"/>
+                                                        </Grid>
+                                                    </ControlTemplate>
+                                                </Button.Template>
+                                            </Button>
+                                            <Button Grid.Column="2" 
+                                                    Height="25" 
+                                                    Width="20" 
+                                                    Cursor="Hand"
+                                                    Command="{Binding MoveDownCommand}">
+                                                <Button.Template>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <Grid Height="25"
+                                                              Width="20"
+                                                              Background="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem}, Path=Background}">
+                                                            <iconPacks:PackIconMaterialDesign Kind="ArrowDownward"
+                                                                                              Height="13"
+                                                                                              Width="13"
+                                                                                              VerticalAlignment="Center"
+                                                                                              HorizontalAlignment="Center"/>
+                                                        </Grid>
+                                                    </ControlTemplate>
+                                                </Button.Template>
+                                            </Button>
+                                            <Button Grid.Column="3" 
+                                                    Height="25" 
+                                                    Width="20" 
+                                                    Cursor="Hand"
+                                                    Command="{Binding RemoveCommand}">
+                                                <Button.Template>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <Grid Height="25"
+                                                              Width="20"
+                                                              Background="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem}, Path=Background}">
+                                                            <iconPacks:PackIconMaterialDesign Kind="Close"
+                                                                                              Height="13"
+                                                                                              Width="13"
+                                                                                              VerticalAlignment="Center"
+                                                                                              HorizontalAlignment="Center"/>
+                                                        </Grid>
+                                                    </ControlTemplate>
+                                                </Button.Template>
+                                            </Button>
+                                        </Grid>
+                                    </Grid>
+                                </HierarchicalDataTemplate>
+                            </TreeView.ItemTemplate>
+                        </TreeView>
+                        
                         <GridSplitter Width="{Binding RelativeSource={RelativeSource AncestorType=ListBox}, Path=Width}" Height="1" />
 
                     </StackPanel>
                     
 
-                    <Grid Grid.Row="1"
+                    <!--<Grid Grid.Row="1"
                           Grid.Column="1">
 
-                        <Grid.RowDefinitions>
+                        --><!--<Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="40"/>
-                            <RowDefinition Height="40"/>
+                            --><!--<RowDefinition Height="40"/>--><!--
                             <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
+                        </Grid.RowDefinitions>-->
 
-                        <Button Grid.Row="1"
+                        <!--<Button Grid.Row="1"
                                 Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"
                                 Cursor="Hand"
-                                Command="{Binding AddElementCommand}">
+                                Command="{Binding AppendTreeNodeCommand}">
                             <Button.Template>
                                 <ControlTemplate TargetType="Button">
                                     <Canvas Background="{TemplateBinding Background}"
@@ -161,23 +303,23 @@
                                         <iconPacks:PackIconMaterial Kind="ChevronDoubleRight"
                                                                     Height="30"
                                                                     Width="30"/>
-                                        <!--<Path Stroke="DarkGray"
+                                        --><!--<Path Stroke="DarkGray"
                                               StrokeThickness="0.5"
                                               Fill="{TemplateBinding Foreground}"
                                               Data="M 15,8 20,8 35,20 20,32 15,32 30,20z"/>
                                         <Path Stroke="DarkGray"
                                               StrokeThickness="0.5"
                                               Fill="{TemplateBinding Foreground}"
-                                              Data="M 5,8 10,8 25,20 10,32 5,32 20,20z"/>-->
+                                              Data="M 5,8 10,8 25,20 10,32 5,32 20,20z"/>--><!--
                                     </Canvas>
                                 </ControlTemplate>
                             </Button.Template>
-                        </Button>
+                        </Button>-->
 
-                        <Button Grid.Row="2"
+                        <!--<Button Grid.Row="2"
                                 Cursor="Hand"
                                 Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"
-                                Command="{Binding RemoveElementCommand}">
+                                Command="{Binding RemoveTreeNodeCommand}">
                             <Button.Template>
                                 <ControlTemplate TargetType="Button">
                                     <Canvas Background="{TemplateBinding Background}"
@@ -188,22 +330,22 @@
                                         <iconPacks:PackIconMaterial Kind="ChevronDoubleLeft"
                                                                     Height="30"
                                                                     Width="30"/>
-                                        <!--<Path Stroke="DarkGray"
+                                        --><!--<Path Stroke="DarkGray"
                                               StrokeThickness="0.5"
                                               Fill="{TemplateBinding Foreground}"
                                               Data="M 25,8 20,8 5,20 20,32 25,32 10,20z"/>
                                         <Path Stroke="DarkGray"
                                               StrokeThickness="0.5"
                                               Fill="{TemplateBinding Foreground}"
-                                              Data="M 35,8 30,8 15,20 30,32 35,32 20,20z"/>-->
+                                              Data="M 35,8 30,8 15,20 30,32 35,32 20,20z"/>--><!--
                                     </Canvas>
                                 </ControlTemplate>
                             </Button.Template>
-                        </Button>
+                        </Button>--><!--
 
-                    </Grid>
+                    </Grid>-->
 
-                    <Grid Grid.Column="3" Grid.Row="1">
+                    <!--<Grid Grid.Column="3" Grid.Row="1">
 
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
@@ -226,14 +368,14 @@
                                         <iconPacks:PackIconMaterial Kind="ChevronDoubleUp"
                                                                     Height="30"
                                                                     Width="30"/>
-                                        <!--<Path Stroke="DarkGray"
+                                        --><!--<Path Stroke="DarkGray"
                                               StrokeThickness="0.5"
                                               Fill="{TemplateBinding Foreground}"
                                               Data="M20,5 8,20 8,25 20,10 32,25 32,20z"/>
                                         <Path Stroke="DarkGray"
                                               StrokeThickness="0.5"
                                               Fill="{TemplateBinding Foreground}"
-                                              Data="M20,15 8,30 8,35 20,20 32,35 32,30z"/>-->
+                                              Data="M20,15 8,30 8,35 20,20 32,35 32,30z"/>--><!--
                                     </Canvas>
                                 </ControlTemplate>
                             </Button.Template>
@@ -253,20 +395,20 @@
                                         <iconPacks:PackIconMaterial Kind="ChevronDoubleDown"
                                                                     Height="30"
                                                                     Width="30"/>
-                                        <!--<Path Stroke="DarkGray"
+                                        --><!--<Path Stroke="DarkGray"
                                               StrokeThickness="0.5"
                                               Fill="{TemplateBinding Foreground}"
                                               Data="M20,35 8,20 8,15 20,30 32,15 32,20z"/>
                                         <Path Stroke="DarkGray"
                                               StrokeThickness="0.5"
                                               Fill="{TemplateBinding Foreground}"
-                                              Data="M20,25 8,10 8,5 20,20 32,5 32,10z"/>-->
+                                              Data="M20,25 8,10 8,5 20,20 32,5 32,10z"/>--><!--
                                     </Canvas>
                                 </ControlTemplate>
                             </Button.Template>
                         </Button>
 
-                    </Grid>
+                    </Grid>-->
                     
                 </Grid>
 
@@ -293,7 +435,6 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="30"/>
                     <RowDefinition Height="*"/>
-                    <RowDefinition Height="40"/>
                 </Grid.RowDefinitions>
 
                 <StackPanel Grid.Row="1"
@@ -309,11 +450,11 @@
                     
                     <GridSplitter Width="{Binding RelativeSource={RelativeSource AncestorType=ListBox}, Path=Width}" Height="1" />
 
-                    <ScrollViewer Height="120" VerticalScrollBarVisibility="Auto">
+                    <ScrollViewer Height="130" VerticalScrollBarVisibility="Auto">
                         <ItemsControl Margin="10 5" 
                                       BorderThickness="0"
                                       Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"
-                                      ItemsSource="{Binding CurrentAxisElementDetailSetting}"
+                                      ItemsSource="{Binding SelectedNode.Details}"
                                       d:ItemsSource="{d:SampleData ItemCount=5}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
@@ -324,12 +465,21 @@
                                                    Margin="5 2"
                                                    FontSize="14"
                                                    VerticalAlignment="Center"
-                                                   Text="{Binding Label}"/>
-                                        <TextBox Width="130"
-                                                 Height="22"
-                                                 FontSize="14"
-                                                 VerticalContentAlignment="Center"
-                                                 Text="{Binding Value}"/>
+                                                   Text="{Binding Name}"/>
+                                        <Grid Width="150" 
+                                              Height="30">
+                                            <TextBox Width="130"
+                                                     FontSize="14"
+                                                     VerticalContentAlignment="Center"
+                                                     Text="{Binding Text}"
+                                                     Visibility="{Binding IsTextBox, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                            <ComboBox Width="130"
+                                                      FontSize="14"
+                                                      VerticalContentAlignment="Center"
+                                                      ItemsSource="{Binding Selections}"
+                                                      SelectedIndex="{Binding SelectedIndex}"
+                                                      Visibility="{Binding IsComboBox, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                        </Grid>
                                     </StackPanel>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
@@ -349,36 +499,36 @@
 
                     <GridSplitter Width="{Binding RelativeSource={RelativeSource AncestorType=ListBox}, Path=Width}" Height="1" />
 
-                    <ScrollViewer Height="195" VerticalScrollBarVisibility="Auto">
+                    <ScrollViewer Height="226" VerticalScrollBarVisibility="Auto">
                     
                         <ItemsControl Margin="10 5" 
                                       BorderThickness="0"
-                                      ItemsSource="{Binding CurrentAxisTailingElementSetting}"
+                                      ItemsSource="{Binding SelectedNode.Suffixes}"
                                       d:ItemsSource="{d:SampleData ItemCount=5}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Height="30" Orientation="Horizontal">
                                         <CheckBox Margin="3 5" 
                                                   VerticalAlignment="Center"
-                                                  IsChecked="{Binding IsChecked}"/>
+                                                  IsChecked="{Binding Checked}"/>
                                         <TextBlock Margin="2 0"
                                                    Width="155"
                                                    FontSize="14"
                                                    VerticalAlignment="Center"
-                                                   Text="{Binding TailingElementLabel}"/>
+                                                   Text="{Binding Name}"/>
                                         <Canvas Width="90"
                                                 Height="28"
                                                 VerticalAlignment="Center">
                                             <ComboBox Width="90"
                                                       Height="28"
-                                                      Visibility="{Binding ComboBoxVisibility}"
-                                                      SelectedIndex="{Binding TailingElementValueSelectedIndex}"
-                                                      ItemsSource="{Binding TailingElementValue}"/>
+                                                      Visibility="{Binding IsComboBox, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                      SelectedIndex="{Binding SelectedIndex}"
+                                                      ItemsSource="{Binding Selections}"/>
                                             <TextBox Width="90"
                                                      Height="28"
                                                      FontSize="14"
-                                                     Visibility="{Binding TextBoxVisiblity}"
-                                                     Text="{Binding TextValue}"
+                                                     Visibility="{Binding IsTextBox, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                     Text="{Binding Text}"
                                                      VerticalContentAlignment="Center"/>
                                         </Canvas>
                                     </StackPanel>
@@ -391,7 +541,7 @@
                     <GridSplitter Width="{Binding RelativeSource={RelativeSource AncestorType=ListBox}, Path=Width}" Height="1" />
                 </StackPanel>
                 
-                <StackPanel Orientation="Horizontal"
+                <!--<StackPanel Orientation="Horizontal"
                             HorizontalAlignment="Right"
                             Grid.Row="5">
 
@@ -413,7 +563,7 @@
                             CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}}"
                             >取消</Button>
 
-                </StackPanel>
+                </StackPanel>-->
 
             </Grid>
 

@@ -70,7 +70,7 @@ namespace IDCA.Client.ViewModel
 
         void SelectProjectPath()
         {
-            object? dialogResult = WindowManager.ShowDialog("FolderBrowserDialog");
+            object? dialogResult = WindowManager.ShowFolderBrowserDialog();
             if (dialogResult != null && dialogResult is string folderPath)
             {
                 ProjectRootPath = folderPath;
@@ -92,7 +92,7 @@ namespace IDCA.Client.ViewModel
 
         void SelectExcelSettingFilePath()
         {
-            object? dialogResult = WindowManager.ShowDialog("OpenFileDialog", "Excel File|*.xlsx");
+            object? dialogResult = WindowManager.ShowOpenFileDialog("Excel File|*.xlsx");
             if (dialogResult != null && dialogResult is string filePath)
             {
                 ExcelSettingFilePath = filePath;
@@ -114,7 +114,7 @@ namespace IDCA.Client.ViewModel
 
         void SelectMdmDocumentPath()
         {
-            object? dialogResult = WindowManager.ShowDialog("OpenFileDialog", "MDM Document|*.mdd");
+            object? dialogResult = WindowManager.ShowOpenFileDialog("MDM Document|*.mdd");
             if (dialogResult != null && dialogResult is string filePath)
             {
                 MdmDocumentPath = filePath;

@@ -31,6 +31,8 @@ namespace IDCA.Model.Spec
             _objectType = SpecObjectType.Metadata;
             _config = config;
             _name = name;
+            _fields = new Dictionary<string, Metadata>();
+            _properties = new Dictionary<string, MetadataProperty>();
         }
 
         readonly Config _config;
@@ -67,7 +69,7 @@ namespace IDCA.Model.Spec
         {
             Array.Resize(ref _categories, _categories.Length + 1);
             string categoricalName = name ?? $"{_config.TryGet<string>(SpecConfigKeys.MetadataCategoricalLabel) ?? "V"}{_categories.Length}";
-            MetadataCategorical categorical = new(this, categoricalName);
+            var categorical = new MetadataCategorical(this, categoricalName);
             _categories[^1] = categorical;
             return categorical;
         }
@@ -86,7 +88,7 @@ namespace IDCA.Model.Spec
             _upperBoundary = ubound;
         }
 
-        readonly Dictionary<string, Metadata> _fields = new();
+        readonly Dictionary<string, Metadata> _fields;
         /// <summary>
         /// 创建新的下级变量，将其添加进当前集合并返回，由于变量名不可重复，
         /// 变量名相同时，会修改对应名称的变量值
@@ -96,7 +98,7 @@ namespace IDCA.Model.Spec
         /// <returns></returns>
         public Metadata NewField(MetadataType type, string name)
         {
-            Metadata field = new(this, _config, name) { Type = type, IndentLevel = _indentLevel + 1 };
+            var field = new Metadata(this, _config, name) { Type = type, IndentLevel = _indentLevel + 1 };
             if (_fields.ContainsKey(name.ToLower()))
             {
                 _fields[name.ToLower()] = field;
@@ -108,7 +110,7 @@ namespace IDCA.Model.Spec
             return field;
         }
 
-        readonly Dictionary<string, MetadataProperty> _properties = new();
+        readonly Dictionary<string, MetadataProperty> _properties;
         /// <summary>
         /// 创建新的元数据属性配置并添加进集合
         /// </summary>
@@ -118,7 +120,7 @@ namespace IDCA.Model.Spec
         /// <returns></returns>
         public MetadataProperty NewProperty(string name, string? value = null, bool isString = false)
         {
-            MetadataProperty property = new(this, name, isString);
+            var property = new MetadataProperty(this, name, isString);
             if (value is not null)
             {
                 property.Value = value;
@@ -141,8 +143,8 @@ namespace IDCA.Model.Spec
         /// <returns></returns>
         public string Export()
         {
-            StringBuilder builder = new();
-            string indent = new(' ', IndentLevel * 4);
+            var builder = new StringBuilder();
+            var indent = new string(' ', IndentLevel * 4);
             builder.Append($"{indent}{_name}");
             if (_description is not null)
             {
@@ -334,7 +336,7 @@ namespace IDCA.Model.Spec
             {
                 return $"use {_listName}";
             }
-            StringBuilder builder = new();
+            var builder = new StringBuilder();
             builder.Append($"{_name}{(_description is null ? "" : $" {_description}")}");
             if (_suffix.Count > 0)
             {
@@ -385,6 +387,24 @@ namespace IDCA.Model.Spec
         readonly Dictionary<string, Metadata> _fields = new();
 
         /// <summary>
+        /// 当前集合中的元素数量
+        /// </summary>
+        public int Count => _fields.Count;
+
+        /// <summary>
+        /// 移除特定名称的元数据对象
+        /// </summary>
+        /// <param name="name"></param>
+        public void Remove(string name)
+        {
+            string lowerName = name.ToLower();
+            if (_fields.ContainsKey(lowerName))
+            {
+                _fields.Remove(lowerName);
+            }
+        }
+
+        /// <summary>
         /// 创建新的Metadata对象，将其加入当前集合并返回，
         /// 由于变量名不可重复，如果name参数已存在，则会创建新的Metadata对象，
         /// 并将原始数据覆盖。
@@ -392,10 +412,15 @@ namespace IDCA.Model.Spec
         /// <param name="name"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public Metadata NewMetadata(string name, MetadataType type = MetadataType.None)
+        public Metadata NewMetadata(string name = "", MetadataType type = MetadataType.None)
         {
-            Metadata metadata = new(this, _config, name) { Type = type };
-            string lowerName = name.ToLower();
+            string metadataName = name;
+            if (string.IsNullOrEmpty(metadataName))
+            {
+                metadataName = $"Metadata{Count + 1}";
+            }
+            var metadata = new Metadata(this, _config, metadataName) { Type = type };
+            string lowerName = metadataName.ToLower();
             if (_fields.ContainsKey(lowerName))
             {
                 _fields[lowerName] = metadata;
@@ -413,7 +438,7 @@ namespace IDCA.Model.Spec
         /// <returns></returns>
         public string Export()
         {
-            StringBuilder builder = new();
+            var builder = new StringBuilder();
             foreach (Metadata metadata in _fields.Values)
             {
                 builder.AppendLine();

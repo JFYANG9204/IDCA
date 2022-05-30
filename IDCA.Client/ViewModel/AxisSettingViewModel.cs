@@ -1,12 +1,12 @@
-﻿using IDCA.Client.ViewModel.Common;
-using IDCA.Model;
+﻿using IDCA.Model;
 using IDCA.Model.Spec;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Windows;
+using System.Linq;
+using System.Reflection;
 using System.Windows.Input;
 
 namespace IDCA.Client.ViewModel
@@ -15,19 +15,44 @@ namespace IDCA.Client.ViewModel
     {
         public AxisSettingViewModel() 
         {
+            _availableElements = new ObservableCollection<AvailableElement>();
+            for (int i = 0; i < _axisDefaultElements.Length; i++)
+            {
+                var ele = _axisDefaultElements[i];
+                var type = (AxisElementType)(i + 1);
+                _availableElements.Add(new AvailableElement(ele, type, e => AppendTreeNode(e)));
+            }
+            _availableSelectedIndex = -1;
+            _tree = new ObservableCollection<AxisTreeNode>();
         }
 
+        Axis? _axis;
+        public Axis? Axis
+        {
+            get { return _axis; }
+        }
 
         string _axisExpression = string.Empty;
         public string AxisExpression
         {
             get { return _axisExpression; }
-            set { SetProperty(ref _axisExpression, value); }
+            set 
+            { 
+                SetProperty(ref _axisExpression, value);
+                _axis?.FromString(value);
+            }
+        }
+
+        void UpdateAxisExpression()
+        {
+            ApplyToAxis();
+            AxisExpression = _axis?.ToString() ?? "{}";
         }
 
         static readonly string[] _axisDefaultElements =
         {
-            "所有Category元素(..)",
+            "Category元素",
+            "Category区间",
             "插入变量或函数",
             "文本行(text)",
             "基数(base)",
@@ -52,446 +77,398 @@ namespace IDCA.Client.ViewModel
             "Ntd(ntd)"
         };
 
-        ObservableCollection<string> _axisAvalibleElements = new(_axisDefaultElements);
-        public ObservableCollection<string> AxisAvalibleElements
+        public class AvailableElement : ObservableObject
         {
-            get { return _axisAvalibleElements; }
-            set { SetProperty(ref _axisAvalibleElements, value); }
+            public AvailableElement(string name, AxisElementType type, Action<AvailableElement> adding)
+            {
+                _name = name;
+                _type = type;
+                _adding = adding;
+            }
+
+            string _name;
+            public string Name
+            {
+                get { return _name; }
+                set { SetProperty(ref _name, value); }
+            }
+
+            AxisElementType _type;
+            public AxisElementType Type
+            {
+                get { return _type; }
+                set { _type = value; }
+            }
+
+            readonly Action<AvailableElement> _adding;
+            public ICommand AddCommand => new RelayCommand(() => _adding(this));
         }
 
-        ObservableCollection<string> _axisCurrentElements = new();
-        public ObservableCollection<string> AxisCurrentElements
+        ObservableCollection<AvailableElement> _availableElements;
+        public ObservableCollection<AvailableElement> AvailableElements
         {
-            get { return _axisCurrentElements; }
-            set { SetProperty(ref _axisCurrentElements, value); }
+            get => _availableElements;
+            set => SetProperty(ref _availableElements, value);
         }
 
-        int _axisAvalibleElementsSelectIndex = 0;
-        public int AxisAvalibleElementsSelectIndex
+        int _availableSelectedIndex;
+        public int AvailableSelectedIndex
         {
-            get { return _axisAvalibleElementsSelectIndex; }
-            set { SetProperty(ref _axisAvalibleElementsSelectIndex, value); }
+            get => _availableSelectedIndex;
+            set => SetProperty(ref _availableSelectedIndex, value);
         }
 
-        int _axisCurrentElementsSelectIndex = 0;
-        public int AxisCurrentElementsSelectIndex
+        AxisTreeNode? _selectedNode;
+        public AxisTreeNode? SelectedNode
         {
-            get { return _axisCurrentElementsSelectIndex; }
-            set 
-            { 
-                SetProperty(ref _axisCurrentElementsSelectIndex, value);
-                UpdateElementSettings();
+            get { return _selectedNode; }
+            set { SetProperty(ref _selectedNode, value); }
+        }
+
+        ObservableCollection<AxisTreeNode> _tree;
+        public ObservableCollection<AxisTreeNode> Tree
+        {
+            get { return _tree; }
+            set { SetProperty(ref _tree, value); }
+        }
+
+        void MoveTreeNode(AxisTreeNode node, bool moveDown = false)
+        {
+            bool success;
+            if (node.Parent != null)
+            {
+                int index = node.Parent.Children.IndexOf(node);
+                if (moveDown)
+                {
+                    success = node.Parent.MoveChildDown(index);
+                }
+                else
+                {
+                    success = node.Parent.MoveChildUp(index);
+                }
+            }
+            else
+            {
+                int index = _tree.IndexOf(node);
+                success = CollectionHelper.Swap(_tree, index, moveDown ? index + 1 : index - 1);
+            }
+
+            if (success)
+            {
+                UpdateAxisExpression();
             }
         }
 
-        readonly List<ObservableCollection<AxisElementDetailSettingViewModel>> _axisElementDetailList = new();
-        readonly List<ObservableCollection<AxisTailingElementSettingViewModel>> _axisTailingElementList = new();
+        //void MoveTreeNode(bool moveDown = false)
+        //{
+        //    if (_selectedNode == null)
+        //    {
+        //        return;
+        //    }
+        //
+        //    var selected = _selectedNode;
+        //    if (_selectedNode.Parent != null)
+        //    {
+        //        int index = _selectedNode.Parent.Children.IndexOf(_selectedNode);
+        //        if (moveDown)
+        //        {
+        //            _selectedNode.Parent.MoveChildDown(index);
+        //        }
+        //        else
+        //        {
+        //            _selectedNode.Parent.MoveChildUp(index);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        int index = _tree.IndexOf(_selectedNode);
+        //        CollectionHelper.Swap(_tree, index, moveDown ? index + 1 : index - 1);
+        //    }
+        //    selected.IsSelected = true;
+        //}
 
-        void UpdateElementSettings()
+
+        //void MoveUpTreeNode()
+        //{
+        //    MoveTreeNode();
+        //    UpdateAxisExpression();
+        //}
+        //public ICommand MoveUpCommand => new RelayCommand(MoveUpTreeNode);
+        //
+        //void MoveDownTreeNode()
+        //{
+        //    MoveTreeNode(true);
+        //    UpdateAxisExpression();
+        //}
+        //public ICommand MoveDownCommand => new RelayCommand(MoveDownTreeNode);
+
+        void RemoveTreeNode(AxisTreeNode node)
         {
-            if (_axisCurrentElementsSelectIndex < 0 ||
-                _axisCurrentElementsSelectIndex >= _axisTailingElementList.Count ||
-                _axisCurrentElementsSelectIndex >= _axisElementDetailList.Count)
+            if (node.Parent != null)
+            {
+                int index = node.Parent.Children.IndexOf(node);
+                if (index > -1)
+                {
+                    node.Parent.RemoveChildAt(index);
+                }
+            }
+            else
+            {
+                int index = _tree.IndexOf(node);
+                if (index > -1)
+                {
+                    _tree.RemoveAt(index);
+                }
+            }
+            UpdateAxisExpression();
+        }
+
+        //void RemoveTreeNode()
+        //{
+        //    if (_selectedNode == null)
+        //    {
+        //        return;
+        //    }
+        //
+        //    if (_selectedNode.Parent != null)
+        //    {
+        //        int index = _selectedNode.Parent.Children.IndexOf(_selectedNode);
+        //        if (index > -1)
+        //        {
+        //            _selectedNode.Parent.RemoveChildAt(index);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        int index = _tree.IndexOf(_selectedNode);
+        //        if (index > -1)
+        //        {
+        //            _tree.RemoveAt(index);
+        //        }
+        //    }
+        //    UpdateAxisExpression();
+        //}
+        //public ICommand RemoveTreeNodeCommand => new RelayCommand(RemoveTreeNode);
+
+        void OnSelectedChanged(AxisTreeNode n, bool v)
+        {
+            if (v)
+            {
+                SelectedNode = n;
+            }
+        }
+        
+        void AppendTreeNode(AvailableElement element, AxisTreeNode? parentNode = null)
+        {
+            var node = new AxisTreeNode(this, element.Type, OnSelectedChanged);
+            node.AddingChild += AppendTreeElementChildNode;
+            node.Removing += RemoveTreeNode;
+            node.MovingUp += n => MoveTreeNode(n);
+            node.MovingDown += n => MoveTreeNode(n, true);
+            node.Name = element.Name;
+            if (parentNode != null)
+            {
+                parentNode.Children.Add(node);
+            }
+            else
+            {
+                _tree.Add(node);
+            }
+            UpdateAxisExpression();
+        }
+
+        void AppendTreeElementChildNode(AxisTreeNode node)
+        {
+            if (_availableSelectedIndex < 0 ||
+                _availableSelectedIndex >= _availableElements.Count)
             {
                 return;
             }
-            CurrentAxisTailingElementSetting = _axisTailingElementList[_axisCurrentElementsSelectIndex];
-            CurrentAxisElementDetailSetting = _axisElementDetailList[_axisCurrentElementsSelectIndex];
+            AppendTreeNode(_availableElements[_availableSelectedIndex], node);
         }
 
-        ObservableCollection<AxisTailingElementSettingViewModel> _currentAxisTailingElementSetting = new();
-        public ObservableCollection<AxisTailingElementSettingViewModel> CurrentAxisTailingElementSetting
+        void AppendTreeNode()
         {
-            get { return _currentAxisTailingElementSetting; }
-            set { SetProperty(ref _currentAxisTailingElementSetting, value); }
-        }
-
-        ObservableCollection<AxisElementDetailSettingViewModel> _currentAxisElementDetailSetting = new();
-        public ObservableCollection<AxisElementDetailSettingViewModel> CurrentAxisElementDetailSetting
-        {
-            get { return _currentAxisElementDetailSetting; }
-            set { SetProperty(ref _currentAxisElementDetailSetting, value); }
-        }
-
-        Axis? _axis = null;
-
-        public void InitAxis(Axis axis)
-        {
-            _axis = axis;
-        }
-
-        public Axis? Axis => _axis;
-
-        void UpdateAxisText()
-        {
-            if (_axis != null)
+            if (_availableSelectedIndex < 0 || 
+                _availableSelectedIndex >= _availableElements.Count)
             {
-                AxisExpression = _axis.ToString();
+                return;
             }
-        }
 
-        void AppendAxisElement()
+            AxisElementType type = (AxisElementType)(_availableSelectedIndex + 1);
+            string name = _availableElements[_availableSelectedIndex].Name;
+            var node = new AxisTreeNode(this, type, OnSelectedChanged);
+            node.Removing += RemoveTreeNode;
+            node.MovingUp += n => MoveTreeNode(n);
+            node.MovingDown += n => MoveTreeNode(n, true);
+            node.Name = name;
+            if (_selectedNode == null || !(
+                _selectedNode.ElementType == AxisElementType.Net ||
+                _selectedNode.ElementType == AxisElementType.Combine))
+            {
+                _tree.Add(node);
+            }
+            else
+            {
+                _selectedNode.Children.Add(node);
+            }
+            UpdateAxisExpression();
+        }
+        public ICommand AppendTreeNodeCommand => new RelayCommand(AppendTreeNode);
+
+
+        //void Confirm(object? sender)
+        //{
+        //    ApplyToAxis();
+        //    WindowManager.CloseWindow(sender);
+        //}
+        //public ICommand ConfirmCommand => new RelayCommand<object?>(Confirm);
+
+        //void Cancel(object? sender)
+        //{
+        //    WindowManager.CloseWindow(sender);
+        //}
+        //public ICommand CancelCommand => new RelayCommand<object?>(Cancel);
+
+        public void ApplyToAxis()
         {
             if (_axis == null)
             {
                 return;
             }
 
-            switch (_axisAvalibleElementsSelectIndex)
+            foreach (var node in _tree)
             {
-                case 0:  _axis.AppendAllCategory();           break;
-                case 1:  _axis.AppendInsertFunction();        break;
-                case 2:  _axis.AppendTextElement();           break;
-                case 3:  _axis.AppendBaseElement();           break;
-                case 4:  _axis.AppendUnweightedBaseElement(); break;
-                case 5:  _axis.AppendEffectiveBaseElement();  break;
-                case 6:  _axis.AppendExpression();            break;
-                case 7:  _axis.AppendNumeric();               break;
-                case 8:  _axis.AppendDerived();               break;
-                case 9:  _axis.AppendMean();                  break;
-                case 10: _axis.AppendStdErr();                break;
-                case 11: _axis.AppendStdDev();                break;
-                case 12: _axis.AppendTotal();                 break;
-                case 13: _axis.AppendSubTotal();              break;
-                case 14: _axis.AppendMin();                   break;
-                case 15: _axis.AppendMax();                   break;
-                case 16: _axis.AppendNet();                   break;
-                case 17: _axis.AppendCombine();               break;
-                case 18: _axis.AppendSum();                   break;
-                case 19: _axis.AppendMedian();                break;
-                case 20: _axis.AppendPercentile();            break;
-                case 21: _axis.AppendMode();                  break;
-                case 22: _axis.AppendNtd();                   break;
-                default:                                      break;
+                var element = _axis.NewObject();
+                node.ApplyToAxisElement(element);
+                _axis.Add(element);
             }
         }
 
-        void InitSingleTailingElement(string label, Type type, AxisElementSuffixType suffixType, params string[] values)
+
+        public void LoadFromAxis(Axis axis)
         {
-            AxisTailingElementSettingViewModel element = new();
-            element.TailingElementLabel = label;
-            element.ValueType = type;
-            element.Type = suffixType;
-            foreach (var v in values)
+            _axis = axis;
+            foreach (AxisElement element in axis)
             {
-                element.TailingElementValue.Add(v);
-            }
-            CurrentAxisTailingElementSetting.Add(element);
-        }
-
-        void InitTailingElements()
-        {
-            InitSingleTailingElement("CalculationScope", typeof(AxisElementSuffixCalculationScope), AxisElementSuffixType.CalculationScope, "AllElements", "PrecedingElements");
-            InitSingleTailingElement("CountsOnly", typeof(bool), AxisElementSuffixType.CountsOnly);
-            InitSingleTailingElement("Decimals", typeof(int), AxisElementSuffixType.Decimals);
-            InitSingleTailingElement("Factor", typeof(double), AxisElementSuffixType.Factor);
-            InitSingleTailingElement("IsFixed", typeof(bool), AxisElementSuffixType.IsFixed);
-            InitSingleTailingElement("IsHidden", typeof(bool), AxisElementSuffixType.IsHidden);
-            InitSingleTailingElement("IsHiddenWhenColumn", typeof(bool), AxisElementSuffixType.IsHiddenWhenColumn);
-            InitSingleTailingElement("IsHiddenWhenRow", typeof(bool), AxisElementSuffixType.IsHiddenWhenRow);
-            InitSingleTailingElement("IncludeInBase", typeof(bool), AxisElementSuffixType.IncludeInBase);
-            InitSingleTailingElement("IsUnweighted", typeof(bool), AxisElementSuffixType.IsUnweighted);
-            InitSingleTailingElement("Multiplier", typeof(string), AxisElementSuffixType.Multiplier);
-            InitSingleTailingElement("Weight", typeof(string), AxisElementSuffixType.Weight);
-        }
-
-        void InitSingleDetailElement(string label, bool canSelect)
-        {
-            AxisElementDetailSettingViewModel element = new()
-            {
-                Label = label,
-                CanSelectVariable = canSelect
-            };
-            CurrentAxisElementDetailSetting.Add(element);
-        }
-
-        void InitLabeledElement()
-        {
-            InitSingleDetailElement("标签", false);
-        }
-
-        void InitDetailElements()
-        {
-            AppendAxisElement();
-            switch (_axisAvalibleElementsSelectIndex)
-            {
-                case 0:
-                    InitSingleDetailElement("排除码号", false);
-                    break;
-                case 1:
-                    break;
-                case 2:
-                case 12:
-                case 13:
-                case 22:
-                    InitLabeledElement();
-                    break;
-                case 3:
-                case 4:
-                case 5:
-                case 6:
-                case 8:
-                    InitLabeledElement();
-                    InitSingleDetailElement("筛选器条件", false);
-                    break;
-                case 7:
-                case 9:
-                case 10:
-                case 11:
-                case 14:
-                case 15:
-                case 18:
-                case 19:
-                case 21:
-                    InitLabeledElement();
-                    InitSingleDetailElement("数值变量名", true);
-                    InitSingleDetailElement("筛选器条件", false);
-                    break;
-                case 16:
-                case 17:
-                    InitLabeledElement();
-                    InitSingleDetailElement("码号", false);
-                    break;
-                case 20:
-                    InitLabeledElement();
-                    InitSingleDetailElement("数值变量名", true);
-                    InitSingleDetailElement("临界值", false);
-                    InitSingleDetailElement("筛选器条件", false);
-                    break;
-                default:
-                    break;
+                var node = new AxisTreeNode(this);
+                node.LoadFromAxisElement(element);
+                _tree.Add(node);
             }
         }
-
-        void AddAndInitDetailElements()
-        {
-            _axisElementDetailList.Add(new());
-            CurrentAxisElementDetailSetting = _axisElementDetailList[^1];
-            InitDetailElements();
-        }
-
-        void AddAndInitTailingElements()
-        {
-            _axisTailingElementList.Add(new());
-            CurrentAxisTailingElementSetting = _axisTailingElementList[^1];
-            InitTailingElements();
-        }
-
-        void AddElement()
-        {
-            if (_axisAvalibleElementsSelectIndex >= 0 &&
-                _axisAvalibleElementsSelectIndex < _axisAvalibleElements.Count)
-            {
-                AxisCurrentElements.Add(_axisAvalibleElements[_axisAvalibleElementsSelectIndex]);
-                AxisCurrentElementsSelectIndex = AxisCurrentElements.Count - 1;
-                AddAndInitDetailElements();
-                AddAndInitTailingElements();
-                UpdateAxisText();
-            }
-        }
-        public ICommand AddElementCommand => new RelayCommand(AddElement);
-
-        void RemoveElement()
-        {
-            if (_axisCurrentElementsSelectIndex >= 0 && 
-                _axisCurrentElements.Count > 0 &&
-                _axisCurrentElementsSelectIndex < _axisCurrentElements.Count)
-            {
-                var tempIndex = _axisCurrentElementsSelectIndex;
-                _axis?.RemoveAt(_axisCurrentElementsSelectIndex);
-                _axisTailingElementList.RemoveAt(_axisCurrentElementsSelectIndex);
-                _axisElementDetailList.RemoveAt(_axisCurrentElementsSelectIndex);
-                _axisCurrentElements.RemoveAt(_axisCurrentElementsSelectIndex);
-                tempIndex--;
-                if (_axisCurrentElements.Count > 0 && tempIndex < _axisCurrentElements.Count)
-                {
-                    if (tempIndex > 0)
-                    {
-                        AxisCurrentElementsSelectIndex = tempIndex;
-                    }
-                    else
-                    {
-                        AxisCurrentElementsSelectIndex = 0;
-                    }
-                }
-                UpdateAxisText();
-            }
-        }
-        public ICommand RemoveElementCommand => new RelayCommand(RemoveElement);
-
-        public void Swap(int sourceIndex, int targetIndex)
-        {
-            CollectionHelper.Swap(_axisCurrentElements, sourceIndex, targetIndex);
-            CollectionHelper.Swap(_axisTailingElementList, sourceIndex, targetIndex);
-            CollectionHelper.Swap(_axisElementDetailList, sourceIndex, targetIndex);
-            _axis?.Swap(sourceIndex, targetIndex);
-        }
-
-        void MoveUp()
-        {
-            int tempIndex = _axisCurrentElementsSelectIndex - 1;
-            Swap(_axisCurrentElementsSelectIndex, _axisCurrentElementsSelectIndex - 1);
-            AxisCurrentElementsSelectIndex = tempIndex >= 0 ? tempIndex : 0;
-            UpdateAxisText();
-        }
-        public ICommand MoveUpCommand => new RelayCommand(MoveUp);
-
-        void MoveDown()
-        {
-            int tempIndex = _axisCurrentElementsSelectIndex + 1;
-            Swap(_axisCurrentElementsSelectIndex, _axisCurrentElementsSelectIndex + 1);
-            AxisCurrentElementsSelectIndex = tempIndex >= _axisCurrentElements.Count ? _axisCurrentElements.Count - 1 : tempIndex;
-            UpdateAxisText();
-        }
-        public ICommand MoveDownCommand => new RelayCommand(MoveDown);
-
-        void Confirm(object? sender)
-        {
-            WindowManager.CloseWindow(sender);
-        }
-        public ICommand ConfirmCommand => new RelayCommand<object?>(Confirm);
-
-
-        void Cancel(object? sender)
-        {
-            WindowManager.CloseWindow(sender);
-        }
-        public ICommand CancelCommand => new RelayCommand<object?>(Cancel);
 
     }
 
-    public class AxisTailingElementSettingViewModel : ObservableObject
+    public class AxisElementSuffixViewModel : ObservableObject
     {
-        public AxisTailingElementSettingViewModel() { }
 
-        AxisElementSuffixType _type = AxisElementSuffixType.None;
-        public AxisElementSuffixType Type
+        public AxisElementSuffixViewModel()
         {
-            get => _type;
-            set => _type = value;
+            _name = string.Empty;
+            _text = string.Empty;
+            _selectedIndex = 0;
+            _selections = new ObservableCollection<string>();
+            _checked = false;
+            _isTextBox = true;
+            _isComboBox = false;
         }
 
-        bool _isChecked = false;
-        public bool IsChecked
+        string _name;
+        public string Name
         {
-            get { return _isChecked; }
-            set { SetProperty(ref _isChecked, value); }
+            get => _name;
+            set => SetProperty(ref _name, value);
         }
 
-        string _tailingElementLabel = string.Empty;
-        public string TailingElementLabel
+        string _text;
+        public string Text
         {
-            get { return _tailingElementLabel; }
-            set { SetProperty(ref _tailingElementLabel, value); }
+            get => _text;
+            set => SetProperty(ref _text, value);
         }
 
-        ObservableCollection<string> _tailingElementValue = new();
-        public ObservableCollection<string> TailingElementValue
+        int _selectedIndex;
+        public int SelectedIndex
         {
-            get { return _tailingElementValue; }
-            set { SetProperty(ref _tailingElementValue, value); }
+            get => _selectedIndex;
+            set => SetProperty(ref _selectedIndex, value);
         }
 
-        int _tailingElementValueSelectedIndex = 0;
-        public int TailingElementValueSelectedIndex
+        ObservableCollection<string> _selections;
+        public ObservableCollection<string> Selections
         {
-            get { return _tailingElementValueSelectedIndex; }
-            set { SetProperty(ref _tailingElementValueSelectedIndex, value); }
+            get => _selections;
+            set => SetProperty(ref _selections, value);
         }
 
-        string _textValue = string.Empty;
-        public string TextValue
+        bool _checked;
+        public bool Checked
         {
-            get { return _textValue; }
-            set { SetProperty(ref _textValue, value); }
+            get => _checked;
+            set => SetProperty(ref _checked, value);
         }
 
-        Visibility _textBoxVisiblity = Visibility.Hidden;
-        public Visibility TextBoxVisiblity
+        bool _isTextBox;
+        public bool IsTextBox
         {
-            get { return _textBoxVisiblity; }
-            set { SetProperty(ref _textBoxVisiblity, value); }
+            get => _isTextBox;
+            set => SetProperty(ref _isTextBox, value);
         }
 
-        Visibility _comboBoxVisibility = Visibility.Visible;
-        public Visibility ComboBoxVisibility
+        bool _isComboBox;
+        public bool IsComboBox
         {
-            get { return _comboBoxVisibility; }
-            set { SetProperty(ref _comboBoxVisibility, value); }
+            get => _isComboBox;
+            set => SetProperty(ref _isComboBox, value);
         }
 
-        bool _isTextBoxValue = false;
-        public bool IsTextBoxValue
+        public void AddSelections(params string[] seletions)
         {
-            get { return _isTextBoxValue; }
-            set 
-            { 
-                if (value)
-                {
-                    TextBoxVisiblity = Visibility.Visible;
-                    ComboBoxVisibility = Visibility.Hidden;
-                }
-                else
-                {
-                    TextBoxVisiblity = Visibility.Hidden;
-                    ComboBoxVisibility = Visibility.Visible;
-                }
-                _isTextBoxValue = value;
-            }
-        }
-
-        Type _valueType = typeof(bool);
-        public Type ValueType
-        {
-            get { return _valueType; }
-            set
+            foreach (var item in seletions)
             {
-                _valueType = value;
-                if (_valueType.Equals(typeof(bool)))
-                {
-                    TailingElementValue.Add("true");
-                    TailingElementValue.Add("false");
-                }
-                else if (_valueType.Equals(typeof(string)) || _valueType.Equals(typeof(int)) || _valueType.Equals(typeof(double)))
-                {
-                    IsTextBoxValue = true;
-                }
+                _selections.Add(item);
             }
         }
 
-        public void InitFromObject(AxisElementSuffix? suffixObject)
+        public string GetValue()
         {
-            if (suffixObject == null)
+            if (_isTextBox)
+            {
+                return _text;
+            }
+            else if (_selectedIndex > 0 && _selectedIndex < _selections.Count)
+            {
+                return _selections[_selectedIndex];
+            }
+            return string.Empty;
+        }
+
+        public void ApplyToAxisElement(AxisElement? element)
+        {
+            if (element == null || !_checked)
             {
                 return;
             }
 
-            switch (suffixObject.Type)
+            var suffix = element.Suffix.NewObject();
+            suffix.Type = Converter.ConvertToAxisElementSuffixType(_name);
+            suffix.Value = GetValue();
+            element.Suffix.Add(suffix);
+        }
+
+        public void LoadFromAxisElement(AxisElementSuffix? suffix)
+        {
+            if (suffix == null || !_name.Equals(suffix.Type.ToString(), StringComparison.OrdinalIgnoreCase))
             {
-                case AxisElementSuffixType.None:
-                    break;
+                return;
+            }
+
+            Checked = true;
+            Text = suffix.Value.ToString() ?? string.Empty;
+
+            switch (suffix.Type)
+            {
                 case AxisElementSuffixType.CalculationScope:
-                    IsTextBoxValue = false;
-                    TailingElementValue.Clear();
-                    TailingElementValue.Add("AllElements");
-                    TailingElementValue.Add("PrecedingElements");
-                    ValueType = typeof(AxisElementSuffixCalculationScope);
-                    if (suffixObject.Value is AxisElementSuffixCalculationScope scope)
-                    {
-                        if (scope == AxisElementSuffixCalculationScope.AllElements)
-                        {
-                            TailingElementValueSelectedIndex = 0;
-                        }
-                        else
-                        {
-                            TailingElementValueSelectedIndex = 1;
-                        }
-                    }
-                    else
-                    {
-                        TailingElementValueSelectedIndex = 0;
-                    }
-                    break;
                 case AxisElementSuffixType.CountsOnly:
                 case AxisElementSuffixType.IsFixed:
                 case AxisElementSuffixType.IsHidden:
@@ -499,95 +476,741 @@ namespace IDCA.Client.ViewModel
                 case AxisElementSuffixType.IsHiddenWhenRow:
                 case AxisElementSuffixType.IncludeInBase:
                 case AxisElementSuffixType.IsUnweighted:
-                    IsTextBoxValue = false;
-                    TailingElementValue.Clear();
-                    TailingElementValue.Add("true");
-                    TailingElementValue.Add("false");
-                    ValueType = typeof(bool);
-                    if (suffixObject.Value is bool b)
-                    {
-                        TailingElementValueSelectedIndex = b ? 0 : 1;
-                    }
-                    else
-                    {
-                        TailingElementValueSelectedIndex = 0;
-                    }
+                    IsComboBox = true;
                     break;
+
                 case AxisElementSuffixType.Decimals:
-                    IsTextBoxValue = true;
-                    ValueType = typeof(int);
-                    TextValue = suffixObject.Value.ToString() ?? "";
-                    break;
                 case AxisElementSuffixType.Factor:
-                    IsTextBoxValue = true;
-                    ValueType = typeof(double);
-                    TextValue = suffixObject.Value.ToString() ?? "";
-                    break;
                 case AxisElementSuffixType.Multiplier:
                 case AxisElementSuffixType.Weight:
-                    IsTextBoxValue = true;
-                    ValueType = typeof(string);
-                    TextValue = suffixObject.Value.ToString() ?? "";
+                    IsTextBox = true;
                     break;
+
+                case AxisElementSuffixType.None:
+                default:
+                    break;
+            }
+
+            if (!string.IsNullOrEmpty(_text) && _isComboBox && _selections.Count > 0)
+            {
+                SelectedIndex = _selections.IndexOf(_text);
+            }
+        }
+
+    }
+
+    public class AxisElementDetailViewModel : ObservableObject
+    {
+        public AxisElementDetailViewModel()
+        {
+            _name = string.Empty;
+            _text = string.Empty;
+            _isTextBox = true;
+            _isComboBox = false;
+            _type = AxisElementDetailType.None;
+            _selectedIndex = 1;
+            _selections = new ObservableCollection<string>();
+        }
+
+        public AxisElementDetailViewModel(AxisElementDetailType type) : this()
+        {
+            var t = type.GetType();
+            FieldInfo? info = t.GetField(type.ToString());
+            if (info != null)
+            {
+                var attr = info.GetCustomAttributes<AxisDescriptionAttribute>();
+                AxisDescriptionAttribute? desc;
+                if (attr != null && (desc = attr.First()) != null)
+                {
+                    _name = desc.Description;
+                    _isTextBox = desc.IsTextBox;
+                    _isComboBox = desc.IsComboBox;
+                    foreach (string s in desc.Selections)
+                    {
+                        _selections.Add(s);
+                    }
+                }
+            }
+            _type = type;
+        }
+
+        AxisElementDetailType _type;
+        public AxisElementDetailType Type
+        {
+            get { return _type; }
+            set { _type = value; }
+        }
+
+        int _indexOfElement = 0;
+        public int IndexOfElement
+        {
+            get { return _indexOfElement; }
+            set { _indexOfElement = value; }
+        }
+
+        string _name;
+        public string Name
+        {
+            get { return _name; }
+            set { SetProperty(ref _name, value); }
+        }
+
+        string _text;
+        public string Text
+        {
+            get { return _text; }
+            set { SetProperty(ref _text, value); }
+        }
+
+        bool _isTextBox;
+        public bool IsTextBox
+        {
+            get { return _isTextBox; }
+            set
+            {
+                SetProperty(ref _isTextBox, value);
+                if (value)
+                {
+                    IsComboBox = false;
+                }
+            }
+        }
+
+        bool _isComboBox;
+        public bool IsComboBox
+        {
+            get { return _isComboBox; }
+            set
+            {
+                SetProperty(ref _isComboBox, value);
+                if (value)
+                {
+                    IsTextBox = false;
+                }
+            }
+        }
+
+        int _selectedIndex;
+        public int SelectedIndex
+        {
+            get { return _selectedIndex; }
+            set { SetProperty(ref _selectedIndex, value); }
+        }
+
+        ObservableCollection<string> _selections;
+        public ObservableCollection<string> Selections
+        {
+            get { return _selections; }
+            set { SetProperty(ref _selections, value); }
+        }
+
+        public void SetSelections(params string[] selections)
+        {
+            foreach (var s in selections)
+            {
+                _selections.Add(s);
+            }
+        }
+
+        public string GetValue()
+        {
+            if (_isComboBox)
+            {
+                return _selectedIndex > 0 && _selectedIndex < _selections.Count ?
+                    _selections[_selectedIndex] : string.Empty;
+            }
+            else
+            {
+                return _text;
+            }
+        }
+
+        public void ApplyToAxisElement(AxisElement element)
+        {
+            switch (_type)
+            {
+                case AxisElementDetailType.Name:
+                    element.Name = _text;
+                    break;
+                case AxisElementDetailType.Description:
+                    element.Description = _text;
+                    break;
+
+                case AxisElementDetailType.Exclude:
+                    element.Exclude = bool.TryParse(GetValue(), out bool b) && b;
+                    break;
+
+                case AxisElementDetailType.Filter:
+                case AxisElementDetailType.VariableName:
+                case AxisElementDetailType.CutOff:
+                    var parameter = element.Template.GetParameter(_indexOfElement);
+                    if (parameter == null)
+                    {
+                        while (element.Template.Count < _indexOfElement + 1)
+                        {
+                            parameter = element.Template.NewParameter();
+                            element.Template.PushParameter(parameter);
+                        }
+                    }
+                    parameter?.SetValue(_text);
+                    break;
+
+                case AxisElementDetailType.None:
                 default:
                     break;
             }
         }
 
-        public void UpdateToObject(AxisElementSuffix suffixObject)
+        public void LoadFromAxisElement(AxisElement element)
         {
-            if (Type != suffixObject.Type)
+            switch (_type)
+            {
+                case AxisElementDetailType.Name:
+                    IsTextBox = true;
+                    _name = ViewModelConstants.AxisElementDetailName;
+                    _text = element.Name;
+                    break;
+                case AxisElementDetailType.Description:
+                    IsTextBox = true;
+                    _name = ViewModelConstants.AxisElementDetailDescription;
+                    _text = string.IsNullOrEmpty(element.Description) ? string.Empty : element.Description;
+                    break;
+                case AxisElementDetailType.Exclude:
+                    IsComboBox = true;
+                    Selections.Clear();
+                    SetSelections("true", "false");
+                    break;
+                case AxisElementDetailType.Filter:
+                case AxisElementDetailType.VariableName:
+                case AxisElementDetailType.CutOff:
+                case AxisElementDetailType.CategoryUpperBoundary:
+                case AxisElementDetailType.CategoryLowerBoundary:
+                    IsTextBox = true;
+
+                    if (_type == AxisElementDetailType.Filter)
+                    {
+                        _name = ViewModelConstants.AxisElementDetailFilter;
+                    }
+                    else if (_type == AxisElementDetailType.VariableName)
+                    {
+                        _name = ViewModelConstants.AxisElementDetailVariableName;
+                    }
+                    else
+                    {
+                        _name = ViewModelConstants.AxisElementDetailCutOff;
+                    }
+                    
+                    if (_indexOfElement > 0 && _indexOfElement < element.Template.Count)
+                    {
+                        var parameter = element.Template.GetParameter(_indexOfElement)?.GetValue().ToString();
+                        _text = parameter ?? string.Empty;
+                    }
+                    break;
+
+                case AxisElementDetailType.None:
+                default:
+                    break;
+            }
+        }
+
+    }
+
+    public enum AxisElementDetailType
+    {
+        [AxisDescription("")]
+        None,
+        [AxisDescription(
+            ViewModelConstants.AxisElementDetailName,
+            IsComboBox = false,
+            IsTextBox = true)]
+        Name,
+        [AxisDescription(
+            ViewModelConstants.AxisElementDetailDescription,
+            IsComboBox = false,
+            IsTextBox = true)]
+        Description,
+        [AxisDescription(
+            ViewModelConstants.AxisElementDetailExclude,
+            IsComboBox = true,
+            IsTextBox = false,
+            Selections = new string[] { "true", "false" })]
+        Exclude,
+        [AxisDescription(
+            ViewModelConstants.AxisElementDetailFilter,
+            IsComboBox = false,
+            IsTextBox = true)]
+        Filter,
+        [AxisDescription(
+            ViewModelConstants.AxisElementDetailVariableName,
+            IsComboBox = false,
+            IsTextBox = true)]
+        VariableName,
+        [AxisDescription(
+            ViewModelConstants.AxisElementDetailCutOff,
+            IsComboBox = false,
+            IsTextBox = true)]
+        CutOff,
+        [AxisDescription(
+            ViewModelConstants.AxisElementDetailCategoryUpperBoundary,
+            IsComboBox = false,
+            IsTextBox = true)]
+        CategoryUpperBoundary,
+        [AxisDescription(
+            ViewModelConstants.AxisElementDetailCategoryLowerBoundary,
+            IsComboBox = false,
+            IsTextBox = true)]
+        CategoryLowerBoundary
+    }
+
+    public class AxisTreeNode : ObservableObject
+    {
+        public AxisTreeNode(ObservableObject root)
+        {
+            _root = root;
+            _allowChildren = false;
+            _elementType = AxisElementType.None;
+            _name = string.Empty;
+            _children = new ObservableCollection<AxisTreeNode>();
+            _suffixes = new ObservableCollection<AxisElementSuffixViewModel>();
+            _details = new ObservableCollection<AxisElementDetailViewModel>();
+            // 填入初始化的后缀配置
+            // CalculationScope=AllElements|PrecedingElements
+            InitSuffixSelectionItem(AxisElementSuffixType.CalculationScope, "AllElements", "PrecedingElements");
+            // CountsOnly=True|False
+            InitSuffixSelectionItem(AxisElementSuffixType.CountsOnly, "true", "false");
+            // Decimals=DecimalPlaces
+            InitSuffixTextBoxItem(AxisElementSuffixType.Decimals);
+            // Factor=FactorValue
+            InitSuffixTextBoxItem(AxisElementSuffixType.Factor);
+            // IsFixed=True|False
+            InitSuffixSelectionItem(AxisElementSuffixType.IsFixed, "true", "false");
+            // IsHidden=True|False
+            InitSuffixSelectionItem(AxisElementSuffixType.IsHidden, "true", "false");
+            // IsHiddenWhenColumn = True | False
+            InitSuffixSelectionItem(AxisElementSuffixType.IsHiddenWhenColumn, "true", "false");
+            // IsHiddenWhenRow=True|False
+            InitSuffixSelectionItem(AxisElementSuffixType.IsHiddenWhenRow, "true", "false");
+            // IncludeInBase=True|False
+            InitSuffixSelectionItem(AxisElementSuffixType.IncludeInBase, "true", "false");
+            // IsUnweighted=True|False
+            InitSuffixSelectionItem(AxisElementSuffixType.IsUnweighted, "true", "false");
+            // Multiplier=MultiplierVariable
+            InitSuffixTextBoxItem(AxisElementSuffixType.Multiplier);
+            // Weight=WeightVariable
+            InitSuffixTextBoxItem(AxisElementSuffixType.Weight);
+        }
+
+        public AxisTreeNode(ObservableObject root, AxisElementType type, Action<AxisTreeNode, bool>? selectedChanged) : this(root)
+        {
+            InitDetail(type);
+            _elementType = type;
+            _selectedChanged = selectedChanged;
+            _allowChildren = type == AxisElementType.Combine || type == AxisElementType.Net;
+        }
+
+        readonly ObservableObject _root;
+        public ObservableObject Root => _root;
+
+        Action<AxisTreeNode, bool>? _selectedChanged;
+        public Action<AxisTreeNode, bool>? SelectedChanged
+        {
+            get => _selectedChanged;
+            set => _selectedChanged = value;
+        }
+
+        AxisElementType _elementType;
+        public AxisElementType ElementType
+        {
+            get { return _elementType; }
+            set
+            {
+                _elementType = value;
+                Details.Clear();
+                InitDetail(value);
+                _allowChildren = value == AxisElementType.Combine || value == AxisElementType.Net;
+            }
+        }
+
+        bool _isSelected;
+        public bool IsSelected
+        {
+            get { return _isSelected; }
+            set
+            {
+                SetProperty(ref _isSelected, value);
+                _selectedChanged?.Invoke(this, value);
+            }
+        }
+
+        Action<AxisTreeNode>? _removing;
+        public event Action<AxisTreeNode>? Removing
+        {
+            add { _removing += value; }
+            remove { _removing -= value; }
+        }
+
+        Action<AxisTreeNode>? _movingUp;
+        public event Action<AxisTreeNode>? MovingUp
+        {
+            add { _movingUp += value; }
+            remove { _removing -= value; }
+        }
+
+        Action<AxisTreeNode>? _movingDown;
+        public event Action<AxisTreeNode>? MovingDown
+        {
+            add { _movingDown += value; }
+            remove { _movingDown -= value; }
+        }
+
+        Action<AxisTreeNode>? _addingChild;
+        public event Action<AxisTreeNode>? AddingChild
+        {
+            add { _addingChild += value; }
+            remove { _addingChild -= value; }
+        }
+
+        bool _allowChildren;
+        public bool AllowChildren
+        {
+            get { return _allowChildren; }
+            set { SetProperty(ref _allowChildren, value); }
+        }
+
+        void AddChild()
+        {
+            _addingChild?.Invoke(this);
+        }
+        public ICommand AddChildCommand => new RelayCommand(AddChild);
+
+        void Remove()
+        {
+            _removing?.Invoke(this);
+        }
+        public ICommand RemoveCommand => new RelayCommand(Remove);
+
+        void MoveUp()
+        {
+            _movingUp?.Invoke(this);
+        }
+        public ICommand MoveUpCommand => new RelayCommand(MoveUp);
+
+        void MoveDown()
+        {
+            _movingDown?.Invoke(this);
+        }
+        public ICommand MoveDownCommand => new RelayCommand(MoveDown);
+
+        AxisTreeNode? _parent;
+        public AxisTreeNode? Parent { get => _parent; set => _parent = value; }
+
+        void InitSuffixTextBoxItem(AxisElementSuffixType type)
+        {
+            var element = new AxisElementSuffixViewModel()
+            {
+                Name = type.ToString(),
+                IsComboBox = false,
+                IsTextBox = true
+            };
+            _suffixes.Add(element);
+        }
+
+        void InitSuffixSelectionItem(AxisElementSuffixType type, params string[] selections)
+        {
+            var element = new AxisElementSuffixViewModel()
+            {
+                Name = type.ToString(),
+                IsComboBox = true,
+                IsTextBox = false,
+            };
+            element.AddSelections(selections);
+            _suffixes.Add(element);
+        }
+
+        public void InitDetail(AxisElementType type)
+        {
+            switch (type)
+            {
+                case AxisElementType.InsertFunctionOrVariable:
+                    break;
+
+                case AxisElementType.CategoryRange:
+                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.Description));
+                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.CategoryLowerBoundary) { IndexOfElement = 0 });
+                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.CategoryUpperBoundary) { IndexOfElement = 1 });
+                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.Exclude));
+                    break;
+
+                // 单个Filter条件
+                case AxisElementType.Base:
+                case AxisElementType.UnweightedBase:
+                case AxisElementType.EffectiveBase:
+                case AxisElementType.Expression:
+                case AxisElementType.Derived:
+                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.Name));
+                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.Description));
+                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.Filter) { IndexOfElement = 0 });
+                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.Exclude));
+                    break;
+
+                // (Variable, 'Filter')
+                case AxisElementType.Numeric:
+                case AxisElementType.Mean:
+                case AxisElementType.StdErr:
+                case AxisElementType.StdDev:
+                case AxisElementType.Min:
+                case AxisElementType.Max:
+                case AxisElementType.Sum:
+                case AxisElementType.Median:
+                case AxisElementType.Mode:
+                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.Name));
+                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.Description));
+                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.VariableName) { IndexOfElement = 0 });
+                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.Filter) { IndexOfElement = 1 });
+                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.Exclude));
+                    break;
+
+                case AxisElementType.Percentile:
+                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.Name));
+                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.Description));
+                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.VariableName) { IndexOfElement = 0 });
+                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.CutOff) { IndexOfElement = 1 });
+                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.Filter) { IndexOfElement = 2 });
+                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.Exclude));
+                    break;
+
+                case AxisElementType.Net:
+                case AxisElementType.Combine:
+                case AxisElementType.Category:
+                case AxisElementType.Text:
+                case AxisElementType.Total:
+                case AxisElementType.SubTotal:
+                case AxisElementType.None:
+                case AxisElementType.Ntd:
+                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.Name));
+                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.Description));
+                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.Exclude));
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        string _name;
+        public string Name { get => _name; set => SetProperty(ref _name, value); }
+
+        ObservableCollection<AxisTreeNode> _children;
+        public ObservableCollection<AxisTreeNode> Children
+        {
+            get { return _children; }
+            set { SetProperty(ref _children, value); }
+        }
+
+        ObservableCollection<AxisElementSuffixViewModel> _suffixes;
+        public ObservableCollection<AxisElementSuffixViewModel> Suffixes
+        {
+            get => _suffixes;
+            set => SetProperty(ref _suffixes, value);
+        }
+
+        ObservableCollection<AxisElementDetailViewModel> _details;
+        public ObservableCollection<AxisElementDetailViewModel> Details
+        {
+            get => _details;
+            set => SetProperty(ref _details, value);
+        }
+
+        public void PushChild(AxisTreeNode node)
+        {
+            _children.Add(node);
+            node.Parent = this;
+        }
+
+        public void PopChild()
+        {
+            if (_children.Count > 0)
+            {
+                _children.RemoveAt(_children.Count - 1);
+            }
+        }
+
+        public bool RemoveChildAt(int index)
+        {
+            if (index < 0 || index >= _children.Count)
+            {
+                return false;
+            }
+            _children.RemoveAt(index);
+            return true;
+        }
+
+        public bool SwapChildren(int index1, int index2)
+        {
+            return CollectionHelper.Swap(_children, index1, index2);
+        }
+
+        public bool MoveChildUp(int index)
+        {
+            return SwapChildren(index, index - 1);
+        }
+
+        public bool MoveChildDown(int index)
+        {
+            return SwapChildren(index, index + 1);
+        }
+
+        public IEnumerable<AxisElementSuffixViewModel> GetSelectedSuffix()
+        {
+            return _suffixes.Where(suffix => suffix.Checked);
+        }
+
+        public void ApplyToAxisElement(AxisElement? element)
+        {
+            if (element == null)
             {
                 return;
             }
 
-            if (Type.Equals(typeof(bool)))
+            element.Template.ElementType = _elementType;
+            // Detail
+            foreach (var detail in _details)
             {
-                suffixObject.Value = TailingElementValueSelectedIndex == 0;
+                detail.ApplyToAxisElement(element);
             }
-            else if (Type.Equals(typeof(AxisElementSuffixCalculationScope)))
+            // Net / Combine
+            if (_elementType == AxisElementType.Net || _elementType == AxisElementType.Combine)
             {
-                suffixObject.Value = TailingElementValueSelectedIndex == 0 ? "AllElements" : "PrecedingElements";
+                foreach (var child in _children)
+                {
+                    var childElement = new AxisElement(element);
+                    child.ApplyToAxisElement(childElement);
+                    var parameter = element.Template.NewParameter();
+                    parameter.SetValue(childElement);
+                    element.Template.PushParameter(parameter);
+                }
             }
-            else if (Type.Equals(typeof(int)) && IsTextBoxValue && int.TryParse(TextValue, out int iValue))
+            // Suffix
+            foreach (var suffix in _suffixes)
             {
-                suffixObject.Value = iValue;
+                suffix.ApplyToAxisElement(element);
             }
-            else if (Type.Equals(typeof(double)) && IsTextBoxValue && double.TryParse(TextValue, out double dValue))
+        }
+
+        void LoadSingleDetail(AxisElementDetailType type, AxisElement element, int indexOfElement = -1)
+        {
+            var detail = new AxisElementDetailViewModel(type);
+            if (indexOfElement > -1)
             {
-                suffixObject.Value = dValue;
+                detail.IndexOfElement = indexOfElement;
+            }
+            detail.LoadFromAxisElement(element);
+            Details.Add(detail);
+        }
+
+        public void LoadFromAxisElement(AxisElement element)
+        {
+            _elementType = element.Template.ElementType;
+            // Detail
+            Details.Clear();
+            switch (_elementType)
+            {
+                case AxisElementType.InsertFunctionOrVariable:
+                    break;
+
+                case AxisElementType.CategoryRange:
+                    LoadSingleDetail(AxisElementDetailType.Description, element);
+                    LoadSingleDetail(AxisElementDetailType.CategoryLowerBoundary, element, 0);
+                    LoadSingleDetail(AxisElementDetailType.CategoryUpperBoundary, element, 1);
+                    LoadSingleDetail(AxisElementDetailType.Exclude, element);
+                    break;
+
+                // 单个Filter条件
+                case AxisElementType.Base:
+                case AxisElementType.UnweightedBase:
+                case AxisElementType.EffectiveBase:
+                case AxisElementType.Expression:
+                case AxisElementType.Derived:
+                    LoadSingleDetail(AxisElementDetailType.Name, element);
+                    LoadSingleDetail(AxisElementDetailType.Description, element);
+                    LoadSingleDetail(AxisElementDetailType.Filter, element, 0);
+                    LoadSingleDetail(AxisElementDetailType.Exclude, element);
+                    break;
+
+                // (Variable, 'Filter')
+                case AxisElementType.Numeric:
+                case AxisElementType.Mean:
+                case AxisElementType.StdErr:
+                case AxisElementType.StdDev:
+                case AxisElementType.Min:
+                case AxisElementType.Max:
+                case AxisElementType.Sum:
+                case AxisElementType.Median:
+                case AxisElementType.Mode:
+                    LoadSingleDetail(AxisElementDetailType.Name, element);
+                    LoadSingleDetail(AxisElementDetailType.Description, element);
+                    LoadSingleDetail(AxisElementDetailType.VariableName, element, 0);
+                    LoadSingleDetail(AxisElementDetailType.Filter, element, 1);
+                    LoadSingleDetail(AxisElementDetailType.Exclude, element);
+                    break;
+
+                case AxisElementType.Percentile:
+                    LoadSingleDetail(AxisElementDetailType.Name, element);
+                    LoadSingleDetail(AxisElementDetailType.Description, element);
+                    LoadSingleDetail(AxisElementDetailType.VariableName, element, 0);
+                    LoadSingleDetail(AxisElementDetailType.CutOff, element, 1);
+                    LoadSingleDetail(AxisElementDetailType.Filter, element, 2);
+                    LoadSingleDetail(AxisElementDetailType.Exclude, element);
+                    break;
+
+                case AxisElementType.Net:
+                case AxisElementType.Combine:
+                case AxisElementType.Category:
+                case AxisElementType.Text:
+                case AxisElementType.Total:
+                case AxisElementType.SubTotal:
+                case AxisElementType.None:
+                case AxisElementType.Ntd:
+                    LoadSingleDetail(AxisElementDetailType.Name, element);
+                    LoadSingleDetail(AxisElementDetailType.Description, element);
+                    LoadSingleDetail(AxisElementDetailType.Exclude, element);
+                    break;
+
+                default:
+                    break;
+            }
+            // Suffix
+            foreach (var suffix in Suffixes)
+            {
+                suffix.LoadFromAxisElement(element.Suffix.Find(s => s.Type.ToString().Equals(suffix.Name)));
+            }
+            // Template Net / Combine的子元素
+            if ((_elementType == AxisElementType.Net || 
+                _elementType == AxisElementType.Combine) &&
+                element.Template.Count > 0)
+            {
+                for (int i = 0; i < element.Template.Count; i++)
+                {
+                    AxisElementParameter parameter = element.Template.GetParameter(i)!;
+                    if (parameter.GetValue() is AxisElement subElement &&
+                        _root is AxisSettingViewModel viewModel)
+                    {
+                        var child = new AxisTreeNode(_root, 
+                            subElement.Template.ElementType,
+                            (n, v) =>
+                            {
+                                if (v)
+                                {
+                                    viewModel.SelectedNode = n;
+                                }
+                            });
+                        child.LoadFromAxisElement(subElement);
+                        PushChild(child);
+                    }
+                }
             }
         }
 
     }
-
-    public class AxisElementDetailSettingViewModel : ObservableObject
-    {
-
-        public AxisElementDetailSettingViewModel() { }
-
-        string _label = "";
-        public string Label
-        {
-            get { return _label; }
-            set { SetProperty(ref _label, value); }
-        }
-
-        string _value = "";
-        public string Value
-        {
-            get { return _value; }
-            set { SetProperty(ref _value, value); }
-        }
-
-        bool _canSelectVariable = false;
-        public bool CanSelectVariable
-        {
-            get => _canSelectVariable;
-            set => _canSelectVariable = value;
-        }
-
-    }
-
 
 }

@@ -12,16 +12,18 @@ namespace IDCA.Model.Spec
         {
             _objectType = SpecObjectType.Collection;
             _constructor = constructor;
+            _items = new List<T>();
         }
 
         internal SpecObjectCollection(SpecObject parent, Func<SpecObject, T> constructor) : base(parent)
         {
             _objectType = SpecObjectType.Collection;
             _constructor = constructor;
+            _items = new List<T>();
         }
 
         readonly Func<SpecObject, T> _constructor;
-        protected List<T> _items = new();
+        protected List<T> _items;
 
         /// <summary>
         /// 当前集合内元素的数量
@@ -59,6 +61,16 @@ namespace IDCA.Model.Spec
         public void Clear()
         {
             _items.Clear();
+        }
+
+        /// <summary>
+        /// 根据回调函数的返回值查找对应的对象
+        /// </summary>
+        /// <param name="match"></param>
+        /// <returns></returns>
+        public T? Find(Predicate<T> match)
+        {
+            return _items.Find(match);
         }
 
         public IEnumerator GetEnumerator()

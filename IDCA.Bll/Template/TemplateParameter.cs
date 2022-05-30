@@ -265,7 +265,7 @@ namespace IDCA.Model.Template
         /// <returns></returns>
         public TemplateParameter NewObject()
         {
-            return new(this);
+            return new TemplateParameter(this);
         }
 
         public IEnumerator GetEnumerator()

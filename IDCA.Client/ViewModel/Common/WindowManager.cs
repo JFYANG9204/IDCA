@@ -67,36 +67,44 @@ namespace IDCA.Client.ViewModel.Common
             }
         }
 
-        public static object? ShowDialog(string key, params string[] parameters)
+        public static string? ShowFolderBrowserDialog()
+        {
+            var browser = new FolderBrowserDialog();
+            if (browser.ShowDialog() == DialogResult.OK)
+            {
+                return browser.SelectedPath;
+            }
+            return null;
+        }
+
+        public static string? ShowOpenFileDialog(string filter)
+        {
+            var dialog = new OpenFileDialog() 
+            { 
+                Multiselect = false,
+                Filter = filter 
+            };
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                return dialog.FileName;
+            }
+            return null;
+        }
+
+        public static void ShowWindow(string key, object? viewModel = null)
         {
             if (_registerWindow.ContainsKey(key))
             {
                 var typeInstance = Activator.CreateInstance((Type)_registerWindow[key]!);
-                if (typeInstance is FolderBrowserDialog folderBrowserDialog)
+                if (typeInstance is Window window)
                 {
-                    if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
+                    if (viewModel != null)
                     {
-                        return folderBrowserDialog.SelectedPath;
+                        window.DataContext = viewModel;
                     }
-                }
-                else if (typeInstance is OpenFileDialog openFileDialog)
-                {
-                    openFileDialog.Multiselect = false;
-                    if (parameters.Length > 0)
-                    {
-                        openFileDialog.Filter = parameters[0];
-                    }
-                    if (openFileDialog.ShowDialog() == DialogResult.OK)
-                    {
-                        return openFileDialog.FileName;
-                    }
-                }
-                else if (typeInstance is Window window)
-                {
-                    return window.ShowDialog();
+                    window.ShowDialog();
                 }
             }
-            return null;
         }
 
         public static T? FindVisualParent<T>(DependencyObject? obj) where T : class

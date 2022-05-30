@@ -1,37 +1,71 @@
 ﻿
 using IDCA.Client.Singleton;
+using IDCA.Model;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 
 namespace IDCA.Client.ViewModel
 {
-
-    public delegate void RemoveTableSettingElementEventHandler(int index);
-
     public class TableSettingViewModel : ObservableObject
     {
-        public TableSettingViewModel() 
+
+        public TableSettingViewModel(string tableName, List<string>? tableNames = null)
         {
-            _tableNames = new ObservableCollection<string>(GlobalConfig.Instance.GetTableNames());
+            _elementList = new ObservableCollection<TableSettingElementViewModel>();
+            _tableName = tableName;
+            _globalTableNames = tableNames;
         }
 
-        ObservableCollection<string> _topbreaks = new();
-        public ObservableCollection<string> Topbreaks
+        readonly List<string>? _globalTableNames;
+
+        TableSettingTreeNode? _node;
+        public TableSettingTreeNode? Node
         {
-            get { return _topbreaks; }
-            set { SetProperty(ref _topbreaks, value); }
+            get { return _node; }
+            set { SetProperty(ref _node, value); }
         }
 
-        ObservableCollection<string> _tableNames;
-        public ObservableCollection<string> TableNames
+        Action<string>? _renamed;
+        public event Action<string>? Renamed
         {
-            get { return _tableNames; }
-            set { SetProperty(ref _tableNames, value); }
+            add { _renamed += value; }
+            remove { _renamed -= value; }
         }
 
-        ObservableCollection<TableSettingElementViewModel> _elementList = new();
+        string _tableName;
+        public string TableName
+        {
+            get { return _tableName; }
+            set 
+            {
+                bool exist = _globalTableNames != null && _globalTableNames.Exists(e => e.Equals(value, StringComparison.OrdinalIgnoreCase));
+                if (!exist)
+                {
+                    SetProperty(ref _tableName, value);
+                    _globalTableNames?.Add(value);
+                    _renamed?.Invoke(value);
+                }
+            }
+        }
+
+        Action<TableSettingViewModel>? _removing;
+        public event Action<TableSettingViewModel> Removing
+        {
+            add { _removing += value; }
+            remove { _removing -= value; }
+        }
+
+        void Remove()
+        {
+            _removing?.Invoke(this);
+        }
+        public ICommand RemoveCommand => new RelayCommand(Remove);
+
+        ObservableCollection<TableSettingElementViewModel> _elementList;
         public ObservableCollection<TableSettingElementViewModel> ElementList
         {
             get { return _elementList; }
@@ -63,40 +97,30 @@ namespace IDCA.Client.ViewModel
             }
         }
 
-        ObservableCollection<HeaderInfo> _headerInfos = new();
-        public ObservableCollection<HeaderInfo> HeaderInfos
+        public void LoadFromTableSettingCollection(TableSettingCollection tableSettings)
         {
-            get { return _headerInfos; }
-            set { SetProperty(ref _headerInfos, value); }
+            _tableName = tableSettings.SpecTables.Name;
+            foreach (TableSetting setting in tableSettings)
+            {
+                var tableSettingViewModel = new TableSettingElementViewModel();
+                tableSettingViewModel.LoadFromTableSetting(setting);
+                _elementList.Add(tableSettingViewModel);
+            }
         }
 
-        public class HeaderInfo : ObservableObject
-        {
-            public HeaderInfo() { }
-
-            string _name = string.Empty;
-            public string Name
-            {
-                get { return _name; }
-                set { SetProperty(ref _name, value); }
-            }
-
-            bool _checked = false;
-            public bool Checked
-            {
-                get { return _checked; }
-                set { SetProperty(ref _checked, value); }
-            }
-
-        }
     }
 
     public class TableSettingElementViewModel : ObservableObject
     {
-        public TableSettingElementViewModel() { }
+        public TableSettingElementViewModel() 
+        {
+            _axisViewModel = new AxisSettingViewModel();
+        }
 
-        RemoveTableSettingElementEventHandler? _removing = null;
-        public event RemoveTableSettingElementEventHandler Removing
+        readonly AxisSettingViewModel _axisViewModel;
+
+        Action<int>? _removing = null;
+        public event Action<int> Removing
         {
             add { _removing += value; }
             remove { _removing -= value; }
@@ -140,20 +164,11 @@ namespace IDCA.Client.ViewModel
         int _index = 0;
         public int Index { get => _index; set => _index = value; }
 
-        public bool IsEmpty
-        {
-            get
-            {
-                return string.IsNullOrEmpty(_variableName);
-            }
-        }
-
-
         public ICommand AxisSettingCommand => new RelayCommand(ShowAxisSettingDialog);
         void ShowAxisSettingDialog()
         {
             GlobalConfig.Instance.CurrentTableSettingIndex = Index;
-            Common.WindowManager.ShowDialog("AxisSettingWindow");
+            Common.WindowManager.ShowWindow("AxisSettingWindow", _axisViewModel);
         }
 
         public ICommand RemoveCommand => new RelayCommand(Remove);
@@ -161,6 +176,16 @@ namespace IDCA.Client.ViewModel
         {
             _removing?.Invoke(Index);
         }
+
+        public void LoadFromTableSetting(TableSetting tableSetting)
+        {
+            _variableName = tableSetting.Field != null ? tableSetting.Field.FullName : string.Empty;
+            _title = tableSetting.TableTitle;
+            _baseText = tableSetting.BaseLabel;
+            _baseFilter = tableSetting.BaseFilter;
+            _tableFilter = tableSetting.TableFilter;
+        }
+
 
     }
 

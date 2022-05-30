@@ -21,9 +21,10 @@ namespace IDCA.Test
         [TestMethod]
         public void Convert()
         {
-            string test = "";
-            string hex = StringHelper.ConvertToHexString(test);
-            System.Console.WriteLine(hex);
+            var e = TableAxisNetType.CombineBeforeAllCategory;
+            var t = e.GetType();
+            var f = t.GetField(e.ToString());
+            System.Console.WriteLine(TableAxisNetType.CombineBetweenAllCategoryAndSigma.ToString());
         }
 
     }

@@ -2,11 +2,12 @@
                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:icon="http://metro.mahapps.com/winfx/xaml/iconpacks"
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
                  xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
                  xmlns:view="clr-namespace:IDCA.Client.View"
                  xmlns:viewmodel="clr-namespace:IDCA.Client.ViewModel" 
-                 d:DataContext="{d:DesignInstance Type=viewmodel:TableSettingViewModel}"
+                 d:DataContext="{d:DesignInstance Type=viewmodel:TableSettingWindowViewModel}"
                  mc:Ignorable="d"
                  Height="600" 
                  Width="1300"
@@ -14,8 +15,12 @@
                  Background="{StaticResource IDCA.Brushes.Window.Background}"
                  >
 
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BtoVConverter"/>
+    </Window.Resources>
+    
     <Window.DataContext>
-        <viewmodel:TableSettingViewModel/>
+        <viewmodel:TableSettingWindowViewModel/>
     </Window.DataContext>
 
     <Grid>
@@ -35,7 +40,7 @@
         <Grid Grid.Row="1">
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="130"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
@@ -47,25 +52,111 @@
                           FontSize="15"
                           FontFamily="{StaticResource IDCA.Font.Family}"
                           Background="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=Background}"
-                          >
-                    <TreeViewItem IsExpanded="True" 
-                                  Margin="0 20 0 0"
-                                  ItemsSource="{Binding Topbreaks}">
+                          Style="{StaticResource MahApps.Styles.TreeView}">
+                    <TreeView.ItemContainerStyle>
+                        <Style TargetType="TreeViewItem" BasedOn="{StaticResource MahApps.Styles.TreeViewItem}">
+                            <Setter Property="Background" Value="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=Background}"/>
+                        </Style>
+                    </TreeView.ItemContainerStyle>
+                    <TreeViewItem Margin="0 20 0 0"
+                                  ItemsSource="{Binding HeaderNode.Children}">
                         <TreeViewItem.Header>
-                            <TextBlock>表头</TextBlock>
+                            <Grid Height="25">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="40"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" 
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Left">表头</TextBlock>
+                                <Button Grid.Column="1"
+                                        Height="25"
+                                        Cursor="Hand"
+                                        Command="{Binding NewHeaderCommand}">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Grid Width="40" 
+                                                  Height="25"
+                                                  Background="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem, Mode=FindAncestor}, Path=Background}">
+                                                <icon:PackIconMaterialDesign Kind="Add"
+                                                                             Height="14"
+                                                                             Width="14"
+                                                                             VerticalAlignment="Center"
+                                                                             HorizontalAlignment="Center"/>
+                                            </Grid>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+                            </Grid>
                         </TreeViewItem.Header>
+                        <TreeViewItem.ItemContainerStyle>
+                            <Style TargetType="TreeViewItem">
+                                <Setter Property="IsSelected" Value="{Binding IsSelected}"/>
+                            </Style>
+                        </TreeViewItem.ItemContainerStyle>
+                        <TreeViewItem.ItemTemplate>
+                            <HierarchicalDataTemplate>
+                                <TextBlock Text="{Binding Name}"/>
+                            </HierarchicalDataTemplate>
+                        </TreeViewItem.ItemTemplate>
                     </TreeViewItem>
                     <TreeViewItem IsExpanded="True"
                                   Margin="0 20 0 0"
-                                  ItemsSource="{Binding TableNames}">
+                                  ItemsSource="{Binding TableNode.Children}">
                         <TreeViewItem.Header>
-                            <TextBlock>表侧</TextBlock>
+                            <Grid Height="25">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="40"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" 
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Left">表侧</TextBlock>
+                                <Button Grid.Column="1"
+                                        Height="25"
+                                        Cursor="Hand"
+                                        Command="{Binding NewTablesCommand}">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Grid Width="40" 
+                                                  Height="25"
+                                                  Background="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem, Mode=FindAncestor}, Path=Background}">
+                                                <icon:PackIconMaterialDesign Kind="Add"
+                                                                             Height="14"
+                                                                             Width="14"
+                                                                             VerticalAlignment="Center"
+                                                                             HorizontalAlignment="Center"/>
+                                            </Grid>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+                            </Grid>
                         </TreeViewItem.Header>
+                        <TreeViewItem.ItemContainerStyle>
+                            <Style TargetType="TreeViewItem">
+                                <Setter Property="IsSelected" Value="{Binding IsSelected}"/>
+                            </Style>
+                        </TreeViewItem.ItemContainerStyle>
+                        <TreeViewItem.ItemTemplate>
+                            <HierarchicalDataTemplate>
+                                <TextBlock Text="{Binding Name}"/>
+                            </HierarchicalDataTemplate>
+                        </TreeViewItem.ItemTemplate>
                     </TreeViewItem>
                 </TreeView>
             </Border>
 
-            <view:TableSettingView Grid.Column="1"/>
+            <view:OverviewControl Grid.Column="1"
+                                  DataContext="{Binding SelectedNode.OverviewViewModel}"
+                                  Visibility="{Binding Node.IsOverView, Converter={StaticResource BtoVConverter}}"/>
+            
+            <view:HeaderSettingView Grid.Column="1" 
+                                    DataContext="{Binding SelectedNode.HeaderViewModel}"
+                                    Visibility="{Binding Node.IsHeaderView, Converter={StaticResource BtoVConverter}}"/>
+            
+            <view:TableSettingView Grid.Column="1" 
+                                   DataContext="{Binding SelectedNode.TableViewModel}"
+                                   Visibility="{Binding Node.IsTableView, Converter={StaticResource BtoVConverter}}"/>
 
         </Grid>
     </Grid>

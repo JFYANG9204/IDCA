@@ -110,7 +110,7 @@ namespace IDCA.Client.Singleton
             {
                 tabName = $"tab{_tableSettings.Count + 1}";
             }
-            var tables = _specDocument.NewCollection(name);
+            var tables = _specDocument.NewTables(name);
             var table = new TableSettingCollection(MDMDocument, Config, tables);
             _tableSettings.Add(tabName, table);
             return table;

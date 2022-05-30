@@ -1,16 +1,14 @@
-﻿<UserControl x:Class="IDCA.Client.View.TableSettingView"
+﻿<UserControl x:Class="IDCA.Client.View.HeaderSettingView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:iconPack="http://metro.mahapps.com/winfx/xaml/iconpacks" 
              xmlns:viewmodel="clr-namespace:IDCA.Client.ViewModel" 
-             d:DataContext="{d:DesignInstance Type=viewmodel:TableSettingViewModel}"
+             d:DataContext="{d:DesignInstance Type=viewmodel:HeaderSettingViewModel}"
              mc:Ignorable="d" 
              d:DesignHeight="550" 
              d:DesignWidth="1200">
-
     <Grid>
 
         <Grid.RowDefinitions>
@@ -18,11 +16,11 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Orientation="Horizontal" Margin="20 0 0 0">
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="20 0 0 0">
 
             <StackPanel.Resources>
                 <Style TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button}">
-                    <Setter Property="Width" Value="80"/>
+                    <Setter Property="Width" Value="100"/>
                     <Setter Property="Height" Value="30"/>
                     <Setter Property="Margin" Value="5"/>
                     <Setter Property="FontSize" Value="13"/>
@@ -44,19 +42,18 @@
                 </Style>
             </StackPanel.Resources>
 
-            <TextBlock>文件名称</TextBlock>
-            <TextBox Text="{Binding TableName}" />
-            <TextBlock>出示表头</TextBlock>
-            <mah:DropDownButton Width="80" Height="30" Margin="5">
-            </mah:DropDownButton>
-            <Button Command="{Binding PushNewElementCommand}">添加表格</Button>
+            <TextBlock>表头名称</TextBlock>
+            <TextBox Text="{Binding HeaderName}" />
+            <Button Command="{Binding NewElementCommand}">添加表头元素</Button>
+            
         </StackPanel>
 
         <ScrollViewer Grid.Row="1">
-            <ItemsControl ItemsSource="{Binding ElementList}" d:ItemsSource="{d:SampleData ItemCount=5}">
+            <ItemsControl ItemsSource="{Binding Elements}"
+                          d:ItemsSource="{d:SampleData ItemCount=5}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Border Height="100" 
+                        <Border Height="60" 
                                 Width="1150"
                                 BorderThickness="0 0 0 1"
                                 BorderBrush="{StaticResource IDCA.Brushes.Window.BorderBrush}">
@@ -64,7 +61,7 @@
 
                                 <Grid.Resources>
                                     <Style TargetType="TextBox" BasedOn="{StaticResource MahApps.Styles.TextBox}">
-                                        <Setter Property="Width" Value="120"/>
+                                        <Setter Property="Width" Value="150"/>
                                         <Setter Property="Height" Value="30"/>
                                         <Setter Property="Margin" Value="5"/>
                                         <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
@@ -91,10 +88,9 @@
                                         <Setter Property="Width" Value="1"/>
                                     </Style>
                                 </Grid.Resources>
-                                
+
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="10"/>
-                                    <RowDefinition Height="40"/>
                                     <RowDefinition Height="40"/>
                                     <RowDefinition Height="10"/>
                                 </Grid.RowDefinitions>
@@ -113,56 +109,34 @@
 
                                     <GridSplitter/>
 
-                                    <TextBlock>标题</TextBlock>
-                                    <TextBox Text="{Binding Title}"/>
+                                    <TextBlock>描述</TextBlock>
+                                    <TextBox Text="{Binding Description}"/>
 
                                     <GridSplitter/>
 
-                                    <TextBlock Grid.Row="1" Grid.Column="5">基数标签</TextBlock>
-                                    <TextBox Grid.Row="1" Grid.Column="6" Text="{Binding BaseText}"/>
+                                    <TextBlock>表达式</TextBlock>
+                                    <TextBox Text="{Binding Expression}"/>
 
                                     <GridSplitter/>
 
-                                    <TextBlock>基数筛选器</TextBlock>
-                                    <TextBox Text="{Binding BaseFilter}"/>
-
-                                    <GridSplitter/>
-
-                                    <TextBlock>表格筛选器</TextBlock>
-                                    <TextBox Text="{Binding TableFilter}"/>
-
-                                    <GridSplitter/>
-
-                                </StackPanel>
-
-                                <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
-                                    <GridSplitter/>
-                                    <Button Width="120" Command="{Binding AxisSettingCommand}">配置轴表达式</Button>
-                                    <GridSplitter/>
-                                </StackPanel>
-                                
-                                <Button Grid.Row="1"
-                                        Grid.RowSpan="2"
-                                        Grid.Column="11"
-                                        Width="25"
-                                        Height="25"
-                                        Command="{Binding RemoveCommand}"
-                                        Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"
-                                        Foreground="Red"
-                                        HorizontalAlignment="Left"
-                                        Margin="25"
-                                        Cursor="Hand">
-                                    <Button.Template>
-                                        <ControlTemplate TargetType="Button">
-                                            <Grid Background="{TemplateBinding Background}">
-                                                <iconPack:PackIconMaterialDesign Kind="Close"
+                                    <Button Width="25"
+                                            Height="25"
+                                            Command="{Binding RemoveCommand}"
+                                            Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"
+                                            Foreground="Red"
+                                            HorizontalAlignment="Left"
+                                            Cursor="Hand">
+                                        <Button.Template>
+                                            <ControlTemplate TargetType="Button">
+                                                <Grid Background="{TemplateBinding Background}">
+                                                    <iconPack:PackIconMaterialDesign Kind="Close"
                                                                                  Height="25"
                                                                                  Width="25"/>
-                                            </Grid>
-                                        </ControlTemplate>
-                                    </Button.Template>
-                                </Button>
-
+                                                </Grid>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                    </Button>
+                                </StackPanel>
                             </Grid>
                         </Border>
                     </DataTemplate>
@@ -171,5 +145,4 @@
         </ScrollViewer>
         
     </Grid>
-    
 </UserControl>

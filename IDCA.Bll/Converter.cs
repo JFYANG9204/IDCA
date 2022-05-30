@@ -32,7 +32,7 @@ namespace IDCA.Model
         {
             return element.ToLower() switch
             {
-                ".." => AxisElementType.AllCategory,
+                ".." => AxisElementType.CategoryRange,
                 "text" => AxisElementType.Text,
                 "base" => AxisElementType.Base,
                 "unweightedbase" => AxisElementType.UnweightedBase,

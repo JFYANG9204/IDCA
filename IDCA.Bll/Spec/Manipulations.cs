@@ -14,10 +14,22 @@ namespace IDCA.Model.Spec
         {
             _document = document;
             _templates = document.Templates;
+            _nameCache = new Dictionary<string, Manipulation>();
         }
 
-        readonly Dictionary<string, Manipulation> _nameCache = new();
+        readonly Dictionary<string, Manipulation> _nameCache;
         readonly TemplateCollection _templates;
+
+        /// <summary>
+        /// 判断当前集合中是否已存在对应Field的配置，不区分大小写
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public bool Exist(string name)
+        {
+            return _nameCache.ContainsKey(name.ToLower());
+        }
+
         /// <summary>
         /// 创建空白的Manipulation对象，并添加进当前集合中
         /// </summary>
@@ -114,8 +126,8 @@ namespace IDCA.Model.Spec
         internal Manipulation(Manipulations parent) : base(parent)
         {
             _objectType = SpecObjectType.Manipulation;
-            _field = new(this);
-            _axis = new(this, AxisType.Normal);
+            _field = new FieldScript(this);
+            _axis = new Axis(this, AxisType.Normal);
         }
 
         readonly FieldScript _field;
@@ -263,19 +275,19 @@ namespace IDCA.Model.Spec
         public void SetDefaultAxis(string baseFilter = "", bool addAverage = false, string averageVariable = "")
         {
             Config? config = Document?.Config;
-            Axis axis = new(this, AxisType.Normal);
-            axis.AppendTextElement();
-            axis.AppendBaseElement(config?.TryGet<string>(SpecConfigKeys.AxisBaseLabel) ?? "", baseFilter);
-            axis.AppendTextElement();
-            axis.AppendAllCategory();
-            axis.AppendTextElement();
-            axis.AppendSubTotal(config?.TryGet<string>(SpecConfigKeys.AxisSigmaLabel) ?? "");
+            _axis.Clear();
+            _axis.AppendTextElement();
+            _axis.AppendBaseElement(config?.TryGet<string>(SpecConfigKeys.AxisBaseLabel) ?? "", baseFilter);
+            _axis.AppendTextElement();
+            _axis.AppendAllCategory();
+            _axis.AppendTextElement();
+            _axis.AppendSubTotal(config?.TryGet<string>(SpecConfigKeys.AxisSigmaLabel) ?? "");
             if (addAverage && _axisAverageFunction != null)
             {
                 _axisAverageFunction.SetFunctionParameterValue(averageVariable, TemplateValueType.String, TemplateParameterUsage.ManipulateRebaseAverageVariable);
-                axis.AppendInsertFunction(_axisAverageFunction);
+                _axis.AppendInsertFunction(_axisAverageFunction);
             }
-            SetAxis(axis);
+            SetAxis(_axis);
         }
 
         /// <summary>
@@ -284,7 +296,18 @@ namespace IDCA.Model.Spec
         /// <returns></returns>
         public string Export()
         {
-            StringBuilder builder = new();
+            // 更新Axis表达式
+            var axisFunction = Array.Find(_templates, f => f.Flag == FunctionTemplateFlags.ManipulateSideAxis);
+            if (axisFunction != null)
+            {
+                var parameter = axisFunction.Parameters[TemplateParameterUsage.ManipulateSideAxis];
+                if (parameter != null)
+                {
+                    parameter.SetValue(_axis);
+                }
+            }
+            //
+            var builder = new StringBuilder();
             builder.AppendLine($"'*************** {_field.TopLevel} ***************");
             foreach (var temp in _templates)
             {

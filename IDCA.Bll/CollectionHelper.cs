@@ -13,16 +13,17 @@ namespace IDCA.Model
         /// <param name="collection"></param>
         /// <param name="sourceIndex"></param>
         /// <param name="targetIndex"></param>
-        public static void Swap<T>(IList<T> collection, int sourceIndex, int targetIndex)
+        public static bool Swap<T>(IList<T> collection, int sourceIndex, int targetIndex)
         {
             if (collection == null ||
                 sourceIndex < 0 || sourceIndex >= collection.Count ||
                 targetIndex < 0 || targetIndex >= collection.Count ||
                 targetIndex == sourceIndex)
             {
-                return;
+                return false;
             }
             (collection[targetIndex], collection[sourceIndex]) = (collection[sourceIndex], collection[targetIndex]);
+            return true;
         }
         /// <summary>
         /// 遍历集合中的各元素并执行回调函数

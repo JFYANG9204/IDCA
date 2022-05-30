@@ -1,13 +1,14 @@
 ﻿using IDCA.Model.MDM;
 using IDCA.Model.Spec;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 namespace IDCA.Model
 {
-    public class TableSettingCollection
+    public class TableSettingCollection : IEnumerable<TableSetting>
     {
         public TableSettingCollection(MDMDocument document, Config config, Tables specTables)
         {
@@ -138,6 +139,15 @@ namespace IDCA.Model
             Swap(itemIndex, itemIndex + 1);
         }
 
+        public IEnumerator<TableSetting> GetEnumerator()
+        {
+            return _settings.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return _settings.GetEnumerator();
+        }
     }
 
     public enum TableType
