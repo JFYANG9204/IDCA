@@ -9,8 +9,6 @@
     <StartupObject>IDCA.Client.App</StartupObject>
   </PropertyGroup>
 
-  <Import Project="..\IDCA.Bll\IDCA.Bll.projitems" Label="Shared" />
-
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
@@ -45,5 +43,7 @@
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0" />
   </ItemGroup>
+
+  <Import Project="..\IDCA.Model\IDCA.Model.projitems" Label="Shared" />
 
 </Project>

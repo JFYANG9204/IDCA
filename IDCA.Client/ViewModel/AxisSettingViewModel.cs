@@ -13,8 +13,9 @@ namespace IDCA.Client.ViewModel
 {
     public class AxisSettingViewModel : ObservableObject
     {
-        public AxisSettingViewModel() 
+        public AxisSettingViewModel(Axis axis) 
         {
+            _axis = axis;
             _availableElements = new ObservableCollection<AvailableElement>();
             for (int i = 0; i < _axisDefaultElements.Length; i++)
             {
@@ -24,10 +25,12 @@ namespace IDCA.Client.ViewModel
             }
             _availableSelectedIndex = -1;
             _tree = new ObservableCollection<AxisTreeNode>();
+            _nodeNames = new List<string>();
+            LoadFromAxis(Axis);
         }
 
-        Axis? _axis;
-        public Axis? Axis
+        Axis _axis;
+        public Axis Axis
         {
             get { return _axis; }
         }
@@ -39,14 +42,18 @@ namespace IDCA.Client.ViewModel
             set 
             { 
                 SetProperty(ref _axisExpression, value);
-                _axis?.FromString(value);
+                //_axis.FromString(value);
             }
         }
 
-        void UpdateAxisExpression()
+
+
+        readonly List<string> _nodeNames;
+        public List<string> NodeNames => _nodeNames;
+
+        public void UpdateAxisExpression()
         {
-            ApplyToAxis();
-            AxisExpression = _axis?.ToString() ?? "{}";
+            AxisExpression = _axis.ToString();
         }
 
         static readonly string[] _axisDefaultElements =
@@ -84,6 +91,34 @@ namespace IDCA.Client.ViewModel
                 _name = name;
                 _type = type;
                 _adding = adding;
+
+                _scriptName = type switch
+                {
+                    AxisElementType.Category => "Category",
+                    AxisElementType.CategoryRange => "CategoryRange",
+                    AxisElementType.Text => "e",
+                    AxisElementType.Base => "base",
+                    AxisElementType.UnweightedBase => "UnweightedBase",
+                    AxisElementType.EffectiveBase => "EffectiveBase",
+                    AxisElementType.Expression => "Expression",
+                    AxisElementType.Numeric => "Numeric",
+                    AxisElementType.Derived => "Derived",
+                    AxisElementType.Mean => "Mean",
+                    AxisElementType.StdErr => "StdErr",
+                    AxisElementType.StdDev => "StdDev",
+                    AxisElementType.Total => "Total",
+                    AxisElementType.SubTotal => "Subtotal",
+                    AxisElementType.Min => "Min",
+                    AxisElementType.Max => "Max",
+                    AxisElementType.Net => "Net",
+                    AxisElementType.Combine => "Combine",
+                    AxisElementType.Sum => "Sum",
+                    AxisElementType.Median => "Median",
+                    AxisElementType.Percentile => "Percentile",
+                    AxisElementType.Mode => "Mode",
+                    AxisElementType.Ntd => "Ntd",
+                    _ => string.Empty,
+                };
             }
 
             string _name;
@@ -91,6 +126,13 @@ namespace IDCA.Client.ViewModel
             {
                 get { return _name; }
                 set { SetProperty(ref _name, value); }
+            }
+
+            string _scriptName;
+            public string ScriptName
+            {
+                get { return _scriptName; }
+                set { _scriptName = value; }
             }
 
             AxisElementType _type;
@@ -150,7 +192,12 @@ namespace IDCA.Client.ViewModel
             else
             {
                 int index = _tree.IndexOf(node);
-                success = CollectionHelper.Swap(_tree, index, moveDown ? index + 1 : index - 1);
+                int targetIndex = moveDown ? index + 1 : index - 1;
+                success = CollectionHelper.Swap(_tree, index, targetIndex);
+                if (success)
+                {
+                    _axis.Swap(index, targetIndex);
+                }
             }
 
             if (success)
@@ -210,6 +257,7 @@ namespace IDCA.Client.ViewModel
                 if (index > -1)
                 {
                     node.Parent.RemoveChildAt(index);
+                    node.Parent.AxisElement.Template.RemoveAt(index);
                 }
             }
             else
@@ -218,8 +266,10 @@ namespace IDCA.Client.ViewModel
                 if (index > -1)
                 {
                     _tree.RemoveAt(index);
+                    _axis.RemoveAt(index);
                 }
             }
+            _nodeNames.RemoveAll(n => n.Equals(node.Name, StringComparison.OrdinalIgnoreCase));
             UpdateAxisExpression();
         }
 
@@ -260,20 +310,53 @@ namespace IDCA.Client.ViewModel
         
         void AppendTreeNode(AvailableElement element, AxisTreeNode? parentNode = null)
         {
-            var node = new AxisTreeNode(this, element.Type, OnSelectedChanged);
+            var axisElement = _axis.NewObject();
+            axisElement.Template.ElementType = element.Type;
+            axisElement.Name = $"{element.ScriptName}{_axis.CountIf(element.Type) + 1}";
+
+            var node = new AxisTreeNode(this, axisElement, OnSelectedChanged);
             node.AddingChild += AppendTreeElementChildNode;
             node.Removing += RemoveTreeNode;
             node.MovingUp += n => MoveTreeNode(n);
             node.MovingDown += n => MoveTreeNode(n, true);
-            node.Name = element.Name;
+            node.Name = axisElement.Name;
+            node.Parent = parentNode;
+
             if (parentNode != null)
             {
-                parentNode.Children.Add(node);
+                var parameter = parentNode.AxisElement.Template.NewParameter();
+                parameter.SetValue(axisElement);
+
+                int currentIndex = _selectedNode == null ? -1 : parentNode.Children.IndexOf(_selectedNode);
+                if (currentIndex == -1 || currentIndex == parentNode.Children.Count - 1)
+                {
+                    parentNode.Children.Add(node);
+                    parentNode.AxisElement.Template.PushParameter(parameter);
+                }
+                else
+                {
+                    parentNode.Children.Insert(currentIndex + 1, node);
+                    parentNode.AxisElement.Template.InsertParameter(currentIndex + 1, parameter);
+                }
+
             }
             else
             {
-                _tree.Add(node);
+                int currentIndex = _selectedNode == null ? -1 : _tree.IndexOf(_selectedNode);
+
+                if (currentIndex == -1 || currentIndex == _tree.Count - 1)
+                {
+                    _tree.Add(node);
+                    _axis.Add(axisElement);
+                }
+                else
+                {
+                    _tree.Insert(currentIndex + 1, node);
+                    _axis.Insert(currentIndex + 1, axisElement);
+                }
+
             }
+            _nodeNames.Add(element.Name);
             UpdateAxisExpression();
         }
 
@@ -287,34 +370,39 @@ namespace IDCA.Client.ViewModel
             AppendTreeNode(_availableElements[_availableSelectedIndex], node);
         }
 
-        void AppendTreeNode()
-        {
-            if (_availableSelectedIndex < 0 || 
-                _availableSelectedIndex >= _availableElements.Count)
-            {
-                return;
-            }
-
-            AxisElementType type = (AxisElementType)(_availableSelectedIndex + 1);
-            string name = _availableElements[_availableSelectedIndex].Name;
-            var node = new AxisTreeNode(this, type, OnSelectedChanged);
-            node.Removing += RemoveTreeNode;
-            node.MovingUp += n => MoveTreeNode(n);
-            node.MovingDown += n => MoveTreeNode(n, true);
-            node.Name = name;
-            if (_selectedNode == null || !(
-                _selectedNode.ElementType == AxisElementType.Net ||
-                _selectedNode.ElementType == AxisElementType.Combine))
-            {
-                _tree.Add(node);
-            }
-            else
-            {
-                _selectedNode.Children.Add(node);
-            }
-            UpdateAxisExpression();
-        }
-        public ICommand AppendTreeNodeCommand => new RelayCommand(AppendTreeNode);
+        //void AppendTreeNode()
+        //{
+        //    if (_availableSelectedIndex < 0 || 
+        //        _availableSelectedIndex >= _availableElements.Count)
+        //    {
+        //        return;
+        //    }
+        //
+        //    AxisElementType type = (AxisElementType)(_availableSelectedIndex + 1);
+        //    string name = _availableElements[_availableSelectedIndex].ScriptName;
+        //
+        //    var axisElement = _axis.AppendElement(type);
+        //
+        //    var node = new AxisTreeNode(this, axisElement, OnSelectedChanged);
+        //    node.Removing += RemoveTreeNode;
+        //    node.MovingUp += n => MoveTreeNode(n);
+        //    node.MovingDown += n => MoveTreeNode(n, true);
+        //    node.Name = name;
+        //    if (_selectedNode == null)
+        //    {
+        //        _tree.Add(node);
+        //    }
+        //    else
+        //    {
+        //        int selectedIndex = _tree.IndexOf(_selectedNode);
+        //        if (selectedIndex > -1)
+        //        {
+        //            _tree.Insert(selectedIndex + 1, node);
+        //        }
+        //    }
+        //    UpdateAxisExpression();
+        //}
+        //public ICommand AppendTreeNodeCommand => new RelayCommand(AppendTreeNode);
 
 
         //void Confirm(object? sender)
@@ -349,12 +437,17 @@ namespace IDCA.Client.ViewModel
         public void LoadFromAxis(Axis axis)
         {
             _axis = axis;
+            _tree.Clear();
             foreach (AxisElement element in axis)
             {
-                var node = new AxisTreeNode(this);
+                var node = new AxisTreeNode(this, element, OnSelectedChanged);
                 node.LoadFromAxisElement(element);
+                node.Removing += RemoveTreeNode;
+                node.MovingUp += n => MoveTreeNode(n);
+                node.MovingDown += n => MoveTreeNode(n, true);
                 _tree.Add(node);
             }
+            _axisExpression = axis.ToString();
         }
 
     }
@@ -362,8 +455,9 @@ namespace IDCA.Client.ViewModel
     public class AxisElementSuffixViewModel : ObservableObject
     {
 
-        public AxisElementSuffixViewModel()
+        public AxisElementSuffixViewModel(AxisElementSuffixType type)
         {
+            _type = type;
             _name = string.Empty;
             _text = string.Empty;
             _selectedIndex = 0;
@@ -373,53 +467,115 @@ namespace IDCA.Client.ViewModel
             _isComboBox = false;
         }
 
+        Action<AxisElementSuffixViewModel>? _checkChanged;
+        public event Action<AxisElementSuffixViewModel>? CheckChanged
+        {
+            add { _checkChanged += value; }
+            remove { _checkChanged -= value; }
+        }
+
+        Action<AxisElementSuffixViewModel>? _valueChanged;
+        public event Action<AxisElementSuffixViewModel>? ValueChanged
+        {
+            add { _valueChanged += value; }
+            remove { _valueChanged -= value; }
+        }
+
+        readonly AxisElementSuffixType _type;
+        public AxisElementSuffixType Type => _type;
+
         string _name;
         public string Name
         {
-            get => _name;
-            set => SetProperty(ref _name, value);
+            get
+            {
+                return _name;
+            }
+            set
+            {
+                SetProperty(ref _name, value);
+            }
         }
 
         string _text;
         public string Text
         {
-            get => _text;
-            set => SetProperty(ref _text, value);
+            get
+            {
+                return _text;
+            }
+            set
+            {
+                SetProperty(ref _text, value);
+                if (_checked)
+                {
+                    _valueChanged?.Invoke(this);
+                }
+            }
         }
 
         int _selectedIndex;
         public int SelectedIndex
         {
-            get => _selectedIndex;
-            set => SetProperty(ref _selectedIndex, value);
+            get { return _selectedIndex; }
+            set 
+            { 
+                SetProperty(ref _selectedIndex, value);
+                if (_checked)
+                {
+                    _valueChanged?.Invoke(this);
+                }
+            }
         }
 
         ObservableCollection<string> _selections;
         public ObservableCollection<string> Selections
         {
-            get => _selections;
-            set => SetProperty(ref _selections, value);
+            get
+            {
+                return _selections;
+            }
+            set
+            {
+                SetProperty(ref _selections, value);
+            }
         }
 
         bool _checked;
         public bool Checked
         {
-            get => _checked;
-            set => SetProperty(ref _checked, value);
+            get { return _checked; }
+            set 
+            { 
+                SetProperty(ref _checked, value);
+                _checkChanged?.Invoke(this);
+            }
         }
 
         bool _isTextBox;
         public bool IsTextBox
         {
-            get => _isTextBox;
-            set => SetProperty(ref _isTextBox, value);
+            get
+            {
+                return _isTextBox;
+            }
+            set
+            {
+                SetProperty(ref _isTextBox, value);
+            }
         }
 
         bool _isComboBox;
         public bool IsComboBox
         {
-            get => _isComboBox;
-            set => SetProperty(ref _isComboBox, value);
+            get
+            {
+                return _isComboBox;
+            }
+            set
+            {
+                SetProperty(ref _isComboBox, value);
+            }
         }
 
         public void AddSelections(params string[] seletions)
@@ -436,7 +592,7 @@ namespace IDCA.Client.ViewModel
             {
                 return _text;
             }
-            else if (_selectedIndex > 0 && _selectedIndex < _selections.Count)
+            else if (_selectedIndex >= 0 && _selectedIndex < _selections.Count)
             {
                 return _selections[_selectedIndex];
             }
@@ -534,6 +690,20 @@ namespace IDCA.Client.ViewModel
             _type = type;
         }
 
+        Func<AxisElementDetailViewModel, bool>? _beforeValueChanged;
+        public event Func<AxisElementDetailViewModel, bool> BeforeValueChanged
+        {
+            add { _beforeValueChanged += value; }
+            remove { _beforeValueChanged -= value; }
+        }
+
+        Action<AxisElementDetailViewModel>? _valueChanged;
+        public event Action<AxisElementDetailViewModel> ValueChanged
+        {
+            add { _valueChanged += value; }
+            remove { _valueChanged -= value; }
+        }
+
         AxisElementDetailType _type;
         public AxisElementDetailType Type
         {
@@ -541,7 +711,7 @@ namespace IDCA.Client.ViewModel
             set { _type = value; }
         }
 
-        int _indexOfElement = 0;
+        int _indexOfElement = -1;
         public int IndexOfElement
         {
             get { return _indexOfElement; }
@@ -559,7 +729,14 @@ namespace IDCA.Client.ViewModel
         public string Text
         {
             get { return _text; }
-            set { SetProperty(ref _text, value); }
+            set 
+            {
+                if (_beforeValueChanged == null || _beforeValueChanged(this))
+                {
+                    SetProperty(ref _text, value);
+                    _valueChanged?.Invoke(this);
+                }
+            }
         }
 
         bool _isTextBox;
@@ -594,7 +771,11 @@ namespace IDCA.Client.ViewModel
         public int SelectedIndex
         {
             get { return _selectedIndex; }
-            set { SetProperty(ref _selectedIndex, value); }
+            set 
+            { 
+                SetProperty(ref _selectedIndex, value);
+                _valueChanged?.Invoke(this);
+            }
         }
 
         ObservableCollection<string> _selections;
@@ -695,6 +876,14 @@ namespace IDCA.Client.ViewModel
                     {
                         _name = ViewModelConstants.AxisElementDetailVariableName;
                     }
+                    else if (_type == AxisElementDetailType.CategoryUpperBoundary)
+                    {
+                        _name = ViewModelConstants.AxisElementDetailCategoryUpperBoundary;
+                    }
+                    else if (_type == AxisElementDetailType.CategoryLowerBoundary)
+                    {
+                        _name = ViewModelConstants.AxisElementDetailCategoryLowerBoundary;
+                    }
                     else
                     {
                         _name = ViewModelConstants.AxisElementDetailCutOff;
@@ -764,9 +953,11 @@ namespace IDCA.Client.ViewModel
 
     public class AxisTreeNode : ObservableObject
     {
-        public AxisTreeNode(ObservableObject root)
+        public AxisTreeNode(AxisSettingViewModel root, AxisElement element)
         {
             _root = root;
+            _axisElement = element;
+            _elementType = element.Template.ElementType;
             _allowChildren = false;
             _elementType = AxisElementType.None;
             _name = string.Empty;
@@ -798,18 +989,21 @@ namespace IDCA.Client.ViewModel
             InitSuffixTextBoxItem(AxisElementSuffixType.Multiplier);
             // Weight=WeightVariable
             InitSuffixTextBoxItem(AxisElementSuffixType.Weight);
+
+            LoadFromAxisElement(_axisElement);
         }
 
-        public AxisTreeNode(ObservableObject root, AxisElementType type, Action<AxisTreeNode, bool>? selectedChanged) : this(root)
+        public AxisTreeNode(AxisSettingViewModel root, AxisElement axisElement, Action<AxisTreeNode, bool>? selectedChanged) : this(root, axisElement)
         {
-            InitDetail(type);
-            _elementType = type;
             _selectedChanged = selectedChanged;
-            _allowChildren = type == AxisElementType.Combine || type == AxisElementType.Net;
+            _allowChildren = _elementType == AxisElementType.Combine || _elementType == AxisElementType.Net;
         }
 
-        readonly ObservableObject _root;
-        public ObservableObject Root => _root;
+        readonly AxisElement _axisElement;
+        public AxisElement AxisElement => _axisElement;
+
+        readonly AxisSettingViewModel _root;
+        public AxisSettingViewModel Root => _root;
 
         Action<AxisTreeNode, bool>? _selectedChanged;
         public Action<AxisTreeNode, bool>? SelectedChanged
@@ -870,6 +1064,13 @@ namespace IDCA.Client.ViewModel
             remove { _addingChild -= value; }
         }
 
+        Action<AxisTreeNode>? _renamed;
+        public event Action<AxisTreeNode>? Renamed
+        {
+            add { _renamed += value; }
+            remove { _renamed -= value; }
+        }
+
         bool _allowChildren;
         public bool AllowChildren
         {
@@ -904,27 +1105,127 @@ namespace IDCA.Client.ViewModel
         AxisTreeNode? _parent;
         public AxisTreeNode? Parent { get => _parent; set => _parent = value; }
 
+        void OnSuffixChecked(AxisElementSuffixViewModel viewModel)
+        {
+            var existSuffix = _axisElement.Suffix[viewModel.Type];
+            if (viewModel.Checked)
+            {
+                if (existSuffix != null)
+                {
+                    existSuffix.Value = viewModel.GetValue();
+                }
+                else
+                {
+                    var suffix = _axisElement.Suffix.Append(viewModel.Type);
+                    suffix.Value = viewModel.GetValue();
+                }
+            }
+            else
+            {
+                if (existSuffix != null)
+                {
+                    _axisElement.Suffix.RemoveIf(e => e.Type == viewModel.Type);
+                }
+            }
+            _root.UpdateAxisExpression();
+        }
+
+        void OnSuffixValueChanged(AxisElementSuffixViewModel viewModel)
+        {
+            if (viewModel.Checked)
+            {
+                var suffix = _axisElement.Suffix[viewModel.Type];
+                if (suffix != null)
+                {
+                    suffix.Value = viewModel.GetValue();
+                    _root.UpdateAxisExpression();
+                }
+            }
+        }
+
         void InitSuffixTextBoxItem(AxisElementSuffixType type)
         {
-            var element = new AxisElementSuffixViewModel()
+            var element = new AxisElementSuffixViewModel(type)
             {
                 Name = type.ToString(),
                 IsComboBox = false,
                 IsTextBox = true
             };
+            element.CheckChanged += OnSuffixChecked;
+            element.ValueChanged += OnSuffixValueChanged;
             _suffixes.Add(element);
         }
 
         void InitSuffixSelectionItem(AxisElementSuffixType type, params string[] selections)
         {
-            var element = new AxisElementSuffixViewModel()
+            var element = new AxisElementSuffixViewModel(type)
             {
                 Name = type.ToString(),
                 IsComboBox = true,
                 IsTextBox = false,
             };
             element.AddSelections(selections);
+            element.CheckChanged += OnSuffixChecked;
+            element.ValueChanged += OnSuffixValueChanged;
             _suffixes.Add(element);
+        }
+
+        bool ValidateNodeName(AxisElementDetailViewModel detail)
+        {
+            return !Root.NodeNames.Exists(n => n.Equals(detail.Name, StringComparison.OrdinalIgnoreCase));
+        }
+
+        void OnDetailTextValueChanged(AxisElementDetailViewModel viewModel)
+        {
+            switch (viewModel.Type)
+            {
+                case AxisElementDetailType.Name:
+                    Name = viewModel.GetValue();
+                    break;
+                case AxisElementDetailType.Description:
+                    _axisElement.Description = viewModel.GetValue();
+                    break;
+                case AxisElementDetailType.Exclude:
+                    _axisElement.Exclude = bool.TryParse(viewModel.GetValue(), out bool b) && b;
+                    break;
+                case AxisElementDetailType.Filter:
+                case AxisElementDetailType.VariableName:
+                case AxisElementDetailType.CutOff:
+                case AxisElementDetailType.CategoryUpperBoundary:
+                case AxisElementDetailType.CategoryLowerBoundary:
+                    var parameter = _axisElement.Template.GetParameter(viewModel.IndexOfElement);
+                    if (parameter == null)
+                    {
+                        while (_axisElement.Template.Count < viewModel.IndexOfElement + 1)
+                        {
+                            parameter = _axisElement.Template.NewParameter();
+                            _axisElement.Template.PushParameter(parameter);
+                        }
+                    }
+                    parameter?.SetValue(viewModel.GetValue());
+                    break;
+                case AxisElementDetailType.None:
+                default:
+                    break;
+            }
+            _root.UpdateAxisExpression();
+        }
+
+        void InitDetailElement(AxisElementDetailType type, int? indexOfElement = null)
+        {
+            var detail = new AxisElementDetailViewModel(type);
+            if (indexOfElement != null && indexOfElement >= 0)
+            {
+                detail.IndexOfElement = (int)indexOfElement;
+            }
+            // 添加需要关联值的事件
+            if (type == AxisElementDetailType.Name)
+            {
+                detail.BeforeValueChanged += ValidateNodeName;
+            }
+            detail.ValueChanged += OnDetailTextValueChanged;
+
+            Details.Add(detail);
         }
 
         public void InitDetail(AxisElementType type)
@@ -935,10 +1236,10 @@ namespace IDCA.Client.ViewModel
                     break;
 
                 case AxisElementType.CategoryRange:
-                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.Description));
-                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.CategoryLowerBoundary) { IndexOfElement = 0 });
-                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.CategoryUpperBoundary) { IndexOfElement = 1 });
-                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.Exclude));
+                    // InitDetailElement(AxisElementDetailType.Description);
+                    InitDetailElement(AxisElementDetailType.CategoryLowerBoundary, 0);
+                    InitDetailElement(AxisElementDetailType.CategoryUpperBoundary, 1);
+                    InitDetailElement(AxisElementDetailType.Exclude);
                     break;
 
                 // 单个Filter条件
@@ -947,10 +1248,10 @@ namespace IDCA.Client.ViewModel
                 case AxisElementType.EffectiveBase:
                 case AxisElementType.Expression:
                 case AxisElementType.Derived:
-                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.Name));
-                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.Description));
-                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.Filter) { IndexOfElement = 0 });
-                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.Exclude));
+                    InitDetailElement(AxisElementDetailType.Name);
+                    InitDetailElement(AxisElementDetailType.Description);
+                    InitDetailElement(AxisElementDetailType.Filter, 0);
+                    InitDetailElement(AxisElementDetailType.Exclude);
                     break;
 
                 // (Variable, 'Filter')
@@ -963,20 +1264,20 @@ namespace IDCA.Client.ViewModel
                 case AxisElementType.Sum:
                 case AxisElementType.Median:
                 case AxisElementType.Mode:
-                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.Name));
-                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.Description));
-                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.VariableName) { IndexOfElement = 0 });
-                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.Filter) { IndexOfElement = 1 });
-                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.Exclude));
+                    InitDetailElement(AxisElementDetailType.Name);
+                    InitDetailElement(AxisElementDetailType.Description);
+                    InitDetailElement(AxisElementDetailType.VariableName, 0);
+                    InitDetailElement(AxisElementDetailType.Filter, 1);
+                    InitDetailElement(AxisElementDetailType.Exclude);
                     break;
 
                 case AxisElementType.Percentile:
-                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.Name));
-                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.Description));
-                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.VariableName) { IndexOfElement = 0 });
-                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.CutOff) { IndexOfElement = 1 });
-                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.Filter) { IndexOfElement = 2 });
-                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.Exclude));
+                    InitDetailElement(AxisElementDetailType.Name);
+                    InitDetailElement(AxisElementDetailType.Description);
+                    InitDetailElement(AxisElementDetailType.VariableName, 0);
+                    InitDetailElement(AxisElementDetailType.CutOff, 1);
+                    InitDetailElement(AxisElementDetailType.Filter, 2);
+                    InitDetailElement(AxisElementDetailType.Exclude);
                     break;
 
                 case AxisElementType.Net:
@@ -987,9 +1288,9 @@ namespace IDCA.Client.ViewModel
                 case AxisElementType.SubTotal:
                 case AxisElementType.None:
                 case AxisElementType.Ntd:
-                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.Name));
-                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.Description));
-                    Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.Exclude));
+                    InitDetailElement(AxisElementDetailType.Name);
+                    InitDetailElement(AxisElementDetailType.Description);
+                    InitDetailElement(AxisElementDetailType.Exclude);
                     break;
 
                 default:
@@ -998,7 +1299,16 @@ namespace IDCA.Client.ViewModel
         }
 
         string _name;
-        public string Name { get => _name; set => SetProperty(ref _name, value); }
+        public string Name 
+        { 
+            get { return _name; }
+            set
+            {
+                SetProperty(ref _name, value);
+                _axisElement.Name = value;
+                _renamed?.Invoke(this);
+            }
+        }
 
         ObservableCollection<AxisTreeNode> _children;
         public ObservableCollection<AxisTreeNode> Children
@@ -1024,6 +1334,9 @@ namespace IDCA.Client.ViewModel
         public void PushChild(AxisTreeNode node)
         {
             _children.Add(node);
+            var parameter = _axisElement.Template.NewParameter();
+            parameter.SetValue(node.AxisElement);
+            _axisElement.Template.PushParameter(parameter);
             node.Parent = this;
         }
 
@@ -1032,6 +1345,7 @@ namespace IDCA.Client.ViewModel
             if (_children.Count > 0)
             {
                 _children.RemoveAt(_children.Count - 1);
+                _axisElement.Template.RemoveAt(_axisElement.Template.Count - 1);
             }
         }
 
@@ -1042,12 +1356,18 @@ namespace IDCA.Client.ViewModel
                 return false;
             }
             _children.RemoveAt(index);
+            _axisElement.Template.RemoveAt(index);
             return true;
         }
 
         public bool SwapChildren(int index1, int index2)
         {
-            return CollectionHelper.Swap(_children, index1, index2);
+            bool result = CollectionHelper.Swap(_children, index1, index2);
+            if (result)
+            {
+                _axisElement.Template.Swap(index1, index2);
+            }
+            return result;
         }
 
         public bool MoveChildUp(int index)
@@ -1104,12 +1424,24 @@ namespace IDCA.Client.ViewModel
             {
                 detail.IndexOfElement = indexOfElement;
             }
+
+            // 添加需要关联值的事件
+            if (type == AxisElementDetailType.Name)
+            {
+                detail.BeforeValueChanged += ValidateNodeName;
+            }
+            detail.ValueChanged += OnDetailTextValueChanged;
+
+            // 向节点名称列表中添加当前元素名
+            _root.NodeNames.Add(element.Name);
+
             detail.LoadFromAxisElement(element);
             Details.Add(detail);
         }
 
         public void LoadFromAxisElement(AxisElement element)
         {
+            _name = element.Name;
             _elementType = element.Template.ElementType;
             // Detail
             Details.Clear();
@@ -1196,7 +1528,7 @@ namespace IDCA.Client.ViewModel
                         _root is AxisSettingViewModel viewModel)
                     {
                         var child = new AxisTreeNode(_root, 
-                            subElement.Template.ElementType,
+                            subElement,
                             (n, v) =>
                             {
                                 if (v)

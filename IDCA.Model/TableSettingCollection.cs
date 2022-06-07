@@ -150,15 +150,6 @@ namespace IDCA.Model
         }
     }
 
-    public enum TableType
-    {
-        Normal,
-        Grid,
-        GridSlice,
-        ResponseSummary,
-        MeanSummary
-    }
-
     public class TableSetting
     {
         public TableSetting(TableSettingCollection setting, Field? field, Config config, Tables tables)
@@ -169,7 +160,7 @@ namespace IDCA.Model
             _name = $"TS{setting.Count + 1}";
             _table = tables.NewTable(Spec.TableType.Normal);
             _tempAxis = new Axis(_table, AxisType.Normal);
-            _tableAxisNetType = TableAxisNetType.StandardNet;
+            _tableAxisNetType = AxisNetType.StandardNet;
             _net = new List<NetLikeSettingElement>();
         }
 
@@ -184,7 +175,7 @@ namespace IDCA.Model
         string _tableFilter = string.Empty;
         readonly List<NetLikeSettingElement> _net;
         readonly Table _table;
-        TableAxisNetType _tableAxisNetType;
+        AxisNetType _tableAxisNetType;
         bool _addSigma = true;
         bool _addNps = false;
         int _npsTopBox = 2;
@@ -312,7 +303,7 @@ namespace IDCA.Model
         /// <summary>
         /// 表格表侧轴表达式元素的Net类型，用于配置Net使用net元素还是combine元素以及出示位置
         /// </summary>
-        public TableAxisNetType TableAxisNetType { get => _tableAxisNetType; set => _tableAxisNetType = value; }
+        public AxisNetType TableAxisNetType { get => _tableAxisNetType; set => _tableAxisNetType = value; }
         /// <summary>
         /// 表格表侧轴表达式是否在末尾添加subtotal()作为小计
         /// </summary>
@@ -360,11 +351,11 @@ namespace IDCA.Model
         public void CreateBaseAxisExpression()
         {
             _tempAxis.Clear();
-            _tempAxis.AppendTextElement();
-            _tempAxis.AppendBaseElement(_baseLabel, _baseFilter);
-            _tempAxis.AppendTextElement();
-            _tempAxis.AppendAllCategory();
-            _tempAxis.AppendTextElement();
+            _tempAxis.AppendText();
+            _tempAxis.AppendBase(_baseLabel, _baseFilter);
+            _tempAxis.AppendText();
+            _tempAxis.AppendCategoryRange();
+            _tempAxis.AppendText();
             _tempAxis.AppendSubTotal(_config.TryGet<string>(SpecConfigKeys.AxisSigmaLabel) ?? "");
         }
         /// <summary>
@@ -427,13 +418,13 @@ namespace IDCA.Model
         {
             if (_net.Count == 0)
             {
-                _tempAxis.AppendAllCategory();
+                _tempAxis.AppendCategoryRange();
                 return;
             }
 
             int topBottomCount = _net.Count(ele => ele.IsTopBottomBox);
 
-            if (_tableAxisNetType == TableAxisNetType.StandardNet)
+            if (_tableAxisNetType == AxisNetType.StandardNet)
             {
                 bool insertEmptyLine = _config.TryGet<bool>(SpecConfigKeys.AxisNetInsertEmptyLine);
                 for (int i = 0; i < _net.Count; i++)
@@ -442,7 +433,7 @@ namespace IDCA.Model
                     _tempAxis.AppendNet(netElement.Label, netElement.Codes);
                     if (insertEmptyLine && i < _net.Count - 1)
                     {
-                        _tempAxis.AppendTextElement();
+                        _tempAxis.AppendText();
                     }
                 }
             }
@@ -460,19 +451,19 @@ namespace IDCA.Model
                     ApplyNps();
                     var subtotal = _tempAxis.AppendSubTotal();
                     subtotal.Suffix.AppendIsHidden(true);
-                    _tempAxis.AppendTextElement();
+                    _tempAxis.AppendText();
                 }
 
-                if (_tableAxisNetType == TableAxisNetType.CombineBeforeAllCategory)
+                if (_tableAxisNetType == AxisNetType.CombineBeforeAllCategory)
                 {
                     ApplyCombineElements(nets);
                     var subtotal = _tempAxis.AppendSubTotal();
                     subtotal.Suffix.AppendIsHidden(true);
-                    _tempAxis.AppendTextElement();
+                    _tempAxis.AppendText();
                 }
 
-                _tempAxis.AppendAllCategory();
-                _tempAxis.AppendTextElement();
+                _tempAxis.AppendCategoryRange();
+                _tempAxis.AppendText();
 
                 if (topBottomCount > 0 && position == AxisTopBottomBoxPosition.BetweenAllCategoryAndSigma)
                 {
@@ -487,7 +478,7 @@ namespace IDCA.Model
                     }
                 }
 
-                if (_tableAxisNetType == TableAxisNetType.CombineBetweenAllCategoryAndSigma)
+                if (_tableAxisNetType == AxisNetType.CombineBetweenAllCategoryAndSigma)
                 {
                     ApplyCombineElements(nets);
                     if (_addSigma)
@@ -508,13 +499,13 @@ namespace IDCA.Model
                 {
                     if (_tempAxis[^1].Template.ElementType != AxisElementType.Text)
                     {
-                        _tempAxis.AppendTextElement();
+                        _tempAxis.AppendText();
                     }
                     ApplyTopBottomBox();
                     ApplyNps();
                 }
 
-                if (_tableAxisNetType == TableAxisNetType.CombineAfterSigma)
+                if (_tableAxisNetType == AxisNetType.CombineAfterSigma)
                 {
                     ApplyCombineElements(nets);
                 }
@@ -556,20 +547,12 @@ namespace IDCA.Model
             }
 
             _tempAxis.Clear();
-            _tempAxis.AppendTextElement();
-            _tempAxis.AppendBaseElement(_baseLabel, _baseFilter);
-            _tempAxis.AppendTextElement();
+            _tempAxis.AppendText();
+            _tempAxis.AppendBase(_baseLabel, _baseFilter);
+            _tempAxis.AppendText();
             ApplyMaybeNetElements();
         }
 
-    }
-
-    public enum TableAxisNetType
-    {
-        StandardNet,
-        CombineBeforeAllCategory,
-        CombineBetweenAllCategoryAndSigma,
-        CombineAfterSigma
     }
 
     public class NetLikeSettingElement

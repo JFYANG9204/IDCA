@@ -15,6 +15,6 @@
     <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0" />
   </ItemGroup>
 
-  <Import Project="..\IDCA.Bll\IDCA.Bll.projitems" Label="Shared" />
+  <Import Project="..\IDCA.Model\IDCA.Model.projitems" Label="Shared" />
 
 </Project>

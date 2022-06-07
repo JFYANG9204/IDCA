@@ -1,4 +1,6 @@
-﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
+﻿using IDCA.Client.Singleton;
+using IDCA.Model.Spec;
+using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
@@ -12,18 +14,35 @@ namespace IDCA.Client.ViewModel
     {
         public TableSettingWindowViewModel()
         {
-            _headerNames = new List<string>();
-            _tablesNames = new List<string>();
+            _tree = new TableSettingTreeNode("Root", null);
 
-            _headerNode = new TableSettingTreeNode("表头", null);
+            _headerNode = new TableSettingTreeNode("表头", null) { AllowNodeRemoving = false };
             _headerNode.SelectedChanged += OnSelectedChanged;
-            _tableNode = new TableSettingTreeNode("表侧", null);
+            _headerNode.AddNewChild += () => AppendNewHeader();
+
+            _tableNode = new TableSettingTreeNode("表侧", null) { AllowNodeRemoving = false };
             _tableNode.SelectedChanged += OnSelectedChanged;
+            _tableNode.AddNewChild += () => AppendNewTables();
+
+            _tree.Children.Add(_headerNode);
+            _tree.Children.Add(_tableNode);
+
             _selectedNode = _headerNode;
+
+            _spec = GlobalConfig.Instance.SpecDocument;
+            _spec.HeaderAdded += OnHeaderAdded;
+            _spec.HeaderRemoved += OnHeaderRemoved;
         }
 
-        readonly List<string> _headerNames;
-        readonly List<string> _tablesNames;
+        readonly SpecDocument _spec;
+
+        TableSettingTreeNode _tree;
+        public TableSettingTreeNode Tree
+        {
+            get { return _tree; }
+            set { SetProperty(ref _tree, value); }
+        }
+
 
         TableSettingTreeNode _headerNode;
         TableSettingTreeNode _tableNode;
@@ -47,6 +66,31 @@ namespace IDCA.Client.ViewModel
             set { SetProperty(ref _selectedNode, value); }
         }
 
+        bool ValidateHeaderName(string name) 
+        {
+            return _spec.ValidateHeaderName(name);
+        }
+
+        bool ValidateTablesName(string name)
+        {
+            return _spec.ValidateTablesName(name);
+        }
+
+        void OnHeaderRenamed(string oldeName, string newName)
+        {
+            if (SelectedNode != null)
+            {
+                SelectedNode.Name = newName;
+            }
+        }
+
+        void OnTablesRenamed(string oldName, string newName)
+        {
+            if (SelectedNode != null)
+            {
+                SelectedNode.Name = newName;
+            }
+        }
 
         void OnSelectedChanged(TableSettingTreeNode node, bool selected)
         {
@@ -56,38 +100,64 @@ namespace IDCA.Client.ViewModel
             }
         }
 
+        void OnHeaderAdded(Metadata header)
+        {
+            foreach (var node in _tableNode.Children)
+            {
+                node.TableViewModel?.AddHeaderInfos(true, header.Name);
+            }
+        }
+
+        void OnHeaderRemoved(Metadata header)
+        {
+            foreach (var node in _tableNode.Children)
+            {
+                node.TableViewModel?.RemoveHeaderInfos(header.Name);
+            }
+        }
+
         public void AppendNewHeader(string name = "")
         {
-            string headerName = name;
-            if (string.IsNullOrEmpty(headerName))
-            {
-                headerName = $"TopBreak_{_headerNode.Children.Count + 1}";
-            }
-            var header = new TableSettingTreeNode(
-                headerName, 
-                new HeaderSettingViewModel(headerName, _headerNames));
+            var vm = new HeaderSettingViewModel(_spec.NewHeader(name));
+            vm.BeforeRenamed += ValidateHeaderName;
+            vm.Renamed += OnHeaderRenamed;
+
+            var header = new TableSettingTreeNode(vm.HeaderName, vm) { AllowAppendChild = false };
             header.SelectedChanged += OnSelectedChanged;
+            header.Removing += OnNodeRemoving;
             _headerNode.Children.Add(header);
-            SelectedNode = _headerNode;
+
+            SelectedNode = header;
         }
 
         public void AppendNewTables(string name = "")
         {
-            string tablesName = name;
-            if (string.IsNullOrEmpty(tablesName))
-            {
-                tablesName = $"Tab_{_tableNode.Children.Count + 1}";
-            }
-            var tables = new TableSettingTreeNode(
-                tablesName, 
-                new TableSettingViewModel(tablesName, _tablesNames));
+            var vm = new TableSettingViewModel(_spec.NewTables(name));
+            vm.AddHeaderInfos(false, _spec.GetHeaderNames());
+            vm.BeforeRemoved += ValidateTablesName;
+            vm.Renamed += OnTablesRenamed;
+
+            var tables = new TableSettingTreeNode(vm.TableName, vm) { AllowAppendChild = false };
             tables.SelectedChanged += OnSelectedChanged;
+            tables.Removing += OnNodeRemoving;
             _tableNode.Children.Add(tables);
+
             SelectedNode = tables;
         }
 
-        public ICommand NewHeaderCommand => new RelayCommand(() => AppendNewHeader());
-        public ICommand NewTablesCommand => new RelayCommand(() => AppendNewTables());
+        void OnNodeRemoving(TableSettingTreeNode node)
+        {
+            if (node.IsTableView)
+            {
+                _tableNode.RemoveChild(node);
+                _spec.RemoveTables(node.Name);
+            }
+            else if (node.IsHeaderView)
+            {
+                _headerNode.RemoveChild(node);
+                _spec.RemoveHeader(node.Name);                
+            }
+        }
 
     }
 
@@ -102,32 +172,33 @@ namespace IDCA.Client.ViewModel
             _isTableView = false;
             _isOverView = false;
 
+            _allowAppendChild = true;
+            _allowNodeRemoving = true;
+
             var type = dataContext?.GetType();
 
             if (dataContext == null || type == null)
             {
-                _headerViewModel = new HeaderSettingViewModel("") { Node = this };
-                _tableViewModel = new TableSettingViewModel("") { Node = this };
+                _headerViewModel = HeaderSettingViewModel.Empty(this);
+                _tableViewModel = TableSettingViewModel.Empty(this);
                 _overviewViewModel = new OverviewViewModel() { Node = this };
             }
             else if (type.Equals(typeof(TableSettingViewModel)))
             {
                 _tableViewModel = (TableSettingViewModel)dataContext;
                 _tableViewModel.Node = this;
-                _tableViewModel.Renamed += name => Name = name;
                 _isTableView = true;
 
-                _headerViewModel = new HeaderSettingViewModel("") { Node = this };
+                _headerViewModel = HeaderSettingViewModel.Empty(this);
                 _overviewViewModel = new OverviewViewModel() { Node = this };
             }
             else if (type.Equals(typeof(HeaderSettingViewModel)))
             {
                 _headerViewModel = (HeaderSettingViewModel)dataContext;
                 _headerViewModel.Node = this;
-                _headerViewModel.Renamed += name => Name = name;
                 _isHeaderView = true;
 
-                _tableViewModel = new TableSettingViewModel("") { Node = this };
+                _tableViewModel = TableSettingViewModel.Empty(this);
                 _overviewViewModel = new OverviewViewModel() { Node = this };
             }
             else if (type.Equals(typeof(OverviewViewModel)))
@@ -136,9 +207,37 @@ namespace IDCA.Client.ViewModel
                 _overviewViewModel.Node = this;
                 _isOverView = true;
 
-                _tableViewModel = new TableSettingViewModel("") { Node = this };
-                _headerViewModel = new HeaderSettingViewModel("") { Node = this };
+                _tableViewModel = TableSettingViewModel.Empty(this);
+                _headerViewModel = HeaderSettingViewModel.Empty(this);
             }
+        }
+
+        bool _allowNodeRemoving;
+        public bool AllowNodeRemoving
+        {
+            get { return _allowNodeRemoving; }
+            set { SetProperty(ref _allowNodeRemoving, value); }
+        }
+
+        bool _allowAppendChild;
+        public bool AllowAppendChild
+        {
+            get { return _allowAppendChild; }
+            set { SetProperty(ref _allowAppendChild, value); }
+        }
+
+        Action<TableSettingTreeNode>? _removing;
+        public event Action<TableSettingTreeNode>? Removing
+        {
+            add { _removing += value; }
+            remove { _removing -= value; }
+        }
+
+        Action? _addNewChild;
+        public event Action? AddNewChild
+        {
+            add { _addNewChild += value; }
+            remove { _addNewChild -= value; }
         }
 
         string _name;
@@ -214,6 +313,18 @@ namespace IDCA.Client.ViewModel
             get { return _children; }
             set { SetProperty(ref _children, value); }
         }        
+
+        public void RemoveChild(TableSettingTreeNode node)
+        {
+            int index = _children.IndexOf(node);
+            if (index > -1)
+            {
+                _children.RemoveAt(index);
+            }
+        }
+
+        public ICommand RemoveCommand => new RelayCommand(() => _removing?.Invoke(this));
+        public ICommand AddChildCommand => new RelayCommand(() => _addNewChild?.Invoke());
 
     }
 

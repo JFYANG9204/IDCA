@@ -28,11 +28,11 @@ namespace IDCA.Test
             string path = Path.Combine(Directory.GetCurrentDirectory(), @"..\..\..\Features\Templates.xml");
             SpecDocument spec = new("", path, new());
             var manipulation = spec.Manipulations.NewObject();
-            manipulation.Axis.AppendTextElement();
-            manipulation.Axis.AppendBaseElement("Base : Total Respondent", "true");
-            manipulation.Axis.AppendTextElement();
-            manipulation.Axis.AppendAllCategory();
-            manipulation.Axis.AppendTextElement();
+            manipulation.Axis.AppendText();
+            manipulation.Axis.AppendBase("Base : Total Respondent", "true");
+            manipulation.Axis.AppendText();
+            manipulation.Axis.AppendCategoryRange();
+            manipulation.Axis.AppendText();
             manipulation.Axis.AppendSubTotal("Sigma");
             manipulation.Axis.AppendMean("Mean").Suffix.AppendIsHidden(true);
             var result = manipulation.Axis.ToString();

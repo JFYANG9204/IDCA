@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace IDCA.Model
 {
@@ -103,6 +104,24 @@ namespace IDCA.Model
                 result.Append(Convert.ToString(buffer[i], 16));
             }
             return result.ToString();
+        }
+        /// <summary>
+        /// 判断文本是否是整数
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        internal static bool IsInteger(string source)
+        {
+            return Regex.IsMatch(source, @"[0-9]+");
+        }
+        /// <summary>
+        /// 判断文本是否是数值，整数或小数
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        internal static bool IsDigit(string source)
+        {
+            return Regex.IsMatch(source, @"[0-9.]+");
         }
 
     }

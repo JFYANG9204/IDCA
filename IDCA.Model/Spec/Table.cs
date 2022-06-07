@@ -75,12 +75,12 @@ namespace IDCA.Model.Spec
         /// <param name="index"></param>
         public void MoveUp(int index)
         {
-            if (index <= 0 || index >= Count)
+            if (index < 0 || index >= Count)
             {
                 return;
             }
-            var table = _items[index];
-            table.IndexAt--;
+            _items[index].IndexAt--;
+            _items[index - 1].IndexAt++;
             Swap(index, index - 1);
         }
 
@@ -94,8 +94,8 @@ namespace IDCA.Model.Spec
             {
                 return;
             }
-            var table = _items[index];
-            table.IndexAt--;
+            _items[index].IndexAt++;
+            _items[index + 1].IndexAt--;
             Swap(index, index + 1);
         }
 
@@ -105,7 +105,7 @@ namespace IDCA.Model.Spec
         /// <returns></returns>
         public string Export()
         {
-            StringBuilder builder = new();
+            var builder = new StringBuilder();
 
             foreach (var item in _items)
             {
@@ -378,12 +378,12 @@ namespace IDCA.Model.Spec
 
     public enum TableType
     {
-        None,
-        Normal,
-        Grid,
-        GridSlice,
-        MeanSummary,
-        ResponseSummary,
+        None = -1,
+        Normal = 0,
+        Grid = 1,
+        GridSlice = 2,
+        MeanSummary = 3,
+        ResponseSummary = 4,
     }
 
 }

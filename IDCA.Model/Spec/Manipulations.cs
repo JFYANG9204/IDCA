@@ -276,11 +276,11 @@ namespace IDCA.Model.Spec
         {
             Config? config = Document?.Config;
             _axis.Clear();
-            _axis.AppendTextElement();
-            _axis.AppendBaseElement(config?.TryGet<string>(SpecConfigKeys.AxisBaseLabel) ?? "", baseFilter);
-            _axis.AppendTextElement();
-            _axis.AppendAllCategory();
-            _axis.AppendTextElement();
+            _axis.AppendText();
+            _axis.AppendBase(config?.TryGet<string>(SpecConfigKeys.AxisBaseLabel) ?? "", baseFilter);
+            _axis.AppendText();
+            _axis.AppendCategoryRange();
+            _axis.AppendText();
             _axis.AppendSubTotal(config?.TryGet<string>(SpecConfigKeys.AxisSigmaLabel) ?? "");
             if (addAverage && _axisAverageFunction != null)
             {

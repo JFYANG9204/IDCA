@@ -6,9 +6,10 @@
     <SharedGUID>3ba6375d-4343-4c93-81d3-ea0063e8452a</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
-    <Import_RootNamespace>IDCA.Bll</Import_RootNamespace>
+    <Import_RootNamespace>IDCA.Model</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AxisOperator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CollectionHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Config.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converter.cs" />
@@ -27,7 +28,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Messages.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Spec\AxisParser.cs" />
-    <Compile Include="..\IDCA.Bll\TableSettingCollection.cs" />
+    <Compile Include="..\IDCA.Model\TableSettingCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Spec\ScriptCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Spec\Axis.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Spec\Manipulations.cs" />

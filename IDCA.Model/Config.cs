@@ -86,6 +86,29 @@ namespace IDCA.Model
         }
     }
 
+    /// <summary>
+    /// 轴表达式Net类型，用于标记Net的组织方式，影响轴表达式的出示顺序
+    /// </summary>
+    public enum AxisNetType
+    {
+        /// <summary>
+        /// 标准的Net组织方式，用Net类型的轴元素出示各个元素，从上到下顺序排列
+        /// </summary>
+        StandardNet,
+        /// <summary>
+        /// 所有的Net以Combine类型的轴元素放在具体Category元素之前
+        /// </summary>
+        CombineBeforeAllCategory,
+        /// <summary>
+        /// 所有的Net以Combine类型的轴元素放在具体Category元素和最后的小计之间
+        /// </summary>
+        CombineBetweenAllCategoryAndSigma,
+        /// <summary>
+        /// 所有的Net以Combine类型的轴元素放在小计之后
+        /// </summary>
+        CombineAfterSigma
+    }
+
     public enum AxisTopBottomBoxPosition
     {
         BeforeAllCategory = 0,
@@ -96,10 +119,14 @@ namespace IDCA.Model
     public class SpecConfigKeys
     {
         public const string MetadataCategoricalLabel = "MetadataCategoricalLabel";
+        // Axis Config
+        public const string AxisAddSigma = "AxisAddSigma";
         public const string AxisBaseLabel = "AxisBaseLabel";
         public const string AxisSigmaLabel = "AxisSigmaLabel";
         public const string AxisNetAheadLabel = "AxisNetAheadLabel";
         public const string AxisNetInsertEmptyLine = "AxisNetInsertEmptyLine";
+        public const string AxisNpsTopBox = "AxisNpsTopBox";
+        public const string AxisNpsBottomBox = "AxisNpsBottomBox";
         /// <summary>
         /// 配置Top/Bottom Box的位置，其int值需要与AxisTopBottomBoxPosition的值相同
         /// </summary>

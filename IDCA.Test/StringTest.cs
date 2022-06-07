@@ -21,10 +21,10 @@ namespace IDCA.Test
         [TestMethod]
         public void Convert()
         {
-            var e = TableAxisNetType.CombineBeforeAllCategory;
+            var e = AxisNetType.CombineBeforeAllCategory;
             var t = e.GetType();
             var f = t.GetField(e.ToString());
-            System.Console.WriteLine(TableAxisNetType.CombineBetweenAllCategoryAndSigma.ToString());
+            System.Console.WriteLine(AxisNetType.CombineBetweenAllCategoryAndSigma.ToString());
         }
 
     }

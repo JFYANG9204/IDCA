@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace IDCA.Model.MDM
 {
-    public class MDMCollection<T> : MDMObject where T : MDMObject
+    public class MDMCollection<T> : MDMObject, IEnumerable, IEnumerable<T> where T : MDMObject
     {
         protected MDMCollection(MDMDocument? document, MDMObject? parent) : base(document, parent)
         {
@@ -41,6 +41,28 @@ namespace IDCA.Model.MDM
         {
             _items.Clear();
         }
+
+        IEnumerator<T> IEnumerable<T>.GetEnumerator()
+        {
+            return _items.GetEnumerator();
+        }
+
+        public void ForEach(Action<T> callback)
+        {
+            foreach (var item in _items)
+            {
+                callback(item);
+            }
+        }
+
+        public void ForEach(Action<int, T> callback)
+        {
+            for (int i = 0; i < _items.Count; i++)
+            {
+                callback(i, _items[i]);
+            }
+        }
+
     }
 
     public class MDMObjectCollection<T> : MDMCollection<T> where T : MDMObject

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
@@ -48,11 +49,11 @@ namespace IDCA.Model.Spec
         /// </summary>
         public int IndentLevel { get => _indentLevel; set => _indentLevel = value; }
 
-        readonly string _name;
+        string _name;
         /// <summary>
-        /// 当前元数据的变量名，为了避免命名冲突，名称不可修改
+        /// 当前元数据的变量名
         /// </summary>
-        public string Name => _name;
+        public string Name { get => _name; set => _name = value; }
 
         string? _description = string.Empty;
         /// <summary>
@@ -375,21 +376,39 @@ namespace IDCA.Model.Spec
 
     }
 
-    public class MetadataCollection : SpecObject
+    public class MetadataCollection : SpecObject, IEnumerable
     {
         public MetadataCollection(SpecDocument document, Config config) : base(document)
         {
             _objectType = SpecObjectType.Collection;
             _config = config;
+            _fields = new Dictionary<string, Metadata>();
         }
 
         readonly Config _config;
-        readonly Dictionary<string, Metadata> _fields = new();
+        readonly Dictionary<string, Metadata> _fields;
 
         /// <summary>
         /// 当前集合中的元素数量
         /// </summary>
         public int Count => _fields.Count;
+        /// <summary>
+        /// 获取指定名称的表头变量，不区分大小写，如果名称不存在，将返回null
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public Metadata? this[string name]
+        {
+            get
+            {
+                string lowerName = name.ToLower();
+                if (_fields.ContainsKey(lowerName))
+                {
+                    return _fields[lowerName];
+                }
+                return null;
+            }
+        }
 
         /// <summary>
         /// 移除特定名称的元数据对象
@@ -450,6 +469,10 @@ namespace IDCA.Model.Spec
             return builder.ToString();
         }
 
+        public IEnumerator GetEnumerator()
+        {
+            return _fields.Values.GetEnumerator();
+        }
     }
 
 

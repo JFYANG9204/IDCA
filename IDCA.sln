@@ -5,16 +5,11 @@ VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDCA.Client", "IDCA.Client\IDCA.Client.csproj", "{F2A06E33-E023-4A09-8D09-1519963E3010}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "IDCA.Model", "IDCA.Bll\IDCA.Model.shproj", "{3BA6375D-4343-4C93-81D3-EA0063E8452A}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "IDCA.Model", "IDCA.Model\IDCA.Model.shproj", "{3BA6375D-4343-4C93-81D3-EA0063E8452A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDCA.Test", "IDCA.Test\IDCA.Test.csproj", "{775817B2-7FD6-477B-A0EF-4BA2A44DFAF8}"
 EndProject
 Global
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		IDCA.Bll\IDCA.Bll.projitems*{3ba6375d-4343-4c93-81d3-ea0063e8452a}*SharedItemsImports = 13
-		IDCA.Bll\IDCA.Bll.projitems*{775817b2-7fd6-477b-a0ef-4ba2a44dfaf8}*SharedItemsImports = 5
-		IDCA.Bll\IDCA.Bll.projitems*{f2a06e33-e023-4a09-8d09-1519963e3010}*SharedItemsImports = 5
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -34,5 +29,10 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5650D9F0-7AF7-4C3F-8193-9978B4360031}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		IDCA.Model\IDCA.Model.projitems*{3ba6375d-4343-4c93-81d3-ea0063e8452a}*SharedItemsImports = 13
+		IDCA.Model\IDCA.Model.projitems*{775817b2-7fd6-477b-a0ef-4ba2a44dfaf8}*SharedItemsImports = 5
+		IDCA.Model\IDCA.Model.projitems*{f2a06e33-e023-4a09-8d09-1519963e3010}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal

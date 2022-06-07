@@ -13,8 +13,6 @@ namespace IDCA.Model.Spec
         public SpecDocument(string projectPath, Config config) : base()
         {
             _globalTables = new List<Tables>();
-            _tableNames = new List<string>();
-            _headerNames = new List<string>();
 
             _projectPath = projectPath;
             _objectType = SpecObjectType.Document;
@@ -58,8 +56,54 @@ namespace IDCA.Model.Spec
             }
         }
 
+        // Header部分更新触发事件
+        Action<Metadata>? _headerAdded;
+        Action<Metadata>? _headerRemoved;
+        Action<Metadata>? _headerChanged;
+        /// <summary>
+        /// 当表头变量添加进集合时触发的事件
+        /// </summary>
+        public event Action<Metadata> HeaderAdded
+        {
+            add { _headerAdded += value; }
+            remove { _headerAdded -= value; }
+        }
+        /// <summary>
+        /// 当表头变量被移除时触发的事件
+        /// </summary>
+        public event Action<Metadata> HeaderRemoved
+        {
+            add { _headerRemoved += value; }
+            remove { _headerRemoved -= value; }
+        }
+        /// <summary>
+        /// 当表头发生变化时（添加或删除）触发的事件
+        /// </summary>
+        public event Action<Metadata> HeaderChanged
+        {
+            add { _headerChanged += value; }
+            remove { _headerChanged -= value; }
+        }
+
+        void OnHeaderAdded(Metadata metadata)
+        {
+            _headerAdded?.Invoke(metadata);
+        }
+
+        void OnHeaderRemoved(Metadata metadata)
+        {
+            _headerRemoved?.Invoke(metadata);
+        }
+
+        void OnHeaderChanged(Metadata metadata)
+        {
+            _headerChanged?.Invoke(metadata);
+        }
+
+        // Table部分更新触发事件
         Action<Tables>? _tablesRemoved;
         Action<Tables>? _tablesAdded;
+        Action<Tables>? _tablesChanged;
         /// <summary>
         /// 表格集合移除时触发的事件
         /// </summary>
@@ -76,7 +120,14 @@ namespace IDCA.Model.Spec
             add { _tablesAdded += value; }
             remove { _tablesAdded -= value; }
         }
-
+        /// <summary>
+        /// 表格集合发生变动时触发的事件
+        /// </summary>
+        public event Action<Tables>? TablesChanged
+        {
+            add { _tablesChanged += value; }
+            remove { _tablesChanged -= value; }
+        }
 
         void OnTablesRemoved(Tables tables)
         {
@@ -86,6 +137,11 @@ namespace IDCA.Model.Spec
         void OnTablesAdded(Tables tables)
         {
             _tablesAdded?.Invoke(tables);
+        }
+
+        void OnTablesChanged(Tables tables)
+        {
+            _tablesChanged?.Invoke(tables);
         }
 
         /// <summary>
@@ -140,8 +196,6 @@ namespace IDCA.Model.Spec
         }
 
         readonly List<Tables> _globalTables;
-        readonly List<string> _tableNames;
-        readonly List<string> _headerNames;
 
         /// <summary>
         /// 判断是否是可用的名称，不区分大小写
@@ -150,7 +204,7 @@ namespace IDCA.Model.Spec
         /// <returns>如果可用返回true，已存在相同名称返回false</returns>
         public bool ValidateTablesName(string name)
         {
-            return !_tableNames.Exists(ele => ele.Equals(name, StringComparison.OrdinalIgnoreCase));
+            return !_globalTables.Exists(t => t.Name.EndsWith(name, StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>
@@ -160,12 +214,7 @@ namespace IDCA.Model.Spec
         /// <returns></returns>
         public bool ValidateHeaderName(string name)
         {
-            return !_headerNames.Exists(header => header.Equals(name, StringComparison.OrdinalIgnoreCase));
-        }
-
-        void RemoveTablesName(string name)
-        {
-            _tableNames.RemoveAll(ele => ele.Equals(name, StringComparison.OrdinalIgnoreCase));
+            return _metadata[name] == null;
         }
 
         bool OnTablesRename(Tables tables, string newName)
@@ -174,8 +223,6 @@ namespace IDCA.Model.Spec
             {
                 return false;
             }
-            RemoveTablesName(tables.Name);
-            _tableNames.Add(newName);
             return true;
         }
 
@@ -189,10 +236,11 @@ namespace IDCA.Model.Spec
             string headerName = name;
             if (string.IsNullOrEmpty(headerName))
             {
-                headerName = $"TopBreak_{_metadata}";
+                headerName = $"TopBreak_{_metadata.Count + 1}";
             }
             var metadata = _metadata.NewMetadata(headerName, MetadataType.Categorical);
-            _headerNames.Add(headerName);
+            OnHeaderAdded(metadata);
+            OnHeaderChanged(metadata);
             return metadata;
         }
 
@@ -208,11 +256,11 @@ namespace IDCA.Model.Spec
             if (string.IsNullOrEmpty(tabName) || !ValidateTablesName(tabName))
             {
                 int index = _globalTables.Count;
-                while (!ValidateTablesName($"tab_{index}"))
+                while (!ValidateTablesName($"Tab_{index}"))
                 {
                     index++;
                 }
-                tables.Name = $"tab_{index}";
+                tables.Name = $"Tab_{index}";
             }
             else
             {
@@ -221,6 +269,7 @@ namespace IDCA.Model.Spec
             tables.Rename += OnTablesRename;
             _globalTables.Add(tables);
             OnTablesAdded(tables);
+            OnTablesChanged(tables);
             return tables;
         }
         /// <summary>
@@ -246,6 +295,15 @@ namespace IDCA.Model.Spec
             return _globalTables.Find(table => table.Name == name);
         }
         /// <summary>
+        /// 获取指定名称的表头变量，不区分大小写。如果不存在，返回null
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public Metadata? GetHeader(string name)
+        {
+            return _metadata[name];
+        }
+        /// <summary>
         /// 移除特定名称的表格集合对象
         /// </summary>
         /// <param name="name"></param>
@@ -253,13 +311,13 @@ namespace IDCA.Model.Spec
         {
             if (!ValidateTablesName(name))
             {
-                int index = _globalTables.FindIndex(table => table.Name == name);
+                int index = _globalTables.FindIndex(table => table.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
                 if (index > -1)
                 {
                     var tables = _globalTables[index];
                     _globalTables.RemoveAt(index);
-                    RemoveTablesName(name);
                     OnTablesRemoved(tables);
+                    OnTablesChanged(tables);
                 }
             }
         }
@@ -275,8 +333,53 @@ namespace IDCA.Model.Spec
             }
             var tables = _globalTables[index];
             _globalTables.RemoveAt(index);
-            RemoveTablesName(_globalTables[index].Name);
             OnTablesRemoved(tables);
+            OnTablesChanged(tables);
+        }
+
+        /// <summary>
+        /// 移除特定名称的表头变量
+        /// </summary>
+        /// <param name="name"></param>
+        public void RemoveHeader(string name)
+        {
+            var header = _metadata[name];
+            if (header != null)
+            {
+                _metadata.Remove(name);
+                OnHeaderRemoved(header);
+                OnHeaderChanged(header);
+            }
+        }
+
+        /// <summary>
+        /// 获取当前所有表头变量的变量名列表
+        /// </summary>
+        /// <returns></returns>
+        public string[] GetHeaderNames()
+        {
+            string[] result = new string[_metadata.Count];
+            int i = 0;
+            foreach (Metadata metadata in _metadata)
+            {
+                result[i] = metadata.Name;
+                i++;
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// 获取当前所有表格配置的文件名
+        /// </summary>
+        /// <returns></returns>
+        public string[] GetTablesNames()
+        {
+            string[] result = new string[_globalTables.Count];
+            for (int i = 0; i < _globalTables.Count; i++)
+            {
+                result[i] = _globalTables[i].Name;
+            }
+            return result;
         }
 
         readonly TemplateCollection _templates;

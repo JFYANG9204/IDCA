@@ -74,7 +74,52 @@ namespace IDCA.Model.Spec
         /// <returns></returns>
         public int CountIf(AxisElementType type)
         {
-            return _items.Select(item => item.Template.ElementType == type).Count(val => val);
+            int count = 0;
+            _items.ForEach(e => {
+                if (e.Template.ElementType == type)
+                {
+                    count++;
+                }
+                count += e.CountChild(type);
+            });
+            return count;
+        }
+
+        /// <summary>
+        /// 添加符合类型的默认轴元素，所有参数都为默认值
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public AxisElement AppendElement(AxisElementType type)
+        {
+            return type switch
+            {
+                AxisElementType.Category => AppendCategory(),
+                AxisElementType.CategoryRange => AppendCategoryRange(),
+                AxisElementType.InsertFunctionOrVariable => AppendInsertFunction(),
+                AxisElementType.Text => AppendText(),
+                AxisElementType.Base => AppendBase(),
+                AxisElementType.UnweightedBase => AppendUnweightedBase(),
+                AxisElementType.EffectiveBase => AppendEffectiveBase(),
+                AxisElementType.Expression => AppendExpression(),
+                AxisElementType.Numeric => AppendNumeric(),
+                AxisElementType.Derived => AppendDerived(),
+                AxisElementType.Mean => AppendMean(),
+                AxisElementType.StdErr => AppendStdErr(),
+                AxisElementType.StdDev => AppendStdDev(),
+                AxisElementType.Total => AppendTotal(),
+                AxisElementType.SubTotal => AppendSubTotal(),
+                AxisElementType.Min => AppendMin(),
+                AxisElementType.Max => AppendMax(),
+                AxisElementType.Net => AppendNet(),
+                AxisElementType.Combine => AppendCombine(),
+                AxisElementType.Sum => AppendSum(),
+                AxisElementType.Median => AppendMedian(),
+                AxisElementType.Percentile => AppendPercentile(),
+                AxisElementType.Mode => AppendMode(),
+                AxisElementType.Ntd => AppendNtd(),
+                _ => AppendElement(AxisElementType.None),
+            };
         }
 
         AxisElement AppendElement(AxisElementType type, string label, Action<AxisElement>? callback, params string[] parameters)
@@ -110,12 +155,22 @@ namespace IDCA.Model.Spec
             return AppendElement(type, label, expr => expr.Name = $"{name}{CountIf(type) + 1}", variable, expression);
         }
 
+        /// <summary>
+        /// 向当前集合的末尾添加一个CategoryRange类型的轴表达式元素，语法格式为[lower]..[upper]
+        /// </summary>
+        /// <param name="lowerBoundary"></param>
+        /// <param name="upperBoundary"></param>
+        /// <returns></returns>
+        public AxisElement AppendCategoryRange(string lowerBoundary = "", string upperBoundary = "")
+        {
+            return AppendNamedElement(AxisElementType.CategoryRange, "", "CategoryRange", lowerBoundary, upperBoundary);
+        }
 
         /// <summary>
         /// 向当前集合的末尾添加一个text类型的轴表达式元素，可以修改标签
         /// </summary>
         /// <param name="label"></param>
-        public AxisElement AppendTextElement(string label = "")
+        public AxisElement AppendText(string label = "")
         {
             return AppendNamedElement(AxisElementType.Text, label, "e");
         }
@@ -125,7 +180,7 @@ namespace IDCA.Model.Spec
         /// </summary>
         /// <param name="label">base元素的标签</param>
         /// <param name="parameter">base元素的参数，一般为表达式或true</param>
-        public AxisElement AppendBaseElement(string label = "", string parameter = "")
+        public AxisElement AppendBase(string label = "", string parameter = "")
         {
             return AppendElement(AxisElementType.Base, label, item =>
             {
@@ -138,7 +193,7 @@ namespace IDCA.Model.Spec
         /// 向当前集合的末尾添加一个unweightedbase类型的轴表达式元素，可以添加标签描述
         /// </summary>
         /// <param name="label">可添加的描述</param>
-        public AxisElement AppendUnweightedBaseElement(string label = "")
+        public AxisElement AppendUnweightedBase(string label = "")
         {
             return AppendNamedElement(AxisElementType.UnweightedBase, label, "unweightedbase");
         }
@@ -147,7 +202,7 @@ namespace IDCA.Model.Spec
         /// 向当前集合的末尾添加一个EffectiveBase类型的轴表达式元素，可以添加标签描述
         /// </summary>
         /// <param name="label">可添加的描述</param>
-        public AxisElement AppendEffectiveBaseElement(string label = "")
+        public AxisElement AppendEffectiveBase(string label = "")
         {
             return AppendNamedElement(AxisElementType.EffectiveBase, label, "effectivebase");
         }
@@ -402,33 +457,22 @@ namespace IDCA.Model.Spec
             return AppendElement(AxisElementType.InsertFunctionOrVariable, "", null, function == null ? "" : function.Exec());
         }
 
-        /// <summary>
-        /// 向当前集合末尾添加一个所有Category的表达式元素'..'
-        /// </summary>
-        public void AppendAllCategory()
-        {
-            AppendElement(AxisElementType.CategoryRange, string.Empty, null);
-        }
+        ///// <summary>
+        ///// 向当前集合末尾添加一个所有Category的表达式元素'..'
+        ///// </summary>
+        //public void AppendAllCategory()
+        //{
+        //    AppendElement(AxisElementType.CategoryRange, string.Empty, null);
+        //}
 
         /// <summary>
         /// 向当前集合末尾添加单个Category元素
         /// </summary>
         /// <param name="name"></param>
         /// <param name="label"></param>
-        public AxisElement AppendCategory(string name, string label = "")
+        public AxisElement AppendCategory(string name = "", string label = "")
         {
-            return AppendElement(AxisElementType.Category, label, null, name, label);
-        }
-
-        /// <summary>
-        /// 向当前集合末尾添加单个Category区间元素，可以提供上限和下限
-        /// </summary>
-        /// <param name="upper">区间上限</param>
-        /// <param name="lower">区间下限</param>
-        /// <returns></returns>
-        public AxisElement AppentCategoryRange(string upper, string lower)
-        {
-            return AppendElement(AxisElementType.CategoryRange, "", null, upper, lower);
+            return AppendNamedElement(AxisElementType.Category, label, name);
         }
 
         /// <summary>
@@ -506,12 +550,36 @@ namespace IDCA.Model.Spec
         public bool Exclude { get => _exclude; internal set => _exclude = value; }
 
         /// <summary>
+        /// 计算模板参数中指定轴元素类型值的数量，会递归计算子元素的子元素
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public int CountChild(AxisElementType type)
+        {
+            int count = 0;
+
+            for (int i = 0; i < _template.Count; i++)
+            {
+                if (_template.GetParameter(i)?.GetValue() is AxisElement element)
+                {
+                    if (element.Template.ElementType == type)
+                    {
+                        count++;
+                    };
+                    count += element.CountChild(type);
+                }
+            }
+
+            return count;
+        }
+
+        /// <summary>
         /// 转换为字符串
         /// </summary>
         /// <returns></returns>
         public override string ToString()
         {
-            return $"{(_exclude ? "^" : "")}{(string.IsNullOrEmpty(_name) ? "" : _name)}{(_description == null ? "" : $" '{_description}'")}{(string.IsNullOrEmpty(_name) ? "" : " ")}{_template}{_suffix}";
+            return $"{(_exclude ? "^" : "")}{((string.IsNullOrEmpty(_name) || _template.ElementType == AxisElementType.CategoryRange) ? "" : _name)}{((_description == null || _template.ElementType == AxisElementType.CategoryRange) ? "" : $" '{_description}'")}{(string.IsNullOrEmpty(_name) ? "" : " ")}{_template}{_suffix}";
         }
     }
 
@@ -594,13 +662,35 @@ namespace IDCA.Model.Spec
         }
 
         /// <summary>
+        /// 将参数插入到指定索引位置，如果索引无效，将插入到最后
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        public bool InsertParameter(int index, AxisElementParameter parameter)
+        {
+            return _parameters.Insert(index, parameter);
+        }
+
+        /// <summary>
         /// 获取指定索引位置的参数对象，如果不存在，返回null
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
         public AxisElementParameter? GetParameter(int index)
         {
-            return index > 0 && index < _parameters.Count ? _parameters[index] : null;
+            return index >= 0 && index < _parameters.Count ? _parameters[index] : null;
+        }
+
+        /// <summary>
+        /// 交换两个参数的位置，如果交换成功，返回true，失败返回false
+        /// </summary>
+        /// <param name="sourceIndex"></param>
+        /// <param name="targetIndex"></param>
+        /// <returns></returns>
+        public bool Swap(int sourceIndex, int targetIndex)
+        {
+            return _parameters.Swap(sourceIndex, targetIndex);
         }
 
         /// <summary>
@@ -609,13 +699,22 @@ namespace IDCA.Model.Spec
         public int Count => _parameters.Count;
 
         /// <summary>
+        /// 移除索引位置的模板参数
+        /// </summary>
+        /// <param name="index"></param>
+        public void RemoveAt(int index)
+        {
+            _parameters.RemoveAt(index);
+        }
+
+        /// <summary>
         /// 转换为字符串
         /// </summary>
         /// <returns></returns>
         public override string ToString()
         {
             // 移除值为空的参数
-            _parameters.RemoveIf(e => string.IsNullOrEmpty(e.ToString()));
+            //_parameters.RemoveIf(e => string.IsNullOrEmpty(e.ToString()));
             return _elementType switch
             {
                 AxisElementType.InsertFunctionOrVariable => $"\" + {(_parameters.Count > 0 ? _parameters[0] : "")} + \"",
@@ -629,8 +728,8 @@ namespace IDCA.Model.Spec
                 AxisElementType.SubTotal => "subtotal()",
                 AxisElementType.Min => $"min({(_parameters.Count > 0 ? _parameters[0] : "")}{(_parameters.Count > 1 ? $", '{_parameters[1]}'" : "")})",
                 AxisElementType.Max => $"max({(_parameters.Count > 0 ? _parameters[0] : "")}{(_parameters.Count > 1 ? $", '{_parameters[1]}'" : "")})",
-                AxisElementType.Net => $"net({{{string.Join(',', _parameters)}}})",
-                AxisElementType.Combine => $"combine({{{string.Join(',', _parameters)}}})",
+                AxisElementType.Net => $"net({{{string.Join<AxisElementParameter>(',', _parameters.ToArray())}}})",
+                AxisElementType.Combine => $"combine({{{string.Join<AxisElementParameter>(',', _parameters.ToArray())}}})",
                 AxisElementType.Expression => $"expression('{(_parameters.Count > 0 ? _parameters[0] : "")}')",
                 AxisElementType.Numeric => $"numeric({(_parameters.Count > 0 ? _parameters[0] : "")}{(_parameters.Count > 1 ? $", '{_parameters[1]}'" : "")})",
                 AxisElementType.Derived => $"derived('{(_parameters.Count > 0 ? _parameters[0] : "")}')",
@@ -700,7 +799,7 @@ namespace IDCA.Model.Spec
     public class AxisElementSuffixCollection : SpecObjectCollection<AxisElementSuffix>
     {
 
-        internal AxisElementSuffixCollection(AxisElementSuffixCollection suffixes) : base(collection => new AxisElementSuffix(collection))
+        public AxisElementSuffixCollection(AxisElementSuffixCollection suffixes) : base(collection => new AxisElementSuffix(collection))
         {
             _parent = suffixes.Parent;
             _objectType = suffixes.SpecObjectType;
@@ -711,12 +810,49 @@ namespace IDCA.Model.Spec
             }
         }
 
-        internal AxisElementSuffixCollection(SpecObject parent) : base(parent, collection => new AxisElementSuffix(collection))
+        public AxisElementSuffixCollection(SpecObject parent) : base(parent, collection => new AxisElementSuffix(collection))
         {
         }
 
+        /// <summary>
+        /// 获取特定类型的后缀配置
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public AxisElementSuffix? this[AxisElementSuffixType type]
+        {
+            get
+            {
+                return _items.Find(e => e.Type == type);
+            }
+        }
 
-        void AppendItem(AxisElementSuffixType type, object value)
+        /// <summary>
+        /// 向当前集合末尾追加固定类型的后缀对象
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public AxisElementSuffix Append(AxisElementSuffixType type)
+        {
+            return type switch
+            {
+                AxisElementSuffixType.CalculationScope => AppendCalculationScope(AxisElementSuffixCalculationScope.AllElements),
+                AxisElementSuffixType.CountsOnly => AppendCountsOnly(false),
+                AxisElementSuffixType.Decimals => AppendDecimals(0),
+                AxisElementSuffixType.Factor => AppendFactor(0),
+                AxisElementSuffixType.IsFixed => AppendIsFixed(false),
+                AxisElementSuffixType.IsHidden => AppendIsHidden(false),
+                AxisElementSuffixType.IsHiddenWhenColumn => AppendIsHiddenWhenColumn(false),
+                AxisElementSuffixType.IsHiddenWhenRow => AppendIsHiddenWhenRow(false),
+                AxisElementSuffixType.IncludeInBase => AppendIncludeInBase(false),
+                AxisElementSuffixType.IsUnweighted => AppendIsUnweighted(false),
+                AxisElementSuffixType.Multiplier => AppendMultiplier(""),
+                AxisElementSuffixType.Weight => AppendWeight(""),
+                _ => AppendItem(type, ""),
+            };
+        }
+
+        AxisElementSuffix AppendItem(AxisElementSuffixType type, object value)
         {
             AxisElementSuffix? elementSuffix = _items.Find(x => x.Type == type);
             if (elementSuffix != null)
@@ -725,20 +861,21 @@ namespace IDCA.Model.Spec
             }
             else
             {
-                AxisElementSuffix suffix = NewObject();
-                suffix.Type = type;
-                suffix.Value = value;
-                Add(suffix);
+                elementSuffix = NewObject();
+                elementSuffix.Type = type;
+                elementSuffix.Value = value;
+                Add(elementSuffix);
             }
+            return elementSuffix;
         }
 
         /// <summary>
         /// 向当前集合末尾添加CalculationScope类型的配置字段
         /// </summary>
         /// <param name="scope"></param>
-        public void AppendCalculationScope(AxisElementSuffixCalculationScope scope)
+        public AxisElementSuffix AppendCalculationScope(AxisElementSuffixCalculationScope scope)
         {
-            AppendItem(AxisElementSuffixType.CalculationScope,
+            return AppendItem(AxisElementSuffixType.CalculationScope,
                 scope == AxisElementSuffixCalculationScope.AllElements ? "AllElements" : "PrecedingElements");
         }
         
@@ -746,99 +883,99 @@ namespace IDCA.Model.Spec
         /// 向当前集合末尾添加CountsOnly类型的配置字段
         /// </summary>
         /// <param name="value"></param>
-        public void AppendCountsOnly(bool value)
+        public AxisElementSuffix AppendCountsOnly(bool value)
         {
-            AppendItem(AxisElementSuffixType.CountsOnly, value ? "True" : "False");
+            return AppendItem(AxisElementSuffixType.CountsOnly, value ? "True" : "False");
         }
 
         /// <summary>
         /// 向当前集合末尾添加Decimals类型的配置字段
         /// </summary>
         /// <param name="value"></param>
-        public void AppendDecimals(int value)
+        public AxisElementSuffix AppendDecimals(int value)
         {
-            AppendItem(AxisElementSuffixType.Decimals, value);
+            return AppendItem(AxisElementSuffixType.Decimals, value);
         }
 
         /// <summary>
         /// 向当前集合末尾添加Factor类型的配置字段
         /// </summary>
         /// <param name="value"></param>
-        public void AppendFactor(double value)
+        public AxisElementSuffix AppendFactor(double value)
         {
-            AppendItem(AxisElementSuffixType.Factor, value);
+            return AppendItem(AxisElementSuffixType.Factor, value);
         }
 
         /// <summary>
         /// 向当前集合末尾添加IsFixed类型的配置字段
         /// </summary>
         /// <param name="value"></param>
-        public void AppendIsFixed(bool value)
+        public AxisElementSuffix AppendIsFixed(bool value)
         {
-            AppendItem(AxisElementSuffixType.IsFixed, value ? "True" : "False");
+            return AppendItem(AxisElementSuffixType.IsFixed, value ? "True" : "False");
         }
 
         /// <summary>
         /// 向当前集合末尾添加IsHidden类型的配置字段
         /// </summary>
         /// <param name="value"></param>
-        public void AppendIsHidden(bool value)
+        public AxisElementSuffix AppendIsHidden(bool value)
         {
-            AppendItem(AxisElementSuffixType.IsHidden, value ? "True" : "False");
+            return AppendItem(AxisElementSuffixType.IsHidden, value ? "True" : "False");
         }
 
         /// <summary>
         /// 向当前集合末尾添加IsHiddenWhenColumn类型的配置字段
         /// </summary>
         /// <param name="value"></param>
-        public void AppendIsHiddenWhenColumn(bool value)
+        public AxisElementSuffix AppendIsHiddenWhenColumn(bool value)
         {
-            AppendItem(AxisElementSuffixType.IsHiddenWhenColumn, value ? "True" : "False");
+            return AppendItem(AxisElementSuffixType.IsHiddenWhenColumn, value ? "True" : "False");
         }
 
         /// <summary>
         /// 向当前集合末尾添加IsHiddenWhenRow类型的配置字段
         /// </summary>
         /// <param name="value"></param>
-        public void AppendIsHiddenWhenRow(bool value)
+        public AxisElementSuffix AppendIsHiddenWhenRow(bool value)
         {
-            AppendItem(AxisElementSuffixType.IsHiddenWhenRow, value ? "True" : "False");
+            return AppendItem(AxisElementSuffixType.IsHiddenWhenRow, value ? "True" : "False");
         }
 
         /// <summary>
         /// 向当前集合末尾添加IncludeInBase类型的配置字段
         /// </summary>
         /// <param name="value"></param>
-        public void AppendIncludeInBase(bool value)
+        public AxisElementSuffix AppendIncludeInBase(bool value)
         {
-            AppendItem(AxisElementSuffixType.IncludeInBase, value ? "True" : "False");
+            return AppendItem(AxisElementSuffixType.IncludeInBase, value ? "True" : "False");
         }
 
         /// <summary>
         /// 向当前集合末尾添加IsUnweighted类型的配置字段
         /// </summary>
         /// <param name="value"></param>
-        public void AppendIsUnweighted(bool value)
+        public AxisElementSuffix AppendIsUnweighted(bool value)
         {
-            AppendItem(AxisElementSuffixType.IsUnweighted, value ? "True" : "False");
+            return AppendItem(AxisElementSuffixType.IsUnweighted, value ? "True" : "False");
         }
 
         /// <summary>
         /// 向当前集合末尾添加Multiplier类型的配置字段
         /// </summary>
         /// <param name="value"></param>
-        public void AppendMultiplier(string value)
+        public AxisElementSuffix AppendMultiplier(string value)
         {
-            AppendItem(AxisElementSuffixType.Multiplier, value);
+            return AppendItem(AxisElementSuffixType.Multiplier, value);
         }
 
         /// <summary>
         /// 向当前集合末尾添加Weight类型的配置字段
         /// </summary>
         /// <param name="value"></param>
-        public void AppendWeight(string value)
+        public AxisElementSuffix AppendWeight(string value)
         {
-            AppendItem(AxisElementSuffixType.Weight, value);
+            return AppendItem(AxisElementSuffixType.Weight, value);
         }
 
         public override string ToString()

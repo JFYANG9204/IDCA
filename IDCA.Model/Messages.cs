@@ -20,6 +20,7 @@ namespace IDCA.Model
         public const string SpecMDMIsNotInitialized = "警告：MDM文档未初始化。";
         // Settings
         public const string SettingNetLikeRangeInvalid = "警告：Net/Combine码号配置格式错误，错误字符：'{0}'已跳过。";
+        public const string SettingTopBottomBoxInvalid = "警告：Top/Bottom Box配置无效，Box值不能为0或大于Categorical列表数量。";
     }
 
     public class Messages

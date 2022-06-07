@@ -1,7 +1,8 @@
-﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
+﻿using IDCA.Client.Singleton;
+using IDCA.Model.Spec;
+using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 
@@ -10,14 +11,14 @@ namespace IDCA.Client.ViewModel
     public class HeaderSettingViewModel : ObservableObject
     {
 
-        public HeaderSettingViewModel(string name, List<string>? names = null)
+        public HeaderSettingViewModel(Metadata metadata)
         {
-            _headerName = name;
+            _metadata = metadata;
+            _headerName = metadata.Name;
             _elements = new ObservableCollection<HeaderSettingElementViewModel>();
-            _headerNames = names;
         }
 
-        readonly List<string>? _headerNames;
+        readonly Metadata _metadata;
 
         TableSettingTreeNode? _node;
         public TableSettingTreeNode? Node
@@ -31,22 +32,29 @@ namespace IDCA.Client.ViewModel
         {
             get { return _headerName; }
             set 
-            { 
-                bool exist = _headerNames != null && _headerNames.Exists(e => e.Equals(value, StringComparison.OrdinalIgnoreCase));
-                if (!exist)
+            {
+                if (_beforeRenamed == null || _beforeRenamed(value))
                 {
+                    var oldeName = _headerName;
                     SetProperty(ref _headerName, value);
-                    _headerNames?.Add(value);
-                    _renamed?.Invoke(value);
+                    _metadata.Name = value;
+                    _renamed?.Invoke(oldeName, value);
                 }
             }
         }
 
-        Action<string>? _renamed;
-        public event Action<string>? Renamed
+        Action<string, string>? _renamed;
+        public event Action<string, string>? Renamed
         {
             add { _renamed += value; }
             remove { _renamed -= value; }
+        }
+
+        Func<string, bool>? _beforeRenamed;
+        public event Func<string, bool>? BeforeRenamed
+        {
+            add { _beforeRenamed += value; }
+            remove { _beforeRenamed -= value; }
         }
 
         ObservableCollection<HeaderSettingElementViewModel> _elements;
@@ -71,6 +79,14 @@ namespace IDCA.Client.ViewModel
             _elements.Add(element);
         }
         public ICommand NewElementCommand => new RelayCommand(NewElement);
+
+        public static HeaderSettingViewModel Empty(TableSettingTreeNode node)
+        {
+            return new HeaderSettingViewModel(new Metadata(GlobalConfig.Instance.SpecDocument, GlobalConfig.Instance.Config, ""))
+            {
+                Node = node
+            };
+        }
 
     }
 

@@ -3,13 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:iconPack="http://metro.mahapps.com/winfx/xaml/iconpacks" 
              xmlns:viewmodel="clr-namespace:IDCA.Client.ViewModel" 
              d:DataContext="{d:DesignInstance Type=viewmodel:TableSettingViewModel}"
              mc:Ignorable="d" 
              d:DesignHeight="550" 
-             d:DesignWidth="1200">
+             d:DesignWidth="780">
 
     <Grid>
 
@@ -46,18 +45,51 @@
 
             <TextBlock>文件名称</TextBlock>
             <TextBox Text="{Binding TableName}" />
+
+            <!--<TextBlock>出示表头</TextBlock>
+            <mah:SplitButton Width="100"
+                             Height="30"
+                             Margin="5"
+                             Text="出示表头"
+                             ItemsSource="{Binding Headers}">
+                <mah:SplitButton.ItemTemplate>
+                    <DataTemplate>
+                        <CheckBox Width="{Binding RelativeSource={RelativeSource AncestorType=ComboBoxItem, Mode=FindAncestor}, Path=Width}"
+                                  Height="{Binding RelativeSource={RelativeSource AncestorType=ComboBoxItem, Mode=FindAncestor}, Path=Height}"
+                                  IsChecked="{Binding Checked}"
+                                  Content="{Binding Name}"/>
+                    </DataTemplate>
+                </mah:SplitButton.ItemTemplate>
+            </mah:SplitButton>-->
+            
             <TextBlock>出示表头</TextBlock>
-            <mah:DropDownButton Width="80" Height="30" Margin="5">
-            </mah:DropDownButton>
+            <ComboBox Width="150" 
+                      Height="30" 
+                      Margin="5"
+                      IsEditable="True"
+                      Text="{Binding CheckedHeaders}"
+                      ItemsSource="{Binding Headers}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <CheckBox Width="{Binding RelativeSource={RelativeSource AncestorType=ComboBox, Mode=FindAncestor}, Path=Width}"
+                                  Height="{Binding RelativeSource={RelativeSource AncestorType=ComboBoxItem, Mode=FindAncestor}, Path=Height}"
+                                  IsChecked="{Binding Checked}"
+                                  Content="{Binding Name}"
+                                  Margin="0"/>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            
             <Button Command="{Binding PushNewElementCommand}">添加表格</Button>
+            
         </StackPanel>
 
         <ScrollViewer Grid.Row="1">
-            <ItemsControl ItemsSource="{Binding ElementList}" d:ItemsSource="{d:SampleData ItemCount=5}">
+            <ItemsControl ItemsSource="{Binding ElementList}" 
+                          d:ItemsSource="{d:SampleData ItemCount=5}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Border Height="100" 
-                                Width="1150"
+                        <Border Height="180" 
                                 BorderThickness="0 0 0 1"
                                 BorderBrush="{StaticResource IDCA.Brushes.Window.BorderBrush}">
                             <Grid>
@@ -89,6 +121,12 @@
                                     <Style TargetType="GridSplitter">
                                         <Setter Property="Height" Value="30"/>
                                         <Setter Property="Width" Value="1"/>
+                                        <Setter Property="Background" Value="LightGray"/>
+                                    </Style>
+                                    <Style TargetType="ComboBox" BasedOn="{StaticResource MahApps.Styles.ComboBox}">
+                                        <Setter Property="Width" Value="100"/>
+                                        <Setter Property="Height" Value="30"/>
+                                        <Setter Property="Margin" Value="5"/>
                                     </Style>
                                 </Grid.Resources>
                                 
@@ -96,20 +134,25 @@
                                     <RowDefinition Height="10"/>
                                     <RowDefinition Height="40"/>
                                     <RowDefinition Height="40"/>
+                                    <RowDefinition Height="40"/>
+                                    <RowDefinition Height="40"/>
                                     <RowDefinition Height="10"/>
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="20"/>
+                                    <ColumnDefinition Width="40"/>
+                                    <ColumnDefinition Width="90"/>
                                     <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="130"/>
+                                    <ColumnDefinition Width="40"/>
                                 </Grid.ColumnDefinitions>
 
-                                <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
+                                <TextBlock Grid.Row="1" Grid.Column="1">描述配置</TextBlock>
+                                <TextBlock Grid.Row="2" Grid.Column="1">表格配置</TextBlock>
+                                <TextBlock Grid.Row="3" Grid.Column="1">轴配置</TextBlock>
+                                <TextBlock Grid.Row="4" Grid.Column="1">筛选器配置</TextBlock>
 
-                                    <GridSplitter/>
-
-                                    <TextBlock>变量名</TextBlock>
-                                    <TextBox Text="{Binding VariableName}"/>
+                                <StackPanel Grid.Row="1" 
+                                            Grid.Column="2" 
+                                            Orientation="Horizontal">
 
                                     <GridSplitter/>
 
@@ -118,8 +161,72 @@
 
                                     <GridSplitter/>
 
-                                    <TextBlock Grid.Row="1" Grid.Column="5">基数标签</TextBlock>
-                                    <TextBox Grid.Row="1" Grid.Column="6" Text="{Binding BaseText}"/>
+                                    <TextBlock>基数标签</TextBlock>
+                                    <TextBox Text="{Binding BaseText}"/>
+                                    
+                                    <GridSplitter/>
+
+                                    <TextBlock>追加标签</TextBlock>
+                                    <TextBox Text="{Binding TableAppendLabel}"/>
+
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="2" 
+                                            Grid.Column="2" 
+                                            Orientation="Horizontal">
+                                    <GridSplitter/>
+
+                                    <TextBlock>变量名</TextBlock>
+                                    <TextBox Text="{Binding VariableName}"/>
+
+                                    <GridSplitter/>
+
+                                    <TextBlock>表格类型</TextBlock>
+                                    <ComboBox ItemsSource="{Binding TableTypeSelections}" SelectedIndex="{Binding TableTypeSelectedIndex}"/>
+
+                                    <GridSplitter/>
+
+                                </StackPanel>
+                                
+                                <StackPanel Grid.Row="3" 
+                                            Grid.Column="2" 
+                                            Orientation="Horizontal">
+
+                                    
+                                    
+                                    <GridSplitter/>
+
+                                    <TextBlock>Top/Bottom/NPS</TextBlock>
+                                    <ComboBox IsEditable="True"
+                                              Text="{Binding TableTopBottomBoxName}"
+                                              ItemsSource="{Binding TableTopBottomBoxSelections}">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <CheckBox IsChecked="{Binding Checked}"
+                                                          Content="{Binding Name}"
+                                                          Margin="0"/>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+
+                                    <GridSplitter/>
+
+                                    <TextBlock>Net类型</TextBlock>
+                                    <ComboBox SelectedIndex="{Binding TableNetTypeSelectedIndex}"
+                                              ItemsSource="{Binding TableNetTypeSelections}"/>
+
+                                    <GridSplitter/>
+
+                                    <Button Width="120" 
+                                            Command="{Binding AxisSettingCommand}">配置轴表达式</Button>
+                                    
+                                    <GridSplitter/>
+
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="4" 
+                                            Grid.Column="2" 
+                                            Orientation="Horizontal">
 
                                     <GridSplitter/>
 
@@ -135,22 +242,15 @@
 
                                 </StackPanel>
 
-                                <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
-                                    <GridSplitter/>
-                                    <Button Width="120" Command="{Binding AxisSettingCommand}">配置轴表达式</Button>
-                                    <GridSplitter/>
-                                </StackPanel>
-                                
                                 <Button Grid.Row="1"
-                                        Grid.RowSpan="2"
+                                        Grid.RowSpan="4"
                                         Grid.Column="11"
                                         Width="25"
                                         Height="25"
                                         Command="{Binding RemoveCommand}"
-                                        Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"
+                                        Background="#00000000"
                                         Foreground="Red"
                                         HorizontalAlignment="Left"
-                                        Margin="25"
                                         Cursor="Hand">
                                     <Button.Template>
                                         <ControlTemplate TargetType="Button">

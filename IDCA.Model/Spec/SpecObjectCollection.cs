@@ -56,6 +56,34 @@ namespace IDCA.Model.Spec
         }
 
         /// <summary>
+        /// 将对象插入到索引处，如果索引错误，将插入到最后
+        /// </summary>
+        /// <param name="index">插入的索引位置</param>
+        /// <param name="obj">插入的对象</param>
+        /// <param name="callback">对于受影响元素执行的回调函数</param>
+        public bool Insert(int index, T obj, Action<T>? callback = null)
+        {
+            return CollectionHelper.Insert(_items, index, obj, callback);
+        }
+
+        /// <summary>
+        /// 将对象插入到已有对象之后
+        /// </summary>
+        /// <param name="previousObj"></param>
+        /// <param name="insertObj"></param>
+        /// <param name="callback"></param>
+        /// <returns></returns>
+        public bool Insert(T previousObj, T insertObj, Action<T>? callback = null)
+        {
+            int index = _items.IndexOf(previousObj);
+            if (index == -1)
+            {
+                return false;
+            }
+            return Insert(index + 1, insertObj, callback);
+        }
+
+        /// <summary>
         /// 清空集合内的所有内容
         /// </summary>
         public void Clear()
@@ -92,9 +120,9 @@ namespace IDCA.Model.Spec
         /// </summary>
         /// <param name="sourceIndex"></param>
         /// <param name="targetIndex"></param>
-        public void Swap(int sourceIndex, int targetIndex)
+        public bool Swap(int sourceIndex, int targetIndex)
         {
-            CollectionHelper.Swap(_items, sourceIndex, targetIndex);
+            return CollectionHelper.Swap(_items, sourceIndex, targetIndex);
         }
 
         /// <summary>
@@ -131,10 +159,19 @@ namespace IDCA.Model.Spec
                 return;
             }
 
-            for (int i = removeIndex.Count - 1; i <= 0; i--)
+            for (int i = removeIndex.Count - 1; i >= 0; i--)
             {
                 _items.RemoveAt(removeIndex[i]);
             }
+        }
+
+        /// <summary>
+        /// 将当前元素内容转换为数组
+        /// </summary>
+        /// <returns></returns>
+        public T[] ToArray()
+        {
+            return _items.ToArray();
         }
 
     }

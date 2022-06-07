@@ -8,14 +8,10 @@
                  xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
                  d:DataContext="{d:DesignInstance Type=viewmodel:AxisSettingViewModel}"
                  mc:Ignorable="d"
-                 Height="500" 
+                 Height="600" 
                  Width="900"
                  ResizeMode="CanMinimize"
                  Background="{StaticResource IDCA.Brushes.Window.Background}">
-
-    <Window.DataContext>
-        <viewmodel:AxisSettingViewModel/>
-    </Window.DataContext>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -42,7 +38,7 @@
 
                 <Grid.RowDefinitions>
                     <RowDefinition Height="30"/>
-                    <RowDefinition Height="300"/>
+                    <RowDefinition Height="350"/>
                     <RowDefinition Height="30"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
@@ -85,10 +81,10 @@
                                    FontSize="15"
                                    FontWeight="Bold"/>
 
-                        <GridSplitter Width="{Binding RelativeSource={RelativeSource AncestorType=ListBox}, Path=Width}" Height="1" />
+                        <GridSplitter Width="{Binding RelativeSource={RelativeSource AncestorType=StackPanel}, Path=Width}" Height="1" />
 
                         <ListBox Margin="10 5"
-                                 Height="250"
+                                 Height="300"
                                  BorderThickness="0"
                                  FontSize="13"
                                  Background="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=Background}"
@@ -103,17 +99,24 @@
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <Grid Height="20">
+                                        <Grid.Resources>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Foreground" Value="{StaticResource MahApps.Brushes.Button.Flat.Foreground}"/>
+                                                <Setter Property="Cursor" Value="Hand"/>
+                                            </Style>
+                                        </Grid.Resources>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="20"/>
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Name}"/>
-                                        <Button Grid.Column="1" Command="{Binding AddCommand}">
+                                        <Button Grid.Column="1" 
+                                                Command="{Binding AddCommand}">
                                             <Button.Template>
                                                 <ControlTemplate TargetType="Button">
                                                     <Grid Height="20"
                                                           Width="20"
-                                                          Background="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem, Mode=FindAncestor}, Path=Background}">
+                                                          Background="#00000000">
                                                         <iconPacks:PackIconMaterialDesign Kind="Add"
                                                                                           Height="13"
                                                                                           Width="13"
@@ -128,7 +131,7 @@
                             </ListBox.ItemTemplate>
                         </ListBox>
 
-                        <GridSplitter Width="{Binding RelativeSource={RelativeSource AncestorType=ListBox}, Path=Width}" Height="1" />
+                        <GridSplitter Width="{Binding RelativeSource={RelativeSource AncestorType=StackPanel}, Path=Width}" Height="1" />
 
                     </StackPanel>
 
@@ -141,7 +144,7 @@
                                    FontSize="15"
                                    FontWeight="Bold"/>
 
-                        <GridSplitter Width="{Binding RelativeSource={RelativeSource AncestorType=ListBox}, Path=Width}" Height="1" />
+                        <GridSplitter Width="{Binding RelativeSource={RelativeSource AncestorType=StackPanel}, Path=Width}" Height="1" />
 
                         <!--<ListBox Margin="10 5"
                                  Height="250"
@@ -159,7 +162,7 @@
                         </ListBox>-->
 
                         <TreeView Margin="10 5"
-                                  Height="250"
+                                  Height="300"
                                   FontSize="13"
                                   BorderThickness="0"
                                   Background="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=Background}"
@@ -174,6 +177,14 @@
                             <TreeView.ItemTemplate>
                                 <HierarchicalDataTemplate ItemsSource="{Binding Children}">
                                     <Grid Height="25">
+                                        <Grid.Resources>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Foreground" Value="{StaticResource MahApps.Brushes.Button.Flat.Foreground}"/>
+                                                <Setter Property="Cursor" Value="Hand"/>
+                                                <Setter Property="Width" Value="20"/>
+                                                <Setter Property="Height" Value="25"/>
+                                            </Style>
+                                        </Grid.Resources>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="80"/>
@@ -192,16 +203,13 @@
                                                 <ColumnDefinition Width="20"/>
                                             </Grid.ColumnDefinitions>
                                             <Button Grid.Column="0" 
-                                                    Height="25" 
-                                                    Width="20" 
-                                                    Cursor="Hand"
                                                     Visibility="{Binding AllowChildren, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                     Command="{Binding AddChildCommand}">
                                                 <Button.Template>
                                                     <ControlTemplate TargetType="Button">
                                                         <Grid Height="25"
                                                               Width="20"
-                                                              Background="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem}, Path=Background}">
+                                                              Background="#00000000">
                                                             <iconPacks:PackIconMaterialDesign Kind="Add"
                                                                                               Height="13"
                                                                                               Width="13"
@@ -212,15 +220,12 @@
                                                 </Button.Template>
                                             </Button>
                                             <Button Grid.Column="1" 
-                                                    Height="25" 
-                                                    Width="20" 
-                                                    Cursor="Hand"
                                                     Command="{Binding MoveUpCommand}">
                                                 <Button.Template>
                                                     <ControlTemplate TargetType="Button">
                                                         <Grid Height="25"
                                                               Width="20"
-                                                              Background="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem}, Path=Background}">
+                                                              Background="#00000000">
                                                             <iconPacks:PackIconMaterialDesign Kind="ArrowUpward"
                                                                                               Height="13"
                                                                                               Width="13"
@@ -231,15 +236,12 @@
                                                 </Button.Template>
                                             </Button>
                                             <Button Grid.Column="2" 
-                                                    Height="25" 
-                                                    Width="20" 
-                                                    Cursor="Hand"
                                                     Command="{Binding MoveDownCommand}">
                                                 <Button.Template>
                                                     <ControlTemplate TargetType="Button">
                                                         <Grid Height="25"
                                                               Width="20"
-                                                              Background="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem}, Path=Background}">
+                                                              Background="#00000000">
                                                             <iconPacks:PackIconMaterialDesign Kind="ArrowDownward"
                                                                                               Height="13"
                                                                                               Width="13"
@@ -250,15 +252,12 @@
                                                 </Button.Template>
                                             </Button>
                                             <Button Grid.Column="3" 
-                                                    Height="25" 
-                                                    Width="20" 
-                                                    Cursor="Hand"
                                                     Command="{Binding RemoveCommand}">
                                                 <Button.Template>
                                                     <ControlTemplate TargetType="Button">
                                                         <Grid Height="25"
                                                               Width="20"
-                                                              Background="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem}, Path=Background}">
+                                                              Background="#00000000">
                                                             <iconPacks:PackIconMaterialDesign Kind="Close"
                                                                                               Height="13"
                                                                                               Width="13"
@@ -273,8 +272,8 @@
                                 </HierarchicalDataTemplate>
                             </TreeView.ItemTemplate>
                         </TreeView>
-                        
-                        <GridSplitter Width="{Binding RelativeSource={RelativeSource AncestorType=ListBox}, Path=Width}" Height="1" />
+
+                        <GridSplitter Width="{Binding RelativeSource={RelativeSource AncestorType=StackPanel}, Path=Width}" Height="1" />
 
                     </StackPanel>
                     
@@ -419,14 +418,15 @@
                            FontFamily="{StaticResource IDCA.Font.Family}"
                            FontSize="15"
                            FontWeight="Bold"/>
-                
+
                 <TextBox Grid.Row="3"
                          Margin="10 5"
                          BorderThickness="0 1 0 1"
                          FontFamily="{StaticResource IDCA.Font.Family}"
                          FontSize="14"
                          Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"
-                         Text="{Binding AxisExpression}"/>
+                         Text="{Binding AxisExpression}"
+                         TextWrapping="Wrap"/>
 
             </Grid>
 
@@ -447,10 +447,10 @@
                                FontFamily="{StaticResource IDCA.Font.Family}"
                                FontSize="15"
                                FontWeight="Bold"/>
-                    
-                    <GridSplitter Width="{Binding RelativeSource={RelativeSource AncestorType=ListBox}, Path=Width}" Height="1" />
 
-                    <ScrollViewer Height="130" VerticalScrollBarVisibility="Auto">
+                    <GridSplitter Width="{Binding RelativeSource={RelativeSource AncestorType=StackPanel}, Path=Width}" Height="1" />
+
+                    <ScrollViewer Height="200" VerticalScrollBarVisibility="Auto">
                         <ItemsControl Margin="10 5" 
                                       BorderThickness="0"
                                       Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"
@@ -486,8 +486,8 @@
                         </ItemsControl>
                         
                     </ScrollViewer>
-                    
-                    <GridSplitter Width="{Binding RelativeSource={RelativeSource AncestorType=ListBox}, Path=Width}" Height="1" />
+
+                    <GridSplitter Width="{Binding RelativeSource={RelativeSource AncestorType=StackPanel}, Path=Width}" Height="1" />
 
                     <TextBlock Grid.Row="3"
                                Margin="10 10 0 5"
@@ -497,9 +497,9 @@
                                FontSize="15"
                                FontWeight="Bold"/>
 
-                    <GridSplitter Width="{Binding RelativeSource={RelativeSource AncestorType=ListBox}, Path=Width}" Height="1" />
+                    <GridSplitter Width="{Binding RelativeSource={RelativeSource AncestorType=StackPanel}, Path=Width}" Height="1" />
 
-                    <ScrollViewer Height="226" VerticalScrollBarVisibility="Auto">
+                    <ScrollViewer Height="255" VerticalScrollBarVisibility="Auto">
                     
                         <ItemsControl Margin="10 5" 
                                       BorderThickness="0"
@@ -535,10 +535,8 @@
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
-                        
                     </ScrollViewer>
-
-                    <GridSplitter Width="{Binding RelativeSource={RelativeSource AncestorType=ListBox}, Path=Width}" Height="1" />
+                    <GridSplitter Width="{Binding RelativeSource={RelativeSource AncestorType=StackPanel}, Path=Width}" Height="1" />
                 </StackPanel>
                 
                 <!--<StackPanel Orientation="Horizontal"

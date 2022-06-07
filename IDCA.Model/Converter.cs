@@ -54,7 +54,7 @@ namespace IDCA.Model
                 "percentile" => AxisElementType.Percentile,
                 "mode" => AxisElementType.Mode,
                 "ntd" => AxisElementType.Ntd,
-                _ => AxisElementType.None
+                _ => AxisElementType.Category
             };
         }
         /// <summary>

@@ -17,11 +17,35 @@ namespace IDCA.Client.ViewModel
             set { SetProperty(ref _node, value); }
         }
 
-        public struct OverviewInfo
+        public class OverviewInfo : ObservableObject
         {
-            public string Name { get; set; }
-            public string Description { get; set; }
-            public int ItemsCount { get; set; }
+            public OverviewInfo()
+            {
+                _name = string.Empty;
+                _description = string.Empty;
+                _itemsCount = 0;
+            }
+
+            string _name;
+            public string Name 
+            {
+                get { return _name; } 
+                set { SetProperty(ref _name, value); }
+            }
+
+            string _description;
+            public string Description
+            {
+                get { return _description; }
+                set { SetProperty(ref _description, value); }
+            }
+
+            int _itemsCount;
+            public int ItemsCount
+            {
+                get { return _itemsCount; }
+                set { SetProperty(ref _itemsCount, value); }
+            }
         }
 
         ObservableCollection<OverviewInfo> _items;
@@ -29,6 +53,11 @@ namespace IDCA.Client.ViewModel
         {
             get { return _items; }
             set { SetProperty(ref _items, value); }
+        }
+
+        void AddNewOverviewInfo()
+        {
+            _items.Add(new OverviewInfo());
         }
 
     }
