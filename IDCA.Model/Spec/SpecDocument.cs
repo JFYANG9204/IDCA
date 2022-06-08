@@ -10,11 +10,10 @@ namespace IDCA.Model.Spec
     public class SpecDocument : SpecObject
     {
 
-        public SpecDocument(string projectPath, Config config) : base()
+        public SpecDocument(Config config) : base()
         {
             _globalTables = new List<Tables>();
-
-            _projectPath = projectPath;
+            _projectPath = string.Empty;
             _objectType = SpecObjectType.Document;
             _manipulations = new Manipulations(this);
             _scripts = new ScriptCollection(this);
@@ -24,13 +23,27 @@ namespace IDCA.Model.Spec
             _metadata = new MetadataCollection(this, config);
         }
 
+        public SpecDocument(string projectPath, Config config) : this(config)
+        {
+            _projectPath = projectPath;
+        }
+
         public SpecDocument(string projectPath, string templateXmlPath, Config config) : this(projectPath, config)
         {
             _templates.Load(templateXmlPath);
         }
 
         readonly Config _config;
-        readonly string _projectPath;
+
+        string _projectPath;
+        /// <summary>
+        /// 当前项目的根目录
+        /// </summary>
+        public string ProjectPath
+        {
+            get { return _projectPath; }
+            set { _projectPath = value; }
+        }
 
         List<FileTemplate>? _libraryFiles;
         List<FileTemplate>? _otherUsefulFiles;
@@ -255,7 +268,7 @@ namespace IDCA.Model.Spec
             string tabName = name.ToLower();
             if (string.IsNullOrEmpty(tabName) || !ValidateTablesName(tabName))
             {
-                int index = _globalTables.Count;
+                int index = _globalTables.Count + 1;
                 while (!ValidateTablesName($"Tab_{index}"))
                 {
                     index++;
@@ -412,6 +425,19 @@ namespace IDCA.Model.Spec
             FileHelper.WriteToFile(_projectPath, _onNextCaseFile, _scripts.Export());
             FileHelper.WriteToFile(_projectPath, _mddManipulationFile, _manipulations.Export());
             CollectionHelper.ForEach(_globalTables, tables => FileHelper.WriteToFile(Path.Combine(_projectPath, tables.Name), tables.Export()));
+        }
+
+        /// <summary>
+        /// 清空集合中的所有配置对象
+        /// </summary>
+        public void Clear()
+        {
+            _dmsMetadata.Clear();
+            _manipulations.Clear();
+            _metadata.Clear();
+            _globalTables.Clear();
+            _scripts.Clear();
+
         }
 
     }

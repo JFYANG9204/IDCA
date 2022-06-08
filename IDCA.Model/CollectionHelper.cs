@@ -25,6 +25,64 @@ namespace IDCA.Model
             (collection[targetIndex], collection[sourceIndex]) = (collection[sourceIndex], collection[targetIndex]);
             return true;
         }
+
+        /// <summary>
+        /// 调换集合内两个对象的位置，如果两个对象有任意一个不在集合中，将调换失败，返回false
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="collection"></param>
+        /// <param name="obj1"></param>
+        /// <param name="obj2"></param>
+        /// <returns></returns>
+        public static bool Swap<T>(IList<T> collection, T obj1, T obj2)
+        {
+            int index1 = collection.IndexOf(obj1);
+            int index2 = collection.IndexOf(obj2);
+
+            if (index1 < 0 || index2 < 0)
+            {
+                return false;
+            }
+
+            return Swap(collection, index1, index2);
+        }
+
+        /// <summary>
+        /// 将集合中的对象向前移动一个位置，如果此对象不在集合中或者是第一个对象，
+        /// 将移动失败，返回false，否则返回true
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="collection"></param>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static bool MoveUp<T>(IList<T> collection, T obj)
+        {
+            int index = collection.IndexOf(obj);
+            if (index <= 0)
+            {
+                return false;
+            }
+            return Swap(collection, index, index - 1);
+        }
+
+        /// <summary>
+        /// 将集合中的对象向后移动一个位置，如果此对象不在集合中或者是最后一个对象，
+        /// 将移动失败，返回false，否则返回true
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="collection"></param>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static bool MoveDown<T>(IList<T> collection, T obj)
+        {
+            int index = collection.IndexOf(obj);
+            if (index < 0 || index >= collection.Count - 1)
+            {
+                return false;
+            }
+            return Swap(collection, index, index + 1);
+        }
+
         /// <summary>
         /// 遍历集合中的各元素并执行回调函数
         /// </summary>
@@ -69,6 +127,7 @@ namespace IDCA.Model
                 return false;
             }
         }
+
 
     }
 

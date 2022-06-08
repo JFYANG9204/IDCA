@@ -9,7 +9,7 @@
     d:DataContext="{d:DesignInstance Type=viewmodel:StartWindowViewModel}"
     mc:Ignorable="d"
     Height="500" 
-    Width="900"
+    Width="840"
     ResizeMode="CanMinimize"
     Background="{StaticResource IDCA.Brushes.Window.Background}"
     >
@@ -20,10 +20,10 @@
     
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="50"/>
+            <ColumnDefinition Width="20"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="50"/>
+            <ColumnDefinition Width="20"/>
         </Grid.ColumnDefinitions>
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>

@@ -67,6 +67,7 @@
                       Height="30" 
                       Margin="5"
                       IsEditable="True"
+                      IsReadOnly="True"
                       Text="{Binding CheckedHeaders}"
                       ItemsSource="{Binding Headers}">
                 <ComboBox.ItemTemplate>
@@ -149,6 +150,49 @@
                                 <TextBlock Grid.Row="2" Grid.Column="1">表格配置</TextBlock>
                                 <TextBlock Grid.Row="3" Grid.Column="1">轴配置</TextBlock>
                                 <TextBlock Grid.Row="4" Grid.Column="1">筛选器配置</TextBlock>
+
+                                <Button Grid.Row="1" 
+                                        Grid.Column="0"
+                                        Width="30"
+                                        Height="30"
+                                        Cursor="Hand"
+                                        Command="{Binding MoveUpCommand}">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Grid Width="30"
+                                                  Height="30"
+                                                  Background="#00000000">
+                                                <iconPack:PackIconMaterialDesign Kind="ArrowDropUp"
+                                                                                 Width="20"
+                                                                                 Height="20"
+                                                                                 HorizontalAlignment="Center"
+                                                                                 VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+                                
+                                <Button Grid.Row="4" 
+                                        Grid.Column="0"
+                                        Width="30"
+                                        Height="30"
+                                        Background="#00000000"
+                                        Cursor="Hand"
+                                        Command="{Binding MoveDownCommand}">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Grid Width="30"
+                                                  Height="30"
+                                                  Background="#00000000">
+                                                <iconPack:PackIconMaterialDesign Kind="ArrowDropDown"
+                                                                                 Width="20"
+                                                                                 Height="20"
+                                                                                 HorizontalAlignment="Center"
+                                                                                 VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
 
                                 <StackPanel Grid.Row="1" 
                                             Grid.Column="2" 

@@ -68,6 +68,15 @@ namespace IDCA.Model.Spec
             return builder.ToString();
         }
 
+        /// <summary>
+        /// 清空当前集合中的所有内容
+        /// </summary>
+        public void Clear()
+        {
+            Array.Clear(_scripts);
+            Array.Resize(ref _scripts, 0);
+        }
+
     }
 
 }

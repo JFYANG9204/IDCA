@@ -26,12 +26,83 @@
     <Grid>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="30"/>
+            <RowDefinition Height="40"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0">
+            <StackPanel Orientation="Horizontal">
+                <StackPanel.Resources>
+                    <Style TargetType="Button">
+                        <Setter Property="Margin" Value="5"/>
+                        <Setter Property="Width" Value="60"/>
+                        <Setter Property="Height" Value="30"/>
+                        <Setter Property="Cursor" Value="Hand"/>
+                    </Style>
+                    <Style TargetType="TextBox" BasedOn="{StaticResource MahApps.Styles.TextBox}">
+                        <Setter Property="Width" Value="120"/>
+                        <Setter Property="Height" Value="30"/>
+                        <Setter Property="IsReadOnly" Value="True"/>
+                        <Setter Property="FontSize" Value="15"/>
+                    </Style>
+                </StackPanel.Resources>
+
+                <Button Command="{Binding SelectProjectRootPathCommand}">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Grid Width="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Width}"
+                                  Height="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Height}"
+                                  Background="#00000000">
+                                <icon:PackIconMaterialDesign Kind="Folder"
+                                                             Width="20"
+                                                             Height="20"
+                                                             HorizontalAlignment="Center"
+                                                             VerticalAlignment="Center"/>
+                            </Grid>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+
+                <TextBox Text="{Binding ProjectPath}"/>
+
+                <Button Command="{Binding SelectMdmDocumentCommand}" Cursor="Hand">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Grid Width="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Width}"
+                                  Height="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Height}"
+                                  Background="#00000000">
+                                <TextBlock HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           Text="MDM"
+                                           FontSize="13"
+                                           FontWeight="Bold"/>
+                            </Grid>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+
+                <TextBox Text="{Binding MdmDocumentPath}"/>
+
+                <Button Command="{Binding SelectExcelSettingFileCommand}" Cursor="Hand">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Grid Width="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Width}"
+                                  Height="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Height}"
+                                  Background="#00000000">
+                                <icon:PackIconModern Kind="OfficeExcel"
+                                                     Width="20"
+                                                     Height="20"
+                                                     HorizontalAlignment="Center"
+                                                     VerticalAlignment="Center"/>
+                            </Grid>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+
+                <TextBox Text="{Binding ExcelSettingFilePath}"/>
+
+            </StackPanel>
         </Grid>
 
         <Grid Grid.Row="2">

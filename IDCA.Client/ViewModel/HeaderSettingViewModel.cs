@@ -1,4 +1,5 @@
 ﻿using IDCA.Client.Singleton;
+using IDCA.Model;
 using IDCA.Model.Spec;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
@@ -66,15 +67,13 @@ namespace IDCA.Client.ViewModel
 
         void RemoveElement(HeaderSettingElementViewModel element)
         {
-            if (element.IndexOfParent > 0 && element.IndexOfParent < _elements.Count)
-            {
-                _elements.RemoveAt(element.IndexOfParent);
-            }
+            _elements.Remove(element);
+            _metadata.RemoveCategorical(element.VariableName);
         }
 
         public void NewElement()
         {
-            var element = new HeaderSettingElementViewModel(_elements.Count);
+            var element = new HeaderSettingElementViewModel(_metadata.NewCategorical());
             element.Removing += RemoveElement;
             _elements.Add(element);
         }
@@ -82,7 +81,7 @@ namespace IDCA.Client.ViewModel
 
         public static HeaderSettingViewModel Empty(TableSettingTreeNode node)
         {
-            return new HeaderSettingViewModel(new Metadata(GlobalConfig.Instance.SpecDocument, GlobalConfig.Instance.Config, ""))
+            return new HeaderSettingViewModel(new Metadata(node.SpecDocument, GlobalConfig.Instance.Config, ""))
             {
                 Node = node
             };
@@ -94,25 +93,15 @@ namespace IDCA.Client.ViewModel
     public class HeaderSettingElementViewModel : ObservableObject
     {
 
-        public HeaderSettingElementViewModel()
+        public HeaderSettingElementViewModel(MetadataCategorical category)
         {
-            _indexOfParent = 0;
-            _variableName = string.Empty;
-            _description = string.Empty;
+            _category = category;
+            _variableName = category.Name;
+            _description = category.Description ?? string.Empty;
             _expression = string.Empty;
         }
 
-        public HeaderSettingElementViewModel(int indexOfParent) : this()
-        {
-            _indexOfParent = indexOfParent;
-        }
-
-        int _indexOfParent;
-        public int IndexOfParent
-        {
-            get { return _indexOfParent; }
-            set { _indexOfParent = value; }
-        }
+        readonly MetadataCategorical _category;
 
         Action<HeaderSettingElementViewModel>? _removing;
         public event Action<HeaderSettingElementViewModel>? Removing
@@ -125,21 +114,37 @@ namespace IDCA.Client.ViewModel
         public string VariableName
         {
             get { return _variableName; }
-            set { SetProperty(ref _variableName, value); }
+            set 
+            {
+                if (_category.Parent is Metadata metadata &&
+                    metadata.GetCategorical(value) == null)
+                {
+                    SetProperty(ref _variableName, value);
+                    _category.Name = value;
+                }
+            }
         }
 
         string _description;
         public string Description
         {
             get { return _description; }
-            set { SetProperty(ref _description, value); }
+            set 
+            { 
+                SetProperty(ref _description, value);
+                _category.Description = value;
+            }
         }
 
         string _expression;
         public string Expression
         {
             get { return _expression; }
-            set { SetProperty(ref _expression, value); }
+            set 
+            { 
+                SetProperty(ref _expression, value);
+                _category.SetSuffix(MetadataCategoricalSuffixType.Expression, value);
+            }
         }
 
         void Remove()

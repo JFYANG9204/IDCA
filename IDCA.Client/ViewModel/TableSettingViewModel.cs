@@ -1,5 +1,4 @@
 ﻿
-using IDCA.Client.Singleton;
 using IDCA.Model;
 using IDCA.Model.Spec;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
@@ -90,6 +89,7 @@ namespace IDCA.Client.ViewModel
                 {
                     var info = new CheckableItemViewModel(header);
                     info.CheckedChanged += i => UpdateCheckedHeaders();
+                    info.Selected += () => UpdateCheckedHeaders();
                     _headers.Add(info);
                 }
             }
@@ -138,6 +138,10 @@ namespace IDCA.Client.ViewModel
         {
             CheckedHeaders = string.Join(',', GetSelectedHeaders());
         }
+        /// <summary>
+        /// 当出示表头选中时触发的命令
+        /// </summary>
+        public ICommand HeaderSelectedCommand => new RelayCommand(UpdateCheckedHeaders);
 
         string _tableName;
         /// <summary>
@@ -193,26 +197,29 @@ namespace IDCA.Client.ViewModel
         public ICommand PushNewElementCommand => new RelayCommand(Push);
         void Push()
         {
-            var element = new TableSettingElementViewModel(_tables.NewTable())
-            {
-                IndexOfParent = ElementList.Count,
-            };
+            var element = new TableSettingElementViewModel(_tables.NewTable());
             element.Removing += RemoveElementAt;
+            element.MovingUp += MoveElementUp;
+            element.MovingDown += MoveElementDown;
             ElementList.Add(element);
-            GlobalConfig.Instance.CurrentTableSetting.NewTableSetting();
         }
 
-        void RemoveElementAt(int index)
+        void RemoveElementAt(TableSettingElementViewModel viewModel)
         {
-            if (index < 0 || index >= _elementList.Count)
-            {
-                return;
-            }
-            _elementList.RemoveAt(index);
-            for (int i = 0; i < _elementList.Count; i++)
-            {
-                _elementList[i].IndexOfParent = i;
-            }
+            _elementList.Remove(viewModel);
+            _tables.Remove(viewModel.Table);
+        }
+
+        void MoveElementUp(TableSettingElementViewModel viewModel)
+        {
+            CollectionHelper.MoveUp(_elementList, viewModel);
+            _tables.MoveUp(viewModel.Table);
+        }
+
+        void MoveElementDown(TableSettingElementViewModel viewModel)
+        {
+            CollectionHelper.MoveDown(_elementList, viewModel);
+            _tables.MoveDown(viewModel.Table);
         }
 
         public void LoadFromTableSettingCollection(TableSettingCollection tableSettings)
@@ -232,7 +239,7 @@ namespace IDCA.Client.ViewModel
         /// <returns></returns>
         public static TableSettingViewModel Empty(TableSettingTreeNode node)
         {
-            return new TableSettingViewModel(new Tables(GlobalConfig.Instance.SpecDocument))
+            return new TableSettingViewModel(new Tables(node.SpecDocument))
             {
                 Node = node
             };
@@ -296,14 +303,39 @@ namespace IDCA.Client.ViewModel
         readonly Table _table;
         readonly AxisSettingViewModel _axisViewModel;
 
-        Action<int>? _removing = null;
+        /// <summary>
+        /// View Model对应的Model.Table对象
+        /// </summary>
+        public Table Table => _table;
+
+        Action<TableSettingElementViewModel>? _removing = null;
         /// <summary>
         /// 移除此对象时使用的回调
         /// </summary>
-        public event Action<int> Removing
+        public event Action<TableSettingElementViewModel> Removing
         {
             add { _removing += value; }
             remove { _removing -= value; }
+        }
+
+        Action<TableSettingElementViewModel>? _movingUp;
+        /// <summary>
+        /// 将此对象向上移动时使用的回调
+        /// </summary>
+        public event Action<TableSettingElementViewModel>? MovingUp
+        {
+            add { _movingUp += value; }
+            remove { _movingUp -= value; }
+        }
+
+        Action<TableSettingElementViewModel>? _movingDown;
+        /// <summary>
+        /// 将此对象向下移动时使用的回调
+        /// </summary>
+        public event Action<TableSettingElementViewModel>? MovingDown
+        {
+            add { _movingDown += value; }
+            remove { _movingDown -= value; }
         }
 
         string[] _tableTypeSelections;
@@ -457,23 +489,34 @@ namespace IDCA.Client.ViewModel
             set { SetProperty(ref _tableAppendLabel, value); }
         }
 
-        int _indexOfParent = 0;
-        /// <summary>
-        /// 此对象在父级对象中的索引
-        /// </summary>
-        public int IndexOfParent { get => _indexOfParent; set => _indexOfParent = value; }
+        //int _indexOfParent = 0;
+        ///// <summary>
+        ///// 此对象在父级对象中的索引
+        ///// </summary>
+        //public int IndexOfParent { get => _indexOfParent; set => _indexOfParent = value; }
 
         public ICommand AxisSettingCommand => new RelayCommand(ShowAxisSettingDialog);
         void ShowAxisSettingDialog()
         {
-            GlobalConfig.Instance.CurrentTableSettingIndex = IndexOfParent;
             Common.WindowManager.ShowWindow("AxisSettingWindow", _axisViewModel);
         }
 
         public ICommand RemoveCommand => new RelayCommand(Remove);
         void Remove()
         {
-            _removing?.Invoke(IndexOfParent);
+            _removing?.Invoke(this);
+        }
+
+        public ICommand MoveUpCommand => new RelayCommand(MoveUp);
+        void MoveUp()
+        {
+            _movingUp?.Invoke(this);
+        }
+
+        public ICommand MoveDownCommand => new RelayCommand(MoveDown);
+        void MoveDown()
+        {
+            _movingDown?.Invoke(this);
         }
 
         public void LoadFromTableSetting(TableSetting tableSetting)

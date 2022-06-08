@@ -69,35 +69,35 @@ namespace IDCA.Model.Spec
             return table;
         }
 
-        /// <summary>
-        /// 将索引位置的Table对象在集合中向前移动一个位置
-        /// </summary>
-        /// <param name="index"></param>
-        public void MoveUp(int index)
-        {
-            if (index < 0 || index >= Count)
-            {
-                return;
-            }
-            _items[index].IndexAt--;
-            _items[index - 1].IndexAt++;
-            Swap(index, index - 1);
-        }
-
-        /// <summary>
-        /// 将索引位置的Table对象在集合中向后移动一个位置
-        /// </summary>
-        /// <param name="index"></param>
-        public void MoveDown(int index)
-        {
-            if (index < 0 || index >= Count - 1)
-            {
-                return;
-            }
-            _items[index].IndexAt++;
-            _items[index + 1].IndexAt--;
-            Swap(index, index + 1);
-        }
+        ///// <summary>
+        ///// 将索引位置的Table对象在集合中向前移动一个位置
+        ///// </summary>
+        ///// <param name="index"></param>
+        //public void MoveUp(int index)
+        //{
+        //    if (index < 0 || index >= Count)
+        //    {
+        //        return;
+        //    }
+        //    _items[index].IndexAt--;
+        //    _items[index - 1].IndexAt++;
+        //    Swap(index, index - 1);
+        //}
+        //
+        ///// <summary>
+        ///// 将索引位置的Table对象在集合中向后移动一个位置
+        ///// </summary>
+        ///// <param name="index"></param>
+        //public void MoveDown(int index)
+        //{
+        //    if (index < 0 || index >= Count - 1)
+        //    {
+        //        return;
+        //    }
+        //    _items[index].IndexAt++;
+        //    _items[index + 1].IndexAt--;
+        //    Swap(index, index + 1);
+        //}
 
         /// <summary>
         /// 导出当前集合中所有的Table配置到字符串

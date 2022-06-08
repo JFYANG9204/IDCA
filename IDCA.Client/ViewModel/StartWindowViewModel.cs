@@ -35,15 +35,11 @@ namespace IDCA.Client.ViewModel
             set { SetProperty(ref _templateItems, value); }
         }
 
-        int _templateSelectedIndex = GlobalConfig.Instance.TemplateSelectIndex;
+        int _templateSelectedIndex = 0;
         public int TemplateSelectedIndex
         {
             get { return _templateSelectedIndex; }
-            set
-            {
-                SetProperty(ref _templateSelectedIndex, value);
-                GlobalConfig.Instance.TemplateSelectIndex = value;
-            }
+            set { SetProperty(ref _templateSelectedIndex, value); }
         }
 
         string _projectName = string.Empty;

@@ -34,6 +34,19 @@ namespace IDCA.Model.Spec
             _name = name;
             _fields = new Dictionary<string, Metadata>();
             _properties = new Dictionary<string, MetadataProperty>();
+            _categories = new List<MetadataCategorical>();
+        }
+
+        Func<string, bool>? _beforeRename;
+        /// <summary>
+        /// 在修改此对象Name属性值之前触发的判定回调函数，
+        /// 因为在同一个Metadata集合中，Metadata名称不可重复，
+        /// 此回调用于判定传入字符是否可用
+        /// </summary>
+        public event Func<string, bool> BeforeRename
+        {
+            add { _beforeRename += value; }
+            remove { _beforeRename -= value; }
         }
 
         readonly Config _config;
@@ -53,7 +66,17 @@ namespace IDCA.Model.Spec
         /// <summary>
         /// 当前元数据的变量名
         /// </summary>
-        public string Name { get => _name; set => _name = value; }
+        public string Name 
+        { 
+            get { return _name; }
+            set
+            {
+                if (_beforeRename == null || _beforeRename.Invoke(value))
+                {
+                    _name = value;
+                }
+            }
+        }
 
         string? _description = string.Empty;
         /// <summary>
@@ -61,18 +84,42 @@ namespace IDCA.Model.Spec
         /// </summary>
         public string? Description { get => _description; set => _description = value; }
 
-        MetadataCategorical[] _categories = Array.Empty<MetadataCategorical>();
+        readonly List<MetadataCategorical> _categories;
         /// <summary>
         /// 创建新的Categorical类型的变量并添加进当前集合
         /// </summary>
         /// <returns></returns>
         public MetadataCategorical NewCategorical(string? name = null)
         {
-            Array.Resize(ref _categories, _categories.Length + 1);
-            string categoricalName = name ?? $"{_config.TryGet<string>(SpecConfigKeys.MetadataCategoricalLabel) ?? "V"}{_categories.Length}";
+            string codeLabel = _config.TryGet<string>(SpecConfigKeys.MetadataCategoricalLabel) ?? "_";
+            int count = _categories.Count + 1;
+            string categoricalName = name ?? $"{codeLabel}{count}";
+            while (_categories.Exists(e => e.Name.Equals(categoricalName, StringComparison.OrdinalIgnoreCase)))
+            {
+                categoricalName = $"{codeLabel}{++count}";
+            }
             var categorical = new MetadataCategorical(this, categoricalName);
-            _categories[^1] = categorical;
+            _categories.Add(categorical);
             return categorical;
+        }
+
+        /// <summary>
+        /// 移除指定名称的Category对象，名称不区分大小写
+        /// </summary>
+        /// <param name="name"></param>
+        public void RemoveCategorical(string name)
+        {
+            _categories.RemoveAll(e => e.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
+        /// 获取指定名称的Categorical对象，不区分大小写。如果不存在，返回Null
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public MetadataCategorical? GetCategorical(string name)
+        {
+            return _categories.Find(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
         }
 
         string? _lowerBoundary;
@@ -213,10 +260,10 @@ namespace IDCA.Model.Spec
             if (_type == MetadataType.CategoricalLoop || _type == MetadataType.Categorical)
             {
                 builder.AppendLine($"{indent}{{");
-                for (int i = 0; i < _categories.Length; i++)
+                for (int i = 0; i < _categories.Count; i++)
                 {
                     MetadataCategorical category = _categories[i];
-                    builder.AppendLine($"{indent}{indent}{category}{(i == _categories.Length - 1 ? "" : ",")}");
+                    builder.AppendLine($"{indent}{indent}{category}{(i == _categories.Count - 1 ? "" : ",")}");
                 }
                 builder.Append($"{indent}}}");
                 if (_type == MetadataType.CategoricalLoop)
@@ -290,12 +337,16 @@ namespace IDCA.Model.Spec
             _name = name;
         }
 
-        readonly string _name;
+        string _name;
         string? _description;
         /// <summary>
-        /// 当前Categorical对象的变量名，为了避免冲突，变量名不可修改
+        /// 当前Categorical对象的变量名
         /// </summary>
-        public string Name => _name;
+        public string Name
+        {
+            get => _name;
+            set => _name = value;
+        }
         /// <summary>
         /// 当前Categorical对象的标签描述
         /// </summary>
@@ -330,6 +381,16 @@ namespace IDCA.Model.Spec
             }
         }
 
+        /// <summary>
+        /// 获取指定类型后缀的值，如果未配置，返回Null
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public string? GetSuffix(MetadataCategoricalSuffixType type)
+        {
+            return _suffix.ContainsKey(type) ? _suffix[type] : string.Empty;
+        }
+
         public override string ToString()
         {
             // 如果是List，忽略其他配置
@@ -338,7 +399,7 @@ namespace IDCA.Model.Spec
                 return $"use {_listName}";
             }
             var builder = new StringBuilder();
-            builder.Append($"{_name}{(_description is null ? "" : $" {_description}")}");
+            builder.Append($"{_name}{(_description is null ? "" : $" \"{_description}\"")}");
             if (_suffix.Count > 0)
             {
                 foreach (KeyValuePair<MetadataCategoricalSuffixType, string> suffix in _suffix)
@@ -382,11 +443,11 @@ namespace IDCA.Model.Spec
         {
             _objectType = SpecObjectType.Collection;
             _config = config;
-            _fields = new Dictionary<string, Metadata>();
+            _fields = new List<Metadata>();
         }
 
         readonly Config _config;
-        readonly Dictionary<string, Metadata> _fields;
+        readonly List<Metadata> _fields;
 
         /// <summary>
         /// 当前集合中的元素数量
@@ -401,12 +462,7 @@ namespace IDCA.Model.Spec
         {
             get
             {
-                string lowerName = name.ToLower();
-                if (_fields.ContainsKey(lowerName))
-                {
-                    return _fields[lowerName];
-                }
-                return null;
+                return _fields.Find(metadata => metadata.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
             }
         }
 
@@ -416,11 +472,7 @@ namespace IDCA.Model.Spec
         /// <param name="name"></param>
         public void Remove(string name)
         {
-            string lowerName = name.ToLower();
-            if (_fields.ContainsKey(lowerName))
-            {
-                _fields.Remove(lowerName);
-            }
+            _fields.RemoveAll(field => field.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>
@@ -434,21 +486,20 @@ namespace IDCA.Model.Spec
         public Metadata NewMetadata(string name = "", MetadataType type = MetadataType.None)
         {
             string metadataName = name;
-            if (string.IsNullOrEmpty(metadataName))
+            if (string.IsNullOrEmpty(metadataName) || 
+                _fields.Find(e => e.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) != null)
             {
                 metadataName = $"Metadata{Count + 1}";
             }
             var metadata = new Metadata(this, _config, metadataName) { Type = type };
-            string lowerName = metadataName.ToLower();
-            if (_fields.ContainsKey(lowerName))
-            {
-                _fields[lowerName] = metadata;
-            }
-            else
-            {
-                _fields.Add(lowerName, metadata);
-            }
+            metadata.BeforeRename += ValidateMetadataName;
+            _fields.Add(metadata);
             return metadata;
+        }
+
+        bool ValidateMetadataName(string name)
+        {
+            return _fields.Find(e => e.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) == null;
         }
 
         /// <summary>
@@ -458,7 +509,7 @@ namespace IDCA.Model.Spec
         public string Export()
         {
             var builder = new StringBuilder();
-            foreach (Metadata metadata in _fields.Values)
+            foreach (Metadata metadata in _fields)
             {
                 builder.AppendLine();
                 builder.AppendLine($"'***************{metadata.Name}***************");
@@ -469,9 +520,17 @@ namespace IDCA.Model.Spec
             return builder.ToString();
         }
 
+        /// <summary>
+        /// 清空当前集合的所有内容
+        /// </summary>
+        public void Clear()
+        {
+            _fields.Clear();
+        }
+
         public IEnumerator GetEnumerator()
         {
-            return _fields.Values.GetEnumerator();
+            return _fields.GetEnumerator();
         }
     }
 

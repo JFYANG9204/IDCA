@@ -84,6 +84,16 @@ namespace IDCA.Model.Spec
         }
 
         /// <summary>
+        /// 获取指定集合元素的索引，如果不在当前集合中，返回-1
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public int IndexOf(T item)
+        {
+            return _items.IndexOf(item);
+        }
+
+        /// <summary>
         /// 清空集合内的所有内容
         /// </summary>
         public void Clear()
@@ -126,6 +136,65 @@ namespace IDCA.Model.Spec
         }
 
         /// <summary>
+        /// 调换两个指定对象的位置，如果有任意一个对象不在集合内，将返回false
+        /// </summary>
+        /// <param name="sourceObj"></param>
+        /// <param name="targetObj"></param>
+        /// <returns></returns>
+        public bool Swap(T sourceObj, T targetObj)
+        {
+            int sourceIndex = _items.IndexOf(sourceObj);
+            int targetIndex = _items.IndexOf(targetObj);
+
+            if (sourceIndex < 0 || targetIndex < 0)
+            {
+                return false;
+            }
+
+            return CollectionHelper.Swap(_items, sourceIndex, targetIndex);
+        }
+
+        /// <summary>
+        /// 将指定索引位置的对象向前移动一个位置，移动成功返回true，否则返回false
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public bool MoveUp(int index)
+        {
+            return Swap(index, index - 1);
+        }
+
+        /// <summary>
+        /// 将指定对象向前移动一个位置，如果对象不在集合内或者索引越限，将移动失败，移动成功返回true，否则返回false
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public bool MoveUp(T obj)
+        {
+            return CollectionHelper.MoveUp(_items, obj);
+        }
+
+        /// <summary>
+        /// 将指定索引位置的对象向后移动一个位置，移动成功返回true，否则返回false
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public bool MoveDown(int index)
+        {
+            return Swap(index, index + 1);
+        }
+
+        /// <summary>
+        /// 将指定对象向后移动一个位置，如果对象不在集合内或者索引越限，将移动失败，移动成功返回true，否则返回false
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public bool MoveDown(T obj)
+        {
+            return CollectionHelper.MoveDown(_items, obj);
+        }
+
+        /// <summary>
         /// 移除特定位置的元素，此方法不会抛出错误
         /// </summary>
         /// <param name="index"></param>
@@ -136,6 +205,15 @@ namespace IDCA.Model.Spec
                 return;
             }
             _items.RemoveAt(index);
+        }
+
+        /// <summary>
+        /// 移除集合内的特定元素
+        /// </summary>
+        /// <param name="obj"></param>
+        public bool Remove(T obj)
+        {
+            return _items.Remove(obj);
         }
 
         /// <summary>

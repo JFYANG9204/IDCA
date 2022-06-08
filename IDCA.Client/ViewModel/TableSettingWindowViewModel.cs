@@ -1,10 +1,12 @@
 ﻿using IDCA.Client.Singleton;
+using IDCA.Client.ViewModel.Common;
+using IDCA.Model.MDM;
 using IDCA.Model.Spec;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Windows.Input;
 
 namespace IDCA.Client.ViewModel
@@ -14,13 +16,17 @@ namespace IDCA.Client.ViewModel
     {
         public TableSettingWindowViewModel()
         {
-            _tree = new TableSettingTreeNode("Root", null);
+            _spec = new SpecDocument(GlobalConfig.Instance.ProjectRootPath, GlobalConfig.Instance.Config);
+            _spec.HeaderAdded += OnHeaderAdded;
+            _spec.HeaderRemoved += OnHeaderRemoved;
 
-            _headerNode = new TableSettingTreeNode("表头", null) { AllowNodeRemoving = false };
+            _tree = new TableSettingTreeNode("Root", _spec, null);
+
+            _headerNode = new TableSettingTreeNode("表头", _spec, null) { AllowNodeRemoving = false };
             _headerNode.SelectedChanged += OnSelectedChanged;
             _headerNode.AddNewChild += () => AppendNewHeader();
 
-            _tableNode = new TableSettingTreeNode("表侧", null) { AllowNodeRemoving = false };
+            _tableNode = new TableSettingTreeNode("表侧", _spec, null) { AllowNodeRemoving = false };
             _tableNode.SelectedChanged += OnSelectedChanged;
             _tableNode.AddNewChild += () => AppendNewTables();
 
@@ -29,12 +35,59 @@ namespace IDCA.Client.ViewModel
 
             _selectedNode = _headerNode;
 
-            _spec = GlobalConfig.Instance.SpecDocument;
-            _spec.HeaderAdded += OnHeaderAdded;
-            _spec.HeaderRemoved += OnHeaderRemoved;
+            _mdd = new MDMDocument();
+            if (!string.IsNullOrEmpty(GlobalConfig.Instance.MdmDocumentPath) &&
+                File.Exists(GlobalConfig.Instance.MdmDocumentPath))
+            {
+                _mdd.Open(GlobalConfig.Instance.MdmDocumentPath);
+            }
         }
 
         readonly SpecDocument _spec;
+        readonly MDMDocument _mdd;
+
+        public SpecDocument SpecDocument => _spec;
+        public MDMDocument MdmDocument => _mdd;
+
+        string _projectPath = GlobalConfig.Instance.ProjectRootPath;
+        public string ProjectPath
+        {
+            get { return _projectPath; }
+            set 
+            { 
+                SetProperty(ref _projectPath, value);
+                _spec.ProjectPath = value;
+            }
+        }
+
+        string _mdmDocumentPath = GlobalConfig.Instance.MdmDocumentPath;
+        public string MdmDocumentPath
+        {
+            get { return _mdmDocumentPath; }
+            set
+            {
+                if (!string.IsNullOrEmpty(value) && File.Exists(value))
+                {
+                    SetProperty(ref _mdmDocumentPath, value);
+                    _mdd.Close();
+                    _mdd.Open(value);
+                }
+            }
+        }
+
+        string _excelSettingFilePath = GlobalConfig.Instance.ExcelSettingFilePath;
+        public string ExcelSettingFilePath
+        {
+            get { return _excelSettingFilePath; }
+            set
+            {
+                if (!string.IsNullOrEmpty(value) && File.Exists(value))
+                {
+                    SetProperty(ref _excelSettingFilePath, value);
+                }
+            }
+        }
+
 
         TableSettingTreeNode _tree;
         public TableSettingTreeNode Tree
@@ -42,7 +95,6 @@ namespace IDCA.Client.ViewModel
             get { return _tree; }
             set { SetProperty(ref _tree, value); }
         }
-
 
         TableSettingTreeNode _headerNode;
         TableSettingTreeNode _tableNode;
@@ -122,7 +174,7 @@ namespace IDCA.Client.ViewModel
             vm.BeforeRenamed += ValidateHeaderName;
             vm.Renamed += OnHeaderRenamed;
 
-            var header = new TableSettingTreeNode(vm.HeaderName, vm) { AllowAppendChild = false };
+            var header = new TableSettingTreeNode(vm.HeaderName, _spec, vm) { AllowAppendChild = false };
             header.SelectedChanged += OnSelectedChanged;
             header.Removing += OnNodeRemoving;
             _headerNode.Children.Add(header);
@@ -137,7 +189,7 @@ namespace IDCA.Client.ViewModel
             vm.BeforeRemoved += ValidateTablesName;
             vm.Renamed += OnTablesRenamed;
 
-            var tables = new TableSettingTreeNode(vm.TableName, vm) { AllowAppendChild = false };
+            var tables = new TableSettingTreeNode(vm.TableName, _spec, vm) { AllowAppendChild = false };
             tables.SelectedChanged += OnSelectedChanged;
             tables.Removing += OnNodeRemoving;
             _tableNode.Children.Add(tables);
@@ -159,13 +211,51 @@ namespace IDCA.Client.ViewModel
             }
         }
 
+        void SelectMdmDocument()
+        {
+            string? dialogResult = WindowManager.ShowOpenFileDialog("MDM Document|*.mdd");
+            if (dialogResult != null && File.Exists(dialogResult))
+            {
+                MdmDocumentPath = dialogResult;
+            }
+        }
+        public ICommand SelectMdmDocumentCommand => new RelayCommand(SelectMdmDocument);
+
+        void SelectProjectPath()
+        {
+            string? dialogResult = WindowManager.ShowFolderBrowserDialog();
+            if (dialogResult != null)
+            {
+                ProjectPath = dialogResult;
+            }
+        }
+        public ICommand SelectProjectRootPathCommand => new RelayCommand(SelectProjectPath);
+
+        void SelectExcelSettingFile()
+        {
+            string? dialogResult = WindowManager.ShowOpenFileDialog("Excel File|*.xlsx");
+            if (!string.IsNullOrEmpty(dialogResult) && File.Exists(dialogResult))
+            {
+                ExcelSettingFilePath = dialogResult;
+            }
+        }
+        public ICommand SelectExcelSettingFileCommand => new RelayCommand(SelectExcelSettingFile);
+
+        void Execute()
+        {
+            _spec.Exec();
+        }
+        public ICommand ExecuteCommand => new RelayCommand(Execute);
+
     }
 
     public class TableSettingTreeNode : ObservableObject
     {
-        public TableSettingTreeNode(string name, ObservableObject? dataContext)
+        public TableSettingTreeNode(string name, SpecDocument spec, ObservableObject? dataContext)
         {
             _name = name;
+            _spec = spec;
+
             _children = new ObservableCollection<TableSettingTreeNode>();
 
             _isHeaderView = false;
@@ -211,6 +301,12 @@ namespace IDCA.Client.ViewModel
                 _headerViewModel = HeaderSettingViewModel.Empty(this);
             }
         }
+
+        readonly SpecDocument _spec;
+        /// <summary>
+        /// 当前的Spec文档对象
+        /// </summary>
+        public SpecDocument SpecDocument => _spec;
 
         bool _allowNodeRemoving;
         public bool AllowNodeRemoving
