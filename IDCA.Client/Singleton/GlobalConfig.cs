@@ -9,7 +9,9 @@ namespace IDCA.Client.Singleton
         {
             _config = new Config();
             LoadConfigs();
+            _templateRootPath = _config.TryGet<string>(SpecConfigKeys.TemplateRootPath) ?? "";
             _templateDictionary = new TemplateDictionary();
+            _templateDictionary.LoadFromFolder(_templateRootPath);
         }
 
         /// <summary>
@@ -66,5 +68,11 @@ namespace IDCA.Client.Singleton
         /// </summary>
         public TemplateDictionary TemplateDictionary => _templateDictionary;
 
+
+        string _templateRootPath;
+        /// <summary>
+        /// 当前保存的模板文件夹路径
+        /// </summary>
+        public string TemplateRootPath { get => _templateRootPath; set => _templateRootPath = value; }
     }
 }

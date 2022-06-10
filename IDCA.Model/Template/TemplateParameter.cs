@@ -18,7 +18,9 @@ namespace IDCA.Model.Template
         JobProjectPath = 1011,
         JobMetaDataName = 1021,
         JobContextType = 1031,
-        JobLanguageType = 1041,
+        JobLanguageShortCode = 1041,
+        JobLanguageLongCode = 1051,
+        JobDescription = 1061,
         
         ManipulateMDMDocument = 2012,
         ManipulateContextType = 2022,

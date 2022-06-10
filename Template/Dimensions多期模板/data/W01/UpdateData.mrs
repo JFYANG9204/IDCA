@@ -1,0 +1,177 @@
+#include "..\job.ini"
+'#define INPUT_METADATA "77125314"
+'#define LOCALE "CHS"
+'#define LOCALE_DMS "zh-CN"
+'#define MDD_TYPE "Question"
+'#define WAVE_NO "W01"
+
+#define SQLUPDATE  WAVE_NO + "\" + "updatedata.txt"
+
+'CHANGE:  TRUE/FALSE - include add_property file or not
+#define INCLUDE_ADD_PROPERTY_FILE TRUE'FALSE'
+
+'CHANGE AS NEEDED:  path and name of input mdd file
+#define METADATA_IN WAVE_NO + "\" + INPUT_METADATA + "_" + WAVE_NO + ".mdd"
+
+'CHANGE AS NEEDED:  path and name of input casedata file
+#define CASEDATA_IN WAVE_NO + "\" + INPUT_METADATA + "_" + WAVE_NO + ".ddf"
+
+'CHANGE AS NEEDED:  path and name of output mdd file
+#define METADATA_OUT WAVE_NO + "\" + INPUT_METADATA + "_" + WAVE_NO + "_withOE.mdd"
+
+'CHANGE AS NEEDED:  path and name of output casedata file
+#define CASEDATA_OUT WAVE_NO + "\" + INPUT_METADATA + "_" + WAVE_NO + "_withOE.ddf"
+
+
+
+'**************************************************************************************
+'No Need To Edit Below This Line
+'**************************************************************************************
+
+
+DIM objFSO, file1
+SET objFSO = CreateObject("Scripting.FileSystemObject")
+
+if INCLUDE_ADD_PROPERTY_FILE = TRUE then
+  If objFSO.FileExists(WAVE_NO + "\add_property.txt") Then objFSO.DeleteFile(WAVE_NO + "\add_property.txt",True)
+  set file1=objFSO.createtextfile(WAVE_NO + "\add_property.txt",true,false)
+  
+  Dim MDM, var
+  
+  set MDM=CreateObject("MDM.Document")
+  MDM.Open(METADATA_IN)
+  
+  for each var in MDM.Fields
+      if var.ObjectTypeValue = 1 then 'is a grid
+  
+     	    file1.WriteLine(var.fullname+" """" [EvaluateemptyIterations = true] loop{} fields () expand grid;")
+          '+var.label+
+      end if
+  next
+  
+  MDM.Close()
+  file1.Close()
+end if
+
+
+If objFSO.FileExists(METADATA_OUT) Then objFSO.DeleteFile(METADATA_OUT,True)
+If objFSO.FileExists(CASEDATA_OUT) Then objFSO.DeleteFile(CASEDATA_OUT,True)
+
+objFSO.CopyFile(METADATA_IN,METADATA_OUT,True)
+objFSO.CopyFile(CASEDATA_IN,CASEDATA_OUT,True)
+
+
+'Dim MDM
+'set MDM=CreateObject("MDM.Document")
+with MDM
+     .Open(METADATA_OUT,"")
+     with .Versions
+          If .Count > 0 Then
+               If .Latest.IsLocked Then
+                    .AddNew()
+               End If
+          End If
+     end with '.Versions
+
+
+     'Create a new mdd file to add the new code to
+     dim MDM_New
+     set MDM_New=createobject("MDM.Document")
+
+     with MDM_New
+          .Contexts.Base=MDD_TYPE
+          .Contexts.Current=MDD_TYPE
+
+          'Adds the LOCALE as the language to the temporary mdd
+          .Languages.Add(LOCALE_DMS)
+          .Languages.Current=LOCALE_DMS
+
+          'Reads in the content of the standard metadata include files
+          'If you have additional metadata files you can load them like the examples below
+          'Opens lists.mrs file - file which should contain all your define lists
+          .sbAddToTypes(objFSO,WAVE_NO + "\deflists.mrs")
+
+
+          'Opens metadata.mrs file - file which contains metadata for all new questions besides
+          'grids that are being flipped
+          .sbAddToFields(objFSO,WAVE_NO + "\defmetadata.mrs")
+          if INCLUDE_ADD_PROPERTY_FILE = TRUE then
+            .sbAddToFields(objFSO,WAVE_NO + "\add_property.txt")
+          end if
+
+          .save("temp1.mdd")
+     end with  'MDM_New
+
+     'Join together the temp and temp1 mdd files
+     .Join(MDM_New,"",1,1)
+
+
+     'Autoassign our categoryvalues...
+     .categorymap.autoassignvalues()
+
+     'save the mdd
+     .Save()
+
+     'cloce the mdd
+     .close()
+
+end with 'MDD
+
+
+
+
+dim adoConnectionString
+
+        adoConnectionString = "Provider=mrOleDB.Provider.2;_
+           Data Source=mrDataFileDsc;_
+           Initial Catalog="METADATA_OUT";MR Init MDM Access=1;_
+           Location=" + CASEDATA_OUT
+
+subUpdateDB(adoConnectionString)
+
+If objFSO.FileExists("temp1.mdd") Then objFSO.DeleteFile("temp1.mdd",True)
+
+Sub subUpdateDB(ConnectionString)
+'This function updates the database with the categorical values for the questions
+'coded in Ascribe.  Each line from the file Ascribe exports is read
+'and the SQL query is executed.
+dim adoConnection,sqlQuery,oFS,oFile,oStream
+
+Set adoConnection = CreateObject("ADODB.Connection")
+adoConnection.Open(ConnectionString)
+Set oFS = CreateObject("Scripting.FileSystemObject")
+set oFile = oFS.GetFile(SQLUPDATE)
+set oStream = oFile.OpenAsTextStream(1, -2)
+
+adoConnection.Execute("exec xp_syncdb")
+
+Do While Not oStream.AtEndOfStream
+        sqlQuery=oStream.ReadLine()
+        debug.Log(sqlQuery)
+        adoConnection.Execute(sqlQuery)
+Loop
+oStream.Close()
+adoConnection.Close()
+End Sub
+
+sub sbAddToTypes(MDD,oFso,strFile)
+        Dim oFile
+
+        if oFso.FileExists(strFile) then
+                set oFile=oFso.OpenTextFile(strFile)
+                if not oFile.AtEndOfStream then MDD.Types.AddScript(oFile.ReadAll())
+        end if
+end sub
+
+sub sbAddToFields(MDD,oFso,strFile)
+        Dim oFile
+
+        if oFso.FileExists(strFile) then
+                set oFile=oFso.OpenTextFile(strFile)
+                if not oFile.AtEndOfStream then MDD.Fields.AddScript(oFile.ReadAll())
+        end if
+end sub
+
+
+
+

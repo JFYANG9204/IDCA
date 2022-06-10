@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<xml>
+	<properties>
+		<property name="Name" value="Dimensions多期模板"/>
+		<property name="Description" value="Dimensions多期模板"/>
+	</properties>
+	<file>
+		<template name="Job" flag="1" filename="Job.ini">
+			<param name="JobProjectPath" usage="1011" />
+			<param name="JobMetaDataName" usage="1021"/>
+			<param name="JobContextType" usage="1031"/>
+			<param name="JobLanguageShortCode" usage="1041"/>
+			<param name="JobLanguageLongCode" usage="1051"/>
+		</template>
+		<template name="MddManipulation" flag="2" filename="MDD_Manipulation.mrs" />
+		<template name="Tab" flag="3" filename="Tab.mrs"/>
+		<template name="OnNextCase" flag="4" filename="OnNextCase.mrs" />
+		<template name="MetadataFile" flag="5" filename="sbMetadata.mrs" />
+		<template name="DmsMetadataFile" flag="6" filename="data\\Metadata_dms.mrs" />
+		<template name="Run" flag="9" filename="Run.mrs" >
+			<param	name="JobDescription" usage="1061" valuetype="0" />
+		</template>
+		<template name="Clean_SplitAccelerated" flag="9" filename="data\\Clean_SplitAccelerated.dms" />
+		<template name="Jacc_compute" flag="9" filename="data\\Jacc_compute.mrs" />
+		<template name="Jacc_Metadata" flag="9" filename="data\\Jacc_Metadata.mrs" />
+		<template name="MergeData" flag="9" filename="data\\MergeData.dms" />
+		<template name="SplitDMSAccelerated" flag="9" filename="data\\SplitDMSAccelerated.mrs" />
+	</file>
+	<folder>
+		<template name="Library" path="Library" />
+		<template name="W01" path="data\\W01" />
+		<template name="SAV" path="data\\SAV" />
+		<template name="Beast" path="data\\Beast" />
+	</folder>
+	<function>
+		<template name="fnAddTable" flag="201">
+			<param name="TableDoc" usage="3012" valuetype="1" default="TableDoc" />
+			<param name="strSideSpec" usage="3032" valuetype="0" />
+			<param name="strTopSpec" usage="3022" valuetype="0" />
+			<param name="strTitleText" usage="3042" valuetype="1" default="Null" />
+			<param name="strBaseText" usage="3052" valuetype="0" default="" />
+		</template>
+		<template name="fnAddGrid" flag="202">
+			<param name="TableDoc" usage="3012" valuetype="1" default="TableDoc" />
+			<param name="strSideSpec" usage="3032" valuetype="0" />
+			<param name="strTopSpec" usage="3022" valuetype="0" />
+			<param name="strTitleText" usage="3042" valuetype="1" default="Null" />
+			<param name="strBaseText" usage="3052" valuetype="0" default="" />
+		</template>
+		<template name="fnAddGridSliceTables" flag="203">
+			<param name="TableDoc" usage="3012" valuetype="1" default="TableDoc" />
+			<param name="strGridName" usage="3032" valuetype="0" />
+			<param name="strTopSpec" usage="3022" valuetype="0" />
+			<param name="strTitleText" usage="3042" valuetype="1" default="Null" />
+			<param name="strBaseText" usage="3052" valuetype="0" default="" />
+			<param name="strShow" usage="3072" valuetype="1" default="Null" />
+			<param name="strSpec" usage="3082" valuetype="0" default="" />
+		</template>
+	</function>
+</xml>

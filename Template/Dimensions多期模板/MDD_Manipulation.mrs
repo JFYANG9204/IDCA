@@ -1,0 +1,56 @@
+'*****FILE VERSION=3, DATE LAST MODIFIED=2012/08/29, KO
+
+'Use this file to amend/add axis expressions and analysis text
+
+'CHANGE AS NEEDED: Existence options applied to FnCreateExistenceAxisSpec - set options as required
+Dim iCategoryExistenceLabel,iDateDisplay,iVariableExistenceLabel,Context
+Context="Main"
+iCategoryExistenceLabel=0
+iDateDisplay=0
+iVariableExistenceLabel=0
+
+'This will remove any HTML tags included in labels of all fields and elements
+sbStripHTMLFromFieldLabels(MDM,MDD_TYPE,LOCALE)
+
+'Note: this will change all the text format of each category of all grids as defined by the CASE_OPTION in the job.ini
+'If there is a need to treat the categories of an individual grid differently, you can use a loop such as:
+'    dim cat
+'    for each cat in mdm.fields["q3"].categories
+'      sbSetResponseText(MDM,"q3",MDD_TYPE,LOCALE,cat.name,fnCaseControl(cat.label,3))
+'    next
+sbAdjustCaseOfCategoriesOnUpperFields(mdm,mdm)
+
+'*************** ADD MDD MANIPULATION HERE *********************
+
+''**************************************************************
+''EXAMPLES
+''
+''Edit/Add an Axis Expression
+''sbSetAxisExpression(MDM,"q13tab[..].slice","{_
+''_7CompletelySatisfied '(7) Completely Satisfied' [factor = 7],_
+''_6 '(6)' [factor = 6],_
+''_5 '(5)' [factor = 5],_
+''_4 '(4)' [factor = 4],_
+''_3 '(3)' [factor = 3],_
+''_2 '(2)' [factor = 2],_
+''_1NotAtAllSatisfied '(1) Not at all satisfied' [factor = 1],_
+''mean() [IsFixed=True,Decimals=2],stddev(),stderr()}")
+''
+''Edit/Add Title Text
+''sbSetTitleText(MDM,"Q26",MDD_TYPE,LOCALE,"(Q26) Where seen ads - Newspaper Campaign")
+''
+''Edit/Add Response Text
+''sbSetResponseText(MDM,"Q26",MDD_TYPE,LOCALE,"StrAgr","(5) Strongly Agree")
+''
+''**************************************************************
+Function mean_inc(Qes)
+mean_inc = ",e99 '' text(),mean 'AVERAGE' mean("+Qes+")[Decimals=2],stdv 'STANDARD DEVIATION' StdDev("+Qes+")[Decimals=2],stde 'STANDARD ERROR' stderr("+Qes+") [Decimals=2]"
+End Function
+
+'	sbSetTitleText(MDM,TOPBREAK,MDD_TYPE,LOCALE,GLOBALLABEL)
+
+
+
+
+
+''**************************************************************

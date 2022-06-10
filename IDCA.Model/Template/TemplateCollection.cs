@@ -27,21 +27,31 @@ namespace IDCA.Model.Template
         public TemplateCollection()
         {
             _path = string.Empty;
+
+            _libraryFileTemplates = new List<FileTemplate>();
+            _otherUsefulFileTemplates = new List<FileTemplate>();
+            _fileTemplates = new Dictionary<FileTemplateFlags, Template>();
+            _functionTemplates = new Dictionary<FunctionTemplateFlags, Template>();
         }
 
         string _path;
 
-        readonly List<FileTemplate> _libraryFileTemplates = new();
-        readonly List<FileTemplate> _otherUsefulFileTemplates = new();
-        readonly Dictionary<FileTemplateFlags, Template> _fileTemplates = new();
-        readonly Dictionary<FunctionTemplateFlags, Template> _functionTemplates = new();
+        readonly List<FileTemplate> _libraryFileTemplates;
+        readonly List<FileTemplate> _otherUsefulFileTemplates;
+        readonly Dictionary<FileTemplateFlags, Template> _fileTemplates;
+        readonly Dictionary<FunctionTemplateFlags, Template> _functionTemplates;
         string _name = string.Empty;
+        string _id = string.Empty;
         string _description = string.Empty;
 
         /// <summary>
         /// Template名称
         /// </summary>
         public string Name { get => _name; set => _name = value; }
+        /// <summary>
+        /// Template编号
+        /// </summary>
+        public string Id { get => _id; set => _id = value; }
         /// <summary>
         /// Template模板描述
         /// </summary>
@@ -200,10 +210,12 @@ namespace IDCA.Model.Template
                         {
                             foreach (var file in Directory.GetFiles(fullPath))
                             {
-                                FileTemplate fileTemplate = new();
-                                fileTemplate.FileName = Path.GetFileName(file);
-                                fileTemplate.Directory = Path.GetDirectoryName(file) ?? string.Empty;
-                                fileTemplate.Flag = FileTemplateFlags.LibraryFile;
+                                var fileTemplate = new FileTemplate
+                                {
+                                    FileName = Path.GetFileName(file),
+                                    Directory = path,
+                                    Flag = FileTemplateFlags.LibraryFile
+                                };
                                 fileTemplate.SetContent(TryReadTextFile(file));
                                 _libraryFileTemplates.Add(fileTemplate);
                             }

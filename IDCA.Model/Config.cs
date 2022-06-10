@@ -1,5 +1,4 @@
 ﻿
-
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -11,9 +10,10 @@ namespace IDCA.Model
     {
         public Config()
         {
+            _configs = new Dictionary<string, object>();
         }
 
-        readonly Dictionary<string, object> _configs = new();
+        readonly Dictionary<string, object> _configs;
         /// <summary>
         /// 获取指定类型的特定名称的配置信息，如果键值不存在或类型不匹配，返回null
         /// </summary>
@@ -84,6 +84,24 @@ namespace IDCA.Model
                 TryLoad(propertyObject, field.Name);
             }
         }
+
+        /// <summary>
+        /// 将当前配置的值更新到配置对象中，需要配置对象包含同名属性
+        /// </summary>
+        /// <param name="properties"></param>
+        public void UpdateToSettings(object properties)
+        {
+            var type = properties.GetType();
+            foreach (var key in _configs.Keys)
+            {
+                var propertyInfo = type.GetProperty(key);
+                if (propertyInfo != null)
+                {
+                    propertyInfo.SetValue(properties, _configs[key]);
+                }
+            }
+        }
+
     }
 
     /// <summary>
@@ -118,6 +136,7 @@ namespace IDCA.Model
 
     public class SpecConfigKeys
     {
+        public const string TemplateRootPath = "TemplateRootPath";
         public const string MetadataCategoricalLabel = "MetadataCategoricalLabel";
         // Axis Config
         public const string AxisAddSigma = "AxisAddSigma";

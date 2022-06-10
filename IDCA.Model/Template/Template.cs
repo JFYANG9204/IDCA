@@ -219,7 +219,7 @@ namespace IDCA.Model.Template
             {
                 foreach (TemplateParameter parameter in Parameters)
                 {
-                    result = result.Replace(parameter.ToString(), parameter.GetValue<string>(), StringComparison.OrdinalIgnoreCase);
+                    result = result.Replace(parameter.ToString(), parameter.GetValue<TemplateValue>()?.Value, StringComparison.OrdinalIgnoreCase);
                 }
             }
             return result;
@@ -283,7 +283,7 @@ namespace IDCA.Model.Template
         {
             TemplateParameter nameParam = GetOrCreateParameter(TemplateParameterUsage.FunctionName);
             nameParam.Name = "FunctionName";
-            nameParam.SetValue(functionName);
+            nameParam.SetValue(new TemplateValue(functionName, TemplateValueType.Expression));
         }
 
         /// <summary>
@@ -295,8 +295,8 @@ namespace IDCA.Model.Template
             TemplateParameter? parameter = _parameters[TemplateParameterUsage.FunctionName];
             if (parameter != null)
             {
-                string? functionName = parameter.GetValue<string>();
-                return functionName is null ? string.Empty : functionName;
+                var functionName = parameter.GetValue<TemplateValue>();
+                return functionName is null ? string.Empty : functionName.Value;
             }
             return string.Empty;
         }
@@ -345,7 +345,7 @@ namespace IDCA.Model.Template
         public override string Exec()
         {
             TemplateParameter? functionNameParam = _parameters[TemplateParameterUsage.FunctionName];
-            string functionName = functionNameParam?.GetValue<string>() ?? string.Empty;
+            string functionName = functionNameParam?.GetValue<TemplateValue>()?.Value ?? string.Empty;
             StringBuilder result = new();
             result.Append(functionName);
             result.Append('(');

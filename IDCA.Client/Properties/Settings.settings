@@ -29,5 +29,8 @@
     <Setting Name="TableSummaryLabel" Type="System.String" Scope="User">
       <Value Profile="(Default)"> - Summary</Value>
     </Setting>
+    <Setting Name="TemplateRootPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

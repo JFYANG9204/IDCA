@@ -1,0 +1,49 @@
+ Dim WgtEng, Wgt, fso, ReptFile
+ Set WgtEng = dmgrJob.WeightEngine
+
+ ' Create an html file to contain the weighting report...
+ 
+' Set fso = CreateObject("Scripting.FileSystemObject")
+' Set ReptFile = fso.CreateTextFile("DataManagement\WeightingReport.htm",True)
+   
+ ' Create an instance of the Weight object with the following parameters:
+ ' "Weight"          : Is the variable of type Double that was created in the metadata section.
+ ' "qb"              : Is the variable that stores the characteristics on which we wish to base the weighting.
+ ' wtMethod.wtTargets: Defines the weighting method as target weighting.
+   
+' Set Wgt = WgtEng.CreateWeight("Weight1", "qb", wtMethod.wtTargets)
+' Set Wgt = WgtEng.CreateWeight("Weights", "s1", wtMethod.wtFactors)
+Set Wgt = WgtEng.CreateWeight("Weight", "gender, age, resident", wtMethod.wtrims)
+
+ ' Define a two cell weighting matrix with a target of 77/76 for each value of the gender variable...
+' Wgt.CellRows.Factors = "1;1;1;1" 
+' Wgt.PreWeightVariable = "nwei1"
+Wgt.Rims["gender"].Targets = "50; 50" 
+Wgt.Rims["age"].Targets = "50; 100; 100; 200; 100; 50; 30; 15" 
+Wgt.Rims["resident"].RimElements[0].Target = "75" 
+Wgt.Rims["resident"].RimElements[1].Target = "25" 
+Wgt.Rims["resident"].RimElements[2].Target = "0" 
+
+'1 默认
+'2 百分比 - weighted total base = weighted total base
+'3 百分比 - 指定weighted total base
+
+Wgt.TotalType = 3
+Wgt.WeightedTotal = 5000
+
+
+ ' Call the WeightEngine.Prepare method and then write the weighting report to the html file...
+ WgtEng.Prepare(Wgt) 
+' ReptFile.Write(Wgt.Report) 
+
+ ' Call the WeightEngine.Execute method, which will insert the calculated weight values in the Weight variable. Then write the weighting report to the html file...
+ WgtEng.Execute(Wgt) 
+' ReptFile.Write(Wgt.Report) 
+' ReptFile.Close()
+
+ ' Setting WgtEng to Null ensures that the connection to the output data source is closed and that any pending data updates are flushed...
+ set WgtEng = Null 
+
+
+
+

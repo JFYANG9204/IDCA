@@ -129,5 +129,17 @@ namespace IDCA.Client.Properties {
                 this["TableSummaryLabel"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TemplateRootPath {
+            get {
+                return ((string)(this["TemplateRootPath"]));
+            }
+            set {
+                this["TemplateRootPath"] = value;
+            }
+        }
     }
 }

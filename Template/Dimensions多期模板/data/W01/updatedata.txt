@@ -1,0 +1,8 @@
+UPDATE vdata SET oeQB1=UNION(oeQB1,{yogurt_262}) WHERE Respondent.serial = 200005
+UPDATE vdata SET QB7={yogurt_75} WHERE Respondent.serial = 201049
+UPDATE vdata SET QC4={_1} WHERE Respondent.serial = 200118
+UPDATE vdata SET QC4=DIFFERENCE(QC4,{_98}) WHERE Respondent.serial = 200118
+
+
+
+

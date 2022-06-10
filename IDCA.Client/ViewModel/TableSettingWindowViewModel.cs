@@ -2,6 +2,7 @@
 using IDCA.Client.ViewModel.Common;
 using IDCA.Model.MDM;
 using IDCA.Model.Spec;
+using IDCA.Model.Template;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using System;
@@ -14,11 +15,12 @@ namespace IDCA.Client.ViewModel
 
     public class TableSettingWindowViewModel : ObservableObject
     {
-        public TableSettingWindowViewModel()
+        public TableSettingWindowViewModel(TemplateCollection template, MDMDocument mDM)
         {
-            _spec = new SpecDocument(GlobalConfig.Instance.ProjectRootPath, GlobalConfig.Instance.Config);
+            _spec = new SpecDocument(GlobalConfig.Instance.ProjectRootPath, template, GlobalConfig.Instance.Config);
             _spec.HeaderAdded += OnHeaderAdded;
             _spec.HeaderRemoved += OnHeaderRemoved;
+            _spec.Init(mDM);
 
             _tree = new TableSettingTreeNode("Root", _spec, null);
 

@@ -8,9 +8,10 @@ namespace IDCA.Model.Template
     {
         public TemplateDictionary()
         {
+            _templates = new Dictionary<string, TemplateCollection>();
         }
 
-        readonly Dictionary<string, TemplateCollection> _templates = new();
+        readonly Dictionary<string, TemplateCollection> _templates;
 
         /// <summary>
         /// 尝试通过ID编号获取对应模板集合对象
@@ -57,9 +58,10 @@ namespace IDCA.Model.Template
                     Logger.Warning("TemplateDefinitionXmlFileIsNotExist", ExceptionMessages.TemplateDefinitionXmlFileIsNotExist, template);
                     continue;
                 }
-                TemplateCollection templateCollection = new();
+                var templateCollection = new TemplateCollection();
                 templateCollection.Load(xmlPath);
                 string id = StringHelper.ConvertToHexString(templateCollection.Name);
+                templateCollection.Id = id;
                 if (string.IsNullOrEmpty(id))
                 {
                     Logger.Warning("TemplateNameCannotBeEmpty", ExceptionMessages.TemplateNameCannotBeEmpty, template);
@@ -74,6 +76,14 @@ namespace IDCA.Model.Template
                     _templates.Add(id, templateCollection);
                 }
             }
+        }
+
+        /// <summary>
+        /// 清空集合中的所有模板
+        /// </summary>
+        public void Clear()
+        {
+            _templates.Clear();
         }
 
     }

@@ -10,22 +10,25 @@ namespace IDCA.Model.Spec
     public class SpecDocument : SpecObject
     {
 
-        public SpecDocument(Config config) : base()
+        public SpecDocument(string projectPath, TemplateCollection template, Config config) : base()
         {
             _globalTables = new List<Tables>();
-            _projectPath = string.Empty;
+            _projectPath = projectPath;
             _objectType = SpecObjectType.Document;
             _manipulations = new Manipulations(this);
             _scripts = new ScriptCollection(this);
-            _templates = new TemplateCollection();
+            _templates = template;
             _config = config;
             _dmsMetadata = new MetadataCollection(this, config);
             _metadata = new MetadataCollection(this, config);
         }
 
-        public SpecDocument(string projectPath, Config config) : this(config)
+        public SpecDocument(Config config) : this("", new TemplateCollection(), config)
         {
-            _projectPath = projectPath;
+        }
+
+        public SpecDocument(string projectPath, Config config) : this(projectPath, new TemplateCollection(), config)
+        {
         }
 
         public SpecDocument(string projectPath, string templateXmlPath, Config config) : this(projectPath, config)

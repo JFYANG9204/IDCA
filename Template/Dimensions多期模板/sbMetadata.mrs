@@ -1,0 +1,6 @@
+'bk01a "城市级别" categorical[..]
+'{
+'    _01 "Tier 1                " expression ("QCity={_1}"),
+'    _02 "Tier 2                " expression ("QCity={_2}"),
+'    _03 "Tier 3                " expression ("QCity={_3}")
+'} axis("{base '总体' base(),..}");

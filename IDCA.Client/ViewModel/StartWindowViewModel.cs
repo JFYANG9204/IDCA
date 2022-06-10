@@ -1,9 +1,13 @@
 ﻿
 using IDCA.Client.Singleton;
 using IDCA.Client.ViewModel.Common;
+using IDCA.Model;
+using IDCA.Model.MDM;
+using IDCA.Model.Template;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Windows.Input;
 
 namespace IDCA.Client.ViewModel
@@ -12,14 +16,14 @@ namespace IDCA.Client.ViewModel
     {
         public StartWindowViewModel()
         {
+            _config = GlobalConfig.Instance.Config;
+            _templateDictionary = GlobalConfig.Instance.TemplateDictionary;
             _templateItems = new ObservableCollection<TemplateElementViewModel>();
-            var template = new TemplateElementViewModel
-            {
-                TemplateName = "默认模板",
-                TemplateDescription = "普通的多期模板"
-            };
-            _templateItems.Add(template);
+            UpdateTemplateInformation();
         }
+
+        readonly Config _config;
+        readonly TemplateDictionary _templateDictionary;
 
         bool _mainWindowToClose = false;
         public bool MainWindowToClose
@@ -35,11 +39,27 @@ namespace IDCA.Client.ViewModel
             set { SetProperty(ref _templateItems, value); }
         }
 
-        int _templateSelectedIndex = 0;
+        int _templateSelectedIndex = -1;
         public int TemplateSelectedIndex
         {
             get { return _templateSelectedIndex; }
-            set { SetProperty(ref _templateSelectedIndex, value); }
+            set 
+            { 
+                SetProperty(ref _templateSelectedIndex, value);
+                CheckConfirmEnable();
+            }
+        }
+
+        bool _isConfirmButtonEnable = false;
+        public bool IsConfirmButtonEnable
+        {
+            get { return _isConfirmButtonEnable; }
+            set { SetProperty(ref _isConfirmButtonEnable, value); }
+        }
+
+        void CheckConfirmEnable()
+        {
+            IsConfirmButtonEnable = _templateSelectedIndex >= 0 && _templateSelectedIndex < _templateItems.Count;
         }
 
         string _projectName = string.Empty;
@@ -121,10 +141,41 @@ namespace IDCA.Client.ViewModel
 
         void Confirm(object? sender)
         {
-            WindowManager.Show("TableSettingWindow");
+            var mdm = new MDMDocument();
+            string path = GlobalConfig.Instance.MdmDocumentPath;
+            if (!string.IsNullOrEmpty(path) && File.Exists(path))
+            {
+                mdm.Open(path);
+            }
+            WindowManager.ShowWindow("TableSettingWindow", new TableSettingWindowViewModel(_templateItems[_templateSelectedIndex].Template, mdm));
             WindowManager.CloseWindow(sender);
         }
         public ICommand ConfirmCommand => new RelayCommand<object?>(Confirm);
 
+
+        void UpdateTemplateInformation()
+        {
+            GlobalConfig.Instance.TemplateDictionary.Clear();
+            _templateItems.Clear();
+            _templateDictionary.LoadFromFolder(_config.TryGet<string>(SpecConfigKeys.TemplateRootPath) ?? "");
+            foreach (var item in GlobalConfig.Instance.TemplateDictionary.GetTemplates())
+            {
+                var templateElement = new TemplateElementViewModel(item);
+                _templateItems.Add(templateElement);
+            }
+        }
+
+        void LoadTemplate()
+        {
+            string? folder = WindowManager.ShowFolderBrowserDialog();
+            if (folder != null && Directory.Exists(folder))
+            {
+                _config.Set(SpecConfigKeys.TemplateRootPath, folder);
+                _config.UpdateToSettings(Properties.Settings.Default);
+                Properties.Settings.Default.Save();
+                UpdateTemplateInformation();
+            }
+        }
+        public ICommand LoadTemplateCommand => new RelayCommand(LoadTemplate);
     }
 }

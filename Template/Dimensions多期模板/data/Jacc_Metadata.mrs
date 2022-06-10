@@ -1,0 +1,181 @@
+topmob "A3d, A4d, A5d vs B1" categorical[..]
+{
+    _1 "百度视频" expression ("A3d.containSany({_7} ) or A4d.containSany({_7} ) or A5d.containSany({_7} )"),
+    _2 "优酷    " expression ("A3d.containSany({_1} ) or A4d.containSany({_1} ) or A5d.containSany({_1} )"),
+    _3 "土豆    " expression ("A3d.containSany({_2} ) or A4d.containSany({_2} ) or A5d.containSany({_2} )"),
+    _4 "搜狐视频" expression ("A3d.containSany({_4} ) or A4d.containSany({_4} ) or A5d.containSany({_4} )"),
+    _5 "PPS     " expression ("A3d.containSany({_12}) or A4d.containSany({_12}) or A5d.containSany({_12})"),
+    _6 "爱奇艺  " expression ("A3d.containSany({_5} ) or A4d.containSany({_5} ) or A5d.containSany({_5} )"),
+    _7 "360影视 " expression ("A3d.containSany({_15}) or A4d.containSany({_15}) or A5d.containSany({_15})"),
+    _8 "迅雷看看" expression ("A3d.containSany({_16}) or A4d.containSany({_16}) or A5d.containSany({_16})"),
+    _9 "乐视    " expression ("A3d.containSany({_11}) or A4d.containSany({_11}) or A5d.containSany({_11})")
+} axis("{base '总体' base(),..}");
+
+Jaccards "Jaccards" categorical[..]
+{
+	_0 ""
+} axis("{                                                                    _
+e1 '' text(),                                                                _
+base 'Base : Total Respondent' base('Comp={Completed}'),                     _
+e2 '' text(),                                                                _
+_0 [ishidden=true],                                                          _
+mean_01 '原创视频内容丰富                    ' mean(Jacc_001) [Decimals=2],  _
+mean_02 '创办了很多我喜欢的专题节目          ' mean(Jacc_002) [Decimals=2],  _
+mean_03 '视频更新速度快                      ' mean(Jacc_003) [Decimals=2],  _
+mean_04 '独家视频内容多                      ' mean(Jacc_004) [Decimals=2],  _
+mean_05 '个性化推送了解我的喜好              ' mean(Jacc_005) [Decimals=2],  _
+mean_06 '帮助我了解最新娱乐剧情信息          ' mean(Jacc_006) [Decimals=2],  _
+mean_07 '视频内容全，片源丰富                ' mean(Jacc_007) [Decimals=2],  _
+mean_08 '能全网搜片，能搜到所有视频网站的片源' mean(Jacc_008) [Decimals=2],  _
+mean_09 '视频质量高                          ' mean(Jacc_009) [Decimals=2],  _
+mean_10 '观看体验好                          ' mean(Jacc_010) [Decimals=2],  _
+mean_11 '产品设计人性化                      ' mean(Jacc_011) [Decimals=2],  _
+mean_12 '总能找到我想看的                    ' mean(Jacc_012) [Decimals=2],  _
+mean_13 '能找到其他网站找不到的资源          ' mean(Jacc_013) [Decimals=2],  _
+mean_14 '搜索视频方便                        ' mean(Jacc_014) [Decimals=2],  _
+mean_15 '搜索结果准确                        ' mean(Jacc_015) [Decimals=2],  _
+mean_16 '搜索结果安全可靠                    ' mean(Jacc_016) [Decimals=2],  _
+mean_17 '年轻有活力的                        ' mean(Jacc_017) [Decimals=2],  _
+mean_18 '引领潮流的                          ' mean(Jacc_018) [Decimals=2],  _
+mean_19 '主流的/有影响力的                   ' mean(Jacc_019) [Decimals=2],  _
+mean_20 '成熟/规范的                         ' mean(Jacc_020) [Decimals=2],  _
+mean_21 '大家都知道的品牌                    ' mean(Jacc_021) [Decimals=2],  _
+mean_22 '不断创新的                          ' mean(Jacc_022) [Decimals=2],  _
+mean_23 '我想别人知道我在用这个品牌          ' mean(Jacc_023) [Decimals=2],  _
+mean_24 '在线视频产品中的领导品牌            ' mean(Jacc_024) [Decimals=2],  _
+mean_25 '适合所有人使用的                    ' mean(Jacc_025) [Decimals=2],  _
+mean_26 '容易找到的                          ' mean(Jacc_026) [Decimals=2],  _
+mean_27 '品牌新闻宣传多                      ' mean(Jacc_027) [Decimals=2],  _
+mean_28 '口碑好                              ' mean(Jacc_028) [Decimals=2],  _
+mean_29 '是其他人推荐的                      ' mean(Jacc_029) [Decimals=2],  _
+e3 '' text(),                                                                _
+stde_01 '原创视频内容丰富                    ' stderr(Jacc_001) [Decimals=2],_
+stde_02 '创办了很多我喜欢的专题节目          ' stderr(Jacc_002) [Decimals=2],_
+stde_03 '视频更新速度快                      ' stderr(Jacc_003) [Decimals=2],_
+stde_04 '独家视频内容多                      ' stderr(Jacc_004) [Decimals=2],_
+stde_05 '个性化推送了解我的喜好              ' stderr(Jacc_005) [Decimals=2],_
+stde_06 '帮助我了解最新娱乐剧情信息          ' stderr(Jacc_006) [Decimals=2],_
+stde_07 '视频内容全，片源丰富                ' stderr(Jacc_007) [Decimals=2],_
+stde_08 '能全网搜片，能搜到所有视频网站的片源' stderr(Jacc_008) [Decimals=2],_
+stde_09 '视频质量高                          ' stderr(Jacc_009) [Decimals=2],_
+stde_10 '观看体验好                          ' stderr(Jacc_010) [Decimals=2],_
+stde_11 '产品设计人性化                      ' stderr(Jacc_011) [Decimals=2],_
+stde_12 '总能找到我想看的                    ' stderr(Jacc_012) [Decimals=2],_
+stde_13 '能找到其他网站找不到的资源          ' stderr(Jacc_013) [Decimals=2],_
+stde_14 '搜索视频方便                        ' stderr(Jacc_014) [Decimals=2],_
+stde_15 '搜索结果准确                        ' stderr(Jacc_015) [Decimals=2],_
+stde_16 '搜索结果安全可靠                    ' stderr(Jacc_016) [Decimals=2],_
+stde_17 '年轻有活力的                        ' stderr(Jacc_017) [Decimals=2],_
+stde_18 '引领潮流的                          ' stderr(Jacc_018) [Decimals=2],_
+stde_19 '主流的/有影响力的                   ' stderr(Jacc_019) [Decimals=2],_
+stde_20 '成熟/规范的                         ' stderr(Jacc_020) [Decimals=2],_
+stde_21 '大家都知道的品牌                    ' stderr(Jacc_021) [Decimals=2],_
+stde_22 '不断创新的                          ' stderr(Jacc_022) [Decimals=2],_
+stde_23 '我想别人知道我在用这个品牌          ' stderr(Jacc_023) [Decimals=2],_
+stde_24 '在线视频产品中的领导品牌            ' stderr(Jacc_024) [Decimals=2],_
+stde_25 '适合所有人使用的                    ' stderr(Jacc_025) [Decimals=2],_
+stde_26 '容易找到的                          ' stderr(Jacc_026) [Decimals=2],_
+stde_27 '品牌新闻宣传多                      ' stderr(Jacc_027) [Decimals=2],_
+stde_28 '口碑好                              ' stderr(Jacc_028) [Decimals=2],_
+stde_29 '是其他人推荐的                      ' stderr(Jacc_029) [Decimals=2] _
+}");
+
+Jacc_001 "Jacc_001" double;
+Jacc_002 "Jacc_002" double;
+Jacc_003 "Jacc_003" double;
+Jacc_004 "Jacc_004" double;
+Jacc_005 "Jacc_005" double;
+Jacc_006 "Jacc_006" double;
+Jacc_007 "Jacc_007" double;
+Jacc_008 "Jacc_008" double;
+Jacc_009 "Jacc_009" double;
+Jacc_010 "Jacc_010" double;
+Jacc_011 "Jacc_011" double;
+Jacc_012 "Jacc_012" double;
+Jacc_013 "Jacc_013" double;
+Jacc_014 "Jacc_014" double;
+Jacc_015 "Jacc_015" double;
+Jacc_016 "Jacc_016" double;
+Jacc_017 "Jacc_017" double;
+Jacc_018 "Jacc_018" double;
+Jacc_019 "Jacc_019" double;
+Jacc_020 "Jacc_020" double;
+Jacc_021 "Jacc_021" double;
+Jacc_022 "Jacc_022" double;
+Jacc_023 "Jacc_023" double;
+Jacc_024 "Jacc_024" double;
+Jacc_025 "Jacc_025" double;
+Jacc_026 "Jacc_026" double;
+Jacc_027 "Jacc_027" double;
+Jacc_028 "Jacc_028" double;
+Jacc_029 "Jacc_029" double;
+Jacc_030 "Jacc_030" double;
+Jacc_031 "Jacc_031" double;
+Jacc_032 "Jacc_032" double;
+Jacc_033 "Jacc_033" double;
+Jacc_034 "Jacc_034" double;
+Jacc_035 "Jacc_035" double;
+Jacc_036 "Jacc_036" double;
+Jacc_037 "Jacc_037" double;
+Jacc_038 "Jacc_038" double;
+Jacc_039 "Jacc_039" double;
+Jacc_040 "Jacc_040" double;
+Jacc_041 "Jacc_041" double;
+Jacc_042 "Jacc_042" double;
+Jacc_043 "Jacc_043" double;
+Jacc_044 "Jacc_044" double;
+Jacc_045 "Jacc_045" double;
+Jacc_046 "Jacc_046" double;
+Jacc_047 "Jacc_047" double;
+Jacc_048 "Jacc_048" double;
+Jacc_049 "Jacc_049" double;
+Jacc_050 "Jacc_050" double;
+Jacc_051 "Jacc_051" double;
+Jacc_052 "Jacc_052" double;
+Jacc_053 "Jacc_053" double;
+Jacc_054 "Jacc_054" double;
+Jacc_055 "Jacc_055" double;
+Jacc_056 "Jacc_056" double;
+Jacc_057 "Jacc_057" double;
+Jacc_058 "Jacc_058" double;
+Jacc_059 "Jacc_059" double;
+Jacc_060 "Jacc_060" double;
+Jacc_061 "Jacc_061" double;
+Jacc_062 "Jacc_062" double;
+Jacc_063 "Jacc_063" double;
+Jacc_064 "Jacc_064" double;
+Jacc_065 "Jacc_065" double;
+Jacc_066 "Jacc_066" double;
+Jacc_067 "Jacc_067" double;
+Jacc_068 "Jacc_068" double;
+Jacc_069 "Jacc_069" double;
+Jacc_070 "Jacc_070" double;
+Jacc_071 "Jacc_071" double;
+Jacc_072 "Jacc_072" double;
+Jacc_073 "Jacc_073" double;
+Jacc_074 "Jacc_074" double;
+Jacc_075 "Jacc_075" double;
+Jacc_076 "Jacc_076" double;
+Jacc_077 "Jacc_077" double;
+Jacc_078 "Jacc_078" double;
+Jacc_079 "Jacc_079" double;
+Jacc_080 "Jacc_080" double;
+Jacc_081 "Jacc_081" double;
+Jacc_082 "Jacc_082" double;
+Jacc_083 "Jacc_083" double;
+Jacc_084 "Jacc_084" double;
+Jacc_085 "Jacc_085" double;
+Jacc_086 "Jacc_086" double;
+Jacc_087 "Jacc_087" double;
+Jacc_088 "Jacc_088" double;
+Jacc_089 "Jacc_089" double;
+Jacc_090 "Jacc_090" double;
+Jacc_091 "Jacc_091" double;
+Jacc_092 "Jacc_092" double;
+Jacc_093 "Jacc_093" double;
+Jacc_094 "Jacc_094" double;
+Jacc_095 "Jacc_095" double;
+Jacc_096 "Jacc_096" double;
+Jacc_097 "Jacc_097" double;
+Jacc_098 "Jacc_098" double;
+Jacc_099 "Jacc_099" double;
