@@ -20,6 +20,7 @@
 		<template name="Run" flag="9" filename="Run.mrs" >
 			<param	name="JobDescription" usage="1061" valuetype="0" />
 		</template>
+		<template name="SpecHelp" flag="9" filename="SpecHelp.mrs" />
 		<template name="Clean_SplitAccelerated" flag="9" filename="data\\Clean_SplitAccelerated.dms" />
 		<template name="Jacc_compute" flag="9" filename="data\\Jacc_compute.mrs" />
 		<template name="Jacc_Metadata" flag="9" filename="data\\Jacc_Metadata.mrs" />

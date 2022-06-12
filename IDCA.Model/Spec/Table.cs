@@ -31,6 +31,10 @@ namespace IDCA.Model.Spec
         }
 
         readonly TemplateCollection _templates;
+        /// <summary>
+        /// 当前表格集合使用的模板
+        /// </summary>
+        public TemplateCollection Templates => _templates;
 
         readonly List<string> _topBreaks;
         /// <summary>
@@ -63,8 +67,8 @@ namespace IDCA.Model.Spec
             var table = NewObject();
             table.Name = $"T{Count + 1}";
             table.Type = type;
-            table.IndexAt = Count;
-            table.LoadTemplate(_templates);
+            //table.IndexAt = Count;
+            //table.LoadTemplate(_templates);
             Add(table);
             return table;
         }
@@ -128,13 +132,14 @@ namespace IDCA.Model.Spec
             _objectType = SpecObjectType.Table;
             _type = TableType.None;
             _field = new FieldScript(this);
+            _banner = new TemplateValue();
         }
 
-        int _indexAt = -1;
-        /// <summary>
-        /// 当前对象在集合中的索引，需要创建时初始化
-        /// </summary>
-        internal int IndexAt { get => _indexAt; set => _indexAt = value; }
+        //int _indexAt = -1;
+        ///// <summary>
+        ///// 当前对象在集合中的索引，需要创建时初始化
+        ///// </summary>
+        //internal int IndexAt { get => _indexAt; set => _indexAt = value; }
 
         string _name = string.Empty;
         /// <summary>
@@ -205,7 +210,15 @@ namespace IDCA.Model.Spec
         /// <summary>
         /// 当前Table对象的表格类型
         /// </summary>
-        public TableType Type { get => _type; set => _type = value; }
+        public TableType Type 
+        {
+            get { return _type; }
+            set
+            {
+                _type = value;
+                LoadTemplate(((Tables)Parent!).Templates);
+            }
+        }
 
         string _titleInTableFile = "Null";
         /// <summary>
@@ -231,7 +244,7 @@ namespace IDCA.Model.Spec
         /// </summary>
         public string LabelInTableFile { get => _labelInTableFile; set => _labelInTableFile = value; }
 
-        readonly TemplateValue _banner = new();
+        readonly TemplateValue _banner;
         /// <summary>
         /// 设置当前Table的表头定义数据和数据类型
         /// </summary>

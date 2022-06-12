@@ -125,5 +125,10 @@ namespace IDCA.Client.ViewModel.Common
             FindVisualParent<Window>(sender as DependencyObject)?.Close();
         }
 
+        public static void HideWindow(object? sender)
+        {
+            FindVisualParent<Window>(sender as DependencyObject)?.Hide();
+        }
+
     }
 }

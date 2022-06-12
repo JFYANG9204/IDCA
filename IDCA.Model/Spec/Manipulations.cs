@@ -303,7 +303,7 @@ namespace IDCA.Model.Spec
                 var parameter = axisFunction.Parameters[TemplateParameterUsage.ManipulateSideAxis];
                 if (parameter != null)
                 {
-                    parameter.SetValue(_axis);
+                    parameter.SetValue(_axis.ToString());
                 }
             }
             //

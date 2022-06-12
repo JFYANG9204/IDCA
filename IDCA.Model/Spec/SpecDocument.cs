@@ -14,6 +14,7 @@ namespace IDCA.Model.Spec
         {
             _globalTables = new List<Tables>();
             _projectPath = projectPath;
+            _projectDescription = string.Empty;
             _objectType = SpecObjectType.Document;
             _manipulations = new Manipulations(this);
             _scripts = new ScriptCollection(this);
@@ -46,6 +47,16 @@ namespace IDCA.Model.Spec
         {
             get { return _projectPath; }
             set { _projectPath = value; }
+        }
+
+        string _projectDescription;
+        /// <summary>
+        /// 项目描述
+        /// </summary>
+        public string ProjectDescription
+        {
+            get { return _projectDescription; }
+            set { _projectDescription = value; }
         }
 
         List<FileTemplate>? _libraryFiles;
@@ -252,7 +263,12 @@ namespace IDCA.Model.Spec
             string headerName = name;
             if (string.IsNullOrEmpty(headerName))
             {
-                headerName = $"TopBreak_{_metadata.Count + 1}";
+                int index = 1;
+                headerName = $"TopBreak_{index}";
+                while (!ValidateHeaderName(headerName))
+                {
+                    headerName = $"TopBreak_{++index}";
+                }
             }
             var metadata = _metadata.NewMetadata(headerName, MetadataType.Categorical);
             OnHeaderAdded(metadata);
@@ -271,7 +287,7 @@ namespace IDCA.Model.Spec
             string tabName = name.ToLower();
             if (string.IsNullOrEmpty(tabName) || !ValidateTablesName(tabName))
             {
-                int index = _globalTables.Count + 1;
+                int index = 1;
                 while (!ValidateTablesName($"Tab_{index}"))
                 {
                     index++;
@@ -421,6 +437,14 @@ namespace IDCA.Model.Spec
         /// </summary>
         public void Exec()
         {
+            // 配置ProjectRootPath
+            _templates.SetParameter(FileTemplateFlags.JobFile, TemplateParameterUsage.JobProjectPath, ProjectPath);
+            // 配置MDMDocument名
+            var mdmFileName = MDMDocument?.Url != null ? Path.GetFileNameWithoutExtension(MDMDocument.Url) : string.Empty;
+            _templates.SetParameter(FileTemplateFlags.JobFile, TemplateParameterUsage.JobMetaDataName, mdmFileName);
+            // 配置项目描述
+            _templates.SetParameter(FileTemplateFlags.RunFile, TemplateParameterUsage.JobDescription, ProjectDescription);
+
             _libraryFiles?.ForEach(file => FileHelper.WriteToFile(_projectPath, file));
             _otherUsefulFiles?.ForEach(file => FileHelper.WriteToFile(_projectPath, file));
             FileHelper.WriteToFile(_projectPath, _dmsMetadataFile, _dmsMetadata.Export());

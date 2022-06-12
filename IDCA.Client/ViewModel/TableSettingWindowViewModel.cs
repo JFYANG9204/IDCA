@@ -17,7 +17,10 @@ namespace IDCA.Client.ViewModel
     {
         public TableSettingWindowViewModel(TemplateCollection template, MDMDocument mDM)
         {
-            _spec = new SpecDocument(GlobalConfig.Instance.ProjectRootPath, template, GlobalConfig.Instance.Config);
+            _spec = new SpecDocument(GlobalConfig.Instance.ProjectRootPath, template, GlobalConfig.Instance.Config)
+            {
+                ProjectDescription = GlobalConfig.Instance.ProjectName
+            };
             _spec.HeaderAdded += OnHeaderAdded;
             _spec.HeaderRemoved += OnHeaderRemoved;
             _spec.Init(mDM);

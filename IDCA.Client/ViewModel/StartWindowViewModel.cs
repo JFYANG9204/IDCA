@@ -141,6 +141,7 @@ namespace IDCA.Client.ViewModel
 
         void Confirm(object? sender)
         {
+            WindowManager.HideWindow(sender);
             var mdm = new MDMDocument();
             string path = GlobalConfig.Instance.MdmDocumentPath;
             if (!string.IsNullOrEmpty(path) && File.Exists(path))

@@ -34,7 +34,7 @@ MDM.Save("data\" + INPUT_METADATA + "_FINAL.mdd")
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 With TableDoc
 
-.DataSet.Description = "$[JobDescription]"
+.DataSet.Description = $[JobDescription]
 
 .Default.Annotations[0].Specification = "" '"{ProjectDescription \n}" 'With break line before and after the Description
 .Default.Annotations[1].Specification = "" '"{TableDescription} <br> Base: Total Respondents <font color='red'> ({TableBase}) </font> </br>" 'Set (Base) font color as red

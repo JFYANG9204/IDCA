@@ -74,13 +74,13 @@ namespace IDCA.Model.Template
         public TemplateParameter(TemplateParameters parent)
         {
             _name = "";
-            _value = new object[1];
+            _value = new TemplateValue();
             _parameters = parent;
             _usage = TemplateParameterUsage.None;
         }
 
         string _name;
-        object _value;
+        TemplateValue _value;
         readonly TemplateParameters _parameters;
         TemplateParameterUsage _usage;
 
@@ -114,40 +114,54 @@ namespace IDCA.Model.Template
         /// 设置参数的值，允许保存多个值
         /// </summary>
         /// <param name="value">设置的参数值</param>
-        public void SetValue(object value)
+        public void SetValue(TemplateValue value)
         {
             _value = value;
+        }
+
+        /// <summary>
+        /// 设置参数的值，并配置值类型为字符串类型
+        /// </summary>
+        /// <param name="value"></param>
+        public void SetValue(string value)
+        {
+            _value.Value = value;
+            _value.ValueType = TemplateValueType.String;
+        }
+
+        /// <summary>
+        /// 设置参数的值和值类型
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="valueType"></param>
+        public void SetValue(string value, TemplateValueType valueType)
+        {
+            _value.ValueType = valueType;
+            _value.Value = value;
         }
 
         /// <summary>
         /// 获取当前存储的参数值
         /// </summary>
         /// <returns></returns>
-        public object GetValue()
+        public TemplateValue GetValue()
         {
             return _value;
         }
 
-        /// <summary>
-        /// 获取当前模板参数值的字符串类型值
-        /// </summary>
-        /// <returns></returns>
-        public OutType? GetValue<OutType>()
-        {
-            return _value is OutType outValue ? outValue : default;
-        }
+        ///// <summary>
+        ///// 获取当前模板参数值的字符串类型值
+        ///// </summary>
+        ///// <returns></returns>
+        //public OutType? GetValue<OutType>()
+        //{
+        //    return _value is OutType outValue ? outValue : default;
+        //}
 
         public object Clone()
         {
             TemplateParameter clone = new(_parameters);
-            if (_value is ICloneable cloneable)
-            {
-                clone.SetValue(cloneable.Clone());
-            }
-            else
-            {
-                clone.SetValue(_value);
-            }
+            clone.SetValue((TemplateValue)_value.Clone());
             clone.Usage = _usage;
             clone.Name = _name;
             return clone;

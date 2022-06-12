@@ -27,6 +27,9 @@ namespace IDCA.Model.Template
         public TemplateCollection()
         {
             _path = string.Empty;
+            _name = string.Empty;
+            _id = string.Empty;
+            _description = string.Empty;
 
             _libraryFileTemplates = new List<FileTemplate>();
             _otherUsefulFileTemplates = new List<FileTemplate>();
@@ -35,14 +38,14 @@ namespace IDCA.Model.Template
         }
 
         string _path;
+        string _name;
+        string _id;
+        string _description;
 
         readonly List<FileTemplate> _libraryFileTemplates;
         readonly List<FileTemplate> _otherUsefulFileTemplates;
         readonly Dictionary<FileTemplateFlags, Template> _fileTemplates;
         readonly Dictionary<FunctionTemplateFlags, Template> _functionTemplates;
-        string _name = string.Empty;
-        string _id = string.Empty;
-        string _description = string.Empty;
 
         /// <summary>
         /// Template名称
@@ -145,7 +148,8 @@ namespace IDCA.Model.Template
             var param = parameters.NewObject();
             param.Name = TryReadStringValue(element.Attribute("name"));
             param.Usage = TryReadEnumValue<TemplateParameterUsage>(element.Attribute("usage"));
-            param.SetValue(TryReadStringValue(element.Attribute("default")));
+            var valueType = TryReadEnumValue<TemplateValueType>(element.Attribute("valuetype"));
+            param.SetValue(TryReadStringValue(element.Attribute("default")), valueType);
             parameters.Add(param);
         }
 
@@ -268,6 +272,31 @@ namespace IDCA.Model.Template
                 return _functionTemplates.ContainsKey(functionFlag) ? (T)_functionTemplates[functionFlag].Clone() : null;
             }
             return null;
+        }
+
+        /// <summary>
+        /// 更新所有模板中指定用途的参数值
+        /// </summary>
+        /// <typeparam name="Flag">模板类型枚举，可以是FileTemplateFlags或FunctionTemplateFlags</typeparam>
+        /// <param name="flag">模板类型</param>
+        /// <param name="usage">参数类型</param>
+        /// <param name="value">参数值</param>
+        public void SetParameter<Flag>(Flag flag, TemplateParameterUsage usage, string value, TemplateValueType valueType = TemplateValueType.String)
+        {
+            if (flag is FileTemplateFlags fileFlage)
+            {
+                if (_fileTemplates.ContainsKey(fileFlage))
+                {
+                    _fileTemplates[fileFlage]?.Parameters[usage]?.SetValue(value, valueType);
+                }
+            }
+            else if (flag is FunctionTemplateFlags functionFlag)
+            {
+                if (_functionTemplates.ContainsKey(functionFlag))
+                {
+                    _functionTemplates[functionFlag]?.Parameters[usage]?.SetValue(value, valueType);
+                }
+            }
         }
 
     }

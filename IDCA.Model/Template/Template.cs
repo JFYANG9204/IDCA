@@ -131,9 +131,9 @@ namespace IDCA.Model.Template
         /// </summary>
         DmsMetadataFile = 6,
         /// <summary>
-        /// 空文件
+        /// Run.mrs文件
         /// </summary>
-        EmptyFile = 7,
+        RunFile = 7,
         /// <summary>
         /// 库文件，库文件内容不会被修改
         /// </summary>
@@ -219,7 +219,7 @@ namespace IDCA.Model.Template
             {
                 foreach (TemplateParameter parameter in Parameters)
                 {
-                    result = result.Replace(parameter.ToString(), parameter.GetValue<TemplateValue>()?.Value, StringComparison.OrdinalIgnoreCase);
+                    result = result.Replace(parameter.ToString(), parameter.GetValue()?.Value, StringComparison.OrdinalIgnoreCase);
                 }
             }
             return result;
@@ -283,7 +283,7 @@ namespace IDCA.Model.Template
         {
             TemplateParameter nameParam = GetOrCreateParameter(TemplateParameterUsage.FunctionName);
             nameParam.Name = "FunctionName";
-            nameParam.SetValue(new TemplateValue(functionName, TemplateValueType.Expression));
+            nameParam.SetValue(functionName, TemplateValueType.Expression);
         }
 
         /// <summary>
@@ -295,7 +295,7 @@ namespace IDCA.Model.Template
             TemplateParameter? parameter = _parameters[TemplateParameterUsage.FunctionName];
             if (parameter != null)
             {
-                var functionName = parameter.GetValue<TemplateValue>();
+                var functionName = parameter.GetValue();
                 return functionName is null ? string.Empty : functionName.Value;
             }
             return string.Empty;
@@ -314,7 +314,7 @@ namespace IDCA.Model.Template
                 TemplateParameter parameter = _parameters.NewObject();
                 parameter.Name = name;
                 parameter.Usage = usage;
-                parameter.SetValue(new TemplateValue(value, type));
+                parameter.SetValue(value, type);
                 _parameters.Add(parameter);
             }
         }
@@ -328,7 +328,7 @@ namespace IDCA.Model.Template
         {
             TemplateParameter? parameter = _parameters[usage];
             TemplateValue? paramValue;
-            if (parameter != null && (paramValue = parameter.GetValue<TemplateValue>()) != null)
+            if (parameter != null && (paramValue = parameter.GetValue()) != null)
             {
                 paramValue.Value = value;
                 paramValue.ValueType = valueType;
@@ -345,14 +345,14 @@ namespace IDCA.Model.Template
         public override string Exec()
         {
             TemplateParameter? functionNameParam = _parameters[TemplateParameterUsage.FunctionName];
-            string functionName = functionNameParam?.GetValue<TemplateValue>()?.Value ?? string.Empty;
+            string functionName = functionNameParam?.GetValue()?.Value ?? string.Empty;
             StringBuilder result = new();
             result.Append(functionName);
             result.Append('(');
             int count = 0;
             _parameters.All(parameter =>
                 {
-                    TemplateValue? paramValue = parameter.GetValue<TemplateValue>();
+                    TemplateValue? paramValue = parameter.GetValue();
                     if (paramValue != null)
                     {
                         if (count > 0)
