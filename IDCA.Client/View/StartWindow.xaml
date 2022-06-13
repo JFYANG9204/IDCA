@@ -1,4 +1,4 @@
-﻿<mah:MetroWindow
+﻿<Window
     x:Class="IDCA.Client.View.StartWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -6,14 +6,11 @@
     xmlns:icon="http://metro.mahapps.com/winfx/xaml/iconpacks"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewmodel="clr-namespace:IDCA.Client.ViewModel" 
-    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     d:DataContext="{d:DesignInstance Type=viewmodel:StartWindowViewModel}"
     mc:Ignorable="d"
     Height="500" 
     Width="840"
-    ResizeMode="CanMinimize"
-    Background="{StaticResource IDCA.Brushes.Window.Background}"
-    >
+    ResizeMode="CanMinimize">
 
     <Window.DataContext>
         <viewmodel:StartWindowViewModel/>
@@ -76,8 +73,6 @@
                                        FontSize="13"
                                        FontFamily="{StaticResource IDCA.Font.Family}"/>
                         </Grid>
-                        <DataTemplate.Triggers>
-                        </DataTemplate.Triggers>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
@@ -87,27 +82,31 @@
 
             <Grid.Resources>
                 <Style x:Key="IDCA.Window.Start.DialogButton" 
-                       TargetType="Button"
-                       BasedOn="{StaticResource MahApps.Styles.Button}">
+                       TargetType="Button">
                     <Setter Property="Height" Value="30"/>
                     <Setter Property="Width" Value="30"/>
                     <Setter Property="Margin" Value="5"/>
-                    <Setter Property="Content" Value="..."/>
                     <Setter Property="Background" Value="{StaticResource IDCA.Brushes.Button.Background}"/>
                     <Setter Property="VerticalContentAlignment" Value="Bottom"/>
                     <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                    <Setter Property="Content" Value="..."/>
+                </Style>
+                <Style x:Key="IDCA.Window.Button.Common" TargetType="Button">
+                    <Setter Property="Width" Value="80"/>
+                    <Setter Property="Height" Value="35"/>
+                    <Setter Property="Background" Value="{StaticResource IDCA.Brushes.Button.Background}"/>
                 </Style>
                 <Style TargetType="TextBlock">
                     <Setter Property="VerticalAlignment" Value="Bottom"/>
                     <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
                     <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.TextBlock.Label}"/>
                 </Style>
-                <Style TargetType="TextBox" BasedOn="{StaticResource MahApps.Styles.TextBox}">
+                <Style TargetType="TextBox">
                     <Setter Property="Width" Value="340"/>
                     <Setter Property="Height" Value="30"/>
                     <Setter Property="FontSize" Value="15"/>
                     <Setter Property="VerticalContentAlignment" Value="Center"/>
-                    <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
+                    <Setter Property="FontFamily" Value="{StaticResource MaterialDesignFont}"/>
                 </Style>
             </Grid.Resources>
             
@@ -173,16 +172,15 @@
             </StackPanel>
 
             <Button Grid.Row="9"
-                    Width="80"
-                    Height="35"
                     Margin="30"
                     FontSize="15"
                     HorizontalAlignment="Right"
                     IsEnabled="{Binding IsConfirmButtonEnable}"
                     Command="{Binding ConfirmCommand}"
-                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}}"
+                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}}" 
+                    Style="{StaticResource IDCA.Window.Button.Common}"
                     >完成</Button>
 
         </Grid>
     </Grid>
-</mah:MetroWindow>
+</Window>

@@ -1,13 +1,13 @@
 ﻿
 using IDCA.Client.ViewModel.Common;
-using MahApps.Metro.Controls;
+using System.Windows;
 
 namespace IDCA.Client.View
 {
     /// <summary>
     /// StartWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class StartWindow : MetroWindow
+    public partial class StartWindow : Window
     {
         public StartWindow()
         {

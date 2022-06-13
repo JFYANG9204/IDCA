@@ -12,6 +12,16 @@
 
     <Grid>
 
+        <Grid.Resources>
+            <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatLightBgButton}">
+                <Setter Property="Width" Value="100"/>
+                <Setter Property="Height" Value="30"/>
+                <Setter Property="Margin" Value="5"/>
+                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="Background" Value="{StaticResource IDCA.Brushes.Button.Background}"/>
+            </Style>
+        </Grid.Resources>
+        
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
             <RowDefinition Height="*"/>
@@ -20,19 +30,13 @@
         <StackPanel Orientation="Horizontal" Margin="20 0 0 0">
 
             <StackPanel.Resources>
-                <Style TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button}">
-                    <Setter Property="Width" Value="80"/>
-                    <Setter Property="Height" Value="30"/>
-                    <Setter Property="Margin" Value="5"/>
-                    <Setter Property="FontSize" Value="13"/>
-                </Style>
-                <Style TargetType="TextBlock" BasedOn="{StaticResource MahApps.Styles.TextBlock}">
+                <Style TargetType="TextBlock">
                     <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
                     <Setter Property="FontSize" Value="15"/>
                     <Setter Property="VerticalAlignment" Value="Center"/>
                     <Setter Property="Margin" Value="5"/>
                 </Style>
-                <Style TargetType="TextBox" BasedOn="{StaticResource MahApps.Styles.TextBox}">
+                <Style TargetType="TextBox" BasedOn="{StaticResource MaterialDesignTextBox}">
                     <Setter Property="Width" Value="120"/>
                     <Setter Property="Height" Value="30"/>
                     <Setter Property="Margin" Value="5"/>
@@ -76,7 +80,8 @@
                                   Height="{Binding RelativeSource={RelativeSource AncestorType=ComboBoxItem, Mode=FindAncestor}, Path=Height}"
                                   IsChecked="{Binding Checked}"
                                   Content="{Binding Name}"
-                                  Margin="0"/>
+                                  Margin="0"
+                                  Style="{StaticResource MaterialDesignUserForegroundCheckBox}"/>
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
@@ -96,7 +101,7 @@
                             <Grid>
 
                                 <Grid.Resources>
-                                    <Style TargetType="TextBox" BasedOn="{StaticResource MahApps.Styles.TextBox}">
+                                    <Style TargetType="TextBox" BasedOn="{StaticResource MaterialDesignTextBox}">
                                         <Setter Property="Width" Value="120"/>
                                         <Setter Property="Height" Value="30"/>
                                         <Setter Property="Margin" Value="5"/>
@@ -105,15 +110,16 @@
                                         <Setter Property="VerticalAlignment" Value="Center"/>
                                         <Setter Property="VerticalContentAlignment" Value="Center"/>
                                     </Style>
-                                    <Style TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button}">
-                                        <Setter Property="Width" Value="80"/>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Width" Value="120"/>
                                         <Setter Property="Height" Value="30"/>
                                         <Setter Property="FontSize" Value="14"/>
                                         <Setter Property="Margin" Value="5"/>
                                         <Setter Property="VerticalContentAlignment" Value="Center"/>
                                         <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                        <Setter Property="Background" Value="{StaticResource IDCA.Brushes.Button.Background}"/>
                                     </Style>
-                                    <Style TargetType="TextBlock" BasedOn="{StaticResource MahApps.Styles.TextBlock}">
+                                    <Style TargetType="TextBlock">
                                         <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
                                         <Setter Property="FontSize" Value="15"/>
                                         <Setter Property="VerticalAlignment" Value="Center"/>
@@ -124,10 +130,11 @@
                                         <Setter Property="Width" Value="1"/>
                                         <Setter Property="Background" Value="LightGray"/>
                                     </Style>
-                                    <Style TargetType="ComboBox" BasedOn="{StaticResource MahApps.Styles.ComboBox}">
+                                    <Style TargetType="ComboBox" BasedOn="{StaticResource MaterialDesignComboBox}">
                                         <Setter Property="Width" Value="100"/>
                                         <Setter Property="Height" Value="30"/>
                                         <Setter Property="Margin" Value="5"/>
+                                        <Setter Property="VerticalContentAlignment" Value="Center"/>
                                     </Style>
                                 </Grid.Resources>
                                 
@@ -248,7 +255,8 @@
                                             <DataTemplate>
                                                 <CheckBox IsChecked="{Binding Checked}"
                                                           Content="{Binding Name}"
-                                                          Margin="0"/>
+                                                          Margin="0"
+                                                          Style="{StaticResource MaterialDesignUserForegroundCheckBox}"/>
                                             </DataTemplate>
                                         </ComboBox.ItemTemplate>
                                     </ComboBox>
