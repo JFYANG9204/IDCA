@@ -9,7 +9,7 @@
         d:DataContext="{d:DesignInstance Type=viewmodel:TableSettingWindowViewModel}"
         mc:Ignorable="d"
         Height="800" 
-        Width="980"
+        Width="1200"
         ResizeMode="CanMinimize">
 
     <Window.Resources>

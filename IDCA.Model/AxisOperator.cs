@@ -93,6 +93,23 @@ namespace IDCA.Bll
             set { _isTopBottomBoxReversed = value; }
         }
 
+        /// <summary>
+        /// NPS使用的Top Box选项数量，如果不修改，默认为配置中的数值。
+        /// </summary>
+        public int NpsTopBox
+        {
+            get { return _npsTopBox; }
+            set { _npsTopBox = value; }
+        }
+        /// <summary>
+        /// NPS使用的Bottom Box选项数量，如果不修改，默认未配置中的数值。
+        /// </summary>
+        public int NpsBottomBox
+        {
+            get { return _npsBottomBox; }
+            set { _npsBottomBox = value; }
+        }
+
         Field? _field = null;
         /// <summary>
         /// 当前轴表达式对应变量的MDMField对象，用来查询使用的码号

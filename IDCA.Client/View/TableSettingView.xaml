@@ -8,7 +8,7 @@
              d:DataContext="{d:DesignInstance Type=viewmodel:TableSettingViewModel}"
              mc:Ignorable="d" 
              d:DesignHeight="550" 
-             d:DesignWidth="780">
+             d:DesignWidth="950">
 
     <Grid>
 
@@ -95,7 +95,7 @@
                           d:ItemsSource="{d:SampleData ItemCount=5}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Border Height="180" 
+                        <Border Height="220" 
                                 BorderThickness="0 0 0 1"
                                 BorderBrush="{StaticResource IDCA.Brushes.Window.BorderBrush}">
                             <Grid>
@@ -144,6 +144,7 @@
                                     <RowDefinition Height="40"/>
                                     <RowDefinition Height="40"/>
                                     <RowDefinition Height="40"/>
+                                    <RowDefinition Height="40"/>
                                     <RowDefinition Height="10"/>
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
@@ -155,8 +156,8 @@
 
                                 <TextBlock Grid.Row="1" Grid.Column="1">描述配置</TextBlock>
                                 <TextBlock Grid.Row="2" Grid.Column="1">表格配置</TextBlock>
-                                <TextBlock Grid.Row="3" Grid.Column="1">轴配置</TextBlock>
-                                <TextBlock Grid.Row="4" Grid.Column="1">筛选器配置</TextBlock>
+                                <TextBlock Grid.Row="3" Grid.Column="1" Grid.RowSpan="2">轴配置</TextBlock>
+                                <TextBlock Grid.Row="5" Grid.Column="1">筛选器配置</TextBlock>
 
                                 <Button Grid.Row="1" 
                                         Grid.Column="0"
@@ -179,7 +180,7 @@
                                     </Button.Template>
                                 </Button>
                                 
-                                <Button Grid.Row="4" 
+                                <Button Grid.Row="5" 
                                         Grid.Column="0"
                                         Width="30"
                                         Height="30"
@@ -243,14 +244,57 @@
                                             Grid.Column="2" 
                                             Orientation="Horizontal">
 
-                                    
+                                    <GridSplitter/>
+
+                                    <TextBlock>Net类型</TextBlock>
+                                    <ComboBox SelectedIndex="{Binding NetTypeSelectedIndex}"
+                                              ItemsSource="{Binding NetTypeSelections}"/>
+
+                                    <GridSplitter/>
+
+                                    <RadioButton GroupName="AppendMeanOrAverage"
+                                                 Margin="5"
+                                                 FontSize="15"
+                                                 FontFamily="{StaticResource IDCA.Font.Family}"
+                                                 Style="{StaticResource MaterialDesignUserForegroundRadioButton}"
+                                                 IsChecked="{Binding DonotAppendMeanOrAverage}"
+                                                 >不添加均值</RadioButton>
+
+                                    <RadioButton GroupName="AppendMeanOrAverage"
+                                                 Margin="5"
+                                                 FontSize="15"
+                                                 FontFamily="{StaticResource IDCA.Font.Family}"
+                                                 Style="{StaticResource MaterialDesignUserForegroundRadioButton}"
+                                                 IsChecked="{Binding AppendMean}"
+                                                 >添加平均值</RadioButton>
+
+                                    <RadioButton GroupName="AppendMeanOrAverage"
+                                                 Margin="5"
+                                                 FontSize="15"
+                                                 FontFamily="{StaticResource IDCA.Font.Family}"
+                                                 Style="{StaticResource MaterialDesignUserForegroundRadioButton}"
+                                                 IsChecked="{Binding AppendAverage}"
+                                                 >添加平均提及</RadioButton>
+
+                                    <GridSplitter/>
+
+                                    <Button Width="120" 
+                                            Command="{Binding AxisSettingCommand}">配置轴表达式</Button>
                                     
                                     <GridSplitter/>
 
-                                    <TextBlock>Top/Bottom/NPS</TextBlock>
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="4"
+                                            Grid.Column="2"
+                                            Orientation="Horizontal">
+
+                                    <GridSplitter/>
+
+                                    <TextBlock>Box/NPS</TextBlock>
                                     <ComboBox IsEditable="True"
-                                              Text="{Binding TableTopBottomBoxName}"
-                                              ItemsSource="{Binding TableTopBottomBoxSelections}">
+                                              Text="{Binding TopBottomBoxName}"
+                                              ItemsSource="{Binding TopBottomBoxSelections}">
                                         <ComboBox.ItemTemplate>
                                             <DataTemplate>
                                                 <CheckBox IsChecked="{Binding Checked}"
@@ -263,20 +307,25 @@
 
                                     <GridSplitter/>
 
-                                    <TextBlock>Net类型</TextBlock>
-                                    <ComboBox SelectedIndex="{Binding TableNetTypeSelectedIndex}"
-                                              ItemsSource="{Binding TableNetTypeSelections}"/>
+                                    <TextBlock>选项顺序</TextBlock>
+                                    <ComboBox ItemsSource="{Binding FactorSequence}"
+                                              SelectedIndex="{Binding FactorSequenceSelectedIndex}"/>
 
                                     <GridSplitter/>
 
-                                    <Button Width="120" 
-                                            Command="{Binding AxisSettingCommand}">配置轴表达式</Button>
-                                    
+                                    <TextBlock>NPS Top Box</TextBlock>
+                                    <TextBox Width="50" Text="{Binding NpsTopBox}"/>
+
+                                    <GridSplitter/>
+
+                                    <TextBlock>NPS Bottom Box</TextBlock>
+                                    <TextBox Width="50" Text="{Binding NpsBottomBox}"/>
+
                                     <GridSplitter/>
 
                                 </StackPanel>
-
-                                <StackPanel Grid.Row="4" 
+                                
+                                <StackPanel Grid.Row="5" 
                                             Grid.Column="2" 
                                             Orientation="Horizontal">
 
@@ -295,14 +344,14 @@
                                 </StackPanel>
 
                                 <Button Grid.Row="1"
-                                        Grid.RowSpan="4"
+                                        Grid.RowSpan="5"
                                         Grid.Column="11"
                                         Width="25"
                                         Height="25"
                                         Command="{Binding RemoveCommand}"
                                         Background="#00000000"
                                         Foreground="Red"
-                                        HorizontalAlignment="Left"
+                                        HorizontalAlignment="Center"
                                         Cursor="Hand">
                                     <Button.Template>
                                         <ControlTemplate TargetType="Button">

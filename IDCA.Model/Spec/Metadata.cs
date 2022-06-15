@@ -8,14 +8,14 @@ namespace IDCA.Model.Spec
 
     public enum MetadataType
     {
-        None,
-        Long,
-        Double,
-        Text,
-        Info,
-        Categorical,
-        NumericLoop,
-        CategoricalLoop,
+        None = -1,
+        Long = 0,
+        Double = 1,
+        Text = 2,
+        Info = 3,
+        Categorical = 4,
+        NumericLoop = 5,
+        CategoricalLoop = 6,
     }
 
     public enum MetadataRangeType
@@ -25,6 +25,9 @@ namespace IDCA.Model.Spec
         Exact,
     }
 
+    /// <summary>
+    /// Spec配置的元数据类型，此对象支持MDM文档中的常用数据类型，
+    /// </summary>
     public class Metadata : SpecObject
     {
         public Metadata(SpecObject parent, Config config, string name) : base(parent)
@@ -32,8 +35,8 @@ namespace IDCA.Model.Spec
             _objectType = SpecObjectType.Metadata;
             _config = config;
             _name = name;
-            _fields = new Dictionary<string, Metadata>();
-            _properties = new Dictionary<string, MetadataProperty>();
+            _fields = new List<Metadata>();
+            _properties = new List<MetadataProperty>();
             _categories = new List<MetadataCategorical>();
         }
 
@@ -50,6 +53,11 @@ namespace IDCA.Model.Spec
         }
 
         readonly Config _config;
+        /// <summary>
+        /// 当前使用的配置对象
+        /// </summary>
+        public Config Config => _config;
+
         MetadataType _type = MetadataType.None;
         /// <summary>
         /// 当前Metadata数据类型
@@ -86,6 +94,10 @@ namespace IDCA.Model.Spec
 
         readonly List<MetadataCategorical> _categories;
         /// <summary>
+        /// 当前已存储的MetadataCategorical对象列表。
+        /// </summary>
+        public List<MetadataCategorical> Categories => _categories;
+        /// <summary>
         /// 创建新的Categorical类型的变量并添加进当前集合
         /// </summary>
         /// <returns></returns>
@@ -98,7 +110,7 @@ namespace IDCA.Model.Spec
             {
                 categoricalName = $"{codeLabel}{++count}";
             }
-            var categorical = new MetadataCategorical(this, categoricalName);
+            var categorical = new MetadataCategorical(this, categoricalName) { IndentLevel = _indentLevel + 1};
             _categories.Add(categorical);
             return categorical;
         }
@@ -136,7 +148,7 @@ namespace IDCA.Model.Spec
             _upperBoundary = ubound;
         }
 
-        readonly Dictionary<string, Metadata> _fields;
+        readonly List<Metadata> _fields;
         /// <summary>
         /// 创建新的下级变量，将其添加进当前集合并返回，由于变量名不可重复，
         /// 变量名相同时，会修改对应名称的变量值
@@ -146,19 +158,43 @@ namespace IDCA.Model.Spec
         /// <returns></returns>
         public Metadata NewField(MetadataType type, string name)
         {
+            _fields.RemoveAll(f => f.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
             var field = new Metadata(this, _config, name) { Type = type, IndentLevel = _indentLevel + 1 };
-            if (_fields.ContainsKey(name.ToLower()))
-            {
-                _fields[name.ToLower()] = field;
-            }
-            else
-            {
-                _fields.Add(name.ToLower(), field);
-            }
+            _fields.Add(field);
             return field;
         }
+        /// <summary>
+        /// 移除指定名称的下级变量，变量名不区分大小写。
+        /// 如果变量名不存在，将不执行任何操作。
+        /// </summary>
+        /// <param name="name"></param>
+        public void RemoveField(string name)
+        {
+            _fields.RemoveAll(f => f.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        }
 
-        readonly Dictionary<string, MetadataProperty> _properties;
+        readonly List<MetadataProperty> _properties;
+        /// <summary>
+        /// 当前配置的属性集合
+        /// </summary>
+        public List<MetadataProperty> Properties => _properties;
+        /// <summary>
+        /// 获取指定名称的属性配置，不区分大小写，如果不存在，将返回null。
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public MetadataProperty? GetProperty(string name)
+        {
+            return _properties.Find(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        }
+        /// <summary>
+        /// 移除指定名称的属性配置，名称不区分大小写。如果名称不存在，将不做任何操作。
+        /// </summary>
+        /// <param name="name"></param>
+        public void RemoveProperty(string name)
+        {
+            _properties.RemoveAll(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        }
         /// <summary>
         /// 创建新的元数据属性配置并添加进集合
         /// </summary>
@@ -168,20 +204,18 @@ namespace IDCA.Model.Spec
         /// <returns></returns>
         public MetadataProperty NewProperty(string name, string? value = null, bool isString = false)
         {
-            var property = new MetadataProperty(this, name, isString);
+            var property = _properties.Find(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+            if (property == null)
+            {
+                property = new MetadataProperty(this, name, isString);
+                _properties.Add(property);
+            }
+
             if (value is not null)
             {
                 property.Value = value;
             }
 
-            if (_properties.ContainsKey(name.ToLower()))
-            {
-                _properties[name.ToLower()] = property;
-            }
-            else
-            {
-                _properties.Add(name.ToLower(), property);
-            }
             return property;
         }
 
@@ -204,7 +238,7 @@ namespace IDCA.Model.Spec
             {
                 int count = 0;
                 builder.AppendLine($"{new string(' ', IndentLevel * 8)}[");
-                foreach (var property in _properties.Values)
+                foreach (var property in _properties)
                 {
                     builder.AppendLine($"{new string(' ', IndentLevel * 12)}{property}{(++count == _properties.Count ? "," : "")}");
                 }
@@ -276,7 +310,7 @@ namespace IDCA.Model.Spec
             if (_type == MetadataType.NumericLoop || _type == MetadataType.CategoricalLoop)
             {
                 builder.AppendLine($"{indent}(");
-                foreach (Metadata sub in _fields.Values)
+                foreach (Metadata sub in _fields)
                 {
                     builder.AppendLine(sub.Export());
                 }
@@ -298,14 +332,18 @@ namespace IDCA.Model.Spec
             _isString = isString;
         }
 
-        readonly string _name;
-        readonly bool _isString;
+        string _name;
+        bool _isString;
         string _value = string.Empty;
 
         /// <summary>
-        /// 元数据属性的属性名，属性名不可修改
+        /// 元数据属性的属性名
         /// </summary>
-        public string Name => _name;
+        public string Name { get => _name; set => _name = value; }
+        /// <summary>
+        /// 当前的属性值是否是字符串类型，影响转换成字符串后的值
+        /// </summary>
+        public bool IsString { get => _isString; set => _isString = value; }
         /// <summary>
         /// 元数据属性的值
         /// </summary>
@@ -320,12 +358,35 @@ namespace IDCA.Model.Spec
 
     public enum MetadataCategoricalSuffixType
     {
+        [MetadataDescription("ElementType", ExpectValues = new string[]
+        {
+            "Category",
+            "AnalysisSubheading",
+            "AnalysisBase",
+            "AnalysisSubtotal",
+            "AnalysisSummaryData",
+            "AnalysisDerived",
+            "AnalysisTotal",
+            "AnalysisMean",
+            "AnalysisStdDev",
+            "AnalysisStdErr",
+            "AnalysisSampleVariance",
+            "AnalysisMinimun",
+            "AnalysisMaximun",
+            "AnalysisCategory"
+        })]
         ElementType,
+        [MetadataDescription("Exclusive")]
         Exclusive,
+        [MetadataDescription("Expression")]
         Expression,
+        [MetadataDescription("Factor")]
         Factor,
+        [MetadataDescription("Fix")]
         Fix,
+        [MetadataDescription("Keycode")]
         Keycode,
+        [MetadataDescription("NoFilter")]
         NoFilter,
     }
 
@@ -335,6 +396,18 @@ namespace IDCA.Model.Spec
         {
             _objectType = SpecObjectType.MetadataCategorical;
             _name = name;
+            _properties = new Dictionary<string, MetadataProperty>();
+            _indentLevel = 0;
+        }
+
+        int _indentLevel;
+        /// <summary>
+        /// 当前脚本的缩进级别
+        /// </summary>
+        public int IndentLevel
+        {
+            get => _indentLevel;
+            set => _indentLevel = value;
         }
 
         string _name;
@@ -362,15 +435,77 @@ namespace IDCA.Model.Spec
             _listName = listName;
         }
 
+        readonly Dictionary<string, MetadataProperty> _properties;
+        /// <summary>
+        /// 当前配置的属性集合
+        /// </summary>
+        public ICollection<MetadataProperty> Properties => _properties.Values;
+        /// <summary>
+        /// 创建新的元数据属性配置并添加进集合
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <param name="isString"></param>
+        /// <returns></returns>
+        public MetadataProperty NewProperty(string name, string? value = null, bool isString = false)
+        {
+            var property = new MetadataProperty(this, name, isString);
+            if (value is not null)
+            {
+                property.Value = value;
+            }
+
+            if (_properties.ContainsKey(name.ToLower()))
+            {
+                _properties[name.ToLower()] = property;
+            }
+            else
+            {
+                _properties.Add(name.ToLower(), property);
+            }
+            return property;
+        }
+        /// <summary>
+        /// 获取指定名称的属性配置，不区分大小写，如果不存在，将返回null。
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public MetadataProperty? GetProperty(string name)
+        {
+            string lowerName = name.ToLower();
+            return _properties.ContainsKey(lowerName) ? _properties[lowerName] : null;
+        }
+        /// <summary>
+        /// 移除指定名称的属性配置，名称不区分大小写。如果名称不存在，将不做任何操作。
+        /// </summary>
+        /// <param name="name"></param>
+        public void RemoveProperty(string name)
+        {
+            string lowerName = name.ToLower();
+            if (_properties.ContainsKey(lowerName))
+            {
+                _properties.Remove(lowerName);
+            }
+        }
+
         readonly Dictionary<MetadataCategoricalSuffixType, string> _suffix = new();
 
         /// <summary>
-        /// 配置后缀类型和数据值
+        /// 配置后缀类型和数据值，如果配置值为null，将会移除对应类型的后缀配置
         /// </summary>
         /// <param name="type"></param>
         /// <param name="value"></param>
-        public void SetSuffix(MetadataCategoricalSuffixType type, string value = "")
+        public void SetSuffix(MetadataCategoricalSuffixType type, string? value = "")
         {
+            if (value == null)
+            {
+                if (_suffix.ContainsKey(type))
+                {
+                    _suffix.Remove(type);
+                }
+                return;
+            }
+
             if (_suffix.ContainsKey(type))
             {
                 _suffix[type] = value;
@@ -382,17 +517,30 @@ namespace IDCA.Model.Spec
         }
 
         /// <summary>
-        /// 获取指定类型后缀的值，如果未配置，返回Null
+        /// 获取指定类型后缀的值，如果未配置，返回null
+        /// 需要注意：如果配置的值是空字符串，此后缀是存在的，只有返回null时，后缀类型不存在。
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
         public string? GetSuffix(MetadataCategoricalSuffixType type)
         {
-            return _suffix.ContainsKey(type) ? _suffix[type] : string.Empty;
+            return _suffix.ContainsKey(type) ? _suffix[type] : null;
         }
 
         public override string ToString()
         {
+
+            //
+            // SumN
+            //     [
+            //         CalculationType="SumN",
+            //         Hidden = True,
+            //         ExcludedFromSummaries = True,
+            //         DataElement = ""
+            //     ]
+            //     elementType(AnalysisSummaryData)
+            //
+
             // 如果是List，忽略其他配置
             if (!string.IsNullOrEmpty(_listName))
             {
@@ -400,6 +548,21 @@ namespace IDCA.Model.Spec
             }
             var builder = new StringBuilder();
             builder.Append($"{_name}{(_description is null ? "" : $" \"{_description}\"")}");
+
+            if (_properties.Count > 0)
+            {
+                builder.AppendLine();
+                builder.Append($"{new string(' ', (_indentLevel + 1) * 4)}[");
+                builder.AppendLine();
+                int count = 0;
+                foreach (var prop in _properties.Values)
+                {
+                    count++;
+                    builder.AppendLine($"{new string(' ', (_indentLevel + 2) * 4)}{prop.ToString()}{(count == _properties.Count - 1 ? "" : ",")}");
+                }
+                builder.AppendLine($"{new string(' ', (_indentLevel + 1) * 4)}]");
+            }
+
             if (_suffix.Count > 0)
             {
                 foreach (KeyValuePair<MetadataCategoricalSuffixType, string> suffix in _suffix)
