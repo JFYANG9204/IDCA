@@ -8,7 +8,7 @@
         d:DataContext="{d:DesignInstance Type=viewmodel:AxisSettingViewModel}"
         mc:Ignorable="d"
         Height="600" 
-        Width="900"
+        Width="920"
         ResizeMode="CanMinimize">
 
     <Window.Resources>
@@ -24,7 +24,7 @@
 
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="10"/>
-            <ColumnDefinition Width="880"/>
+            <ColumnDefinition Width="900"/>
             <ColumnDefinition Width="10"/>
         </Grid.ColumnDefinitions>
 
@@ -443,7 +443,9 @@
                                FontSize="15"
                                FontWeight="Bold"/>
 
-                    <ScrollViewer Height="150" VerticalScrollBarVisibility="Auto">
+                    <ScrollViewer Height="150" 
+                                  Width="330"
+                                  VerticalScrollBarVisibility="Auto">
                         <ItemsControl Margin="10 5" 
                                       BorderThickness="0"
                                       Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"
@@ -459,15 +461,16 @@
                                                    FontSize="14"
                                                    VerticalAlignment="Center"
                                                    Text="{Binding Name}"/>
-                                        <Grid Width="120" 
+                                        <Grid Width="180" 
                                               Height="30">
-                                            <TextBox Width="120"
+                                            <TextBox Width="180"
                                                      FontSize="14"
                                                      VerticalContentAlignment="Center"
                                                      Text="{Binding Text}"
                                                      Visibility="{Binding IsTextBox, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                                            <ComboBox Width="120"
+                                            <ComboBox Width="180"
                                                       FontSize="14"
+                                                      HorizontalContentAlignment="Center"
                                                       VerticalContentAlignment="Center"
                                                       ItemsSource="{Binding Selections}"
                                                       SelectedIndex="{Binding SelectedIndex}"
@@ -487,13 +490,15 @@
                                FontFamily="{StaticResource IDCA.Font.Family}"
                                FontSize="15"
                                FontWeight="Bold"/>
-                    
-                    <ScrollViewer Height="255" VerticalScrollBarVisibility="Auto">
-                    
+
+                    <ScrollViewer Height="255" 
+                                  Width="330"
+                                  VerticalScrollBarVisibility="Auto">
+
                         <ItemsControl Margin="10 5" 
                                       BorderThickness="0"
                                       ItemsSource="{Binding SelectedNode.Suffixes}"
-                                      d:ItemsSource="{d:SampleData ItemCount=5}">
+                                      d:ItemsSource="{d:SampleData ItemCount=10}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Height="30"

@@ -579,7 +579,7 @@ namespace IDCA.Model.Spec
         /// <returns></returns>
         public override string ToString()
         {
-            return $"{(_exclude ? "^" : "")}{((string.IsNullOrEmpty(_name) || _template.ElementType == AxisElementType.CategoryRange) ? "" : _name)}{((_description == null || _template.ElementType == AxisElementType.CategoryRange) ? "" : $" '{_description}'")}{(string.IsNullOrEmpty(_name) ? "" : " ")}{_template}{_suffix}";
+            return $"{(_exclude ? "^" : "")}{((string.IsNullOrEmpty(_name) || _template.ElementType == AxisElementType.CategoryRange) ? "" : _name)}{((_description == null || _template.ElementType == AxisElementType.CategoryRange) ? "" : $" '{_description}'")}{(string.IsNullOrEmpty(_name) || _template.ElementType == AxisElementType.CategoryRange ? "" : " ")}{_template}{_suffix}";
         }
     }
 

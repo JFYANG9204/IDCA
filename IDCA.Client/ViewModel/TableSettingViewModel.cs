@@ -2,6 +2,7 @@
 using IDCA.Bll;
 using IDCA.Model;
 using IDCA.Model.Spec;
+using IDCA.Model.Template;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using System;
@@ -19,7 +20,7 @@ namespace IDCA.Client.ViewModel
     public class TableSettingViewModel : ObservableObject
     {
 
-        public TableSettingViewModel(Tables tables, Config config)
+        public TableSettingViewModel(Tables tables, Config config, TemplateCollection templates)
         {
             _elementList = new ObservableCollection<TableSettingElementViewModel>();
             _tableName = tables.Name;
@@ -27,10 +28,12 @@ namespace IDCA.Client.ViewModel
             _headers = new ObservableCollection<CheckableItemViewModel>();
             _checkedHeaders = string.Empty;
             _config = config;
+            _templates = templates;
         }
 
         readonly Tables _tables;
         readonly Config _config;
+        readonly TemplateCollection _templates;
 
         TableSettingTreeNode? _node;
         /// <summary>
@@ -200,7 +203,7 @@ namespace IDCA.Client.ViewModel
         public ICommand PushNewElementCommand => new RelayCommand(Push);
         void Push()
         {
-            var element = new TableSettingElementViewModel(_tables.NewTable(), _config);
+            var element = new TableSettingElementViewModel(_tables.NewTable(), _config, _templates);
             element.Removing += RemoveElementAt;
             element.MovingUp += MoveElementUp;
             element.MovingDown += MoveElementDown;
@@ -230,7 +233,7 @@ namespace IDCA.Client.ViewModel
             _tableName = tableSettings.SpecTables.Name;
             foreach (TableSetting setting in tableSettings)
             {
-                var tableSettingViewModel = new TableSettingElementViewModel(_tables.NewTable(), _config);
+                var tableSettingViewModel = new TableSettingElementViewModel(_tables.NewTable(), _config, _templates);
                 tableSettingViewModel.LoadFromTableSetting(setting);
                 _elementList.Add(tableSettingViewModel);
             }
@@ -242,7 +245,7 @@ namespace IDCA.Client.ViewModel
         /// <returns></returns>
         public static TableSettingViewModel Empty(TableSettingTreeNode node)
         {
-            return new TableSettingViewModel(new Tables(node.SpecDocument), new Config())
+            return new TableSettingViewModel(new Tables(node.SpecDocument), new Config(), new TemplateCollection())
             {
                 Node = node
             };
@@ -252,11 +255,11 @@ namespace IDCA.Client.ViewModel
 
     public class TableSettingElementViewModel : ObservableObject
     {
-        public TableSettingElementViewModel(Table table, Config config) 
+        public TableSettingElementViewModel(Table table, Config config, TemplateCollection templates) 
         {
             _table = table;
             var sideAxis = _table.SideAxis ?? _table.CreateSideAxis(AxisType.Normal);
-            _axisOperater = new AxisOperator(sideAxis, config);
+            _axisOperater = new AxisOperator(sideAxis, config, templates);
             if (sideAxis.Count == 0)
             {
                 // 如果是空表达式，创建基础的表达式
@@ -303,6 +306,7 @@ namespace IDCA.Client.ViewModel
             _donotAppendMeanOrAverage = true;
             _appendMean = false;
             _appendAverage = false;
+            _meanVariable = string.Empty;
         }
 
         CheckableItemViewModel CreateTableTopBottomBoxSelectionItem(string label)
@@ -365,6 +369,8 @@ namespace IDCA.Client.ViewModel
                 {
                     _appendMean = false;
                     _appendAverage = false;
+                    _axisOperater.AppendMean = false;
+                    _axisOperater.AppendAverage = false;
                 }
             }
         }
@@ -379,11 +385,13 @@ namespace IDCA.Client.ViewModel
             set
             {
                 SetProperty(ref _appendMean, value);
+                _axisOperater.AppendMean = value;
                 if (value)
                 {
                     _donotAppendMeanOrAverage = false;
                     _appendAverage = false;
                 }
+                UpdateAxisExpression();
             }
         }
 
@@ -397,11 +405,28 @@ namespace IDCA.Client.ViewModel
             set
             {
                 SetProperty(ref _appendAverage, value);
+                _axisOperater.AppendAverage = value;
                 if (value)
                 {
                     _donotAppendMeanOrAverage = false;
                     _appendMean = false;
                 }
+                UpdateAxisExpression();
+            }
+        }
+
+        string _meanVariable;
+        /// <summary>
+        /// 添加计算均值时使用的变量
+        /// </summary>
+        public string MeanVariable
+        {
+            get { return _meanVariable; }
+            set
+            {
+                SetProperty(ref _meanVariable, value);
+                _axisOperater.MeanVariable = value;
+                UpdateAxisExpression();
             }
         }
 
@@ -494,10 +519,23 @@ namespace IDCA.Client.ViewModel
         void UpdateAxisExpression()
         {
             var boxes = GetTopBottomBox();
+            var nps = SelectedNps();
             if (boxes != null)
             {
-                _axisOperater.CreateTopBottomBoxAxisExpression(_baseText, SelectedNps(), boxes);
+                _axisOperater.CreateTopBottomBoxAxisExpression(_baseText, nps, boxes);
+                _axisViewModel.LoadFromAxis(_axisOperater.Axis);
+                return;
             }
+            // 只添加NPS
+            if (nps)
+            {
+                _axisOperater.CreateTopBottomBoxAxisExpression(_baseText, true);
+                _axisViewModel.LoadFromAxis(_axisOperater.Axis);
+                return;
+            }
+
+            _axisOperater.CreateBasicAxisExpression(_baseText);
+            _axisViewModel.LoadFromAxis(_axisOperater.Axis);
         }
 
         string[] _factorSequence = { "正序", "逆序" };

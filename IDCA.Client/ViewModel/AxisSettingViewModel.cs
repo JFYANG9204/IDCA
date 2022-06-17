@@ -11,6 +11,9 @@ using System.Windows.Input;
 
 namespace IDCA.Client.ViewModel
 {
+    /// <summary>
+    /// AxisSettingView使用的ViewModel
+    /// </summary>
     public class AxisSettingViewModel : ObservableObject
     {
         public AxisSettingViewModel(Axis axis) 
@@ -25,17 +28,23 @@ namespace IDCA.Client.ViewModel
             }
             _availableSelectedIndex = -1;
             _tree = new ObservableCollection<AxisTreeNode>();
-            _nodeNames = new List<string>();
+            _nodeNames = new HashSet<string>();
             LoadFromAxis(Axis);
         }
 
         Axis _axis;
+        /// <summary>
+        /// 当前窗口修改轴表达式对象
+        /// </summary>
         public Axis Axis
         {
             get { return _axis; }
         }
 
         string _axisExpression = string.Empty;
+        /// <summary>
+        /// 当前轴表达式的文本内容
+        /// </summary>
         public string AxisExpression
         {
             get { return _axisExpression; }
@@ -48,9 +57,14 @@ namespace IDCA.Client.ViewModel
 
 
 
-        readonly List<string> _nodeNames;
-        public List<string> NodeNames => _nodeNames;
-
+        readonly HashSet<string> _nodeNames;
+        /// <summary>
+        /// 当前轴包含的节点名称，用来判断元素名是否可用
+        /// </summary>
+        public HashSet<string> NodeNames => _nodeNames;
+        /// <summary>
+        /// 更新轴表达式文本内容
+        /// </summary>
         public void UpdateAxisExpression()
         {
             AxisExpression = _axis.ToString();
@@ -83,7 +97,9 @@ namespace IDCA.Client.ViewModel
             "模式(mode)",
             "Ntd(ntd)"
         };
-
+        /// <summary>
+        /// 轴表达式可用元素
+        /// </summary>
         public class AvailableElement : ObservableObject
         {
             public AvailableElement(string name, AxisElementType type, Action<AvailableElement> adding)
@@ -122,6 +138,9 @@ namespace IDCA.Client.ViewModel
             }
 
             string _name;
+            /// <summary>
+            /// 元素名
+            /// </summary>
             public string Name
             {
                 get { return _name; }
@@ -129,6 +148,9 @@ namespace IDCA.Client.ViewModel
             }
 
             string _scriptName;
+            /// <summary>
+            /// 添加新元素时的默认名称前缀
+            /// </summary>
             public string ScriptName
             {
                 get { return _scriptName; }
@@ -136,6 +158,9 @@ namespace IDCA.Client.ViewModel
             }
 
             AxisElementType _type;
+            /// <summary>
+            /// 轴元素类型
+            /// </summary>
             public AxisElementType Type
             {
                 get { return _type; }
@@ -143,10 +168,16 @@ namespace IDCA.Client.ViewModel
             }
 
             readonly Action<AvailableElement> _adding;
+            /// <summary>
+            /// 父级对象添加此类元素时执行的命令
+            /// </summary>
             public ICommand AddCommand => new RelayCommand(() => _adding(this));
         }
 
         ObservableCollection<AvailableElement> _availableElements;
+        /// <summary>
+        /// 当前所有可用类型的轴元素
+        /// </summary>
         public ObservableCollection<AvailableElement> AvailableElements
         {
             get => _availableElements;
@@ -154,6 +185,9 @@ namespace IDCA.Client.ViewModel
         }
 
         int _availableSelectedIndex;
+        /// <summary>
+        /// 可用轴元素列表的选取索引
+        /// </summary>
         public int AvailableSelectedIndex
         {
             get => _availableSelectedIndex;
@@ -161,6 +195,9 @@ namespace IDCA.Client.ViewModel
         }
 
         AxisTreeNode? _selectedNode;
+        /// <summary>
+        /// 当前轴已有元素树中的选中节点
+        /// </summary>
         public AxisTreeNode? SelectedNode
         {
             get { return _selectedNode; }
@@ -168,12 +205,19 @@ namespace IDCA.Client.ViewModel
         }
 
         ObservableCollection<AxisTreeNode> _tree;
+        /// <summary>
+        /// 当前已有元素构成的轴元素树
+        /// </summary>
         public ObservableCollection<AxisTreeNode> Tree
         {
             get { return _tree; }
             set { SetProperty(ref _tree, value); }
         }
-
+        /// <summary>
+        /// 移动轴元素节点，可以向上或向下移动一个位置
+        /// </summary>
+        /// <param name="node">移动的节点</param>
+        /// <param name="moveDown">是否向下移动</param>
         void MoveTreeNode(AxisTreeNode node, bool moveDown = false)
         {
             bool success;
@@ -248,7 +292,10 @@ namespace IDCA.Client.ViewModel
         //    UpdateAxisExpression();
         //}
         //public ICommand MoveDownCommand => new RelayCommand(MoveDownTreeNode);
-
+        /// <summary>
+        /// 移除指定的树节点
+        /// </summary>
+        /// <param name="node"></param>
         void RemoveTreeNode(AxisTreeNode node)
         {
             if (node.Parent != null)
@@ -269,7 +316,7 @@ namespace IDCA.Client.ViewModel
                     _axis.RemoveAt(index);
                 }
             }
-            _nodeNames.RemoveAll(n => n.Equals(node.Name, StringComparison.OrdinalIgnoreCase));
+            _nodeNames.RemoveWhere(n => n.Equals(node.Name, StringComparison.OrdinalIgnoreCase));
             UpdateAxisExpression();
         }
 
@@ -307,7 +354,11 @@ namespace IDCA.Client.ViewModel
                 SelectedNode = n;
             }
         }
-        
+        /// <summary>
+        /// 向当前树的选中节点后添加新的节点
+        /// </summary>
+        /// <param name="element">选中的可用元素类型</param>
+        /// <param name="parentNode">父级节点，针对Net/Combine这种有子类的元素</param>
         void AppendTreeNode(AvailableElement element, AxisTreeNode? parentNode = null)
         {
             var axisElement = _axis.NewObject();
@@ -418,22 +469,25 @@ namespace IDCA.Client.ViewModel
         //}
         //public ICommand CancelCommand => new RelayCommand<object?>(Cancel);
 
-        public void ApplyToAxis()
-        {
-            if (_axis == null)
-            {
-                return;
-            }
+        //public void ApplyToAxis()
+        //{
+        //    if (_axis == null)
+        //    {
+        //        return;
+        //    }
+        //
+        //    foreach (var node in _tree)
+        //    {
+        //        var element = _axis.NewObject();
+        //        node.ApplyToAxisElement(element);
+        //        _axis.Add(element);
+        //    }
+        //}
 
-            foreach (var node in _tree)
-            {
-                var element = _axis.NewObject();
-                node.ApplyToAxisElement(element);
-                _axis.Add(element);
-            }
-        }
-
-
+        /// <summary>
+        /// 从已有的轴表达式对象载入UI数据
+        /// </summary>
+        /// <param name="axis"></param>
         public void LoadFromAxis(Axis axis)
         {
             _axis = axis;
@@ -451,11 +505,13 @@ namespace IDCA.Client.ViewModel
         }
 
     }
-
+    /// <summary>
+    /// AxisSettingView中，AxisElement后缀列表使用的ViewModel
+    /// </summary>
     public class AxisElementSuffixViewModel : ObservableObject
     {
 
-        public AxisElementSuffixViewModel(AxisElementSuffixType type)
+        public AxisElementSuffixViewModel(AxisTreeNode node, AxisElementSuffixType type, AxisElement axisElement)
         {
             _type = type;
             _name = string.Empty;
@@ -465,26 +521,40 @@ namespace IDCA.Client.ViewModel
             _checked = false;
             _isTextBox = true;
             _isComboBox = false;
+            _axisElement = axisElement;
+            _node = node;
         }
 
-        Action<AxisElementSuffixViewModel>? _checkChanged;
-        public event Action<AxisElementSuffixViewModel>? CheckChanged
-        {
-            add { _checkChanged += value; }
-            remove { _checkChanged -= value; }
-        }
+        //Action<AxisElementSuffixViewModel>? _checkChanged;
+        //public event Action<AxisElementSuffixViewModel>? CheckChanged
+        //{
+        //    add { _checkChanged += value; }
+        //    remove { _checkChanged -= value; }
+        //}
+        //
+        //Action<AxisElementSuffixViewModel>? _valueChanged;
+        //public event Action<AxisElementSuffixViewModel>? ValueChanged
+        //{
+        //    add { _valueChanged += value; }
+        //    remove { _valueChanged -= value; }
+        //}
 
-        Action<AxisElementSuffixViewModel>? _valueChanged;
-        public event Action<AxisElementSuffixViewModel>? ValueChanged
-        {
-            add { _valueChanged += value; }
-            remove { _valueChanged -= value; }
-        }
-
+        readonly AxisElement _axisElement;
         readonly AxisElementSuffixType _type;
+        /// <summary>
+        /// 当前后缀所在的Axis元素树节点
+        /// </summary>
+        readonly AxisTreeNode _node;
+        /// <summary>
+        /// 后缀类型，可以在AxisElement中直接使用。
+        /// 此类型只用于标注这个配置对应的元素类型，不代表AxisElement对象中一定有这个类型的配置。
+        /// </summary>
         public AxisElementSuffixType Type => _type;
 
         string _name;
+        /// <summary>
+        /// 后缀名，应该是AxisElementSuffixType对应的名称
+        /// </summary>
         public string Name
         {
             get
@@ -498,6 +568,9 @@ namespace IDCA.Client.ViewModel
         }
 
         string _text;
+        /// <summary>
+        /// TextBox中填入的内容
+        /// </summary>
         public string Text
         {
             get
@@ -507,28 +580,28 @@ namespace IDCA.Client.ViewModel
             set
             {
                 SetProperty(ref _text, value);
-                if (_checked)
-                {
-                    _valueChanged?.Invoke(this);
-                }
+                UpdateAxisExpression();
             }
         }
 
         int _selectedIndex;
+        /// <summary>
+        /// 可选值选中的索引
+        /// </summary>
         public int SelectedIndex
         {
             get { return _selectedIndex; }
             set 
             { 
                 SetProperty(ref _selectedIndex, value);
-                if (_checked)
-                {
-                    _valueChanged?.Invoke(this);
-                }
+                UpdateAxisExpression();
             }
         }
 
         ObservableCollection<string> _selections;
+        /// <summary>
+        /// 如果后缀值用ComboBox选取，此属性值是ComboBox的可选值
+        /// </summary>
         public ObservableCollection<string> Selections
         {
             get
@@ -542,17 +615,23 @@ namespace IDCA.Client.ViewModel
         }
 
         bool _checked;
+        /// <summary>
+        /// 当前后缀是否选中
+        /// </summary>
         public bool Checked
         {
             get { return _checked; }
             set 
             { 
                 SetProperty(ref _checked, value);
-                _checkChanged?.Invoke(this);
+                UpdateAxisExpression();
             }
         }
 
         bool _isTextBox;
+        /// <summary>
+        /// 当前值用TextBox填入
+        /// </summary>
         public bool IsTextBox
         {
             get
@@ -566,6 +645,9 @@ namespace IDCA.Client.ViewModel
         }
 
         bool _isComboBox;
+        /// <summary>
+        /// 当前值用ComboBox选取
+        /// </summary>
         public bool IsComboBox
         {
             get
@@ -577,7 +659,10 @@ namespace IDCA.Client.ViewModel
                 SetProperty(ref _isComboBox, value);
             }
         }
-
+        /// <summary>
+        /// 向当前值选项末尾添加新的值
+        /// </summary>
+        /// <param name="seletions"></param>
         public void AddSelections(params string[] seletions)
         {
             foreach (var item in seletions)
@@ -585,7 +670,10 @@ namespace IDCA.Client.ViewModel
                 _selections.Add(item);
             }
         }
-
+        /// <summary>
+        /// 获取当前选中的值或填入的值
+        /// </summary>
+        /// <returns></returns>
         public string GetValue()
         {
             if (_isTextBox)
@@ -598,7 +686,10 @@ namespace IDCA.Client.ViewModel
             }
             return string.Empty;
         }
-
+        /// <summary>
+        /// 将当前配置应用到轴元素
+        /// </summary>
+        /// <param name="element"></param>
         public void ApplyToAxisElement(AxisElement? element)
         {
             if (element == null || !_checked)
@@ -611,7 +702,10 @@ namespace IDCA.Client.ViewModel
             suffix.Value = GetValue();
             element.Suffix.Add(suffix);
         }
-
+        /// <summary>
+        /// 从轴元素载入当前UI配置
+        /// </summary>
+        /// <param name="suffix"></param>
         public void LoadFromAxisElement(AxisElementSuffix? suffix)
         {
             if (suffix == null || !_name.Equals(suffix.Type.ToString(), StringComparison.OrdinalIgnoreCase))
@@ -653,8 +747,33 @@ namespace IDCA.Client.ViewModel
             }
         }
 
+        void UpdateAxisExpression()
+        {
+            var suffix = _axisElement.Suffix[_type];
+            if (!Checked && suffix != null)
+            {
+                _axisElement.Suffix.Remove(suffix);
+                _node.Root.UpdateAxisExpression();
+            }
+            else if (Checked)
+            {
+                if (suffix != null)
+                {
+                    suffix.Value = GetValue();
+                }
+                else
+                {
+                    _axisElement.Suffix.Append(_type).Value = GetValue();
+                }
+                _node.Root.UpdateAxisExpression();
+            }
+        }
     }
 
+    /// <summary>
+    /// 存储AxisSettingView里AxisElement树节点详细配置的ViewModel。
+    /// 存储配置值的控件可以是TextBox或者ComboBox。
+    /// </summary>
     public class AxisElementDetailViewModel : ObservableObject
     {
         public AxisElementDetailViewModel()
@@ -691,20 +810,30 @@ namespace IDCA.Client.ViewModel
         }
 
         Func<AxisElementDetailViewModel, bool>? _beforeValueChanged;
+        /// <summary>
+        /// 在修改Text属性时，如果此事件不为null，会优先触发此事件来判断值是否可用。
+        /// 如果返回true或者事件未配置，将修改成功，否则，将修改失败。
+        /// </summary>
         public event Func<AxisElementDetailViewModel, bool> BeforeValueChanged
         {
             add { _beforeValueChanged += value; }
             remove { _beforeValueChanged -= value; }
         }
 
-        Action<AxisElementDetailViewModel>? _valueChanged;
-        public event Action<AxisElementDetailViewModel> ValueChanged
+        Action<AxisElementDetailViewModel, string>? _valueChanged;
+        /// <summary>
+        /// 在修改Text值或SelectedIndex后，触发的事件。
+        /// </summary>
+        public event Action<AxisElementDetailViewModel, string> ValueChanged
         {
             add { _valueChanged += value; }
             remove { _valueChanged -= value; }
         }
 
         AxisElementDetailType _type;
+        /// <summary>
+        /// 当前对象的详细配置类型
+        /// </summary>
         public AxisElementDetailType Type
         {
             get { return _type; }
@@ -712,6 +841,9 @@ namespace IDCA.Client.ViewModel
         }
 
         int _indexOfElement = -1;
+        /// <summary>
+        /// 当前对象在AxisTreeNode中的索引位置
+        /// </summary>
         public int IndexOfElement
         {
             get { return _indexOfElement; }
@@ -719,6 +851,9 @@ namespace IDCA.Client.ViewModel
         }
 
         string _name;
+        /// <summary>
+        /// 当前详细设置的名称，显示在ComboBox或TextBox左边
+        /// </summary>
         public string Name
         {
             get { return _name; }
@@ -726,6 +861,9 @@ namespace IDCA.Client.ViewModel
         }
 
         string _text;
+        /// <summary>
+        /// 当前详细配置值控件是TextBox时，绑定TextBox内的文本内容。
+        /// </summary>
         public string Text
         {
             get { return _text; }
@@ -733,13 +871,17 @@ namespace IDCA.Client.ViewModel
             {
                 if (_beforeValueChanged == null || _beforeValueChanged(this))
                 {
+                    string oldValue = _text;
                     SetProperty(ref _text, value);
-                    _valueChanged?.Invoke(this);
+                    _valueChanged?.Invoke(this, _text);
                 }
             }
         }
 
         bool _isTextBox;
+        /// <summary>
+        /// 当前配置值控件是否是TextBox，和IsComboBox不能同时为true。
+        /// </summary>
         public bool IsTextBox
         {
             get { return _isTextBox; }
@@ -754,6 +896,9 @@ namespace IDCA.Client.ViewModel
         }
 
         bool _isComboBox;
+        /// <summary>
+        /// 当前配置值控件是否是ComboBox，和IsTextBox不能同时为true。
+        /// </summary>
         public bool IsComboBox
         {
             get { return _isComboBox; }
@@ -768,23 +913,33 @@ namespace IDCA.Client.ViewModel
         }
 
         int _selectedIndex;
+        /// <summary>
+        /// 绑定值选择ComboBox的已选择索引
+        /// </summary>
         public int SelectedIndex
         {
             get { return _selectedIndex; }
             set 
-            { 
+            {
+                string oldValue = GetValue();
                 SetProperty(ref _selectedIndex, value);
-                _valueChanged?.Invoke(this);
+                _valueChanged?.Invoke(this, oldValue);
             }
         }
 
         ObservableCollection<string> _selections;
+        /// <summary>
+        /// 绑定ComboBox内的选项内容。
+        /// </summary>
         public ObservableCollection<string> Selections
         {
             get { return _selections; }
             set { SetProperty(ref _selections, value); }
         }
-
+        /// <summary>
+        /// 设置当前ComboBox控件的选项内容。
+        /// </summary>
+        /// <param name="selections"></param>
         public void SetSelections(params string[] selections)
         {
             foreach (var s in selections)
@@ -792,12 +947,15 @@ namespace IDCA.Client.ViewModel
                 _selections.Add(s);
             }
         }
-
+        /// <summary>
+        /// 获取当前配置的字符串值，无论当前使用控件是TextBox还是ComboBox。
+        /// </summary>
+        /// <returns></returns>
         public string GetValue()
         {
             if (_isComboBox)
             {
-                return _selectedIndex > 0 && _selectedIndex < _selections.Count ?
+                return _selectedIndex >= 0 && _selectedIndex < _selections.Count ?
                     _selections[_selectedIndex] : string.Empty;
             }
             else
@@ -805,7 +963,10 @@ namespace IDCA.Client.ViewModel
                 return _text;
             }
         }
-
+        /// <summary>
+        /// 将当前详细配置应用到已有的轴元素中
+        /// </summary>
+        /// <param name="element"></param>
         public void ApplyToAxisElement(AxisElement element)
         {
             switch (_type)
@@ -841,7 +1002,10 @@ namespace IDCA.Client.ViewModel
                     break;
             }
         }
-
+        /// <summary>
+        /// 从已有的轴元素对象读取配置内容。
+        /// </summary>
+        /// <param name="element"></param>
         public void LoadFromAxisElement(AxisElement element)
         {
             switch (_type)
@@ -951,6 +1115,10 @@ namespace IDCA.Client.ViewModel
         CategoryLowerBoundary
     }
 
+    /// <summary>
+    /// AxisSettingView中Axis及其下级元素用TreeView表示出来，AxisTreeNode绑定
+    /// TreeView内的基础节点。
+    /// </summary>
     public class AxisTreeNode : ObservableObject
     {
         public AxisTreeNode(AxisSettingViewModel root, AxisElement element)
@@ -958,7 +1126,7 @@ namespace IDCA.Client.ViewModel
             _root = root;
             _axisElement = element;
             _elementType = element.Template.ElementType;
-            _allowChildren = false;
+            _allowChildren = _elementType == AxisElementType.Net || _elementType == AxisElementType.Combine;
             _elementType = AxisElementType.None;
             _name = string.Empty;
             _children = new ObservableCollection<AxisTreeNode>();
@@ -1000,12 +1168,21 @@ namespace IDCA.Client.ViewModel
         }
 
         readonly AxisElement _axisElement;
+        /// <summary>
+        /// 树节点对应的Axis轴元素，修改ViewModel的时候会同步修改此对象的数据。
+        /// </summary>
         public AxisElement AxisElement => _axisElement;
 
         readonly AxisSettingViewModel _root;
+        /// <summary>
+        /// 根节点，为存储整个轴的ViewModel。
+        /// </summary>
         public AxisSettingViewModel Root => _root;
 
         Action<AxisTreeNode, bool>? _selectedChanged;
+        /// <summary>
+        /// 当TreeView选择这个节点或者取消选择这个节点时触发的事件。
+        /// </summary>
         public Action<AxisTreeNode, bool>? SelectedChanged
         {
             get => _selectedChanged;
@@ -1013,6 +1190,9 @@ namespace IDCA.Client.ViewModel
         }
 
         AxisElementType _elementType;
+        /// <summary>
+        /// 当前配置的轴元素类型。
+        /// </summary>
         public AxisElementType ElementType
         {
             get { return _elementType; }
@@ -1026,6 +1206,9 @@ namespace IDCA.Client.ViewModel
         }
 
         bool _isSelected;
+        /// <summary>
+        /// 当前节点在TreeView中是否被选中。
+        /// </summary>
         public bool IsSelected
         {
             get { return _isSelected; }
@@ -1037,6 +1220,10 @@ namespace IDCA.Client.ViewModel
         }
 
         Action<AxisTreeNode>? _removing;
+        /// <summary>
+        /// 在父级对象（AxisSettingViewModel或AxisTreeNode）中移除此对象。
+        /// 此回调由父级对象提供。
+        /// </summary>
         public event Action<AxisTreeNode>? Removing
         {
             add { _removing += value; }
@@ -1044,6 +1231,10 @@ namespace IDCA.Client.ViewModel
         }
 
         Action<AxisTreeNode>? _movingUp;
+        /// <summary>
+        /// 在父级对象中（AxisSettingViewModel或AxisTreeNode）向上移动此对象一个位置
+        /// 此回调由父级对象提供。
+        /// </summary>
         public event Action<AxisTreeNode>? MovingUp
         {
             add { _movingUp += value; }
@@ -1051,6 +1242,10 @@ namespace IDCA.Client.ViewModel
         }
 
         Action<AxisTreeNode>? _movingDown;
+        /// <summary>
+        /// 在父级对象中（AxisSettingViewModel或AxisTreeNode）向下移动此对象一个位置
+        /// 此回调由父级对象提供。
+        /// </summary>
         public event Action<AxisTreeNode>? MovingDown
         {
             add { _movingDown += value; }
@@ -1058,6 +1253,9 @@ namespace IDCA.Client.ViewModel
         }
 
         Action<AxisTreeNode>? _addingChild;
+        /// <summary>
+        /// 当前对象添加下级节点，回调由父级对象提供。
+        /// </summary>
         public event Action<AxisTreeNode>? AddingChild
         {
             add { _addingChild += value; }
@@ -1065,6 +1263,9 @@ namespace IDCA.Client.ViewModel
         }
 
         Action<AxisTreeNode>? _renamed;
+        /// <summary>
+        /// 当前对象重命名后触发的事件。
+        /// </summary>
         public event Action<AxisTreeNode>? Renamed
         {
             add { _renamed += value; }
@@ -1072,15 +1273,24 @@ namespace IDCA.Client.ViewModel
         }
 
         bool _allowChildren;
+        /// <summary>
+        /// 当前节点是否允许添加子节点。
+        /// </summary>
         public bool AllowChildren
         {
             get { return _allowChildren; }
             set { SetProperty(ref _allowChildren, value); }
         }
-
+        /// <summary>
+        /// 向当前节点对象中添加下级节点对象，此方法使用AddingChild回调，
+        /// 如果AddingChild回调未配置或AllowChild为false，将无法添加。
+        /// </summary>
         void AddChild()
         {
-            _addingChild?.Invoke(this);
+            if (_allowChildren)
+            {
+                _addingChild?.Invoke(this);
+            }
         }
         public ICommand AddChildCommand => new RelayCommand(AddChild);
 
@@ -1105,81 +1315,78 @@ namespace IDCA.Client.ViewModel
         AxisTreeNode? _parent;
         public AxisTreeNode? Parent { get => _parent; set => _parent = value; }
 
-        void OnSuffixChecked(AxisElementSuffixViewModel viewModel)
-        {
-            var existSuffix = _axisElement.Suffix[viewModel.Type];
-            if (viewModel.Checked)
-            {
-                if (existSuffix != null)
-                {
-                    existSuffix.Value = viewModel.GetValue();
-                }
-                else
-                {
-                    var suffix = _axisElement.Suffix.Append(viewModel.Type);
-                    suffix.Value = viewModel.GetValue();
-                }
-            }
-            else
-            {
-                if (existSuffix != null)
-                {
-                    _axisElement.Suffix.RemoveIf(e => e.Type == viewModel.Type);
-                }
-            }
-            _root.UpdateAxisExpression();
-        }
-
-        void OnSuffixValueChanged(AxisElementSuffixViewModel viewModel)
-        {
-            if (viewModel.Checked)
-            {
-                var suffix = _axisElement.Suffix[viewModel.Type];
-                if (suffix != null)
-                {
-                    suffix.Value = viewModel.GetValue();
-                    _root.UpdateAxisExpression();
-                }
-            }
-        }
+        //void OnSuffixChecked(AxisElementSuffixViewModel viewModel)
+        //{
+        //    var existSuffix = _axisElement.Suffix[viewModel.Type];
+        //    if (viewModel.Checked)
+        //    {
+        //        if (existSuffix != null)
+        //        {
+        //            existSuffix.Value = viewModel.GetValue();
+        //        }
+        //        else
+        //        {
+        //            var suffix = _axisElement.Suffix.Append(viewModel.Type);
+        //            suffix.Value = viewModel.GetValue();
+        //        }
+        //    }
+        //    else
+        //    {
+        //        if (existSuffix != null)
+        //        {
+        //            _axisElement.Suffix.RemoveIf(e => e.Type == viewModel.Type);
+        //        }
+        //    }
+        //    _root.UpdateAxisExpression();
+        //}
+        //
+        //void OnSuffixValueChanged(AxisElementSuffixViewModel viewModel)
+        //{
+        //    if (viewModel.Checked)
+        //    {
+        //        var suffix = _axisElement.Suffix[viewModel.Type];
+        //        if (suffix != null)
+        //        {
+        //            suffix.Value = viewModel.GetValue();
+        //            _root.UpdateAxisExpression();
+        //        }
+        //    }
+        //}
 
         void InitSuffixTextBoxItem(AxisElementSuffixType type)
         {
-            var element = new AxisElementSuffixViewModel(type)
+            var element = new AxisElementSuffixViewModel(this, type, _axisElement)
             {
                 Name = type.ToString(),
                 IsComboBox = false,
                 IsTextBox = true
             };
-            element.CheckChanged += OnSuffixChecked;
-            element.ValueChanged += OnSuffixValueChanged;
             _suffixes.Add(element);
         }
 
         void InitSuffixSelectionItem(AxisElementSuffixType type, params string[] selections)
         {
-            var element = new AxisElementSuffixViewModel(type)
+            var element = new AxisElementSuffixViewModel(this, type, _axisElement)
             {
                 Name = type.ToString(),
                 IsComboBox = true,
                 IsTextBox = false,
             };
             element.AddSelections(selections);
-            element.CheckChanged += OnSuffixChecked;
-            element.ValueChanged += OnSuffixValueChanged;
             _suffixes.Add(element);
         }
 
         bool ValidateNodeName(AxisElementDetailViewModel detail)
         {
-            return !Root.NodeNames.Exists(n => n.Equals(detail.Name, StringComparison.OrdinalIgnoreCase));
+            return !Root.NodeNames.Contains(detail.GetValue().ToLower());
         }
 
-        void OnDetailTextValueChanged(AxisElementDetailViewModel viewModel)
+        void OnDetailTextValueChanged(AxisElementDetailViewModel viewModel, string oldValue)
         {
             switch (viewModel.Type)
             {
                 case AxisElementDetailType.Name:
+                    Root.NodeNames.Remove(oldValue.ToLower());
                     Name = viewModel.GetValue();
                     break;
                 case AxisElementDetailType.Description:
@@ -1227,7 +1434,10 @@ namespace IDCA.Client.ViewModel
 
             Details.Add(detail);
         }
-
+        /// <summary>
+        /// 初始化指定类型的详细配置对象。
+        /// </summary>
+        /// <param name="type"></param>
         public void InitDetail(AxisElementType type)
         {
             switch (type)
@@ -1299,11 +1509,19 @@ namespace IDCA.Client.ViewModel
         }
 
         string _name;
+        /// <summary>
+        /// 当前节点名，对应AxisElement中的Name属性，在修改前会验证传入值，
+        /// 当轴表达式中已存在此名称（不区分大小写）时，将修改失败。
+        /// </summary>
         public string Name 
         { 
             get { return _name; }
             set
             {
+                if (_root.NodeNames.Contains(value.ToLower()))
+                {
+                    return;
+                }
                 SetProperty(ref _name, value);
                 _axisElement.Name = value;
                 _renamed?.Invoke(this);
@@ -1311,6 +1529,9 @@ namespace IDCA.Client.ViewModel
         }
 
         ObservableCollection<AxisTreeNode> _children;
+        /// <summary>
+        /// 当前节点的子节点集合。
+        /// </summary>
         public ObservableCollection<AxisTreeNode> Children
         {
             get { return _children; }
@@ -1318,6 +1539,9 @@ namespace IDCA.Client.ViewModel
         }
 
         ObservableCollection<AxisElementSuffixViewModel> _suffixes;
+        /// <summary>
+        /// 当前节点的后缀配置集合。
+        /// </summary>
         public ObservableCollection<AxisElementSuffixViewModel> Suffixes
         {
             get => _suffixes;
@@ -1325,12 +1549,18 @@ namespace IDCA.Client.ViewModel
         }
 
         ObservableCollection<AxisElementDetailViewModel> _details;
+        /// <summary>
+        /// 当前节点的详细配置集合。
+        /// </summary>
         public ObservableCollection<AxisElementDetailViewModel> Details
         {
             get => _details;
             set => SetProperty(ref _details, value);
         }
-
+        /// <summary>
+        /// 向当前节点中添加子节点。
+        /// </summary>
+        /// <param name="node"></param>
         public void PushChild(AxisTreeNode node)
         {
             _children.Add(node);
@@ -1339,7 +1569,9 @@ namespace IDCA.Client.ViewModel
             _axisElement.Template.PushParameter(parameter);
             node.Parent = this;
         }
-
+        /// <summary>
+        /// 移除当前子节点的最后一个。
+        /// </summary>
         public void PopChild()
         {
             if (_children.Count > 0)
@@ -1348,7 +1580,11 @@ namespace IDCA.Client.ViewModel
                 _axisElement.Template.RemoveAt(_axisElement.Template.Count - 1);
             }
         }
-
+        /// <summary>
+        /// 移除指定位置的子节点。如果索引存在，将移除成功，返回true，否则返回false。
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
         public bool RemoveChildAt(int index)
         {
             if (index < 0 || index >= _children.Count)
@@ -1359,7 +1595,13 @@ namespace IDCA.Client.ViewModel
             _axisElement.Template.RemoveAt(index);
             return true;
         }
-
+        /// <summary>
+        /// 交换两个索引位置的子节点数据。如果有任意一个索引不存在或者两个索引相同，将返回false；
+        /// 否则将成功交换并返回true。
+        /// </summary>
+        /// <param name="index1"></param>
+        /// <param name="index2"></param>
+        /// <returns></returns>
         public bool SwapChildren(int index1, int index2)
         {
             bool result = CollectionHelper.Swap(_children, index1, index2);
@@ -1369,12 +1611,20 @@ namespace IDCA.Client.ViewModel
             }
             return result;
         }
-
+        /// <summary>
+        /// 将指定位置的子节点向前移动一个位置。
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
         public bool MoveChildUp(int index)
         {
             return SwapChildren(index, index - 1);
         }
-
+        /// <summary>
+        /// 将指定位置的子节点向后移动一个位置。
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
         public bool MoveChildDown(int index)
         {
             return SwapChildren(index, index + 1);
@@ -1384,7 +1634,10 @@ namespace IDCA.Client.ViewModel
         {
             return _suffixes.Where(suffix => suffix.Checked);
         }
-
+        /// <summary>
+        /// 将当前的所有配置应用到已有的轴元素中。
+        /// </summary>
+        /// <param name="element"></param>
         public void ApplyToAxisElement(AxisElement? element)
         {
             if (element == null)
@@ -1433,12 +1686,15 @@ namespace IDCA.Client.ViewModel
             detail.ValueChanged += OnDetailTextValueChanged;
 
             // 向节点名称列表中添加当前元素名
-            _root.NodeNames.Add(element.Name);
+            _root.NodeNames.Add(element.Name.ToLower());
 
             detail.LoadFromAxisElement(element);
             Details.Add(detail);
         }
-
+        /// <summary>
+        /// 从已有的轴元素对象（AxisElement）中读取数据。读取前会清空以后的数据。
+        /// </summary>
+        /// <param name="element"></param>
         public void LoadFromAxisElement(AxisElement element)
         {
             _name = element.Name;

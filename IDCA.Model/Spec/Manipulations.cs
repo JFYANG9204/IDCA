@@ -31,6 +31,20 @@ namespace IDCA.Model.Spec
         }
 
         /// <summary>
+        /// 移除指定名称的Manipulation元素
+        /// </summary>
+        /// <param name="name"></param>
+        public void Remove(string name)
+        {
+            var lowerName = name.ToLower();
+            if (_nameCache.ContainsKey(lowerName))
+            {
+                _items.Remove(_nameCache[lowerName]);
+                _nameCache.Remove(lowerName);
+            }
+        }
+
+        /// <summary>
         /// 创建空白的Manipulation对象，并添加进当前集合中
         /// </summary>
         /// <returns></returns>
@@ -154,8 +168,8 @@ namespace IDCA.Model.Spec
         {
             _titleFunction = templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateTitleLabel);
             _axisFunction = templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateSideAxis);
-            _responseLabelFunction = templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateSideLabel);
-            _definitionLabelFunction = templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateTypeLabel);
+            _responseLabelFunction = templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateSideResponseLabel);
+            _definitionLabelFunction = templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateTypeSideResponseLabel);
             _axisAverageFunction = templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateAxisAverage);
         }
 
@@ -228,7 +242,7 @@ namespace IDCA.Model.Spec
                 return;
             }
             var template = (FunctionTemplate)_responseLabelFunction.Clone();
-            template.SetFunctionParameterValue(code, TemplateValueType.String, TemplateParameterUsage.ManipulateCodeName);
+            template.SetFunctionParameterValue(code, TemplateValueType.String, TemplateParameterUsage.ManipulateCategoryName);
             template.SetFunctionParameterValue(label, TemplateValueType.String, TemplateParameterUsage.ManipulateLabelText);
             Add(template);
         }
@@ -243,7 +257,7 @@ namespace IDCA.Model.Spec
                 return;
             }
             var template = (FunctionTemplate)_definitionLabelFunction.Clone();
-            template.SetFunctionParameterValue(code, TemplateValueType.String, TemplateParameterUsage.ManipulateCodeName);
+            template.SetFunctionParameterValue(code, TemplateValueType.String, TemplateParameterUsage.ManipulateCategoryName);
             template.SetFunctionParameterValue(label, TemplateValueType.String, TemplateParameterUsage.ManipulateLabelText);
             Add(template);
         }
@@ -284,7 +298,7 @@ namespace IDCA.Model.Spec
             _axis.AppendSubTotal(config?.TryGet<string>(SpecConfigKeys.AxisSigmaLabel) ?? "");
             if (addAverage && _axisAverageFunction != null)
             {
-                _axisAverageFunction.SetFunctionParameterValue(averageVariable, TemplateValueType.String, TemplateParameterUsage.ManipulateRebaseAverageVariable);
+                _axisAverageFunction.SetFunctionParameterValue(averageVariable, TemplateValueType.String, TemplateParameterUsage.RebaseMeanVariable);
                 _axis.AppendInsertFunction(_axisAverageFunction);
             }
             SetAxis(_axis);

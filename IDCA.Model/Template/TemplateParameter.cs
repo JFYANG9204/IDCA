@@ -15,49 +15,157 @@ namespace IDCA.Model.Template
     {
         None = 0,
 
+        /// <summary>
+        /// 此类参数值为Job.ini文件中的项目根目录（DPGM文件夹）
+        /// </summary>
         JobProjectPath = 1011,
+        /// <summary>
+        /// 此类参数值为Job.ini文件中的元数据文件名（.mdd/.ddf文件文件名）
+        /// </summary>
         JobMetaDataName = 1021,
+        /// <summary>
+        /// 此类参数值为Job.ini文件中的.mdd文件上下文类型
+        /// </summary>
         JobContextType = 1031,
+        /// <summary>
+        /// 此类参数值为Job.ini文件中的.mdd文件语言3字符短码
+        /// </summary>
         JobLanguageShortCode = 1041,
+        /// <summary>
+        /// 此类参数值为Job.ini文件中的.mdd文件语言对应的语言长码
+        /// </summary>
         JobLanguageLongCode = 1051,
+        /// <summary>
+        /// 此类参数值为Run.mrs文件中的项目描述
+        /// </summary>
         JobDescription = 1061,
         
+        /// <summary>
+        /// 此类参数值为Manipulate文件或Tab文件内使用的MDMDocument变量
+        /// </summary>
         ManipulateMDMDocument = 2012,
+        /// <summary>
+        /// 此类参数值为Manipulate文件或Tab文件内使用的上下文类型，可为字符串、宏或变量
+        /// </summary>
         ManipulateContextType = 2022,
+        /// <summary>
+        /// 此类参数值为Manipulate文件或Tab文件内使用的语言类型，可为字符串、宏或变量
+        /// </summary>
         ManipulateLanguageType = 2032,
+        /// <summary>
+        /// 此类参数值为Manipulate文件中使用的变量名，仅指当前级别的变量，不包括上级或下级变量
+        /// </summary>
         ManipulateFieldName = 2042,
-        ManipulateCodeName = 2052,
+        /// <summary>
+        /// 此类参数值为Manipulate文件中需要修改的Category类型数据的Name属性值
+        /// </summary>
+        ManipulateCategoryName = 2052,
+        /// <summary>
+        /// 此类参数值为Manipulate文件中修改的描述值
+        /// </summary>
         ManipulateLabelText = 2062,
+        /// <summary>
+        /// 此类参数值为MDMDocument内Field的轴表达式
+        /// </summary>
         ManipulateSideAxis = 2072,
-        ManipulateRebaseBaseText = 2082,
-        ManipulateRebaseAverage = 2092,
-        ManipulateRebaseAverageVariable = 2102,
+        
+        /// <summary>
+        /// 此类参数值为Rebase函数使用的Base行描述
+        /// </summary>
+        RebaseBaseText = 2082,
+        /// <summary>
+        /// 此类参数值为Rebase函数是否添加均值，需要是true或false
+        /// </summary>
+        RebaseMean = 2092,
+        /// <summary>
+        /// 此类参数值为Rebase函数添加的均值计算变量名
+        /// </summary>
+        RebaseMeanVariable = 2102,
 
+        /// <summary>
+        /// 此类参数值为向轴表达式添加均值计算时插入函数的均值计算变量名
+        /// </summary>
+        ManipulateFunctionMeanVariable = 2112,
+
+        /// <summary>
+        /// 此类参数值为Tab文件中使用的TableDocument对象
+        /// </summary>
         TableTableDocument = 3012,
+        /// <summary>
+        /// 此类参数值为Tab文件中添加表格函数的表头变量名
+        /// </summary>
         TableTopVariableName = 3022,
+        /// <summary>
+        /// 此类参数值为Tab文件中添加表格函数的表侧变量名
+        /// </summary>
         TableSideVariableName = 3032,
+        /// <summary>
+        /// 此类参数值为Tab文件中添加表格函数的标题文本
+        /// </summary>
         TableTitleText = 3042,
+        /// <summary>
+        /// 此类参数值为Tab文件中添加表格函数的Base文本描述
+        /// </summary>
         TableBaseText = 3052,
+        /// <summary>
+        /// 此类参数值为Tab文件中添加表格函数的Table Filter
+        /// </summary>
         TableFilterText = 3062,
+        /// <summary>
+        /// 此类参数值为Tab文件中额外添加的描述文本
+        /// </summary>
         TableLabelText = 3072,
+        /// <summary>
+        /// 此类参数值为Tab文件中添加GridSlice Table时需要指定出示的表头码号
+        /// </summary>
         TableGridSliceShowCodes = 3082,
+        /// <summary>
+        /// 此类参数值为Tab文件中添加GridSlice Table时需要添加的额外表侧轴表达式
+        /// </summary>
         TableGridSliceAdditionAxis = 3092,
+        /// <summary>
+        /// 此类参数值为Tab文件中表格名称开头表格标记，一般Grid表格为"TG"，其他为"T"
+        /// </summary>
         TableTypeSpecifyWord = 3102,
 
-        ScriptDeclaration = 401,
-        ScriptLowerBoundary = 402,
-        ScriptUpperBoundary = 403,
-        ScriptForVariable = 404,
-        ScriptCollection = 405,
-        ScriptTest = 406,
-        ScriptBody = 407,
-        ScriptLoopVariables = 408,
-        ScriptTopField = 409,
-        ScriptLevelField = 410,
-        ScriptObjectName = 411,
-        ScriptFunctionTemplate = 412,
-        ScriptBinaryLeft = 413,
-        ScriptBinaryRight = 414,
+        ///// <summary>
+        ///// 此类参数值为脚本中单个变量声明
+        ///// </summary>
+        //ScriptDeclaration = 401,
+        ///// <summary>
+        ///// 此类参数值为脚本中For循环的循环下限
+        ///// </summary>
+        //ScriptLowerBoundary = 402,
+        ///// <summary>
+        ///// 此类参数值为脚本中For循环的循环上限
+        ///// </summary>
+        //ScriptUpperBoundary = 403,
+        ///// <summary>
+        ///// 此类参数值为脚本中For循环或ForEach循环使用的变量名
+        ///// </summary>
+        //ScriptForVariable = 404,
+        ///// <summary>
+        ///// 此类参数值为脚本中ForEach循环中的集合对象
+        ///// </summary>
+        //ScriptCollection = 405,
+        ///// <summary>
+        ///// 此类参数值为脚本中If语句中的条件判断部分
+        ///// </summary>
+        //ScriptTest = 406,
+        ///// <summary>
+        ///// 此类参数值为脚本中的各种Block语句
+        ///// </summary>
+        //ScriptBody = 407,
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        //ScriptLoopVariables = 408,
+        //ScriptTopField = 409,
+        //ScriptLevelField = 410,
+        //ScriptObjectName = 411,
+        //ScriptFunctionTemplate = 412,
+        //ScriptBinaryLeft = 413,
+        //ScriptBinaryRight = 414,
 
         FunctionTemplate = 501,
         FunctionName = 502,

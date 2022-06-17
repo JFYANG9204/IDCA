@@ -239,13 +239,43 @@ namespace IDCA.Model.Template
     public enum FunctionTemplateFlags
     {
         None = 0,
-
+        /// <summary>
+        /// 此类函数用于在Manipulate文件中修改变量标题
+        /// </summary>
         ManipulateTitleLabel = 101,
-        ManipulateSideLabel = 102,
+        /// <summary>
+        /// 此类函数用于在Manipulate文件中修改变量表侧单项的描述
+        /// </summary>
+        ManipulateSideResponseLabel = 102,
+        /// <summary>
+        /// 此类函数用于在Manipulate文件中修改变量的轴表达式
+        /// </summary>
         ManipulateSideAxis = 103,
-        ManipulateTypeLabel = 104,
-        ManipulateAxisAverage = 105,
-        ManipulateAxisRebase = 106,
+        /// <summary>
+        /// 此类函数用于在Manipulate文件中给已存在的轴表达式末尾添加平均提及个数的计算值。
+        /// 注意：
+        /// 此函数类型与ManipulateAxisAverage的区别是：
+        /// 此类函数不用于插入到轴表达式中，
+        /// 而ManipulateAxisAverage用于直接插入到轴表达式中
+        /// </summary>
+        ManipulateSideAverage = 104,
+        /// <summary>
+        /// 此类函数用于在Manipulate文件中用于修改Category列表定义的单项描述
+        /// </summary>
+        ManipulateTypeSideResponseLabel = 105,
+        /// <summary>
+        /// 此类函数用于在Manipulate文件中，向轴表达式中插入平均提及个数计算值。
+        /// 注意：
+        /// 此类函数会直接插入到轴表达式文本内，所以，此类函数必须要返回字符串类型的返回值。
+        /// </summary>
+        ManipulateAxisAverage = 106,
+        /// <summary>
+        /// 此类函数用于在Manipulate文件中，向轴表达式中插入计算平均值的内容。
+        /// 此类函数会直接插入到轴表达式文本内，所以，此类函数必须要返回字符串类型的返回值。
+        /// </summary>
+        ManipulateAxisMean = 107,
+
+        ManipulateAxisRebase = 108,
 
         TableNormal = 201,
         TableGrid = 202,

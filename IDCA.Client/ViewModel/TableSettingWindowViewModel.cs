@@ -189,7 +189,7 @@ namespace IDCA.Client.ViewModel
 
         public void AppendNewTables(string name = "")
         {
-            var vm = new TableSettingViewModel(_spec.NewTables(name), _spec.Config);
+            var vm = new TableSettingViewModel(_spec.NewTables(name), _spec.Config, _spec.Templates);
             vm.AddHeaderInfos(false, _spec.GetHeaderNames());
             vm.BeforeRemoved += ValidateTablesName;
             vm.Renamed += OnTablesRenamed;

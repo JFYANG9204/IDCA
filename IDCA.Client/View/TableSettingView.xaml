@@ -252,7 +252,7 @@
 
                                     <GridSplitter/>
 
-                                    <RadioButton GroupName="AppendMeanOrAverage"
+                                    <RadioButton GroupName="{Binding Table.Name}"
                                                  Margin="5"
                                                  FontSize="15"
                                                  FontFamily="{StaticResource IDCA.Font.Family}"
@@ -260,7 +260,7 @@
                                                  IsChecked="{Binding DonotAppendMeanOrAverage}"
                                                  >不添加均值</RadioButton>
 
-                                    <RadioButton GroupName="AppendMeanOrAverage"
+                                    <RadioButton GroupName="{Binding Table.Name}"
                                                  Margin="5"
                                                  FontSize="15"
                                                  FontFamily="{StaticResource IDCA.Font.Family}"
@@ -268,7 +268,7 @@
                                                  IsChecked="{Binding AppendMean}"
                                                  >添加平均值</RadioButton>
 
-                                    <RadioButton GroupName="AppendMeanOrAverage"
+                                    <RadioButton GroupName="{Binding Table.Name}"
                                                  Margin="5"
                                                  FontSize="15"
                                                  FontFamily="{StaticResource IDCA.Font.Family}"
@@ -278,10 +278,8 @@
 
                                     <GridSplitter/>
 
-                                    <Button Width="120" 
-                                            Command="{Binding AxisSettingCommand}">配置轴表达式</Button>
-                                    
-                                    <GridSplitter/>
+                                    <TextBlock>均值变量</TextBlock>
+                                    <TextBox Text="{Binding MeanVariable}"/>
 
                                 </StackPanel>
 
@@ -308,20 +306,28 @@
                                     <GridSplitter/>
 
                                     <TextBlock>选项顺序</TextBlock>
-                                    <ComboBox ItemsSource="{Binding FactorSequence}"
+                                    <ComboBox Width="60" 
+                                              ItemsSource="{Binding FactorSequence}"
                                               SelectedIndex="{Binding FactorSequenceSelectedIndex}"/>
 
                                     <GridSplitter/>
 
                                     <TextBlock>NPS Top Box</TextBlock>
-                                    <TextBox Width="50" Text="{Binding NpsTopBox}"/>
+                                    <TextBox Width="30" 
+                                             HorizontalContentAlignment="Center"
+                                             Text="{Binding NpsTopBox}"/>
 
                                     <GridSplitter/>
 
                                     <TextBlock>NPS Bottom Box</TextBlock>
-                                    <TextBox Width="50" Text="{Binding NpsBottomBox}"/>
+                                    <TextBox Width="30" 
+                                             HorizontalContentAlignment="Center"
+                                             Text="{Binding NpsBottomBox}"/>
 
                                     <GridSplitter/>
+
+                                    <Button Width="110" 
+                                            Command="{Binding AxisSettingCommand}">配置轴表达式</Button>
 
                                 </StackPanel>
                                 

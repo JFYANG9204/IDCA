@@ -1,6 +1,7 @@
 ﻿using IDCA.Model;
 using IDCA.Model.MDM;
 using IDCA.Model.Spec;
+using IDCA.Model.Template;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -19,16 +20,34 @@ namespace IDCA.Bll
         public const string DefaultAxisNetLabelSeparater = ":";
         public const string DefaultAxisNetCodeSeparater = ",";
         public const string DefaultAxisNetCodeRangeSeparater = "-";
+        public const string DefaultAxisMeanLabel = "AVERAGE";
+        public const string DefaultAxisStdDevLabel = "STANDARD DEVIATION";
+        public const string DefaultAxisStdErrLabel = "STANDARD ERROR";
 
-        public AxisOperator(Axis axis, Config config)
+        public AxisOperator(Axis axis, Config config, TemplateCollection templates)
         {
             _axis = axis;
             _config = config;
+            _templates = templates;
             LoadConfig();
+
+            _appendMean = false;
+            _appendAverage = false;
+
+            _axisMeanFunction = _templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateAxisMean);
+            _axisAverageFunction = _templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateAxisAverage);
+
+            _meanVariable = string.Empty;
         }
 
         readonly Axis _axis;
         readonly Config _config;
+        readonly TemplateCollection _templates;
+        
+        /// <summary>
+        /// 当前修改器修改的轴表达式对象
+        /// </summary>
+        public Axis Axis => _axis;
 
         // 配置属性
 
@@ -47,6 +66,9 @@ namespace IDCA.Bll
             _netCodeSeparater = _config.TryGet<string>(SpecConfigKeys.TableSettingNetCodeSeparater) ?? DefaultAxisNetCodeSeparater;
             _netCodeRangeSeparater = _config.TryGet<string>(SpecConfigKeys.TableSettingNetCodeRangeSeparater) ?? DefaultAxisNetCodeRangeSeparater;
         }
+
+        FunctionTemplate? _axisMeanFunction;
+        FunctionTemplate? _axisAverageFunction;
 
         AxisNetType _netType = AxisNetType.StandardNet;
         /// <summary>
@@ -110,6 +132,50 @@ namespace IDCA.Bll
             set { _npsBottomBox = value; }
         }
 
+        bool _appendMean;
+        /// <summary>
+        /// 当前轴表达式是否添加均值，和AppendAverage不能同时为true
+        /// </summary>
+        public bool AppendMean
+        {
+            get { return _appendMean; }
+            set 
+            { 
+                _appendMean = value;
+                if (value)
+                {
+                    _appendAverage = false;
+                }
+            }
+        }
+
+        bool _appendAverage;
+        /// <summary>
+        /// 当前轴表达式是否添加平均提及数，和AppendMean不能同时为true
+        /// </summary>
+        public bool AppendAverage
+        {
+            get { return _appendAverage; }
+            set 
+            { 
+                _appendAverage = value;
+                if (value)
+                {
+                    _appendMean = false;
+                }
+            }
+        }
+
+        string _meanVariable;
+        /// <summary>
+        /// 用于计算均值/标准差/标准误差的变量，可以是null
+        /// </summary>
+        public string MeanVariable
+        {
+            get { return _meanVariable; }
+            set { _meanVariable = value; }
+        }
+
         Field? _field = null;
         /// <summary>
         /// 当前轴表达式对应变量的MDMField对象，用来查询使用的码号
@@ -133,6 +199,7 @@ namespace IDCA.Bll
             _axis.AppendCategoryRange();
             _axis.AppendText();
             _axis.AppendSubTotal(_sigmaLabel);
+            AppendMeanStdDevStdErr();
         }
 
         /// <summary>
@@ -231,6 +298,28 @@ namespace IDCA.Bll
             total.Suffix.AppendIsHidden(true);
         }
 
+        void AppendMeanStdDevStdErr()
+        {
+            if (!_appendMean)
+            {
+                return;
+            }
+
+            // 优先添加已有的函数模板
+            if (_axisMeanFunction != null)
+            {
+                _axisMeanFunction.SetFunctionParameterValue(_meanVariable, TemplateValueType.Variable, TemplateParameterUsage.ManipulateFunctionMeanVariable);
+                _axis.AppendInsertFunction(_axisMeanFunction);
+            }
+            else
+            {
+                _axis.AppendText();
+                _axis.AppendMean(DefaultAxisMeanLabel, _meanVariable).Suffix.AppendDecimals(2);
+                _axis.AppendStdDev(DefaultAxisStdDevLabel, _meanVariable).Suffix.AppendDecimals(2);
+                _axis.AppendStdErr(DefaultAxisStdErrLabel, _meanVariable).Suffix.AppendDecimals(2);
+            }
+        }
+
         /// <summary>
         /// 创建基于MDMField对象分类选项列表的Top/Bottom Box轴表达式，允许添加NPS和多个Box
         /// </summary>
@@ -304,6 +393,8 @@ namespace IDCA.Bll
                     AppendNps();
                 }
             }
+
+            AppendMeanStdDevStdErr();
 
         }
 
@@ -505,6 +596,7 @@ namespace IDCA.Bll
             {
                 netElements.ForEach(e => _axis.AppendCombine(e.Label, e.Codes));
             }
+            AppendMeanStdDevStdErr();
 
         }
 
