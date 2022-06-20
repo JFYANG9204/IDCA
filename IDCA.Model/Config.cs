@@ -151,6 +151,9 @@ namespace IDCA.Model
         /// </summary>
         public const string AxisTopBottomBoxPositon = "AxisTopBottomBoxPositon";
         public const string AxisCombinePosition = "AxisCombinePosition";
+        public const string AxisAverageMentionLabel = "AxisAverageMentionLabel";
+        public const string AxisAverageMentionBlankRow = "AxisAverageMentionBlankRow";
+        public const string AxisAverageMentionDecimals = "AxisAverageMentionDecimals";
         public const string TableSummaryLabel = "TableSummaryLabel";
         // Table Setting
         public const string TableSettingNetLabelCodeSeparater = "TableSettingNetLabelCodeSeparater";

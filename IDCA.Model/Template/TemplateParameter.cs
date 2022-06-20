@@ -68,24 +68,36 @@ namespace IDCA.Model.Template
         /// 此类参数值为MDMDocument内Field的轴表达式
         /// </summary>
         ManipulateSideAxis = 2072,
+        /// <summary>
+        /// 此类参数值为Manipulate文件中涉及到跳过码号的内容
+        /// </summary>
+        ManipulateExclude = 2082,
+        /// <summary>
+        /// 此类参数值为Manipulate文件中是否添加额外空白行
+        /// </summary>
+        ManipulateBlanckRow = 2092,
+        /// <summary>
+        /// 此类参数值为Manipulate文件中保留小数位的配置
+        /// </summary>
+        ManipulateDecimals = 2102,
         
         /// <summary>
         /// 此类参数值为Rebase函数使用的Base行描述
         /// </summary>
-        RebaseBaseText = 2082,
+        RebaseBaseText = 2112,
         /// <summary>
         /// 此类参数值为Rebase函数是否添加均值，需要是true或false
         /// </summary>
-        RebaseMean = 2092,
+        RebaseMean = 2122,
         /// <summary>
         /// 此类参数值为Rebase函数添加的均值计算变量名
         /// </summary>
-        RebaseMeanVariable = 2102,
+        RebaseMeanVariable = 2132,
 
         /// <summary>
         /// 此类参数值为向轴表达式添加均值计算时插入函数的均值计算变量名
         /// </summary>
-        ManipulateFunctionMeanVariable = 2112,
+        ManipulateFunctionMeanVariable = 2142,
 
         /// <summary>
         /// 此类参数值为Tab文件中使用的TableDocument对象

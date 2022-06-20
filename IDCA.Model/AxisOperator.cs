@@ -23,6 +23,7 @@ namespace IDCA.Bll
         public const string DefaultAxisMeanLabel = "AVERAGE";
         public const string DefaultAxisStdDevLabel = "STANDARD DEVIATION";
         public const string DefaultAxisStdErrLabel = "STANDARD ERROR";
+        public const string DefaultAxisAverageMentionLabel = "AVERAGE MENTION";
 
         public AxisOperator(Axis axis, Config config, TemplateCollection templates)
         {
@@ -35,7 +36,7 @@ namespace IDCA.Bll
             _appendAverage = false;
 
             _axisMeanFunction = _templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateAxisMean);
-            _axisAverageFunction = _templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateAxisAverage);
+            //_axisAverageFunction = _templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateAxisAverage);
 
             _meanVariable = string.Empty;
         }
@@ -58,6 +59,9 @@ namespace IDCA.Bll
             _baseText = _config.TryGet<string>(SpecConfigKeys.AxisSigmaLabel) ?? DefaultAxisBaseLabel;
             _addSigma = _config.TryGet<bool>(SpecConfigKeys.AxisAddSigma);
             _sigmaLabel = _config.TryGet<string>(SpecConfigKeys.AxisSigmaLabel) ?? DefaultAxisSigmaLabel;
+            _averageMentionLabel = _config.TryGet<string>(SpecConfigKeys.AxisAverageMentionLabel) ?? DefaultAxisAverageMentionLabel;
+            _averageMentionDecimals = _config.TryGet<int>(SpecConfigKeys.AxisAverageMentionDecimals);
+            _averageMentionBlanckRow = _config.TryGet<bool>(SpecConfigKeys.AxisAverageMentionBlankRow);
             _emptyLineSeparator = _config.TryGet<bool>(SpecConfigKeys.AxisNetInsertEmptyLine);
             _netAheadLabel = _config.TryGet<string>(SpecConfigKeys.AxisNetAheadLabel) ?? DefaultAxisNetAheadLabel;
             _npsTopBox = _config.TryGet<int>(SpecConfigKeys.AxisNpsTopBox);
@@ -68,7 +72,7 @@ namespace IDCA.Bll
         }
 
         readonly FunctionTemplate? _axisMeanFunction;
-        readonly FunctionTemplate? _axisAverageFunction;
+        //readonly FunctionTemplate? _axisAverageFunction;
 
         AxisNetType _netType = AxisNetType.StandardNet;
         /// <summary>
@@ -88,6 +92,12 @@ namespace IDCA.Bll
         bool _addSigma = false;
         // Sigma行的默认描述
         string _sigmaLabel = DefaultAxisSigmaLabel;
+        // 计算均值行的默认描述
+        string _averageMentionLabel = DefaultAxisAverageMentionLabel;
+        // 计算均值行的保留小数位数
+        int _averageMentionDecimals = 2;
+        // 是否在均值行前插入空白行
+        bool _averageMentionBlanckRow = true;
         // 是否在两个Net中间插入空白行
         bool _emptyLineSeparator = false;
         // Net行标签开头描述
@@ -200,6 +210,7 @@ namespace IDCA.Bll
             _axis.AppendText();
             _axis.AppendSubTotal(_sigmaLabel);
             AppendMeanStdDevStdErr();
+            AppendAverageMention();
         }
 
         /// <summary>
@@ -327,15 +338,25 @@ namespace IDCA.Bll
                 return;
             }
 
-            if (_axisAverageFunction != null)
+            //if (_axisAverageFunction != null)
+            //{
+            //    _axisAverageFunction.SetFunctionParameterValue(_field?.FullName ?? string.Empty, TemplateValueType.String, TemplateParameterUsage.ManipulateFieldName);
+            //    _axisAverageFunction.SetFunctionParameterValue(_averageMentionLabel, TemplateValueType.String, TemplateParameterUsage.ManipulateLabelText);
+            //    _axisAverageFunction.SetFunctionParameterValue(_averageMentionDecimals.ToString(), TemplateValueType.String, TemplateParameterUsage.ManipulateDecimals);
+            //    _axisAverageFunction.SetFunctionParameterValue(_averageMentionBlanckRow.ToString(), TemplateValueType.Expression, TemplateParameterUsage.ManipulateBlanckRow);
+            //    _axisAverageFunction.SetFunctionParameterValue("Null", TemplateValueType.Expression, TemplateParameterUsage.ManipulateExclude);
+            //}
+            //else
+            //{
+            _axis.AppendSubTotal().Suffix.AppendIsHidden(true);
+            if (_averageMentionBlanckRow)
             {
-                _axisAverageFunction.SetFunctionParameterValue(_field?.FullName ?? string.Empty, TemplateValueType.String, TemplateParameterUsage.ManipulateFieldName);
+                _axis.AppendText();
             }
-            else
-            {
-                _axis.AppendSubTotal().Suffix.AppendIsHidden(true);
-                _axis.AppendText();                
-            }
+            _axis.AppendNamedNet("AverageBase").Suffix.AppendIsHidden(true);
+            _axis.AppendSubTotal("AverageSubTotal").Suffix.AppendIsHidden(true);
+            _axis.AppendNamedDerived("AverageMention", _averageMentionLabel, "AverageSubTotal/AverageBase").Suffix.AppendDecimals(_averageMentionDecimals);
+            //}
         }
 
         /// <summary>
@@ -615,7 +636,7 @@ namespace IDCA.Bll
                 netElements.ForEach(e => _axis.AppendCombine(e.Label, e.Codes));
             }
             AppendMeanStdDevStdErr();
-
+            AppendAverageMention();
         }
 
 
