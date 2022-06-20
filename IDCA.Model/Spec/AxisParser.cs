@@ -1,4 +1,6 @@
 ﻿
+using System.Text.RegularExpressions;
+
 namespace IDCA.Model.Spec
 {
     public class AxisParser
@@ -444,7 +446,8 @@ namespace IDCA.Model.Spec
                    character == '@' || 
                    character == '#' ||
                    character == '_' ||
-                   character == '$';
+                   character == '$' ||
+                   Regex.IsMatch(character.ToString(), @"[\u4e00-\u9fa5]");
         }
 
 

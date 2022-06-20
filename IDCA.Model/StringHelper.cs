@@ -124,5 +124,19 @@ namespace IDCA.Model
             return Regex.IsMatch(source, @"[0-9.]+");
         }
 
+        /// <summary>
+        /// 判断文本是否是有效的MDM脚本名称
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        internal static bool ValidateElementName(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return false;
+            }
+            return Regex.IsMatch(name, @"[a-zA-Z_$#@\u4e00-\u9fa5]{1}[a-zA-Z_0-9$#@\u4e00-\u9fa5]*");
+        }
+
     }
 }

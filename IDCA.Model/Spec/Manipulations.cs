@@ -142,6 +142,7 @@ namespace IDCA.Model.Spec
             _objectType = SpecObjectType.Manipulation;
             _field = new FieldScript(this);
             _axis = new Axis(this, AxisType.Normal);
+            _templates = new List<FunctionTemplate>();
         }
 
         readonly FieldScript _field;
@@ -153,7 +154,7 @@ namespace IDCA.Model.Spec
         FunctionTemplate? _definitionLabelFunction;
         FunctionTemplate? _axisAverageFunction;
 
-        FunctionTemplate[] _templates = Array.Empty<FunctionTemplate>();
+        readonly List<FunctionTemplate> _templates;
 
         /// <summary>
         /// 当前Field的表侧轴表达式，同一个对象只能有一个
@@ -171,6 +172,41 @@ namespace IDCA.Model.Spec
             _responseLabelFunction = templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateSideResponseLabel);
             _definitionLabelFunction = templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateTypeSideResponseLabel);
             _axisAverageFunction = templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateAxisAverage);
+        }
+
+        /// <summary>
+        /// 判断指定类型的函数模板是否可用
+        /// </summary>
+        /// <param name="flags"></param>
+        /// <returns></returns>
+        public bool IsAvailable(FunctionTemplateFlags flags)
+        {
+            if (flags == FunctionTemplateFlags.ManipulateTitleLabel)
+            {
+                return _titleFunction != null;
+            }
+
+            if (flags == FunctionTemplateFlags.ManipulateSideAxis)
+            {
+                return _axisFunction != null;
+            }
+
+            if (flags == FunctionTemplateFlags.ManipulateSideResponseLabel)
+            {
+                return _responseLabelFunction != null;
+            }
+
+            if (flags == FunctionTemplateFlags.ManipulateTypeSideResponseLabel)
+            {
+                return _definitionLabelFunction != null;
+            }
+
+            if (flags == FunctionTemplateFlags.ManipulateAxisAverage)
+            {
+                return _axisAverageFunction != null;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -196,8 +232,16 @@ namespace IDCA.Model.Spec
 
         void Add(FunctionTemplate functionTemplate)
         {
-            Array.Resize(ref _templates, _templates.Length + 1);
-            _templates[^1] = functionTemplate;
+            _templates.Add(functionTemplate);
+        }
+
+        /// <summary>
+        /// 移除所有符合指定类型的函数模板数据
+        /// </summary>
+        /// <param name="flags"></param>
+        public void RemoveAll(FunctionTemplateFlags flags)
+        {
+            _templates.RemoveAll(t => t.Flag == flags);
         }
 
         /// <summary>
@@ -272,7 +316,7 @@ namespace IDCA.Model.Spec
             {
                 return;
             }
-            FunctionTemplate? template = Array.Find(_templates, t => t.Flag == FunctionTemplateFlags.ManipulateSideAxis);
+            FunctionTemplate? template = _templates.Find(t => t.Flag == FunctionTemplateFlags.ManipulateSideAxis);
             if (template == null)
             {
                 template = (FunctionTemplate)_axisFunction.Clone();
@@ -311,7 +355,7 @@ namespace IDCA.Model.Spec
         public string Export()
         {
             // 更新Axis表达式
-            var axisFunction = Array.Find(_templates, f => f.Flag == FunctionTemplateFlags.ManipulateSideAxis);
+            var axisFunction = _templates.Find(f => f.Flag == FunctionTemplateFlags.ManipulateSideAxis);
             if (axisFunction != null)
             {
                 var parameter = axisFunction.Parameters[TemplateParameterUsage.ManipulateSideAxis];

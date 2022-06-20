@@ -170,7 +170,7 @@ namespace IDCA.Model.Spec
         /// 向当前集合的末尾添加一个text类型的轴表达式元素，可以修改标签
         /// </summary>
         /// <param name="label"></param>
-        public AxisElement AppendText(string? label = null)
+        public AxisElement AppendText(string? label = "")
         {
             return AppendNamedElement(AxisElementType.Text, label, "e");
         }

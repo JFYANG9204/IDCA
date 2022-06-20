@@ -713,8 +713,8 @@ namespace IDCA.Client.ViewModel
                 return;
             }
 
-            Checked = true;
-            Text = suffix.Value.ToString() ?? string.Empty;
+            _text = suffix.Value.ToString() ?? string.Empty;
+            _checked = true;
 
             switch (suffix.Type)
             {
@@ -1375,10 +1375,15 @@ namespace IDCA.Client.ViewModel
             element.AddSelections(selections);
             _suffixes.Add(element);
         }
-
+        /// <summary>
+        /// 判断当前输入的字符是否是作为元素名的有效值
+        /// </summary>
+        /// <param name="detail"></param>
+        /// <returns></returns>
         bool ValidateNodeName(AxisElementDetailViewModel detail)
         {
-            return !Root.NodeNames.Contains(detail.GetValue().ToLower());
+            string value = detail.GetValue();
+            return !Root.NodeNames.Contains(value.ToLower()) && StringHelper.ValidateElementName(value);
         }
 
         void OnDetailTextValueChanged(AxisElementDetailViewModel viewModel, string oldValue)
