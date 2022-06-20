@@ -122,7 +122,7 @@ namespace IDCA.Model.Spec
             };
         }
 
-        AxisElement AppendElement(AxisElementType type, string label, Action<AxisElement>? callback, params string[] parameters)
+        AxisElement AppendElement(AxisElementType type, string? label, Action<AxisElement>? callback, params string[] parameters)
         {
             AxisElement element = NewObject();
             element.Template.ElementType = type;
@@ -141,12 +141,12 @@ namespace IDCA.Model.Spec
             return element;
         }
 
-        AxisElement AppendNamedElement(AxisElementType type, string label, string name, params string[] parameters)
+        AxisElement AppendNamedElement(AxisElementType type, string? label, string name, params string[] parameters)
         {
             return AppendElement(type, label, element => element.Name = $"{name}{CountIf(type) + 1}", parameters);
         }
 
-        AxisElement AppendMeanLike(AxisElementType type, string label, string name, string variable = "", string expression = "")
+        AxisElement AppendMeanLike(AxisElementType type, string? label, string name, string variable = "", string expression = "")
         {
             if (string.IsNullOrEmpty(expression))
             {
@@ -170,7 +170,7 @@ namespace IDCA.Model.Spec
         /// 向当前集合的末尾添加一个text类型的轴表达式元素，可以修改标签
         /// </summary>
         /// <param name="label"></param>
-        public AxisElement AppendText(string label = "")
+        public AxisElement AppendText(string? label = null)
         {
             return AppendNamedElement(AxisElementType.Text, label, "e");
         }
@@ -180,7 +180,7 @@ namespace IDCA.Model.Spec
         /// </summary>
         /// <param name="label">base元素的标签</param>
         /// <param name="parameter">base元素的参数，一般为表达式或true</param>
-        public AxisElement AppendBase(string label = "", string parameter = "")
+        public AxisElement AppendBase(string? label = null, string parameter = "")
         {
             return AppendElement(AxisElementType.Base, label, item =>
             {
@@ -193,7 +193,7 @@ namespace IDCA.Model.Spec
         /// 向当前集合的末尾添加一个unweightedbase类型的轴表达式元素，可以添加标签描述
         /// </summary>
         /// <param name="label">可添加的描述</param>
-        public AxisElement AppendUnweightedBase(string label = "")
+        public AxisElement AppendUnweightedBase(string? label = null)
         {
             return AppendNamedElement(AxisElementType.UnweightedBase, label, "unweightedbase");
         }
@@ -202,7 +202,7 @@ namespace IDCA.Model.Spec
         /// 向当前集合的末尾添加一个EffectiveBase类型的轴表达式元素，可以添加标签描述
         /// </summary>
         /// <param name="label">可添加的描述</param>
-        public AxisElement AppendEffectiveBase(string label = "")
+        public AxisElement AppendEffectiveBase(string? label = null)
         {
             return AppendNamedElement(AxisElementType.EffectiveBase, label, "effectivebase");
         }
@@ -213,7 +213,7 @@ namespace IDCA.Model.Spec
         /// <param name="label">可添加的描述</param>
         /// <param name="expression">表达式</param>
         /// <returns></returns>
-        public AxisElement AppendExpression(string label = "", string expression = "")
+        public AxisElement AppendExpression(string? label = null, string expression = "")
         {
             return AppendNamedElement(AxisElementType.Expression, label, "expr", expression);
         }
@@ -238,7 +238,7 @@ namespace IDCA.Model.Spec
         /// <param name="variable">基于的变量名</param>
         /// <param name="expression">可选的筛选器表达式</param>
         /// <returns></returns>
-        public AxisElement AppendNumeric(string label = "", string variable = "", string expression = "")
+        public AxisElement AppendNumeric(string? label = null, string variable = "", string expression = "")
         {
             return AppendMeanLike(AxisElementType.Numeric, label, "numeric", variable, expression);
         }
@@ -249,7 +249,7 @@ namespace IDCA.Model.Spec
         /// <param name="label">可添加的描述</param>
         /// <param name="expression">表达式</param>
         /// <returns></returns>
-        public AxisElement AppendDerived(string label = "", string expression = "")
+        public AxisElement AppendDerived(string? label = null, string expression = "")
         {
             return AppendNamedElement(AxisElementType.Derived, label, "dev", expression);
         }
@@ -262,7 +262,7 @@ namespace IDCA.Model.Spec
         /// <param name="label"></param>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public AxisElement AppendNamedDerived(string name, string label = "", string expression = "")
+        public AxisElement AppendNamedDerived(string name, string? label = null, string expression = "")
         {
             return AppendElement(AxisElementType.Derived, label, d => d.Name = name, expression);
         }
@@ -274,7 +274,7 @@ namespace IDCA.Model.Spec
         /// <param name="variable">基于的变量名</param>
         /// <param name="expression">可选的筛选器表达式</param>
         /// <returns></returns>
-        public AxisElement AppendMean(string label = "", string variable = "", string expression = "")
+        public AxisElement AppendMean(string? label = null, string variable = "", string expression = "")
         {
             return AppendMeanLike(AxisElementType.Mean, label, "mean", variable, expression);
         }
@@ -286,7 +286,7 @@ namespace IDCA.Model.Spec
         /// <param name="variable">基于的变量名</param>
         /// <param name="expression">可选的筛选器表达式</param>
         /// <returns></returns>
-        public AxisElement AppendStdErr(string label = "", string variable = "", string expression = "")
+        public AxisElement AppendStdErr(string? label = null, string variable = "", string expression = "")
         {
             return AppendMeanLike(AxisElementType.StdErr, label, "stderr", variable, expression);
         }
@@ -298,7 +298,7 @@ namespace IDCA.Model.Spec
         /// <param name="variable">基于的变量名</param>
         /// <param name="expression">可选的筛选器表达式</param>
         /// <returns></returns>
-        public AxisElement AppendStdDev(string label = "", string variable = "", string expression = "")
+        public AxisElement AppendStdDev(string? label = null, string variable = "", string expression = "")
         {
             return AppendMeanLike(AxisElementType.StdDev, label, "stddev", variable, expression);
         }
@@ -308,7 +308,7 @@ namespace IDCA.Model.Spec
         /// </summary>
         /// <param name="label">可添加的描述</param>
         /// <returns></returns>
-        public AxisElement AppendTotal(string label = "")
+        public AxisElement AppendTotal(string? label = null)
         {
             return AppendNamedElement(AxisElementType.Total, label, "total");
         }
@@ -318,7 +318,7 @@ namespace IDCA.Model.Spec
         /// </summary>
         /// <param name="label">可添加的描述</param>
         /// <returns></returns>
-        public AxisElement AppendSubTotal(string label = "")
+        public AxisElement AppendSubTotal(string? label = null)
         {
             return AppendNamedElement(AxisElementType.SubTotal, label, "subTotal");
         }
@@ -330,7 +330,7 @@ namespace IDCA.Model.Spec
         /// <param name="variable">基于的变量名</param>
         /// <param name="expression">可选的筛选器表达式</param>
         /// <returns></returns>
-        public AxisElement AppendMin(string label = "", string variable = "", string expression = "")
+        public AxisElement AppendMin(string? label = null, string variable = "", string expression = "")
         {
             return AppendMeanLike(AxisElementType.Min, label, "min", variable, expression);
         }
@@ -342,7 +342,7 @@ namespace IDCA.Model.Spec
         /// <param name="variable">基于的变量名</param>
         /// <param name="expression">可选的筛选器表达式</param>
         /// <returns></returns>
-        public AxisElement AppendMax(string label = "", string variable = "", string expression = "")
+        public AxisElement AppendMax(string? label = null, string variable = "", string expression = "")
         {
             return AppendMeanLike(AxisElementType.Max, label, "max", variable, expression);
         }
@@ -353,7 +353,7 @@ namespace IDCA.Model.Spec
         /// <param name="label">可添加的描述</param>
         /// <param name="codes">需要包含的码号</param>
         /// <returns></returns>
-        public AxisElement AppendNet(string label = "", string codes = "")
+        public AxisElement AppendNet(string? label = null, string codes = "")
         {
             return AppendNamedElement(AxisElementType.Net, label, "net", codes);
         }
@@ -364,19 +364,31 @@ namespace IDCA.Model.Spec
         /// <param name="label">可添加的描述</param>
         /// <param name="codes">需要包含的码号</param>
         /// <returns></returns>
-        public AxisElement AppendCombine(string label = "", string codes = "")
+        public AxisElement AppendCombine(string? label = null, string codes = "..")
         {
             return AppendNamedElement(AxisElementType.Combine, label, "com", codes);
         }
 
         /// <summary>
-        /// 向集合末尾添加一个Combine类型的轴表达式元素，元素名不可忽略
+        /// 向集合末尾添加一个可命名的Net类型的轴表达式元素
+        /// </summary>
+        /// <param name="name">元素名</param>
+        /// <param name="label">元素描述</param>
+        /// <param name="codes"></param>
+        /// <returns></returns>
+        public AxisElement AppendNamedNet(string name, string? label = null, string codes = "..")
+        {
+            return AppendElement(AxisElementType.Net, label, net => net.Name = name, codes);
+        }
+
+        /// <summary>
+        /// 向集合末尾添加一个可命名的Combine类型的轴表达式元素
         /// </summary>
         /// <param name="name"></param>
         /// <param name="label"></param>
         /// <param name="codes"></param>
         /// <returns></returns>
-        public AxisElement AppendNamedCombine(string name, string label = "", string codes = "")
+        public AxisElement AppendNamedCombine(string name, string? label = null, string codes = "..")
         {
             return AppendElement(AxisElementType.Combine, label, combine => combine.Name = name, codes);
         }
@@ -387,7 +399,7 @@ namespace IDCA.Model.Spec
         /// <param name="variable">基于的变量名</param>
         /// <param name="expression">可选的筛选器表达式</param>
         /// <returns></returns>
-        public AxisElement AppendSum(string label = "", string variable = "", string expression = "")
+        public AxisElement AppendSum(string? label = null, string variable = "", string expression = "")
         {
             return AppendMeanLike(AxisElementType.Sum, label, "sum", variable, expression);
         }
@@ -399,7 +411,7 @@ namespace IDCA.Model.Spec
         /// <param name="variable">基于的变量名</param>
         /// <param name="expression">可选的筛选器表达式</param>
         /// <returns></returns>
-        public AxisElement AppendMedian(string label = "", string variable = "", string expression = "")
+        public AxisElement AppendMedian(string? label = null, string variable = "", string expression = "")
         {
             return AppendMeanLike(AxisElementType.Median, label, "med", variable, expression);
         }
@@ -412,7 +424,7 @@ namespace IDCA.Model.Spec
         /// <param name="cutOffValue">所需要的百分比数值，如果为50，则和中位数(Median)相同</param>
         /// <param name="expression">可选的筛选器表达式</param>
         /// <returns></returns>
-        public AxisElement AppendPercentile(string label = "", string variable = "", double cutOffValue = 50, string expression = "")
+        public AxisElement AppendPercentile(string? label = null, string variable = "", double cutOffValue = 50, string expression = "")
         {
             return AppendNamedElement(AxisElementType.Percentile, label, "pt", variable, cutOffValue.ToString(), expression);
         }
@@ -424,7 +436,7 @@ namespace IDCA.Model.Spec
         /// <param name="variable">基于的变量名</param>
         /// <param name="expression">可选的筛选器表达式</param>
         /// <returns></returns>
-        public AxisElement AppendMode(string label = "", string variable = "", string expression = "")
+        public AxisElement AppendMode(string? label = null, string variable = "", string expression = "")
         {
             return AppendMeanLike(AxisElementType.Mode, label, "mode", variable, expression);
         }
@@ -434,7 +446,7 @@ namespace IDCA.Model.Spec
         /// </summary>
         /// <param name="label">可添加的描述</param>
         /// <returns></returns>
-        public AxisElement AppendNtd(string label = "")
+        public AxisElement AppendNtd(string? label = null)
         {
             return AppendNamedElement(AxisElementType.Ntd, label, "ntd");
         }
@@ -470,7 +482,7 @@ namespace IDCA.Model.Spec
         /// </summary>
         /// <param name="name"></param>
         /// <param name="label"></param>
-        public AxisElement AppendCategory(string name = "", string label = "")
+        public AxisElement AppendCategory(string name = "", string? label = null)
         {
             return AppendNamedElement(AxisElementType.Category, label, name);
         }

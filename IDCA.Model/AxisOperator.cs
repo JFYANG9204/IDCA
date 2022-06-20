@@ -67,8 +67,8 @@ namespace IDCA.Bll
             _netCodeRangeSeparater = _config.TryGet<string>(SpecConfigKeys.TableSettingNetCodeRangeSeparater) ?? DefaultAxisNetCodeRangeSeparater;
         }
 
-        FunctionTemplate? _axisMeanFunction;
-        FunctionTemplate? _axisAverageFunction;
+        readonly FunctionTemplate? _axisMeanFunction;
+        readonly FunctionTemplate? _axisAverageFunction;
 
         AxisNetType _netType = AxisNetType.StandardNet;
         /// <summary>
@@ -317,6 +317,24 @@ namespace IDCA.Bll
                 _axis.AppendMean(DefaultAxisMeanLabel, _meanVariable).Suffix.AppendDecimals(2);
                 _axis.AppendStdDev(DefaultAxisStdDevLabel, _meanVariable).Suffix.AppendDecimals(2);
                 _axis.AppendStdErr(DefaultAxisStdErrLabel, _meanVariable).Suffix.AppendDecimals(2);
+            }
+        }
+
+        void AppendAverageMention()
+        {
+            if (!_appendAverage)
+            {
+                return;
+            }
+
+            if (_axisAverageFunction != null)
+            {
+                _axisAverageFunction.SetFunctionParameterValue(_field?.FullName ?? string.Empty, TemplateValueType.String, TemplateParameterUsage.ManipulateFieldName);
+            }
+            else
+            {
+                _axis.AppendSubTotal().Suffix.AppendIsHidden(true);
+                _axis.AppendText();                
             }
         }
 
