@@ -198,6 +198,15 @@ namespace IDCA.Model.Spec
         readonly MetadataCollection _metadata;
 
         /// <summary>
+        /// 向dms文件添加的元数据配置
+        /// </summary>
+        public MetadataCollection DmsMetadata => _dmsMetadata;
+        /// <summary>
+        /// 向metadata文件添加的元数据配置
+        /// </summary>
+        public MetadataCollection Metadata => _metadata;
+
+        /// <summary>
         /// 初始化当前Spec文档，需要提供已载入的MDM文档对象
         /// </summary>
         /// <param name="mdm">MDM文档对象</param>

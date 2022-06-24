@@ -13,17 +13,18 @@
     <Grid>
 
         <Grid.Resources>
-            <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatLightBgButton}">
+            <Style TargetType="Button">
                 <Setter Property="Width" Value="100"/>
-                <Setter Property="Height" Value="30"/>
+                <Setter Property="Height" Value="25"/>
                 <Setter Property="Margin" Value="5"/>
                 <Setter Property="FontSize" Value="13"/>
+                <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
                 <Setter Property="Background" Value="{StaticResource IDCA.Brushes.Button.Background}"/>
             </Style>
         </Grid.Resources>
         
         <Grid.RowDefinitions>
-            <RowDefinition Height="50"/>
+            <RowDefinition Height="35"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
@@ -32,16 +33,16 @@
             <StackPanel.Resources>
                 <Style TargetType="TextBlock">
                     <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
-                    <Setter Property="FontSize" Value="15"/>
+                    <Setter Property="FontSize" Value="13"/>
                     <Setter Property="VerticalAlignment" Value="Center"/>
                     <Setter Property="Margin" Value="5"/>
                 </Style>
-                <Style TargetType="TextBox" BasedOn="{StaticResource MaterialDesignTextBox}">
+                <Style TargetType="TextBox">
                     <Setter Property="Width" Value="120"/>
-                    <Setter Property="Height" Value="30"/>
+                    <Setter Property="Height" Value="25"/>
                     <Setter Property="Margin" Value="5"/>
                     <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
-                    <Setter Property="FontSize" Value="14"/>
+                    <Setter Property="FontSize" Value="13"/>
                     <Setter Property="VerticalAlignment" Value="Center"/>
                     <Setter Property="VerticalContentAlignment" Value="Center"/>
                 </Style>
@@ -49,39 +50,22 @@
 
             <TextBlock>文件名称</TextBlock>
             <TextBox Text="{Binding TableName}" />
-
-            <!--<TextBlock>出示表头</TextBlock>
-            <mah:SplitButton Width="100"
-                             Height="30"
-                             Margin="5"
-                             Text="出示表头"
-                             ItemsSource="{Binding Headers}">
-                <mah:SplitButton.ItemTemplate>
-                    <DataTemplate>
-                        <CheckBox Width="{Binding RelativeSource={RelativeSource AncestorType=ComboBoxItem, Mode=FindAncestor}, Path=Width}"
-                                  Height="{Binding RelativeSource={RelativeSource AncestorType=ComboBoxItem, Mode=FindAncestor}, Path=Height}"
-                                  IsChecked="{Binding Checked}"
-                                  Content="{Binding Name}"/>
-                    </DataTemplate>
-                </mah:SplitButton.ItemTemplate>
-            </mah:SplitButton>-->
             
             <TextBlock>出示表头</TextBlock>
             <ComboBox Width="150" 
-                      Height="30" 
+                      Height="25" 
                       Margin="5"
                       IsEditable="True"
                       IsReadOnly="True"
+                      FontSize="13"
+                      FontFamily="{StaticResource IDCA.Font.Family}"
                       Text="{Binding CheckedHeaders}"
                       ItemsSource="{Binding Headers}">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
-                        <CheckBox Width="{Binding RelativeSource={RelativeSource AncestorType=ComboBox, Mode=FindAncestor}, Path=Width}"
-                                  Height="{Binding RelativeSource={RelativeSource AncestorType=ComboBoxItem, Mode=FindAncestor}, Path=Height}"
-                                  IsChecked="{Binding Checked}"
+                        <CheckBox IsChecked="{Binding Checked}"
                                   Content="{Binding Name}"
-                                  Margin="0"
-                                  Style="{StaticResource MaterialDesignUserForegroundCheckBox}"/>
+                                  Margin="0"/>
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
@@ -95,15 +79,15 @@
                           d:ItemsSource="{d:SampleData ItemCount=5}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Border Height="220" 
+                        <Border Height="195" 
                                 BorderThickness="0 0 0 1"
                                 BorderBrush="{StaticResource IDCA.Brushes.Window.BorderBrush}">
                             <Grid>
 
                                 <Grid.Resources>
-                                    <Style TargetType="TextBox" BasedOn="{StaticResource MaterialDesignTextBox}">
+                                    <Style TargetType="TextBox">
                                         <Setter Property="Width" Value="120"/>
-                                        <Setter Property="Height" Value="30"/>
+                                        <Setter Property="Height" Value="25"/>
                                         <Setter Property="Margin" Value="5"/>
                                         <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
                                         <Setter Property="FontSize" Value="14"/>
@@ -112,8 +96,9 @@
                                     </Style>
                                     <Style TargetType="Button">
                                         <Setter Property="Width" Value="120"/>
-                                        <Setter Property="Height" Value="30"/>
-                                        <Setter Property="FontSize" Value="14"/>
+                                        <Setter Property="Height" Value="25"/>
+                                        <Setter Property="FontSize" Value="13"/>
+                                        <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
                                         <Setter Property="Margin" Value="5"/>
                                         <Setter Property="VerticalContentAlignment" Value="Center"/>
                                         <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -121,7 +106,7 @@
                                     </Style>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
-                                        <Setter Property="FontSize" Value="15"/>
+                                        <Setter Property="FontSize" Value="13"/>
                                         <Setter Property="VerticalAlignment" Value="Center"/>
                                         <Setter Property="Margin" Value="5"/>
                                     </Style>
@@ -130,28 +115,48 @@
                                         <Setter Property="Width" Value="1"/>
                                         <Setter Property="Background" Value="LightGray"/>
                                     </Style>
-                                    <Style TargetType="ComboBox" BasedOn="{StaticResource MaterialDesignComboBox}">
+                                    <Style TargetType="ComboBox">
                                         <Setter Property="Width" Value="100"/>
-                                        <Setter Property="Height" Value="30"/>
+                                        <Setter Property="Height" Value="25"/>
                                         <Setter Property="Margin" Value="5"/>
+                                        <Setter Property="FontSize" Value="13"/>
+                                        <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
                                         <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                    </Style>
+                                    <Style TargetType="RadioButton">
+                                        <Setter Property="Margin" Value="5"/>
+                                        <Setter Property="FontSize" Value="13"/>
+                                        <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="HorizontalAlignment" Value="Center"/>
+                                        <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                    </Style>
+                                    <Style TargetType="CheckBox">
+                                        <Setter Property="Margin" Value="5"/>
+                                        <Setter Property="FontSize" Value="13"/>
+                                        <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="HorizontalAlignment" Value="Center"/>
+                                        <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
                                     </Style>
                                 </Grid.Resources>
                                 
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="10"/>
-                                    <RowDefinition Height="40"/>
-                                    <RowDefinition Height="40"/>
-                                    <RowDefinition Height="40"/>
-                                    <RowDefinition Height="40"/>
-                                    <RowDefinition Height="40"/>
+                                    <RowDefinition Height="35"/>
+                                    <RowDefinition Height="35"/>
+                                    <RowDefinition Height="35"/>
+                                    <RowDefinition Height="35"/>
+                                    <RowDefinition Height="35"/>
                                     <RowDefinition Height="10"/>
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="40"/>
-                                    <ColumnDefinition Width="90"/>
+                                    <ColumnDefinition Width="80"/>
                                     <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="40"/>
+                                    <ColumnDefinition Width="60"/>
                                 </Grid.ColumnDefinitions>
 
                                 <TextBlock Grid.Row="1" Grid.Column="1">描述配置</TextBlock>
@@ -238,6 +243,17 @@
 
                                     <GridSplitter/>
 
+                                    <CheckBox Margin="5"
+                                              IsChecked="{Binding AddNewVariable}"
+                                              >添加新变量</CheckBox>
+                                    
+                                    <GridSplitter/>
+
+                                    <Button Width="100" 
+                                            IsEnabled="{Binding AddNewVariable}"
+                                            Command="{Binding NewVariableSettingCommand}"
+                                            >配置新变量</Button>
+
                                 </StackPanel>
                                 
                                 <StackPanel Grid.Row="3" 
@@ -253,26 +269,14 @@
                                     <GridSplitter/>
 
                                     <RadioButton GroupName="{Binding Table.Name}"
-                                                 Margin="5"
-                                                 FontSize="15"
-                                                 FontFamily="{StaticResource IDCA.Font.Family}"
-                                                 Style="{StaticResource MaterialDesignUserForegroundRadioButton}"
                                                  IsChecked="{Binding DonotAppendMeanOrAverage}"
                                                  >不添加均值</RadioButton>
 
                                     <RadioButton GroupName="{Binding Table.Name}"
-                                                 Margin="5"
-                                                 FontSize="15"
-                                                 FontFamily="{StaticResource IDCA.Font.Family}"
-                                                 Style="{StaticResource MaterialDesignUserForegroundRadioButton}"
                                                  IsChecked="{Binding AppendMean}"
                                                  >添加平均值</RadioButton>
 
                                     <RadioButton GroupName="{Binding Table.Name}"
-                                                 Margin="5"
-                                                 FontSize="15"
-                                                 FontFamily="{StaticResource IDCA.Font.Family}"
-                                                 Style="{StaticResource MaterialDesignUserForegroundRadioButton}"
                                                  IsChecked="{Binding AppendAverage}"
                                                  >添加平均提及</RadioButton>
 
@@ -297,8 +301,7 @@
                                             <DataTemplate>
                                                 <CheckBox IsChecked="{Binding Checked}"
                                                           Content="{Binding Name}"
-                                                          Margin="0"
-                                                          Style="{StaticResource MaterialDesignUserForegroundCheckBox}"/>
+                                                          Margin="0"/>
                                             </DataTemplate>
                                         </ComboBox.ItemTemplate>
                                     </ComboBox>
@@ -326,7 +329,7 @@
 
                                     <GridSplitter/>
 
-                                    <Button Width="110" 
+                                    <Button Width="90" 
                                             Command="{Binding AxisSettingCommand}">配置轴表达式</Button>
 
                                 </StackPanel>
@@ -352,19 +355,18 @@
                                 <Button Grid.Row="1"
                                         Grid.RowSpan="5"
                                         Grid.Column="11"
-                                        Width="25"
-                                        Height="25"
+                                        Width="20"
+                                        Height="20"
                                         Command="{Binding RemoveCommand}"
                                         Background="#00000000"
-                                        Foreground="Red"
                                         HorizontalAlignment="Center"
                                         Cursor="Hand">
                                     <Button.Template>
                                         <ControlTemplate TargetType="Button">
                                             <Grid Background="{TemplateBinding Background}">
                                                 <iconPack:PackIconMaterialDesign Kind="Close"
-                                                                                 Height="25"
-                                                                                 Width="25"/>
+                                                                                 Height="15"
+                                                                                 Width="15"/>
                                             </Grid>
                                         </ControlTemplate>
                                     </Button.Template>

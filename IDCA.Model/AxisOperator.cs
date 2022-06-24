@@ -14,7 +14,7 @@ namespace IDCA.Bll
     public class AxisOperator
     {
 
-        public const string DefaultAxisBaseLabel = "Base : Total Respondent";
+        public const string DefaultAxisBaseLabel = "Total Respondent";
         public const string DefaultAxisSigmaLabel = "Sigma";
         public const string DefaultAxisNetAheadLabel = "Net.";
         public const string DefaultAxisNetLabelSeparater = ":";
@@ -56,7 +56,7 @@ namespace IDCA.Bll
         {
             _topBottomPosition = Converter.ConvertToAxisTopBottomBoxPosition(
                 _config.TryGet<AxisTopBottomBoxPosition>(SpecConfigKeys.AxisTopBottomBoxPositon));
-            _baseText = _config.TryGet<string>(SpecConfigKeys.AxisSigmaLabel) ?? DefaultAxisBaseLabel;
+            _baseText = _config.TryGet<string>(SpecConfigKeys.AxisBaseLabel) ?? DefaultAxisBaseLabel;
             _addSigma = _config.TryGet<bool>(SpecConfigKeys.AxisAddSigma);
             _sigmaLabel = _config.TryGet<string>(SpecConfigKeys.AxisSigmaLabel) ?? DefaultAxisSigmaLabel;
             _averageMentionLabel = _config.TryGet<string>(SpecConfigKeys.AxisAverageMentionLabel) ?? DefaultAxisAverageMentionLabel;

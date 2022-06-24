@@ -263,12 +263,7 @@ namespace IDCA.Client.ViewModel
             if (sideAxis.Count == 0)
             {
                 // 如果是空表达式，创建基础的表达式
-                sideAxis.AppendText();
-                sideAxis.AppendBase("Base : Total Respondent");
-                sideAxis.AppendText();
-                sideAxis.AppendCategoryRange();
-                sideAxis.AppendText();
-                sideAxis.AppendSubTotal();
+                _axisOperater.CreateBasicAxisExpression(null);
             }
             _axisViewModel = new AxisSettingViewModel(sideAxis);
             // 初始化表格类型
@@ -318,7 +313,25 @@ namespace IDCA.Client.ViewModel
 
         readonly Table _table;
         readonly AxisSettingViewModel _axisViewModel;
-        readonly AxisOperator _axisOperater;
+        readonly AxisOperator _axisOperater;        
+
+        Metadata? _metadata;
+        /// <summary>
+        /// 当前表格配置需要添加的新变量
+        /// </summary>
+        public Metadata? Metadata
+        {
+            get => _metadata;
+            set => _metadata = value;
+        }
+
+        VariableSettingViewModel? _variableSettingViewModel;
+
+        public VariableSettingViewModel? VariableSettingViewModel
+        {
+            get => _variableSettingViewModel;
+            set => _variableSettingViewModel = value;
+        }
 
         /// <summary>
         /// View Model对应的Model.Table对象
@@ -353,6 +366,57 @@ namespace IDCA.Client.ViewModel
         {
             add { _movingDown += value; }
             remove { _movingDown -= value; }
+        }
+
+        bool _addNewVariable;
+        /// <summary>
+        /// 是否添加新的变量
+        /// </summary>
+        public bool AddNewVariable
+        {
+            get { return _addNewVariable; }
+            set 
+            { 
+                SetProperty(ref _addNewVariable, value);
+                if (!value && _metadata != null)
+                {
+                    _table.Document?.DmsMetadata.Remove(_metadata.Name);
+                    _metadata = null;
+                    _variableSettingViewModel = null;
+                }
+                else if (value && _metadata == null)
+                {
+                    _metadata = _table.Document!.DmsMetadata.NewMetadata();
+                    // 创建新的变量时，验证已填入的变量名，需要同时满足：不是空字符串、名称定义合法、集合中没有重名，
+                    // 如果同时满足上述条件，将新变量名修改为当前已填入的名称
+                    if (!string.IsNullOrEmpty(_variableName) &&
+                        StringHelper.ValidateElementName(_variableName) && (
+                        _table.Document == null || (
+                        _table.Document.DmsMetadata[_variableName] == null &&
+                        _table.Document.Metadata[_variableName] == null)))
+                    {
+                        _metadata.Name = _variableName;
+                    }
+                    // 如果上述条件有任一失败，将当前变量名修改为自动设置的名称
+                    else
+                    {
+                        VariableName = _metadata.Name;
+                    }
+                    _variableSettingViewModel = new VariableSettingViewModel(_metadata);
+                    _variableSettingViewModel.BeforeRenamed += name =>
+                    {
+                        return !string.IsNullOrEmpty(name) && 
+                                StringHelper.ValidateElementName(name) && (
+                                _table.Document == null || (
+                                _table.Document.DmsMetadata[name] == null &&
+                                _table.Document.Metadata[name] == null));
+                    };
+                    _variableSettingViewModel.Renamed += vm =>
+                    {
+                        VariableName = vm.Name;
+                    };
+                }
+            }
         }
 
         bool _donotAppendMeanOrAverage;
@@ -573,7 +637,7 @@ namespace IDCA.Client.ViewModel
             set
             {
                 SetProperty(ref _npsTopBox, value);
-                if (int.TryParse(value, out int iValue))
+                if (int.TryParse(value, out int iValue) && iValue > 0)
                 {
                     _axisOperater.NpsTopBox = iValue;
                 }
@@ -590,7 +654,7 @@ namespace IDCA.Client.ViewModel
             set
             {
                 SetProperty(ref _npsBottomBox, value);
-                if (int.TryParse(value, out int iValue))
+                if (int.TryParse(value, out int iValue) && iValue > 0)
                 {
                     _axisOperater.NpsBottomBox = iValue;
                 }
@@ -718,6 +782,12 @@ namespace IDCA.Client.ViewModel
         void ShowAxisSettingDialog()
         {
             Common.WindowManager.ShowWindow("AxisSettingWindow", _axisViewModel);
+        }
+
+        public ICommand NewVariableSettingCommand => new RelayCommand(ShowNewVariableSettingDialog);
+        void ShowNewVariableSettingDialog()
+        {
+            Common.WindowManager.ShowWindow("VariableSettingWindow", _variableSettingViewModel);
         }
 
         public ICommand RemoveCommand => new RelayCommand(Remove);

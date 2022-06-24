@@ -15,6 +15,7 @@ namespace IDCA.Model.Spec
             _description = description;
             _expectValueType = expectType;
             _expectValues = expectValues;
+            _noValue = false;
         }
 
         string _description;
@@ -47,7 +48,15 @@ namespace IDCA.Model.Spec
             set => _expectValues = value;
         }
 
-
+        bool _noValue;
+        /// <summary>
+        /// 是否不需要配置值
+        /// </summary>
+        public bool NoValue
+        {
+            get => _noValue;
+            set => _noValue = value;
+        }
 
     }
 }

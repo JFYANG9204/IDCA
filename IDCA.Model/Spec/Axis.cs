@@ -64,7 +64,7 @@ namespace IDCA.Model.Spec
         public override string ToString()
         {
             string text = string.Join(", ", _items);
-            return _type == AxisType.Normal ? $"{{{text}}}" : $"axis({{{text}}}){(!string.IsNullOrEmpty(_name) ? $" as {_name} '${_label}'" : "")}";
+            return _type == AxisType.Normal ? $"{{{text}}}" : $"axis({(_type == AxisType.MetadataAxis ? "\"" : "")}{{{text}}}{(_type == AxisType.MetadataAxis ? "\"" : "")}){(!string.IsNullOrEmpty(_name) ? $" as {_name} '${_label}'" : "")}";
         }
 
         /// <summary>
@@ -510,6 +510,10 @@ namespace IDCA.Model.Spec
         /// 可以直接添加表格的表达式，由"axis("开头，右括号")"结尾
         /// </summary>
         AxisVariable,
+        /// <summary>
+        /// Metadata元数据定义时使用的轴表达式，格式：axis("{....}")
+        /// </summary>
+        MetadataAxis
     }
 
     public class AxisElement : SpecObject

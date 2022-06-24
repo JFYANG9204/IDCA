@@ -35,6 +35,8 @@ namespace IDCA.Client.ViewModel
             }
             // Fields
             _fields = new ObservableCollection<VariableSettingViewModel>();
+            _fieldTypeSelectedIndex = 0;
+            _fieldTypeSelectedItem = "";
         }
 
         readonly Metadata _metadata;
@@ -65,6 +67,16 @@ namespace IDCA.Client.ViewModel
             remove { _beforeRenamed -= value; }
         }
 
+        Action<VariableSettingViewModel>? _renamed;
+        /// <summary>
+        /// 成功修改变量名后触发的事件，此事件应该由创建此对象的父级对象配置
+        /// </summary>
+        public event Action<VariableSettingViewModel> Renamed
+        {
+            add { _renamed += value; }
+            remove { _renamed -= value; }
+        }
+
         string _name;
         /// <summary>
         /// 当前的变量名，修改前会调用BeforeRenamed回调判断传入值是否可用。
@@ -79,7 +91,49 @@ namespace IDCA.Client.ViewModel
                 {
                     SetProperty(ref _name, value);
                     _metadata.Name = value;
+                    _renamed?.Invoke(this);
                 }
+            }
+        }
+
+        string[] _fieldTypes =
+        {
+            "Long",
+            "Double",
+            "Text",
+            "Info",
+            "Categorical",
+        };
+        /// <summary>
+        /// 当前可用的变量类型
+        /// </summary>
+        public string[] FieldTypes
+        {
+            get { return _fieldTypes; }
+            set { SetProperty(ref _fieldTypes, value); }
+        }
+
+        string _fieldTypeSelectedItem;
+        /// <summary>
+        /// Field变量类型的选中项
+        /// </summary>
+        public string FieldTypeSelectedItem
+        {
+            get { return _fieldTypeSelectedItem; }
+            set { SetProperty(ref _fieldTypeSelectedItem, value); }
+        }
+
+        int _fieldTypeSelectedIndex;
+        /// <summary>
+        /// 当前选中的变量类型索引
+        /// </summary>
+        public int FieldTypeSelectedIndex
+        {
+            get { return _fieldTypeSelectedIndex; }
+            set 
+            { 
+                SetProperty(ref _fieldTypeSelectedIndex, value);
+                _metadata.Type = (MetadataType)_fieldTypeSelectedIndex;
             }
         }
 
@@ -101,7 +155,7 @@ namespace IDCA.Client.ViewModel
         /// <returns></returns>
         bool ValidatePropertyName(string name)
         {
-            return _metadata.GetProperty(name) == null;
+            return _metadata.GetProperty(name) == null && !string.IsNullOrEmpty(name);
         }
 
         /// <summary>
@@ -117,7 +171,7 @@ namespace IDCA.Client.ViewModel
         /// <summary>
         /// 创建新的Property，新的对象初始默认命名，需要后续手动修改
         /// </summary>
-        void NewProperty()
+        public void NewProperty()
         {
             string propName = "Property1";
             int count = 1;
@@ -157,6 +211,16 @@ namespace IDCA.Client.ViewModel
             _metadata.RemoveCategorical(categorical.Name);
         }
 
+        MetadataCategoryViewModel? _selectedCategory;
+        /// <summary>
+        /// 当前选中的Category元素
+        /// </summary>
+        public MetadataCategoryViewModel? SelectedCategory
+        {
+            get { return _selectedCategory; }
+            set { SetProperty(ref _selectedCategory, value); }
+        }
+
         /// <summary>
         /// 添加新的Categorical类型配置进当前列表，用于添加命令的响应
         /// </summary>
@@ -192,6 +256,48 @@ namespace IDCA.Client.ViewModel
             set { SetProperty(ref _fields, value); }
         }
 
+        VariableSettingViewModel? _selectedField;
+        /// <summary>
+        /// 下级变量树中选中的节点
+        /// </summary>
+        public VariableSettingViewModel? SelectedField
+        {
+            get { return _selectedField; }
+            set { SetProperty(ref _selectedField, value); }
+        }
+
+        Action<VariableSettingViewModel, bool>? _selected;
+        /// <summary>
+        /// 当此节点选中时触发的事件
+        /// </summary>
+        public event Action<VariableSettingViewModel, bool>? Selected
+        {
+            add { _selected += value; }
+            remove { _selected -= value; }
+        }
+
+        bool _isSelected = false;
+        /// <summary>
+        /// 当前节点是否已选中
+        /// </summary>
+        public bool IsSelected
+        {
+            get { return _isSelected; }
+            set 
+            { 
+                SetProperty(ref _isSelected, value);
+                _selected?.Invoke(this, value);
+            }
+        }
+
+        void OnFieldSelected(VariableSettingViewModel vm, bool selected)
+        {
+            if (selected)
+            {
+                SelectedField = vm;
+            }
+        }
+
         /// <summary>
         /// 判断变量名是否可用，如果可用返回true，不可用返回false
         /// </summary>
@@ -210,6 +316,17 @@ namespace IDCA.Client.ViewModel
         {
             _fields.Remove(viewModel);
             _metadata.RemoveField(viewModel.Name);
+            if (_fields.Count == 0)
+            {
+                if (_metadata.Type == MetadataType.CategoricalLoop)
+                {
+                    _metadata.Type = MetadataType.Categorical;
+                }
+                else if (_metadata.Type == MetadataType.NumericLoop)
+                {
+                    _metadata.Type = MetadataType.Long;
+                }
+            }
         }
 
         void NewField()
@@ -224,7 +341,26 @@ namespace IDCA.Client.ViewModel
             var vm = new VariableSettingViewModel(field);
             vm.BeforeRenamed += ValidateFieldName;
             vm.Removing += RemoveField;
+            if (_selected == null)
+            {
+                vm.Selected += OnFieldSelected;
+            }
+            else
+            {
+                vm.Selected += _selected;
+            }
             _fields.Add(vm);
+            if (_parent != null)
+            {
+                if (_parent.Metadata.Type == MetadataType.Categorical)
+                {
+                    _parent.Metadata.Type = MetadataType.CategoricalLoop;
+                }
+                else if (_parent.Metadata.Type == MetadataType.Long)
+                {
+                    _parent.Metadata.Type = MetadataType.NumericLoop;
+                }
+            }
         }
         /// <summary>
         /// 向当前元数据中追加新的下级变量时执行的命令
@@ -263,6 +399,17 @@ namespace IDCA.Client.ViewModel
                 vm.BeforeRenamed += ValidatePropertyName;
                 _properties.Add(vm);
             }
+            // Suffix
+            _suffixViewModels = new ObservableCollection<MetadataCategoricalSuffixViewModel>
+            {
+                new MetadataCategoricalSuffixViewModel(_categorical, MetadataCategoricalSuffixType.ElementType),
+                new MetadataCategoricalSuffixViewModel(_categorical, MetadataCategoricalSuffixType.Exclusive),
+                new MetadataCategoricalSuffixViewModel(_categorical, MetadataCategoricalSuffixType.Expression),
+                new MetadataCategoricalSuffixViewModel(_categorical, MetadataCategoricalSuffixType.Factor),
+                new MetadataCategoricalSuffixViewModel(_categorical, MetadataCategoricalSuffixType.Fix),
+                new MetadataCategoricalSuffixViewModel(_categorical, MetadataCategoricalSuffixType.Keycode),
+                new MetadataCategoricalSuffixViewModel(_categorical, MetadataCategoricalSuffixType.NoFilter)
+            };
 
         }
 
@@ -271,6 +418,16 @@ namespace IDCA.Client.ViewModel
         /// 当前修改的元数据分类选项对象
         /// </summary>
         public MetadataCategorical Categorical => _categorical;
+
+        ObservableCollection<MetadataCategoricalSuffixViewModel> _suffixViewModels;
+        /// <summary>
+        /// 当前Categorical对象的后缀对象
+        /// </summary>
+        public ObservableCollection<MetadataCategoricalSuffixViewModel> Suffixes
+        {
+            get { return _suffixViewModels; }
+            set { SetProperty(ref _suffixViewModels, value); }
+        }
 
         Action<MetadataCategoryViewModel>? _removing;
         /// <summary>
@@ -517,6 +674,7 @@ namespace IDCA.Client.ViewModel
             if (attr != null)
             {
                 _name = attr.Description;
+                _noValue = attr.NoValue;
                 if (attr.ExpectValues.Length > 0)
                 {
                     _isCombobox = true;
@@ -535,7 +693,9 @@ namespace IDCA.Client.ViewModel
                 _name = "Suffix";
                 _valueSelection = string.Empty;
                 _valueSelections = Array.Empty<string>();
+                _noValue = false;
             }
+            _isTextBox = !_isCombobox && !NoValue;
         }
 
         readonly MetadataCategorical _categorical;
@@ -592,12 +752,36 @@ namespace IDCA.Client.ViewModel
 
         bool _isCombobox;
         /// <summary>
-        /// 用于标记修改值的形式，如果为true，将出示为ComboBox，如果为false，将出示为TextBox
+        /// 用于标记修改值的方式，如果为true，将出示为ComboBox，和IsTextBox互斥
         /// </summary>
         public bool IsCombobox
         {
             get { return _isCombobox; }
-            set { SetProperty(ref _isCombobox, value); }
+            set 
+            { 
+                SetProperty(ref _isCombobox, value);
+                if (value)
+                {
+                    _isTextBox = false;
+                }
+            }
+        }
+
+        bool _isTextBox;
+        /// <summary>
+        /// 用于标记修改值的方式，如果为true，将出示TextBox，和IsComboBox互斥
+        /// </summary>
+        public bool IsTextBox
+        {
+            get { return _isTextBox; }
+            set 
+            { 
+                SetProperty(ref _isTextBox, value);
+                if (value)
+                {
+                    _isCombobox = false;
+                }
+            }
         }
 
         string[] _valueSelections;
@@ -611,7 +795,9 @@ namespace IDCA.Client.ViewModel
         }
 
         string _valueSelection;
-
+        /// <summary>
+        /// 如果当前值配置方法为ComboBox选取值，此属性绑定选中值
+        /// </summary>
         public string ValueSelection
         {
             get { return _valueSelection; }
@@ -622,6 +808,15 @@ namespace IDCA.Client.ViewModel
             }
         }
 
+        bool _noValue;
+        /// <summary>
+        /// 是否不需要配置值
+        /// </summary>
+        public bool NoValue
+        {
+            get { return _noValue; }
+            set { SetProperty(ref _noValue, value); }
+        }
 
     }
 

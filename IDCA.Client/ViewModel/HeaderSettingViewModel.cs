@@ -17,6 +17,10 @@ namespace IDCA.Client.ViewModel
             _metadata = metadata;
             _headerName = metadata.Name;
             _elements = new ObservableCollection<HeaderSettingElementViewModel>();
+            // 创建基础的轴表达式
+            var axis = _metadata.CreateAxis();
+            axis.AppendBase().Suffix.AppendIsHidden(true);
+            axis.AppendCategoryRange();
         }
 
         readonly Metadata _metadata;

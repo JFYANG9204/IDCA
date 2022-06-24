@@ -3,10 +3,16 @@
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
     <FontFamily x:Key="IDCA.Font.Family.English">Calibri</FontFamily>
-    <FontFamily x:Key="IDCA.Font.Family">微软雅黑</FontFamily>
+    <FontFamily x:Key="IDCA.Font.Family">等线</FontFamily>
+    <FontFamily x:Key="IDCA.Font.Family.Button">华文中宋</FontFamily>
     
     <sys:Double x:Key="IDCA.Font.Size.Start.Title">20</sys:Double>
     <sys:Double x:Key="IDCA.Font.Size.TextBlock.Label">15</sys:Double>
     <sys:Double x:Key="IDCA.Font.Size.Content">14</sys:Double>
 
+    <Style x:Key="IDCA.Font.Base" TargetType="Control">
+        <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
+        <Setter Property="FontSize" Value="13"/>
+    </Style>
+    
 </ResourceDictionary>

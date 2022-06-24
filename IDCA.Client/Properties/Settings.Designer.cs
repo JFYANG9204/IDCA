@@ -48,7 +48,7 @@ namespace IDCA.Client.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Base : ")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Total Respondents")]
         public string AxisBaseLabel {
             get {
                 return ((string)(this["AxisBaseLabel"]));
@@ -139,6 +139,30 @@ namespace IDCA.Client.Properties {
             }
             set {
                 this["TemplateRootPath"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
+        public int AxisNpsTopBox {
+            get {
+                return ((int)(this["AxisNpsTopBox"]));
+            }
+            set {
+                this["AxisNpsTopBox"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("7")]
+        public int AxisNpsBottomBox {
+            get {
+                return ((int)(this["AxisNpsBottomBox"]));
+            }
+            set {
+                this["AxisNpsBottomBox"] = value;
             }
         }
     }

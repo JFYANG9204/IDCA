@@ -9,7 +9,7 @@
       <Value Profile="(Default)">V</Value>
     </Setting>
     <Setting Name="AxisBaseLabel" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Base : </Value>
+      <Value Profile="(Default)">Total Respondents</Value>
     </Setting>
     <Setting Name="AxisSigmaLabel" Type="System.String" Scope="User">
       <Value Profile="(Default)">Sigma</Value>
@@ -31,6 +31,12 @@
     </Setting>
     <Setting Name="TemplateRootPath" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="AxisNpsTopBox" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">2</Value>
+    </Setting>
+    <Setting Name="AxisNpsBottomBox" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">7</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -219,6 +219,22 @@ namespace IDCA.Model.Spec
             return property;
         }
 
+        Axis? _axis;
+        /// <summary>
+        /// 当前元数据的轴配置，可以为空，如果不为null，将在转换成字符串时插入到最后的';'之前
+        /// </summary>
+        public Axis? Axis => _axis;
+        /// <summary>
+        /// 创建当前元数据的轴表达式对象，如果已存在，会重新创建新的并替换原有数据
+        /// </summary>
+        /// <returns></returns>
+        public Axis CreateAxis()
+        {
+            var axis = new Axis(this, AxisType.MetadataAxis);
+            _axis = axis;
+            return axis;
+        }
+
         /// <summary>
         /// 将当前配置导出为字符串
         /// </summary>
@@ -317,6 +333,12 @@ namespace IDCA.Model.Spec
                 builder.AppendLine($"{indent}) expand");
             }
             // End
+            if (_axis != null && 
+                _type != MetadataType.NumericLoop && 
+                _type != MetadataType.CategoricalLoop)
+            {
+                builder.Append($" {_axis.ToString()}");
+            }
             builder.Append(';');
             builder.AppendLine();
             return builder.ToString();
@@ -376,17 +398,17 @@ namespace IDCA.Model.Spec
             "AnalysisCategory"
         })]
         ElementType,
-        [MetadataDescription("Exclusive")]
+        [MetadataDescription("Exclusive", NoValue = true)]
         Exclusive,
         [MetadataDescription("Expression")]
         Expression,
         [MetadataDescription("Factor")]
         Factor,
-        [MetadataDescription("Fix")]
+        [MetadataDescription("Fix", NoValue = true)]
         Fix,
         [MetadataDescription("Keycode")]
         Keycode,
-        [MetadataDescription("NoFilter")]
+        [MetadataDescription("NoFilter", NoValue = true)]
         NoFilter,
     }
 

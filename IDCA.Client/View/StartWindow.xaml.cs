@@ -1,18 +1,18 @@
 ﻿
 using IDCA.Client.ViewModel.Common;
-using System.Windows;
 
 namespace IDCA.Client.View
 {
     /// <summary>
     /// StartWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class StartWindow : Window
+    public partial class StartWindow : CustomWindow
     {
         public StartWindow()
         {
             InitializeComponent();
             WindowManager.Register<TableSettingWindow>("TableSettingWindow");
+            WindowManager.Register<SettingWindow>("SettingWindow");
         }
 
     }
