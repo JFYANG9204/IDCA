@@ -7,12 +7,13 @@
     <FontFamily x:Key="IDCA.Font.Family.Button">华文中宋</FontFamily>
     
     <sys:Double x:Key="IDCA.Font.Size.Start.Title">20</sys:Double>
+    <sys:Double x:Key="IDCA.Font.SubTitle">17</sys:Double>
     <sys:Double x:Key="IDCA.Font.Size.TextBlock.Label">15</sys:Double>
     <sys:Double x:Key="IDCA.Font.Size.Content">14</sys:Double>
 
     <Style x:Key="IDCA.Font.Base" TargetType="Control">
         <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
-        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="FontSize" Value="15"/>
     </Style>
     
 </ResourceDictionary>

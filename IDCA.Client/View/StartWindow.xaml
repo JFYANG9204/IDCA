@@ -9,14 +9,14 @@
     xmlns:viewmodel="clr-namespace:IDCA.Client.ViewModel" 
     d:DataContext="{d:DesignInstance Type=viewmodel:StartWindowViewModel}"
     mc:Ignorable="d"
-    Height="440" 
-    Width="780"
+    Height="550" 
+    Width="850"
     Style="{StaticResource CustomWindowStyle}">
 
     <Window.DataContext>
         <viewmodel:StartWindowViewModel/>
     </Window.DataContext>
-    
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="20"/>
@@ -40,7 +40,7 @@
                        Margin="20 0 0 0"
                        Text="选择模板"
                        FontFamily="{StaticResource IDCA.Font.Family}"
-                       FontSize="16"
+                       FontSize="{StaticResource IDCA.Font.SubTitle}"
                        VerticalAlignment="Center"/>
             <ListBox Grid.Row="2"
                      Margin="20 8 80 50"
@@ -62,7 +62,7 @@
                             <TextBlock Grid.Row="0"
                                        Margin="5 0 40 0"
                                        Text="{Binding TemplateName}"
-                                       FontSize="15"
+                                       FontSize="{StaticResource IDCA.Font.Size.TextBlock.Label}"
                                        VerticalAlignment="Center"
                                        HorizontalAlignment="Left"
                                        FontFamily="{StaticResource IDCA.Font.Family}"/>
@@ -71,7 +71,7 @@
                                        Text="{Binding TemplateDescription}"
                                        TextWrapping="Wrap"
                                        FontStyle="Italic"
-                                       FontSize="13"
+                                       FontSize="{StaticResource IDCA.Font.Size.Content}"
                                        FontFamily="{StaticResource IDCA.Font.Family}"/>
                         </Grid>
                     </DataTemplate>
@@ -84,44 +84,37 @@
             <Grid.Resources>
                 <Style x:Key="IDCA.Window.Start.DialogButton" 
                        TargetType="Button">
-                    <Setter Property="Height" Value="25"/>
-                    <Setter Property="Width" Value="25"/>
+                    <Setter Property="Height" Value="30"/>
+                    <Setter Property="Width" Value="30"/>
                     <Setter Property="Margin" Value="5"/>
                     <Setter Property="Background" Value="{StaticResource IDCA.Brushes.Button.Background}"/>
                     <Setter Property="VerticalContentAlignment" Value="Bottom"/>
                     <Setter Property="HorizontalContentAlignment" Value="Center"/>
                     <Setter Property="Content" Value="..."/>
                 </Style>
-                <Style x:Key="IDCA.Window.Button.Common" TargetType="Button">
-                    <Setter Property="Width" Value="60"/>
-                    <Setter Property="Height" Value="30"/>
-                    <Setter Property="FontSize" Value="13"/>
-                    <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
-                    <Setter Property="Background" Value="{StaticResource IDCA.Brushes.Button.Background}"/>
-                </Style>
                 <Style TargetType="TextBlock">
                     <Setter Property="VerticalAlignment" Value="Bottom"/>
                     <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
-                    <Setter Property="FontSize" Value="13"/>
+                    <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.TextBlock.Label}"/>
                 </Style>
                 <Style TargetType="TextBox">
                     <Setter Property="Width" Value="340"/>
-                    <Setter Property="Height" Value="25"/>
+                    <Setter Property="Height" Value="30"/>
                     <Setter Property="FontSize" Value="13"/>
                     <Setter Property="VerticalContentAlignment" Value="Center"/>
                     <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
                 </Style>
             </Grid.Resources>
-            
+
             <Grid.RowDefinitions>
                 <RowDefinition Height="80"/>
-                <RowDefinition Height="20"/>
+                <RowDefinition Height="30"/>
                 <RowDefinition Height="40"/>
-                <RowDefinition Height="20"/>
+                <RowDefinition Height="30"/>
                 <RowDefinition Height="40"/>
-                <RowDefinition Height="20"/>
+                <RowDefinition Height="30"/>
                 <RowDefinition Height="40"/>
-                <RowDefinition Height="20"/>
+                <RowDefinition Height="30"/>
                 <RowDefinition Height="40"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
@@ -147,7 +140,7 @@
                     </ControlTemplate>
                 </Button.Template>
             </Button>
-            
+
             <TextBlock Grid.Row="1">项目名称</TextBlock>
             <StackPanel Grid.Row="2" Orientation="Horizontal">
                 <TextBox Text="{Binding ProjectName}"/>
@@ -173,14 +166,18 @@
                 <Button Style="{StaticResource IDCA.Window.Start.DialogButton}" 
                         Command="{Binding SelectExcelSettingFilePathCommand}"/>
             </StackPanel>
-
+            
             <Button Grid.Row="9"
+                    Width="70"
+                    Height="35"
+                    Margin="30"
+                    FontSize="{StaticResource IDCA.Font.Size.TextBlock.Label}"
+                    Background="{StaticResource IDCA.Brushes.Button.Background}"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Center"
                     IsEnabled="{Binding IsConfirmButtonEnable}"
                     Command="{Binding ConfirmCommand}"
                     CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}}" 
-                    Style="{StaticResource IDCA.Window.Button.Common}"
                     >完成</Button>
 
         </Grid>

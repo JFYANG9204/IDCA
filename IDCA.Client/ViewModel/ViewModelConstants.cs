@@ -26,6 +26,7 @@ namespace IDCA.Client.ViewModel
         public const string AxisTop4BoxName = "Top 4 Box";
         public const string AxisTop5BoxName = "Top 5 Box";
         public const string AxisTop6BoxName = "Top 6 Box";
+        public const string AxisTop7BoxName = "Top 7 Box";
 
         public const string AxisBottom1BoxName = "Bottom Box";
         public const string AxisBottom2BoxName = "Bottom 2 Box";
@@ -33,6 +34,7 @@ namespace IDCA.Client.ViewModel
         public const string AxisBottom4BoxName = "Bottom 4 Box";
         public const string AxisBottom5BoxName = "Bottom 5 Box";
         public const string AxisBottom6BoxName = "Bottom 6 Box";
+        public const string AxisBottom7BoxName = "Bottom 7 Box";
 
         public const string AxisNpsName = "NPS";
 

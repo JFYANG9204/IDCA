@@ -255,7 +255,32 @@ namespace IDCA.Client.ViewModel
 
     public class TableSettingElementViewModel : ObservableObject
     {
-        public TableSettingElementViewModel(Table table, Config config, TemplateCollection templates) 
+        /// <summary>
+        /// 当前表格添加Net的类型
+        /// </summary>
+        public static readonly string[] TableNetTypeSelections =
+        {
+            "标准Net",
+            "在具体选项前的Combine",
+            "在Subtotal和具体选项之间的Combine",
+            "放在最后的Combine",
+        };
+
+        /// <summary>
+        /// 当前表格表侧Factor赋值的顺序，正序时递增，逆序时递减。
+        /// </summary>
+        public static readonly string[] FactorSequence = { "正序", "逆序" };
+
+        // 初始化表格类型
+        public static readonly string[] TableTypeSelections = { 
+            ViewModelConstants.TableTypeNormal,
+            ViewModelConstants.TableTypeGrid,
+            ViewModelConstants.TableTypeGridSlice,
+            ViewModelConstants.TableTypeMeanSummary,
+            ViewModelConstants.TableTypeResponseSummary
+        };
+
+    public TableSettingElementViewModel(Table table, Config config, TemplateCollection templates) 
         {
             _table = table;
             var sideAxis = _table.SideAxis ?? _table.CreateSideAxis(AxisType.Normal);
@@ -266,15 +291,6 @@ namespace IDCA.Client.ViewModel
                 _axisOperater.CreateBasicAxisExpression(null);
             }
             _axisViewModel = new AxisSettingViewModel(sideAxis);
-            // 初始化表格类型
-            _tableTypeSelections = new string[5] 
-            { 
-                ViewModelConstants.TableTypeNormal,
-                ViewModelConstants.TableTypeGrid,
-                ViewModelConstants.TableTypeGridSlice,
-                ViewModelConstants.TableTypeMeanSummary,
-                ViewModelConstants.TableTypeResponseSummary
-            };
             _tableTypeSelectedIndex = 0;
             // 初始化Top/Bottom Box选项类别
             _topBottomBoxSelections = new ObservableCollection<CheckableItemViewModel>
@@ -285,12 +301,14 @@ namespace IDCA.Client.ViewModel
                 CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisTop4BoxName),
                 CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisTop5BoxName),
                 CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisTop6BoxName),
+                CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisTop7BoxName),
                 CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisBottom1BoxName),
                 CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisBottom2BoxName),
                 CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisBottom3BoxName),
                 CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisBottom4BoxName),
                 CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisBottom5BoxName),
                 CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisBottom6BoxName),
+                CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisBottom7BoxName),
                 CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisNpsName)
             };
             // Factor Sequence
@@ -494,16 +512,6 @@ namespace IDCA.Client.ViewModel
             }
         }
 
-        string[] _tableTypeSelections;
-        /// <summary>
-        /// TableType选择的选项
-        /// </summary>
-        public string[] TableTypeSelections
-        {
-            get { return _tableTypeSelections; }
-            set { SetProperty(ref _tableTypeSelections, value); }
-        }
-
         int _tableTypeSelectedIndex;
         /// <summary>
         /// TableType下拉框选择的索引，配置选项顺序应该和TableType枚举的顺序相同
@@ -602,16 +610,6 @@ namespace IDCA.Client.ViewModel
             _axisViewModel.LoadFromAxis(_axisOperater.Axis);
         }
 
-        string[] _factorSequence = { "正序", "逆序" };
-        /// <summary>
-        /// 当前表格表侧Factor赋值的顺序，正序时递增，逆序时递减。
-        /// </summary>
-        public string[] FactorSequence
-        {
-            get { return _factorSequence; }
-            set { SetProperty(ref _factorSequence, value); }
-        }
-
         int _factorSequenceSelectedIndex;
         /// <summary>
         /// 当前表格Factor赋值顺序选择索引，修改时同步修改Axis对象配置
@@ -671,22 +669,6 @@ namespace IDCA.Client.ViewModel
         void OnTableTopBottomBoxNameCheckedChanged(CheckableItemViewModel _)
         {
             UpdateTableTopBottomBoxName();
-        }
-
-        string[] _tableNetTypeSelections =
-        {
-            "标准Net",
-            "在具体选项前的Combine",
-            "在Subtotal和具体选项之间的Combine",
-            "放在最后的Combine",
-        };
-        /// <summary>
-        /// 当前表格添加Net的类型
-        /// </summary>
-        public string[] NetTypeSelections
-        {
-            get { return _tableNetTypeSelections; }
-            set { SetProperty(ref _tableNetTypeSelections, value); }
         }
 
         int _netTypeSelectedIndex = 0;

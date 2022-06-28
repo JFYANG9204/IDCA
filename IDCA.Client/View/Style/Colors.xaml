@@ -15,7 +15,8 @@
 
     <Color x:Key="IDCA.Colors.Button.Background">#FFF3F3F3</Color>
     <Color x:Key="IDCA.Colors.Button.Background.Click">LightGray</Color>
-    
+    <Color x:Key="IDCA.Colors.Button.Background.MouseOver">#FFB9D1EA</Color>
+
     <SolidColorBrush x:Key="IDCA.Brushes.ListBox.Item.Dark" Color="{StaticResource IDCA.Colors.ListBox.Item.Dark}"/>
     <SolidColorBrush x:Key="IDCA.Brushes.ListBox.Item.Selected" Color="{StaticResource IDCA.Colors.ListBox.Item.Selected}"/>
 
@@ -31,6 +32,7 @@
     
     <SolidColorBrush x:Key="IDCA.Brushes.Button.Background" Color="{StaticResource IDCA.Colors.Button.Background}"/>
     <SolidColorBrush x:Key="IDCA.Brushes.Button.Background.Click" Color="{StaticResource IDCA.Colors.Button.Background.Click}"/>
+    <SolidColorBrush x:Key="IDCA.Brushes.Button.Background.MouseOver" Color="{StaticResource IDCA.Colors.Button.Background.MouseOver}"/>
 
     <SolidColorBrush x:Key="IDCA.Burshes.DataGrid.Separater" Color="{StaticResource IDCA.Colors.Window.Borderbrush}"/>
 

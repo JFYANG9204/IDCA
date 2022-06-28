@@ -25,7 +25,7 @@
             </Style>
             <Style TargetType="CheckBox">
                 <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
-                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
                 <Setter Property="Height" Value="25"/>
                 <Setter Property="HorizontalAlignment" Value="Center"/>
                 <Setter Property="VerticalAlignment" Value="Center"/>
@@ -33,7 +33,7 @@
             </Style>
             <Style TargetType="TextBox">
                 <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
-                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
                 <Setter Property="Height" Value="25"/>
                 <Setter Property="HorizontalAlignment" Value="Center"/>
                 <Setter Property="VerticalAlignment" Value="Center"/>
@@ -109,7 +109,7 @@
                         <ListBox Margin="10 5"
                                  Height="300"
                                  BorderThickness="0"
-                                 FontSize="13"
+                                 FontSize="{StaticResource IDCA.Font.Size.Content}"
                                  Background="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=Background}"
                                  ItemsSource="{Binding AvailableElements}"
                                  SelectedIndex="{Binding AvailableSelectedIndex}"
@@ -172,7 +172,7 @@
 
                         <TreeView Margin="10 5"
                                   Height="300"
-                                  FontSize="13"
+                                  FontSize="{StaticResource IDCA.Font.Size.Content}"
                                   BorderThickness="0"
                                   Background="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=Background}"
                                   ItemsSource="{Binding Tree}"
@@ -380,7 +380,7 @@
                          VerticalAlignment="Top"
                          VerticalContentAlignment="Top"
                          FontFamily="{StaticResource IDCA.Font.Family}"
-                         FontSize="13"
+                         FontSize="{StaticResource IDCA.Font.Size.Content}"
                          Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"
                          Text="{Binding AxisExpression}"
                          TextWrapping="Wrap"/>
@@ -414,21 +414,21 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal" 
-                                                Height="30"
+                                                Height="35"
                                                 Margin="2">
                                         <TextBlock Width="80"
                                                    Margin="5 2"
                                                    VerticalAlignment="Center"
                                                    Text="{Binding Name}"/>
                                         <Grid Width="180" 
-                                              Height="25">
+                                              Height="35">
                                             <TextBox Width="180"
-                                                     Height="25"
+                                                     Height="35"
                                                      VerticalContentAlignment="Center"
                                                      Text="{Binding Text}"
                                                      Visibility="{Binding IsTextBox, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                                             <ComboBox Width="180"
-                                                      Height="25"
+                                                      Height="35"
                                                       FontSize="13"
                                                       FontFamily="{StaticResource IDCA.Font.Family}"
                                                       HorizontalContentAlignment="Center"
@@ -460,7 +460,7 @@
                                       d:ItemsSource="{d:SampleData ItemCount=10}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <StackPanel Height="30"
+                                    <StackPanel Height="45"
                                                 Width="280"
                                                 HorizontalAlignment="Left"
                                                 Orientation="Horizontal">
@@ -471,11 +471,11 @@
                                                   Content="{Binding Name}"
                                                   Cursor="Hand"/>
                                         <Canvas Width="90"
-                                                Height="25"
+                                                Height="35"
                                                 VerticalAlignment="Center">
                                             <ComboBox Width="90"
-                                                      Height="25"
-                                                      FontSize="13"
+                                                      Height="35"
+                                                      FontSize="{StaticResource IDCA.Font.Size.Content}"
                                                       FontFamily="{StaticResource IDCA.Font.Family}"
                                                       HorizontalContentAlignment="Center"
                                                       VerticalContentAlignment="Center"
@@ -483,6 +483,7 @@
                                                       SelectedIndex="{Binding SelectedIndex}"
                                                       ItemsSource="{Binding Selections}"/>
                                             <TextBox Width="90"
+                                                     Height="35"
                                                      Visibility="{Binding IsTextBox, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                      Text="{Binding Text}"/>
                                         </Canvas>

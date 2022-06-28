@@ -18,6 +18,9 @@
                     <Grid Width="{TemplateBinding Width}"
                           Height="{TemplateBinding Height}"
                           Background="{TemplateBinding Background}">
+                        <Border Width="{TemplateBinding Width}"
+                                Height="{TemplateBinding Height}"
+                                Background="Transparent"/>
                         <Line X1="20" Y1="20" 
                               X2="30" Y2="20"
                               StrokeThickness="1"
@@ -41,7 +44,9 @@
                 <ControlTemplate TargetType="Button">
                     <Grid Width="{TemplateBinding Width}"
                           Height="{TemplateBinding Height}"
-                          Background="{TemplateBinding Background}">
+                          Background="{TemplateBinding Background}"
+                          UseLayoutRounding="True"
+                          >
                         <Line X1="20" Y1="15"
                               X2="30" Y2="25"
                               StrokeThickness="1"

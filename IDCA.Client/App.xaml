@@ -8,6 +8,7 @@
                 <ResourceDictionary Source="View/Style/Font.xaml"/>
                 <ResourceDictionary Source="View/Style/Colors.xaml"/>
                 <ResourceDictionary Source="View/Style/Button.xaml"/>
+                <ResourceDictionary Source="View/Style/PopupButton.xaml"/>
                 <ResourceDictionary Source="View/Style/DataGrid.xaml"/>
                 <ResourceDictionary Source="View/Style/CustomWindow.xaml"/>
             </ResourceDictionary.MergedDictionaries>
