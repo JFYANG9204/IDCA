@@ -1,16 +1,16 @@
-﻿<view:CustomWindow x:Class="IDCA.Client.View.VariableSettingWindow"
-                   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                   xmlns:view="clr-namespace:IDCA.Client.View"
-                   xmlns:viewmodel="clr-namespace:IDCA.Client.ViewModel" 
-                   d:DataContext="{d:DesignInstance Type=viewmodel:VariableSettingViewModel}"
-                   mc:Ignorable="d"
-                   Title="" 
-                   Height="680" 
-                   Width="800"
-                   Style="{StaticResource CustomWindowStyle}">
+﻿<mah:MetroWindow x:Class="IDCA.Client.View.VariableSettingWindow"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:viewmodel="clr-namespace:IDCA.Client.ViewModel" 
+                 d:DataContext="{d:DesignInstance Type=viewmodel:VariableSettingViewModel}"
+                 mc:Ignorable="d"
+                 Title="" 
+                 Height="680" 
+                 Width="800"
+                 Background="{StaticResource IDCA.Brushes.Window.Background}">
 
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
@@ -20,15 +20,14 @@
             <Setter Property="FontSize" Value="13"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
-        <Style TargetType="TextBox">
-            <Setter Property="Width" Value="120"/>
+        <Style TargetType="TextBox" BasedOn="{StaticResource MahApps.Styles.TextBox}">
             <Setter Property="Height" Value="25"/>
-            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
             <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
         </Style>
-        <Style TargetType="ComboBox">
+        <Style TargetType="ComboBox" BasedOn="{StaticResource MahApps.Styles.ComboBox}">
             <Setter Property="Width" Value="60"/>
             <Setter Property="Height" Value="25"/>
             <Setter Property="FontSize" Value="13"/>
@@ -36,7 +35,7 @@
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
         </Style>
-        <Style TargetType="CheckBox">
+        <Style TargetType="CheckBox" BasedOn="{StaticResource MahApps.Styles.CheckBox}">
             <Setter Property="FontSize" Value="13"/>
             <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
@@ -73,13 +72,14 @@
 
             <StackPanel Grid.Row="0" Orientation="Horizontal">
                 <TextBlock FontSize="15">变量名</TextBlock>
-                <TextBox Width="50" 
+                <TextBox MinWidth="70" 
                          Height="25"
                          Style="{StaticResource IDCA.Font.Base}"
                          VerticalContentAlignment="Center"
                          Text="{Binding Name}"/>
                 <TextBlock FontSize="15">变量类型</TextBlock>
-                <ComboBox ItemsSource="{Binding FieldTypes}"
+                <ComboBox MaxWidth="100"
+                          ItemsSource="{Binding FieldTypes}"
                           SelectedIndex="{Binding FieldTypeSelectedIndex}"
                           SelectedItem="{Binding FieldTypeSelectedItem}"/>
             </StackPanel>
@@ -842,4 +842,4 @@
 
         </Grid>
     </Grid>
-</view:CustomWindow>
+</mah:MetroWindow>

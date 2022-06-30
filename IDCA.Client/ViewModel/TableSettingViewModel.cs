@@ -449,8 +449,8 @@ namespace IDCA.Client.ViewModel
                 SetProperty(ref _donotAppendMeanOrAverage, value);
                 if (value)
                 {
-                    _appendMean = false;
-                    _appendAverage = false;
+                    AppendMean = false;
+                    AppendAverage = false;
                     _axisOperater.AppendMean = false;
                     _axisOperater.AppendAverage = false;
                 }
@@ -470,8 +470,8 @@ namespace IDCA.Client.ViewModel
                 _axisOperater.AppendMean = value;
                 if (value)
                 {
-                    _donotAppendMeanOrAverage = false;
-                    _appendAverage = false;
+                    DonotAppendMeanOrAverage = false;
+                    AppendAverage = false;
                 }
                 UpdateAxisExpression();
             }
@@ -490,8 +490,8 @@ namespace IDCA.Client.ViewModel
                 _axisOperater.AppendAverage = value;
                 if (value)
                 {
-                    _donotAppendMeanOrAverage = false;
-                    _appendMean = false;
+                    DonotAppendMeanOrAverage = false;
+                    AppendMean = false;
                 }
                 UpdateAxisExpression();
             }
@@ -568,12 +568,14 @@ namespace IDCA.Client.ViewModel
                     ViewModelConstants.AxisTop4BoxName => 4,
                     ViewModelConstants.AxisTop5BoxName => 5,
                     ViewModelConstants.AxisTop6BoxName => 6,
+                    ViewModelConstants.AxisTop7BoxName => 7,
                     ViewModelConstants.AxisBottom1BoxName => -1,
                     ViewModelConstants.AxisBottom2BoxName => -2,
                     ViewModelConstants.AxisBottom3BoxName => -3,
                     ViewModelConstants.AxisBottom4BoxName => -4,
                     ViewModelConstants.AxisBottom5BoxName => -5,
                     ViewModelConstants.AxisBottom6BoxName => -6,
+                    ViewModelConstants.AxisBottom7BoxName => -7,
                     _ => 0
                 };
             }).ToArray();

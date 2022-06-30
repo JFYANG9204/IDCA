@@ -2,7 +2,9 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Color x:Key="IDCA.Colors.ListBox.Item.Dark">#FFF3F3F3</Color>
-    <Color x:Key="IDCA.Colors.ListBox.Item.Selected">DarkGray</Color>
+    <Color x:Key="IDCA.Colors.ListBox.Item.Selected.Background">#FF006CBE</Color>
+    <Color x:Key="IDCA.Colors.ListBox.Item.Selected.Foreground">White</Color>
+    
     <Color x:Key="IDCA.Colors.Window.Background">#FFFBFBFB</Color>
     <Color x:Key="IDCA.Colors.Window.Background.Toolbar">#FFFBFBFB</Color>
     <Color x:Key="IDCA.Colors.Window.Borderbrush">LightGray</Color>
@@ -18,7 +20,8 @@
     <Color x:Key="IDCA.Colors.Button.Background.MouseOver">#FFB9D1EA</Color>
 
     <SolidColorBrush x:Key="IDCA.Brushes.ListBox.Item.Dark" Color="{StaticResource IDCA.Colors.ListBox.Item.Dark}"/>
-    <SolidColorBrush x:Key="IDCA.Brushes.ListBox.Item.Selected" Color="{StaticResource IDCA.Colors.ListBox.Item.Selected}"/>
+    <SolidColorBrush x:Key="IDCA.Brushes.ListBox.Item.Selected.Background" Color="{StaticResource IDCA.Colors.ListBox.Item.Selected.Background}"/>
+    <SolidColorBrush x:Key="IDCA.Brushes.ListBox.Item.Selected.Foreground" Color="{StaticResource IDCA.Colors.ListBox.Item.Selected.Foreground}"/>
 
     <SolidColorBrush x:Key="IDCA.Brushes.Window.Background" Color="{StaticResource IDCA.Colors.Window.Background}"/>
     <SolidColorBrush x:Key="IDCA.Brushes.Window.HeaderButton.Minimize.Background" Color="{StaticResource IDCA.Colors.Window.HeaderButton.Minimize.Background}"/>

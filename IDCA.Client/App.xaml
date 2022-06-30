@@ -5,12 +5,15 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="View/Style/Font.xaml"/>
                 <ResourceDictionary Source="View/Style/Colors.xaml"/>
                 <ResourceDictionary Source="View/Style/Button.xaml"/>
-                <ResourceDictionary Source="View/Style/PopupButton.xaml"/>
+                <ResourceDictionary Source="View/Style/GridSplitter.xaml"/>
                 <ResourceDictionary Source="View/Style/DataGrid.xaml"/>
-                <ResourceDictionary Source="View/Style/CustomWindow.xaml"/>
+                <ResourceDictionary Source="View/Style/MetroTheme.xaml"/>
+                <ResourceDictionary Source="View/Style/PopupButton.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

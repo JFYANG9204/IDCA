@@ -1,17 +1,17 @@
-﻿<view:CustomWindow 
+﻿<mah:MetroWindow
         x:Class="IDCA.Client.View.AxisSettingWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:view="clr-namespace:IDCA.Client.View"
         xmlns:viewmodel="clr-namespace:IDCA.Client.ViewModel" 
         d:DataContext="{d:DesignInstance Type=viewmodel:AxisSettingViewModel}"
         mc:Ignorable="d"
         Height="600" 
         Width="900"
         ResizeMode="NoResize"
-        Style="{StaticResource CustomWindowStyle}">
+        Background="{StaticResource IDCA.Brushes.Window.Background}">
 
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
@@ -23,7 +23,7 @@
             <Style TargetType="TextBlock">
                 <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
             </Style>
-            <Style TargetType="CheckBox">
+            <Style TargetType="CheckBox" BasedOn="{StaticResource MahApps.Styles.CheckBox}">
                 <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
                 <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
                 <Setter Property="Height" Value="25"/>
@@ -31,7 +31,7 @@
                 <Setter Property="VerticalAlignment" Value="Center"/>
                 <Setter Property="VerticalContentAlignment" Value="Center"/>
             </Style>
-            <Style TargetType="TextBox">
+            <Style TargetType="TextBox" BasedOn="{StaticResource MahApps.Styles.TextBox}">
                 <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
                 <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
                 <Setter Property="Height" Value="25"/>
@@ -115,7 +115,7 @@
                                  SelectedIndex="{Binding AvailableSelectedIndex}"
                                  d:ItemsSource="{d:SampleData ItemCount=5}">
                             <ListBox.Resources>
-                                <Style TargetType="ListBoxItem">
+                                <Style TargetType="ListBoxItem" BasedOn="{StaticResource MahApps.Styles.ListBoxItem}">
                                     <Setter Property="Background" Value="{Binding RelativeSource={RelativeSource AncestorType=ListBox}, Path=Background}"/>
                                 </Style>
                             </ListBox.Resources>
@@ -423,12 +423,12 @@
                                         <Grid Width="180" 
                                               Height="35">
                                             <TextBox Width="180"
-                                                     Height="35"
+                                                     Height="30"
                                                      VerticalContentAlignment="Center"
                                                      Text="{Binding Text}"
                                                      Visibility="{Binding IsTextBox, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                                             <ComboBox Width="180"
-                                                      Height="35"
+                                                      Height="30"
                                                       FontSize="13"
                                                       FontFamily="{StaticResource IDCA.Font.Family}"
                                                       HorizontalContentAlignment="Center"
@@ -471,10 +471,10 @@
                                                   Content="{Binding Name}"
                                                   Cursor="Hand"/>
                                         <Canvas Width="90"
-                                                Height="35"
+                                                Height="30"
                                                 VerticalAlignment="Center">
                                             <ComboBox Width="90"
-                                                      Height="35"
+                                                      Height="30"
                                                       FontSize="{StaticResource IDCA.Font.Size.Content}"
                                                       FontFamily="{StaticResource IDCA.Font.Family}"
                                                       HorizontalContentAlignment="Center"
@@ -483,7 +483,7 @@
                                                       SelectedIndex="{Binding SelectedIndex}"
                                                       ItemsSource="{Binding Selections}"/>
                                             <TextBox Width="90"
-                                                     Height="35"
+                                                     Height="30"
                                                      Visibility="{Binding IsTextBox, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                      Text="{Binding Text}"/>
                                         </Canvas>
@@ -523,4 +523,4 @@
         </Grid>
         
     </Grid>
-</view:CustomWindow>
+</mah:MetroWindow>

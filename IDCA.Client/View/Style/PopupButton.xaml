@@ -3,39 +3,45 @@
                     xmlns:icon="http://metro.mahapps.com/winfx/xaml/iconpacks"
                     xmlns:view="clr-namespace:IDCA.Client.View">
     <Style TargetType="view:PopupButton">
+        <Setter Property="Background" Value="Transparent"/>
         <Setter Property="MinWidth" Value="20"/>
         <Setter Property="MinHeight" Value="10"/>
-        <Setter Property="BorderBrush" Value="#00000000"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="view:PopupButton">
                     <Grid UseLayoutRounding="True">
-                        <Border Background="Transparent"
-                                BorderBrush="{TemplateBinding Background}"
-                                BorderThickness="1">
-                            <icon:PackIconMaterialDesign Kind="ArrowDropDown"
-                                                         Width="12"
-                                                         Height="12"
-                                                         VerticalAlignment="Center"
-                                                         HorizontalAlignment="Center"
-                                                         Foreground="{TemplateBinding Foreground}"/>
-                        </Border>
+                        <Button x:Name="PART_ShowPopupButton">
+                            <Button.Template>
+                                <ControlTemplate>
+                                    <Border Background="Transparent"
+                                            BorderThickness="0">
+                                        <icon:PackIconMaterialDesign Kind="ArrowDropDown"
+                                                                     Width="14"
+                                                                     Height="14"
+                                                                     VerticalAlignment="Center"
+                                                                     HorizontalAlignment="Center"
+                                                                     Foreground="{TemplateBinding Foreground}"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
                         <Popup x:Name="PART_Popup" 
                                AllowsTransparency="True"
                                StaysOpen="False"
                                IsOpen="{TemplateBinding IsPopupOpen}"
                                Placement="Bottom"
+                               PlacementTarget="{Binding ElementName=PART_ShowPopupButton}"
                                PopupAnimation="Fade">
                             <Border Height="Auto"
                                     Focusable="False"
+                                    HorizontalAlignment="Stretch"
                                     BorderThickness="{TemplateBinding BorderThickness}"
                                     BorderBrush="{TemplateBinding BorderBrush}">
                                 <ScrollViewer Padding="1" 
                                               BorderThickness="0"
                                               VerticalScrollBarVisibility="Auto"
                                               HorizontalScrollBarVisibility="Auto">
-                                    <ContentPresenter Content="{TemplateBinding PopupContent}" 
-                                                      ContentTemplate="{TemplateBinding PopupTemplate}"/>
+                                    <ContentPresenter/>
                                 </ScrollViewer>
                             </Border>
                         </Popup>

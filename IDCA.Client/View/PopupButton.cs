@@ -7,7 +7,7 @@ namespace IDCA.Client.View
 
     [TemplatePart(Name = PART_Popup, Type = typeof(Popup))]
     [TemplatePart(Name = PART_ShowPopupButton, Type = typeof(Button))]
-    public class PopupButton : ToggleButton
+    public class PopupButton : ContentControl
     {
 
         public const string PART_Popup = "PART_Popup";
@@ -31,37 +31,19 @@ namespace IDCA.Client.View
             set => SetValue(IsPopupOpenProperty, value);
         }
 
-        public static readonly DependencyProperty PopupContentProperty = DependencyProperty
-            .Register(nameof(PopupContent),
-                      typeof(object),
-                      typeof(PopupButton));
-
-        public object PopupContent
-        {
-            get => GetValue(PopupContentProperty);
-            set => SetValue(PopupContentProperty, value);
-        }
-
-        public static readonly DependencyProperty PopupTemplateProperty = DependencyProperty
-            .Register(nameof(PopupTemplate),
-                      typeof(DataTemplate),
-                      typeof(PopupButton));
-
-        public DataTemplate PopupTemplate
-        {
-            get => (DataTemplate)GetValue(PopupTemplateProperty);
-            set => SetValue(PopupTemplateProperty, value);
-        }
-
-        protected override void OnClick()
-        {
-            base.OnClick();
-            IsPopupOpen = IsChecked != null && (bool)IsChecked;
-        }
-
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
+
+            if (_button != null)
+            {
+                _button.Click -= ButtonClicked;
+            }
+            _button = GetTemplateChild(PART_ShowPopupButton) as Button;
+            if (_button != null)
+            {
+                _button.Click += ButtonClicked;
+            }
 
             if (_popup != null)
             {
@@ -76,10 +58,19 @@ namespace IDCA.Client.View
 
         private void PopupClosed(object? sender, System.EventArgs e)
         {
-            IsPopupOpen = false;
-            IsChecked = false;
+            if (IsPopupOpen)
+            {
+                IsPopupOpen = false;
+            }
         }
 
+        private void ButtonClicked(object? sender, RoutedEventArgs e)
+        {
+            
+            IsPopupOpen = !IsPopupOpen;
+        }
+
+        Button? _button;
         Popup? _popup;
     }
 }
