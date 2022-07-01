@@ -103,7 +103,7 @@ namespace IDCA.Model.Spec
         /// <returns></returns>
         public MetadataCategorical NewCategorical(string? name = null)
         {
-            string codeLabel = _config.TryGet<string>(SpecConfigKeys.MetadataCategoricalLabel) ?? "_";
+            string codeLabel = _config.Get<string>(SpecConfigKeys.METADATA_CATEGORICAL_LABEL) ?? "_";
             int count = _categories.Count + 1;
             string categoricalName = name ?? $"{codeLabel}{count}";
             while (_categories.Exists(e => e.Name.Equals(categoricalName, StringComparison.OrdinalIgnoreCase)))

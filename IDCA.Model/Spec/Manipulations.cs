@@ -335,11 +335,11 @@ namespace IDCA.Model.Spec
             Config? config = Document?.Config;
             _axis.Clear();
             _axis.AppendText();
-            _axis.AppendBase(config?.TryGet<string>(SpecConfigKeys.AxisBaseLabel) ?? "", baseFilter);
+            _axis.AppendBase(config?.Get(SpecConfigKeys.AXIS_BASE_LABEL), baseFilter);
             _axis.AppendText();
             _axis.AppendCategoryRange();
             _axis.AppendText();
-            _axis.AppendSubTotal(config?.TryGet<string>(SpecConfigKeys.AxisSigmaLabel) ?? "");
+            _axis.AppendSubTotal(config?.Get<string>(SpecConfigKeys.AXIS_SIGMA_LABEL) ?? "");
             if (addAverage && _axisAverageFunction != null)
             {
                 _axisAverageFunction.SetFunctionParameterValue(averageVariable, TemplateValueType.String, TemplateParameterUsage.RebaseMeanVariable);

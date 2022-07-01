@@ -29,7 +29,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)FileHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Spec\AxisParser.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Spec\MetadataDescriptionAttribute.cs" />
-    <Compile Include="..\IDCA.Model\TableSettingCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Spec\ScriptCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Spec\Axis.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Spec\Manipulations.cs" />

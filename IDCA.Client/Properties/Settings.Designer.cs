@@ -25,144 +25,253 @@ namespace IDCA.Client.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Specialized.StringCollection Templates {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string GLOBAL_TEMPLATE_ROOTPATH {
             get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["Templates"]));
+                return ((string)(this["GLOBAL_TEMPLATE_ROOTPATH"]));
             }
             set {
-                this["Templates"] = value;
+                this["GLOBAL_TEMPLATE_ROOTPATH"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("V")]
-        public string MetadataCategoricalLabel {
+        public string METADATA_CATEGORICAL_LABEL {
             get {
-                return ((string)(this["MetadataCategoricalLabel"]));
+                return ((string)(this["METADATA_CATEGORICAL_LABEL"]));
             }
             set {
-                this["MetadataCategoricalLabel"] = value;
+                this["METADATA_CATEGORICAL_LABEL"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Total Respondents")]
-        public string AxisBaseLabel {
+        public string AXIS_BASE_LABEL {
             get {
-                return ((string)(this["AxisBaseLabel"]));
+                return ((string)(this["AXIS_BASE_LABEL"]));
             }
             set {
-                this["AxisBaseLabel"] = value;
+                this["AXIS_BASE_LABEL"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Sigma")]
-        public string AxisSigmaLabel {
+        public string AXIS_SIGMA_LABEL {
             get {
-                return ((string)(this["AxisSigmaLabel"]));
+                return ((string)(this["AXIS_SIGMA_LABEL"]));
             }
             set {
-                this["AxisSigmaLabel"] = value;
+                this["AXIS_SIGMA_LABEL"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Net.")]
-        public string AxisNetAheadLabel {
+        public string AXIS_NET_AHEAD_LABEL {
             get {
-                return ((string)(this["AxisNetAheadLabel"]));
+                return ((string)(this["AXIS_NET_AHEAD_LABEL"]));
             }
             set {
-                this["AxisNetAheadLabel"] = value;
+                this["AXIS_NET_AHEAD_LABEL"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool AxisNetInsertEmptyLine {
+        public bool AXIS_NET_INSERT_EMPTYLINE {
             get {
-                return ((bool)(this["AxisNetInsertEmptyLine"]));
+                return ((bool)(this["AXIS_NET_INSERT_EMPTYLINE"]));
             }
             set {
-                this["AxisNetInsertEmptyLine"] = value;
+                this["AXIS_NET_INSERT_EMPTYLINE"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("1")]
-        public int AxisTopBottomBoxPositon {
+        public int AXIS_TOP_BOTTOM_BOX_POSITION {
             get {
-                return ((int)(this["AxisTopBottomBoxPositon"]));
+                return ((int)(this["AXIS_TOP_BOTTOM_BOX_POSITION"]));
             }
             set {
-                this["AxisTopBottomBoxPositon"] = value;
+                this["AXIS_TOP_BOTTOM_BOX_POSITION"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int AxisCombinePosition {
+        public int AXIS_COMBINE_POSITION {
             get {
-                return ((int)(this["AxisCombinePosition"]));
+                return ((int)(this["AXIS_COMBINE_POSITION"]));
             }
             set {
-                this["AxisCombinePosition"] = value;
+                this["AXIS_COMBINE_POSITION"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute(" - Summary")]
-        public string TableSummaryLabel {
+        public string TABLE_SUMMARY_LABEL {
             get {
-                return ((string)(this["TableSummaryLabel"]));
+                return ((string)(this["TABLE_SUMMARY_LABEL"]));
             }
             set {
-                this["TableSummaryLabel"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string TemplateRootPath {
-            get {
-                return ((string)(this["TemplateRootPath"]));
-            }
-            set {
-                this["TemplateRootPath"] = value;
+                this["TABLE_SUMMARY_LABEL"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("2")]
-        public int AxisNpsTopBox {
+        public int AXIS_NPS_TOP_BOX {
             get {
-                return ((int)(this["AxisNpsTopBox"]));
+                return ((int)(this["AXIS_NPS_TOP_BOX"]));
             }
             set {
-                this["AxisNpsTopBox"] = value;
+                this["AXIS_NPS_TOP_BOX"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("7")]
-        public int AxisNpsBottomBox {
+        public int AXIS_NPS_BOTTOM_BOX {
             get {
-                return ((int)(this["AxisNpsBottomBox"]));
+                return ((int)(this["AXIS_NPS_BOTTOM_BOX"]));
             }
             set {
-                this["AxisNpsBottomBox"] = value;
+                this["AXIS_NPS_BOTTOM_BOX"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AXIS_ADD_SIGMA {
+            get {
+                return ((bool)(this["AXIS_ADD_SIGMA"]));
+            }
+            set {
+                this["AXIS_ADD_SIGMA"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Average")]
+        public string AXIS_AVERAGE_MENTION_LABEL {
+            get {
+                return ((string)(this["AXIS_AVERAGE_MENTION_LABEL"]));
+            }
+            set {
+                this["AXIS_AVERAGE_MENTION_LABEL"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AXIS_AVERAGE_MENTION_BLANKLINE {
+            get {
+                return ((bool)(this["AXIS_AVERAGE_MENTION_BLANKLINE"]));
+            }
+            set {
+                this["AXIS_AVERAGE_MENTION_BLANKLINE"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
+        public int AXIS_AVERAGE_MENTION_DECIMALS {
+            get {
+                return ((int)(this["AXIS_AVERAGE_MENTION_DECIMALS"]));
+            }
+            set {
+                this["AXIS_AVERAGE_MENTION_DECIMALS"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(":")]
+        public string TABLE_SETTING_NET_LABEL_CODE_SEPARATER {
+            get {
+                return ((string)(this["TABLE_SETTING_NET_LABEL_CODE_SEPARATER"]));
+            }
+            set {
+                this["TABLE_SETTING_NET_LABEL_CODE_SEPARATER"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(",")]
+        public string TABLE_SETTING_NET_CODE_SEPARATER {
+            get {
+                return ((string)(this["TABLE_SETTING_NET_CODE_SEPARATER"]));
+            }
+            set {
+                this["TABLE_SETTING_NET_CODE_SEPARATER"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-")]
+        public string TABLE_SETTING_NET_RANGE_SEPARATER {
+            get {
+                return ((string)(this["TABLE_SETTING_NET_RANGE_SEPARATER"]));
+            }
+            set {
+                this["TABLE_SETTING_NET_RANGE_SEPARATER"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("AVERAGE")]
+        public string AXIS_MEAN_LABEL {
+            get {
+                return ((string)(this["AXIS_MEAN_LABEL"]));
+            }
+            set {
+                this["AXIS_MEAN_LABEL"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("STANDARD DEVIATION")]
+        public string AXIS_STDDEV_LABEL {
+            get {
+                return ((string)(this["AXIS_STDDEV_LABEL"]));
+            }
+            set {
+                this["AXIS_STDDEV_LABEL"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("STANDARD ERROR")]
+        public string AXIS_STDERR_LABEL {
+            get {
+                return ((string)(this["AXIS_STDERR_LABEL"]));
+            }
+            set {
+                this["AXIS_STDERR_LABEL"] = value;
             }
         }
     }

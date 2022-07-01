@@ -158,7 +158,7 @@ namespace IDCA.Client.ViewModel
         {
             GlobalConfig.Instance.TemplateDictionary.Clear();
             _templateItems.Clear();
-            _templateDictionary.LoadFromFolder(_config.TryGet<string>(SpecConfigKeys.TemplateRootPath) ?? "");
+            _templateDictionary.LoadFromFolder(_config.Get(SpecConfigKeys.GLOBAL_TEMPLATE_ROOTPATH));
             foreach (var item in GlobalConfig.Instance.TemplateDictionary.GetTemplates())
             {
                 var templateElement = new TemplateElementViewModel(item);
@@ -171,7 +171,7 @@ namespace IDCA.Client.ViewModel
             string? folder = WindowManager.ShowFolderBrowserDialog();
             if (folder != null && Directory.Exists(folder))
             {
-                _config.Set(SpecConfigKeys.TemplateRootPath, folder);
+                _config.Set(SpecConfigKeys.GLOBAL_TEMPLATE_ROOTPATH, folder);
                 _config.UpdateToSettings(Properties.Settings.Default);
                 Properties.Settings.Default.Save();
                 UpdateTemplateInformation();

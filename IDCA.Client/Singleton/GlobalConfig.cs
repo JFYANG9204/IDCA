@@ -9,7 +9,7 @@ namespace IDCA.Client.Singleton
         {
             _config = new Config();
             LoadConfigs();
-            _templateRootPath = _config.TryGet<string>(SpecConfigKeys.TemplateRootPath) ?? "";
+            _templateRootPath = _config.Get(SpecConfigKeys.GLOBAL_TEMPLATE_ROOTPATH);
             _templateDictionary = new TemplateDictionary();
             _templateDictionary.LoadFromFolder(_templateRootPath);
         }

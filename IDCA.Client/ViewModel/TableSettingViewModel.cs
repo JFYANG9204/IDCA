@@ -228,16 +228,6 @@ namespace IDCA.Client.ViewModel
             _tables.MoveDown(viewModel.Table);
         }
 
-        public void LoadFromTableSettingCollection(TableSettingCollection tableSettings)
-        {
-            _tableName = tableSettings.SpecTables.Name;
-            foreach (TableSetting setting in tableSettings)
-            {
-                var tableSettingViewModel = new TableSettingElementViewModel(_tables.NewTable(), _config, _templates);
-                tableSettingViewModel.LoadFromTableSetting(setting);
-                _elementList.Add(tableSettingViewModel);
-            }
-        }
         /// <summary>
         /// 空白的View Model对象
         /// </summary>
@@ -790,15 +780,6 @@ namespace IDCA.Client.ViewModel
         void MoveDown()
         {
             _movingDown?.Invoke(this);
-        }
-
-        public void LoadFromTableSetting(TableSetting tableSetting)
-        {
-            _variableName = tableSetting.Field != null ? tableSetting.Field.FullName : string.Empty;
-            _title = tableSetting.TableTitle;
-            _baseText = tableSetting.BaseLabel;
-            _baseFilter = tableSetting.BaseFilter;
-            _tableFilter = tableSetting.TableFilter;
         }
 
 

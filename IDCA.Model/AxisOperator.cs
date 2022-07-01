@@ -14,17 +14,6 @@ namespace IDCA.Bll
     public class AxisOperator
     {
 
-        public const string DefaultAxisBaseLabel = "Total Respondent";
-        public const string DefaultAxisSigmaLabel = "Sigma";
-        public const string DefaultAxisNetAheadLabel = "Net.";
-        public const string DefaultAxisNetLabelSeparater = ":";
-        public const string DefaultAxisNetCodeSeparater = ",";
-        public const string DefaultAxisNetCodeRangeSeparater = "-";
-        public const string DefaultAxisMeanLabel = "AVERAGE";
-        public const string DefaultAxisStdDevLabel = "STANDARD DEVIATION";
-        public const string DefaultAxisStdErrLabel = "STANDARD ERROR";
-        public const string DefaultAxisAverageMentionLabel = "AVERAGE MENTION";
-
         public AxisOperator(Axis axis, Config config, TemplateCollection templates)
         {
             _axis = axis;
@@ -55,20 +44,20 @@ namespace IDCA.Bll
         void LoadConfig()
         {
             _topBottomPosition = Converter.ConvertToAxisTopBottomBoxPosition(
-                _config.TryGet<AxisTopBottomBoxPosition>(SpecConfigKeys.AxisTopBottomBoxPositon));
-            _baseText = _config.TryGet<string>(SpecConfigKeys.AxisBaseLabel) ?? DefaultAxisBaseLabel;
-            _addSigma = _config.TryGet<bool>(SpecConfigKeys.AxisAddSigma);
-            _sigmaLabel = _config.TryGet<string>(SpecConfigKeys.AxisSigmaLabel) ?? DefaultAxisSigmaLabel;
-            _averageMentionLabel = _config.TryGet<string>(SpecConfigKeys.AxisAverageMentionLabel) ?? DefaultAxisAverageMentionLabel;
-            _averageMentionDecimals = _config.TryGet<int>(SpecConfigKeys.AxisAverageMentionDecimals);
-            _averageMentionBlanckRow = _config.TryGet<bool>(SpecConfigKeys.AxisAverageMentionBlankRow);
-            _emptyLineSeparator = _config.TryGet<bool>(SpecConfigKeys.AxisNetInsertEmptyLine);
-            _netAheadLabel = _config.TryGet<string>(SpecConfigKeys.AxisNetAheadLabel) ?? DefaultAxisNetAheadLabel;
-            _npsTopBox = _config.TryGet<int>(SpecConfigKeys.AxisNpsTopBox);
-            _npsBottomBox = _config.TryGet<int>(SpecConfigKeys.AxisNpsBottomBox);
-            _netLabelSeparater = _config.TryGet<string>(SpecConfigKeys.TableSettingNetLabelCodeSeparater) ?? DefaultAxisNetLabelSeparater;
-            _netCodeSeparater = _config.TryGet<string>(SpecConfigKeys.TableSettingNetCodeSeparater) ?? DefaultAxisNetCodeSeparater;
-            _netCodeRangeSeparater = _config.TryGet<string>(SpecConfigKeys.TableSettingNetCodeRangeSeparater) ?? DefaultAxisNetCodeRangeSeparater;
+                (AxisTopBottomBoxPosition)_config.Get(SpecConfigKeys.AXIS_TOP_BOTTOM_BOX_POSITION));
+            _baseText = _config.Get(SpecConfigKeys.AXIS_BASE_LABEL);
+            _addSigma = _config.Get(SpecConfigKeys.AXIS_ADD_SIGMA);
+            _sigmaLabel = _config.Get(SpecConfigKeys.AXIS_SIGMA_LABEL);
+            _averageMentionLabel = _config.Get(SpecConfigKeys.AXIS_AVERAGE_MENTION_LABEL);
+            _averageMentionDecimals = _config.Get(SpecConfigKeys.AXIS_AVERAGE_MENTION_DECIMALS);
+            _averageMentionBlanckRow = _config.Get(SpecConfigKeys.AXIS_AVERAGE_MENTION_BLANKLINE);
+            _emptyLineSeparator = _config.Get(SpecConfigKeys.AXIS_NET_INSERT_EMPTYLINE);
+            _netAheadLabel = _config.Get(SpecConfigKeys.AXIS_NET_AHEAD_LABEL);
+            _npsTopBox = _config.Get(SpecConfigKeys.AXIS_NPS_TOP_BOX);
+            _npsBottomBox = _config.Get(SpecConfigKeys.AXIS_NPS_BOTTOM_BOX);
+            _netLabelSeparater = _config.Get(SpecConfigKeys.TABLE_SETTING_NET_LABEL_CODE_SEPARATER);
+            _netCodeSeparater = _config.Get(SpecConfigKeys.TABLE_SETTING_NET_CODE_SEPARATER);
+            _netCodeRangeSeparater = _config.Get(SpecConfigKeys.TABLE_SETTING_NET_RANGE_SEPARATER);
         }
 
         readonly FunctionTemplate? _axisMeanFunction;
@@ -87,13 +76,13 @@ namespace IDCA.Bll
         // Top Bottom Box 所在轴表达式的位置
         AxisTopBottomBoxPosition _topBottomPosition = AxisTopBottomBoxPosition.BeforeAllCategory;
         // 默认的Base行描述
-        string _baseText = DefaultAxisBaseLabel;
+        string _baseText = SpecConfigDefaultValue.AXIS_BASE_LABEL;
         // 是否添加Sigma行小计
         bool _addSigma = false;
         // Sigma行的默认描述
-        string _sigmaLabel = DefaultAxisSigmaLabel;
+        string _sigmaLabel = SpecConfigDefaultValue.AXIS_SIGMA_LABEL;
         // 计算均值行的默认描述
-        string _averageMentionLabel = DefaultAxisAverageMentionLabel;
+        string _averageMentionLabel = SpecConfigDefaultValue.AXIS_AVERAGE_MENTION_LABEL;
         // 计算均值行的保留小数位数
         int _averageMentionDecimals = 2;
         // 是否在均值行前插入空白行
@@ -101,17 +90,17 @@ namespace IDCA.Bll
         // 是否在两个Net中间插入空白行
         bool _emptyLineSeparator = false;
         // Net行标签开头描述
-        string _netAheadLabel = DefaultAxisNetAheadLabel;
+        string _netAheadLabel = SpecConfigDefaultValue.AXIS_NET_AHEAD_LABEL;
         // 用于计算NPS的Top Box选项数量
         int _npsTopBox = 2;
         // 用于计算NPS的Bottom Box选项数量
         int _npsBottomBox = 6;
         // Net配置中描述和码号两部分的分隔符号
-        string _netLabelSeparater = DefaultAxisNetLabelSeparater;
+        string _netLabelSeparater = SpecConfigDefaultValue.TABLE_SETTING_NET_LABEL_CODE_SEPARATER;
         // 单独码号的分隔符号，例如"V1,V2,V3"中的','
-        string _netCodeSeparater = DefaultAxisNetCodeSeparater;
+        string _netCodeSeparater = SpecConfigDefaultValue.TABLE_SETTING_NET_CODE_SEPARATER;
         // 码号区间的上下限分隔符号，例如"V1-V4"中的'-'
-        string _netCodeRangeSeparater = DefaultAxisNetCodeRangeSeparater;
+        string _netCodeRangeSeparater = SpecConfigDefaultValue.TABLE_SETTING_NET_RANGE_SEPARATER;
 
         bool _isTopBottomBoxReversed = false;
         /// <summary>
@@ -303,10 +292,8 @@ namespace IDCA.Bll
 
         void AppendExactSubtotalSeparater()
         {
-            var subtotal = _axis.AppendSubTotal();
-            subtotal.Suffix.AppendIsHidden(true);
-            var total = _axis.AppendNet("", "..");
-            total.Suffix.AppendIsHidden(true);
+            _axis.AppendSubTotal().Suffix.AppendIsHidden(true);
+            _axis.AppendNet("", "..").Suffix.AppendIsHidden(true);
         }
 
         void AppendMeanStdDevStdErr()
@@ -325,9 +312,9 @@ namespace IDCA.Bll
             else
             {
                 _axis.AppendText();
-                _axis.AppendMean(DefaultAxisMeanLabel, _meanVariable).Suffix.AppendDecimals(2);
-                _axis.AppendStdDev(DefaultAxisStdDevLabel, _meanVariable).Suffix.AppendDecimals(2);
-                _axis.AppendStdErr(DefaultAxisStdErrLabel, _meanVariable).Suffix.AppendDecimals(2);
+                _axis.AppendMean(SpecConfigDefaultValue.AXIS_MEAN_LABEL, _meanVariable).Suffix.AppendDecimals(2);
+                _axis.AppendStdDev(SpecConfigDefaultValue.AXIS_STDDEV_LABEL, _meanVariable).Suffix.AppendDecimals(2);
+                _axis.AppendStdErr(SpecConfigDefaultValue.AXIS_STDERR_LABEL, _meanVariable).Suffix.AppendDecimals(2);
             }
         }
 

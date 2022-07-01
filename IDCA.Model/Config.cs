@@ -20,9 +20,9 @@ namespace IDCA.Model
         /// <typeparam name="T">指定配置信息的类型</typeparam>
         /// <param name="key">配置名称</param>
         /// <returns>配置值</returns>
-        public T? TryGet<T>(string key)
+        public T Get<T>(ConfigInfo<T> info)
         {
-            return _configs.ContainsKey(key) && _configs[key] is T value ? value : default;
+            return _configs.ContainsKey(info.Name) && _configs[info.Name] is T value ? value : info.DefaultValue;
         }
         /// <summary>
         /// 配置指定索引的值
@@ -38,6 +38,20 @@ namespace IDCA.Model
             else
             {
                 _configs.Add(key, value);
+            }
+        }
+
+        /// <summary>
+        /// 配置指定ConfigInfo对应的配置值，如果对应键不存在，将创建新的键值对。
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="info"></param>
+        /// <param name="value"></param>
+        public void Set<T>(ConfigInfo<T> info, T value)
+        {
+            if (value != null)
+            {
+                Set(info.Name, value);
             }
         }
 
@@ -134,31 +148,81 @@ namespace IDCA.Model
         AfterSigma = 2
     }
 
+    /// <summary>
+    /// 保存配置的基础信息，包括配置的名称和默认值，用于配置的查询
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public struct ConfigInfo<T>
+    {
+        public ConfigInfo(string name, T defaultValue)
+        {
+            _name = name;
+            _defaultValue = defaultValue;
+        }
+
+        readonly string _name;
+        readonly T _defaultValue;
+
+        public string Name => _name;
+
+        public T DefaultValue => _defaultValue;
+    }
+
+    public class SpecConfigDefaultValue
+    {
+        public const string TEMPLATE_ROOTPATH = "";
+        public const string METADATA_CATEGORICAL_LABEL = "_";
+        // Axis
+        public const bool AXIS_ADD_SIGMA = true;
+        public const string AXIS_BASE_LABEL = "Base : ";
+        public const string AXIS_SIGMA_LABEL = "Sigma";
+        public const string AXIS_NET_AHEAD_LABEL = "Net.";
+        public const bool AXIS_NET_INSERT_EMPTYLINE = true;
+        public const int AXIS_NPS_TOP_BOX = 2;
+        public const int AXIS_NPS_BOTTOM_BOX = 7;
+        public const string AXIS_MEAN_LABEL = "AVERAGE";
+        public const string AXIS_STDDEV_LABEL = "STANDARD DEVIATION";
+        public const string AXIS_STDERR_LABEL = "STANDARD ERROR";
+        public const int AXIS_TOP_BOTTOM_BOX_POSITION = 1;
+        public const int AXIS_COMBINE_POSITION = 0;
+        public const string AXIS_AVERAGE_MENTION_LABEL = "AVERAGE MENTION";
+        public const bool AXIS_AVERAGE_MENTION_BLANKLINE = true;
+        public const int AXIS_AVERAGE_MENTION_DECIMALS = 2;
+        // Table
+        public const string TABLE_SUMMARY_LABEL = " - Summary";
+        public const string TABLE_SETTING_NET_LABEL_CODE_SEPARATER = ":";
+        public const string TABLE_SETTING_NET_CODE_SEPARATER = ",";
+        public const string TABLE_SETTING_NET_RANGE_SEPARATER = "-";
+    }
+
     public class SpecConfigKeys
     {
-        public const string TemplateRootPath = "TemplateRootPath";
-        public const string MetadataCategoricalLabel = "MetadataCategoricalLabel";
+        public static readonly ConfigInfo<string> GLOBAL_TEMPLATE_ROOTPATH = new(nameof(GLOBAL_TEMPLATE_ROOTPATH), SpecConfigDefaultValue.TEMPLATE_ROOTPATH);
+        public static readonly ConfigInfo<string> METADATA_CATEGORICAL_LABEL = new(nameof(METADATA_CATEGORICAL_LABEL), SpecConfigDefaultValue.METADATA_CATEGORICAL_LABEL);
         // Axis Config
-        public const string AxisAddSigma = "AxisAddSigma";
-        public const string AxisBaseLabel = "AxisBaseLabel";
-        public const string AxisSigmaLabel = "AxisSigmaLabel";
-        public const string AxisNetAheadLabel = "AxisNetAheadLabel";
-        public const string AxisNetInsertEmptyLine = "AxisNetInsertEmptyLine";
-        public const string AxisNpsTopBox = "AxisNpsTopBox";
-        public const string AxisNpsBottomBox = "AxisNpsBottomBox";
+        public static readonly ConfigInfo<bool> AXIS_ADD_SIGMA = new(nameof(AXIS_ADD_SIGMA), SpecConfigDefaultValue.AXIS_ADD_SIGMA);
+        public static readonly ConfigInfo<string> AXIS_BASE_LABEL = new(nameof(AXIS_BASE_LABEL), SpecConfigDefaultValue.AXIS_BASE_LABEL);
+        public static readonly ConfigInfo<string> AXIS_SIGMA_LABEL = new(nameof(AXIS_SIGMA_LABEL), SpecConfigDefaultValue.AXIS_SIGMA_LABEL);
+        public static readonly ConfigInfo<string> AXIS_NET_AHEAD_LABEL = new(nameof(AXIS_NET_AHEAD_LABEL), SpecConfigDefaultValue.AXIS_NET_AHEAD_LABEL);
+        public static readonly ConfigInfo<bool> AXIS_NET_INSERT_EMPTYLINE = new(nameof(AXIS_NET_INSERT_EMPTYLINE), SpecConfigDefaultValue.AXIS_NET_INSERT_EMPTYLINE);
+        public static readonly ConfigInfo<int> AXIS_NPS_TOP_BOX = new(nameof(AXIS_NPS_TOP_BOX), SpecConfigDefaultValue.AXIS_NPS_TOP_BOX);
+        public static readonly ConfigInfo<int> AXIS_NPS_BOTTOM_BOX = new(nameof(AXIS_NPS_BOTTOM_BOX), SpecConfigDefaultValue.AXIS_NPS_BOTTOM_BOX);
+        public static readonly ConfigInfo<string> AXIS_MEAN_LABEL = new(nameof(AXIS_MEAN_LABEL), SpecConfigDefaultValue.AXIS_MEAN_LABEL);
+        public static readonly ConfigInfo<string> AXIS_STDDEV_LABEL = new(nameof(AXIS_STDDEV_LABEL), SpecConfigDefaultValue.AXIS_STDDEV_LABEL);
+        public static readonly ConfigInfo<string> AXIS_STDERR_LABEL = new(nameof(AXIS_STDERR_LABEL), SpecConfigDefaultValue.AXIS_STDERR_LABEL);
         /// <summary>
         /// 配置Top/Bottom Box的位置，其int值需要与AxisTopBottomBoxPosition的值相同
         /// </summary>
-        public const string AxisTopBottomBoxPositon = "AxisTopBottomBoxPositon";
-        public const string AxisCombinePosition = "AxisCombinePosition";
-        public const string AxisAverageMentionLabel = "AxisAverageMentionLabel";
-        public const string AxisAverageMentionBlankRow = "AxisAverageMentionBlankRow";
-        public const string AxisAverageMentionDecimals = "AxisAverageMentionDecimals";
-        public const string TableSummaryLabel = "TableSummaryLabel";
+        public static readonly ConfigInfo<int> AXIS_TOP_BOTTOM_BOX_POSITION = new(nameof(AXIS_TOP_BOTTOM_BOX_POSITION), SpecConfigDefaultValue.AXIS_TOP_BOTTOM_BOX_POSITION);
+        public static readonly ConfigInfo<int> AXIS_COMBINE_POSITION = new(nameof(AXIS_COMBINE_POSITION), SpecConfigDefaultValue.AXIS_COMBINE_POSITION);
+        public static readonly ConfigInfo<string> AXIS_AVERAGE_MENTION_LABEL = new(nameof(AXIS_AVERAGE_MENTION_LABEL), SpecConfigDefaultValue.AXIS_AVERAGE_MENTION_LABEL);
+        public static readonly ConfigInfo<bool> AXIS_AVERAGE_MENTION_BLANKLINE = new(nameof(AXIS_AVERAGE_MENTION_BLANKLINE), SpecConfigDefaultValue.AXIS_AVERAGE_MENTION_BLANKLINE);
+        public static readonly ConfigInfo<int> AXIS_AVERAGE_MENTION_DECIMALS = new(nameof(AXIS_AVERAGE_MENTION_DECIMALS), SpecConfigDefaultValue.AXIS_AVERAGE_MENTION_DECIMALS);
         // Table Setting
-        public const string TableSettingNetLabelCodeSeparater = "TableSettingNetLabelCodeSeparater";
-        public const string TableSettingNetCodeSeparater = "TableSettingNetCodeSeparater";
-        public const string TableSettingNetCodeRangeSeparater = "TableSettingNetCodeRangeSeparater";
+        public static readonly ConfigInfo<string> TABLE_SUMMARY_LABEL = new(nameof(TABLE_SUMMARY_LABEL), SpecConfigDefaultValue.TABLE_SUMMARY_LABEL);
+        public static readonly ConfigInfo<string> TABLE_SETTING_NET_LABEL_CODE_SEPARATER = new(nameof(TABLE_SETTING_NET_LABEL_CODE_SEPARATER), SpecConfigDefaultValue.TABLE_SETTING_NET_LABEL_CODE_SEPARATER);
+        public static readonly ConfigInfo<string> TABLE_SETTING_NET_CODE_SEPARATER = new(nameof(TABLE_SETTING_NET_CODE_SEPARATER), SpecConfigDefaultValue.TABLE_SETTING_NET_CODE_SEPARATER);
+        public static readonly ConfigInfo<string> TABLE_SETTING_NET_RANGE_SEPARATER = new(nameof(TABLE_SETTING_NET_RANGE_SEPARATER), SpecConfigDefaultValue.TABLE_SETTING_NET_RANGE_SEPARATER);
     }
 
 }

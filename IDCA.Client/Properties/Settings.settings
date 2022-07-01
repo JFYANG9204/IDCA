@@ -2,41 +2,68 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="IDCA.Client.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="Templates" Type="System.Collections.Specialized.StringCollection" Scope="User">
+    <Setting Name="GLOBAL_TEMPLATE_ROOTPATH" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="MetadataCategoricalLabel" Type="System.String" Scope="User">
+    <Setting Name="METADATA_CATEGORICAL_LABEL" Type="System.String" Scope="User">
       <Value Profile="(Default)">V</Value>
     </Setting>
-    <Setting Name="AxisBaseLabel" Type="System.String" Scope="User">
+    <Setting Name="AXIS_BASE_LABEL" Type="System.String" Scope="User">
       <Value Profile="(Default)">Total Respondents</Value>
     </Setting>
-    <Setting Name="AxisSigmaLabel" Type="System.String" Scope="User">
+    <Setting Name="AXIS_SIGMA_LABEL" Type="System.String" Scope="User">
       <Value Profile="(Default)">Sigma</Value>
     </Setting>
-    <Setting Name="AxisNetAheadLabel" Type="System.String" Scope="User">
+    <Setting Name="AXIS_NET_AHEAD_LABEL" Type="System.String" Scope="User">
       <Value Profile="(Default)">Net.</Value>
     </Setting>
-    <Setting Name="AxisNetInsertEmptyLine" Type="System.Boolean" Scope="User">
+    <Setting Name="AXIS_NET_INSERT_EMPTYLINE" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="AxisTopBottomBoxPositon" Type="System.Int32" Scope="User">
+    <Setting Name="AXIS_TOP_BOTTOM_BOX_POSITION" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">1</Value>
     </Setting>
-    <Setting Name="AxisCombinePosition" Type="System.Int32" Scope="User">
+    <Setting Name="AXIS_COMBINE_POSITION" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="TableSummaryLabel" Type="System.String" Scope="User">
+    <Setting Name="TABLE_SUMMARY_LABEL" Type="System.String" Scope="User">
       <Value Profile="(Default)"> - Summary</Value>
     </Setting>
-    <Setting Name="TemplateRootPath" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="AxisNpsTopBox" Type="System.Int32" Scope="User">
+    <Setting Name="AXIS_NPS_TOP_BOX" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">2</Value>
     </Setting>
-    <Setting Name="AxisNpsBottomBox" Type="System.Int32" Scope="User">
+    <Setting Name="AXIS_NPS_BOTTOM_BOX" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">7</Value>
+    </Setting>
+    <Setting Name="AXIS_ADD_SIGMA" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="AXIS_AVERAGE_MENTION_LABEL" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Average</Value>
+    </Setting>
+    <Setting Name="AXIS_AVERAGE_MENTION_BLANKLINE" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="AXIS_AVERAGE_MENTION_DECIMALS" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">2</Value>
+    </Setting>
+    <Setting Name="TABLE_SETTING_NET_LABEL_CODE_SEPARATER" Type="System.String" Scope="User">
+      <Value Profile="(Default)">:</Value>
+    </Setting>
+    <Setting Name="TABLE_SETTING_NET_CODE_SEPARATER" Type="System.String" Scope="User">
+      <Value Profile="(Default)">,</Value>
+    </Setting>
+    <Setting Name="TABLE_SETTING_NET_RANGE_SEPARATER" Type="System.String" Scope="User">
+      <Value Profile="(Default)">-</Value>
+    </Setting>
+    <Setting Name="AXIS_MEAN_LABEL" Type="System.String" Scope="User">
+      <Value Profile="(Default)">AVERAGE</Value>
+    </Setting>
+    <Setting Name="AXIS_STDDEV_LABEL" Type="System.String" Scope="User">
+      <Value Profile="(Default)">STANDARD DEVIATION</Value>
+    </Setting>
+    <Setting Name="AXIS_STDERR_LABEL" Type="System.String" Scope="User">
+      <Value Profile="(Default)">STANDARD ERROR</Value>
     </Setting>
   </Settings>
 </SettingsFile>
