@@ -110,12 +110,12 @@ namespace IDCA.Client.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int AXIS_COMBINE_POSITION {
+        public int AXIS_NET_TYPE {
             get {
-                return ((int)(this["AXIS_COMBINE_POSITION"]));
+                return ((int)(this["AXIS_NET_TYPE"]));
             }
             set {
-                this["AXIS_COMBINE_POSITION"] = value;
+                this["AXIS_NET_TYPE"] = value;
             }
         }
         

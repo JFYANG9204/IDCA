@@ -1,12 +1,11 @@
-﻿using IDCA.Model;
-using IDCA.Model.MDM;
+﻿using IDCA.Model.MDM;
 using IDCA.Model.Spec;
 using IDCA.Model.Template;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace IDCA.Bll
+namespace IDCA.Model
 {
     /// <summary>
     /// 轴表达式操作类，用于生成各种样式的轴表达式

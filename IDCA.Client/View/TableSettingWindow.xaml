@@ -145,8 +145,9 @@
                           ItemsSource="{Binding Tree.Children}"
                           d:ItemsSource="{d:SampleData ItemCount=5}">
                     <TreeView.ItemContainerStyle>
-                        <Style TargetType="TreeViewItem">
+                        <Style TargetType="TreeViewItem" BasedOn="{StaticResource MahApps.Styles.TreeViewItem}">
                             <Setter Property="IsSelected" Value="{Binding IsSelected}"/>
+                            <Setter Property="Background" Value="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"/>
                         </Style>
                     </TreeView.ItemContainerStyle>
                     <TreeView.ItemTemplate>
@@ -168,12 +169,16 @@
                                            Text="{Binding Name}"/>
                                 <Button Grid.Column="1"
                                         Style="{StaticResource IDCA.Button.Add}"
+                                        Foreground="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem}, Path=Foreground}"
                                         Visibility="{Binding AllowAppendChild, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                        Command="{Binding AddChildCommand}"/>
+                                        Command="{Binding AddChildCommand}" 
+                                        Cursor="Hand"/>
                                 <Button Grid.Column="1"
                                         Style="{StaticResource IDCA.Button.Remove}"
+                                        Foreground="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem}, Path=Foreground}"
                                         Visibility="{Binding AllowNodeRemoving, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                        Command="{Binding RemoveCommand}"/>
+                                        Command="{Binding RemoveCommand}"
+                                        Cursor="Hand"/>
                             </Grid>
                         </HierarchicalDataTemplate>
                     </TreeView.ItemTemplate>

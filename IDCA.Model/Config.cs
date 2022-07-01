@@ -103,7 +103,7 @@ namespace IDCA.Model
         /// 将当前配置的值更新到配置对象中，需要配置对象包含同名属性
         /// </summary>
         /// <param name="properties"></param>
-        public void UpdateToSettings(object properties)
+        public void Synchronize(object properties)
         {
             var type = properties.GetType();
             foreach (var key in _configs.Keys)
@@ -184,7 +184,7 @@ namespace IDCA.Model
         public const string AXIS_STDDEV_LABEL = "STANDARD DEVIATION";
         public const string AXIS_STDERR_LABEL = "STANDARD ERROR";
         public const int AXIS_TOP_BOTTOM_BOX_POSITION = 1;
-        public const int AXIS_COMBINE_POSITION = 0;
+        public const int AXIS_NET_TYPE = 0;
         public const string AXIS_AVERAGE_MENTION_LABEL = "AVERAGE MENTION";
         public const bool AXIS_AVERAGE_MENTION_BLANKLINE = true;
         public const int AXIS_AVERAGE_MENTION_DECIMALS = 2;
@@ -214,7 +214,7 @@ namespace IDCA.Model
         /// 配置Top/Bottom Box的位置，其int值需要与AxisTopBottomBoxPosition的值相同
         /// </summary>
         public static readonly ConfigInfo<int> AXIS_TOP_BOTTOM_BOX_POSITION = new(nameof(AXIS_TOP_BOTTOM_BOX_POSITION), SpecConfigDefaultValue.AXIS_TOP_BOTTOM_BOX_POSITION);
-        public static readonly ConfigInfo<int> AXIS_COMBINE_POSITION = new(nameof(AXIS_COMBINE_POSITION), SpecConfigDefaultValue.AXIS_COMBINE_POSITION);
+        public static readonly ConfigInfo<int> AXIS_NET_TYPE = new(nameof(AXIS_NET_TYPE), SpecConfigDefaultValue.AXIS_NET_TYPE);
         public static readonly ConfigInfo<string> AXIS_AVERAGE_MENTION_LABEL = new(nameof(AXIS_AVERAGE_MENTION_LABEL), SpecConfigDefaultValue.AXIS_AVERAGE_MENTION_LABEL);
         public static readonly ConfigInfo<bool> AXIS_AVERAGE_MENTION_BLANKLINE = new(nameof(AXIS_AVERAGE_MENTION_BLANKLINE), SpecConfigDefaultValue.AXIS_AVERAGE_MENTION_BLANKLINE);
         public static readonly ConfigInfo<int> AXIS_AVERAGE_MENTION_DECIMALS = new(nameof(AXIS_AVERAGE_MENTION_DECIMALS), SpecConfigDefaultValue.AXIS_AVERAGE_MENTION_DECIMALS);

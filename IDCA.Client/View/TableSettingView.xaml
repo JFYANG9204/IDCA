@@ -111,6 +111,7 @@
                         <DataTemplate>
                             <view:PopupButton Width="40" 
                                               Height="20"
+                                              Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource AncestorType=DataGridCell}}"
                                               HorizontalAlignment="Center"
                                               VerticalAlignment="Center"
                                               Cursor="Hand">
@@ -178,7 +179,9 @@
                 <DataGridTemplateColumn Header="表格类型" Width="80">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <ComboBox ItemsSource="{x:Static viewmodel:TableSettingElementViewModel.TableTypeSelections}"
+                            <ComboBox Background="{Binding Path=Background, RelativeSource={RelativeSource AncestorType=DataGridCell}}"
+                                      Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource AncestorType=DataGridCell}}"
+                                      ItemsSource="{x:Static viewmodel:TableSettingElementViewModel.TableTypeSelections}"
                                       SelectedIndex="{Binding TableTypeSelectedIndex}"
                                       VerticalContentAlignment="Center"/>
                         </DataTemplate>
@@ -189,6 +192,7 @@
                         <DataTemplate>
                             <view:PopupButton Width="40"
                                               Height="20"
+                                              Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource AncestorType=DataGridCell}}"
                                               HorizontalAlignment="Center"
                                               VerticalAlignment="Center"
                                               Cursor="Hand">
@@ -209,6 +213,7 @@
                                             </Style>
                                             <Style TargetType="TextBlock">
                                                 <Setter Property="Margin" Value="2"/>
+                                                <Setter Property="Foreground" Value="Black"/>
                                                 <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
                                                 <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
                                                 <Setter Property="VerticalAlignment" Value="Center"/>
@@ -273,10 +278,23 @@
                                         <CheckBox Grid.Column="2" Grid.Row="10" Content="{x:Static viewmodel:ViewModelConstants.AxisBottom6BoxName}" IsChecked="{Binding TopBottomBoxSelections[12].Checked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                         <CheckBox Grid.Column="2" Grid.Row="12" Content="{x:Static viewmodel:ViewModelConstants.AxisBottom7BoxName}" IsChecked="{Binding TopBottomBoxSelections[13].Checked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-                                        <CheckBox Grid.Column="4" Grid.Row="0" Content="{x:Static viewmodel:ViewModelConstants.AxisNpsName}" IsChecked="{Binding TopBottomBoxSelections[14].Checked}"/>
+                                        <StackPanel Orientation="Horizontal" Grid.Column="4" Grid.Row="0">
+                                            <TextBlock>码号赋值顺序</TextBlock>
+                                            <ComboBox FontFamily="{StaticResource IDCA.Font.Family}"
+                                                      FontSize="{StaticResource IDCA.Font.Size.Content}"
+                                                      Height="23" 
+                                                      VerticalAlignment="Center"
+                                                      ItemsSource="{x:Static viewmodel:TableSettingElementViewModel.FactorSequence}"
+                                                      SelectedIndex="{Binding FactorSequenceSelectedIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                        </StackPanel>
+                                        
+                                        <CheckBox Grid.Column="4" 
+                                                  Grid.Row="2" 
+                                                  Content="{x:Static viewmodel:ViewModelConstants.AxisNpsName}" 
+                                                  IsChecked="{Binding TopBottomBoxSelections[14].Checked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
                                         <Grid Grid.Column="4"
-                                              Grid.Row="2"
+                                              Grid.Row="4"
                                               Grid.RowSpan="8">
 
                                             <Grid.RowDefinitions>
@@ -288,6 +306,7 @@
                                                 <RowDefinition Height="1"/>
                                                 <RowDefinition Height="35"/>
                                                 <RowDefinition Height="1"/>
+                                                <RowDefinition Height="35"/>
                                             </Grid.RowDefinitions>
 
                                             <Grid.ColumnDefinitions>
@@ -311,7 +330,7 @@
 
                                         </Grid>
 
-                                        <CheckBox Grid.Row="10" Grid.Column="4" Content="添加平均提及" IsChecked="{Binding AppendAverage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                        <CheckBox Grid.Row="12" Grid.Column="4" Content="添加平均提及" IsChecked="{Binding AppendAverage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                         
                                     </Grid>
                                 </Border>
@@ -322,7 +341,9 @@
                 <DataGridTemplateColumn Header="Net类型" Width="75">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <ComboBox VerticalContentAlignment="Center"
+                            <ComboBox Background="{Binding Path=Background, RelativeSource={RelativeSource AncestorType=DataGridCell}}"
+                                      Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource AncestorType=DataGridCell}}"
+                                      VerticalContentAlignment="Center"
                                       ItemsSource="{x:Static viewmodel:TableSettingElementViewModel.TableNetTypeSelections}"
                                       SelectedIndex="{Binding NetTypeSelectedIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                         </DataTemplate>
@@ -331,9 +352,10 @@
                 <DataGridTemplateColumn Header="轴表达式" Width="70">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button HorizontalAlignment="Stretch"
+                            <Button Background="{Binding Path=Background, RelativeSource={RelativeSource AncestorType=DataGridCell}}"
+                                    Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource AncestorType=DataGridCell}}"
+                                    HorizontalAlignment="Stretch"
                                     VerticalAlignment="Stretch"
-                                    Background="{StaticResource IDCA.Brushes.Button.Background}"
                                     Command="{Binding AxisSettingCommand}">配置</Button>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -342,7 +364,9 @@
                 <DataGridTemplateColumn Header="配置变量" Width="75">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button IsEnabled="{Binding AddNewVariable}" 
+                            <Button Background="{Binding Path=Background, RelativeSource={RelativeSource AncestorType=DataGridCell}}"
+                                    Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource AncestorType=DataGridCell}}"
+                                    IsEnabled="{Binding AddNewVariable}" 
                                     Content="配置"
                                     Command="{Binding NewVariableSettingCommand}"/>
                         </DataTemplate>

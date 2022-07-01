@@ -59,6 +59,10 @@ namespace IDCA.Model.Template
         /// Template模板描述
         /// </summary>
         public string Description { get => _description; set => _description = value; }
+        /// <summary>
+        /// Template的XML描述文件路径
+        /// </summary>
+        public string XmlPath { get => _path; }
 
         /// <summary>
         /// 当前模板集合中的Library部分文件模板

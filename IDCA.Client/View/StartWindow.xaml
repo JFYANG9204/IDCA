@@ -93,23 +93,12 @@
         <Grid Grid.Column="2">
 
             <Grid.Resources>
-                <Style x:Key="IDCA.Window.Start.DialogButton" 
-                       TargetType="Button">
-                    <Setter Property="Height" Value="30"/>
-                    <Setter Property="Width" Value="30"/>
-                    <Setter Property="Margin" Value="5"/>
-                    <Setter Property="BorderBrush" Value="{StaticResource MahApps.Brushes.Button.Border}"/>
-                    <Setter Property="Background" Value="{StaticResource IDCA.Brushes.Button.Background}"/>
-                    <Setter Property="VerticalContentAlignment" Value="Bottom"/>
-                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                    <Setter Property="Content" Value="..."/>
-                </Style>
                 <Style TargetType="TextBlock">
                     <Setter Property="VerticalAlignment" Value="Bottom"/>
                     <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
                     <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.TextBlock.Label}"/>
                 </Style>
-                <Style TargetType="TextBox">
+                <Style TargetType="TextBox" BasedOn="{StaticResource MahApps.Styles.TextBox}">
                     <Setter Property="Width" Value="340"/>
                     <Setter Property="Height" Value="30"/>
                     <Setter Property="FontSize" Value="13"/>
@@ -138,7 +127,7 @@
                     HorizontalAlignment="Right"
                     Margin="25, 20"
                     Cursor="Hand"
-                    Command="{Binding LoadTemplateCommand}">
+                    Command="{Binding ShowSettingWindowCommand}">
                 <Button.Template>
                     <ControlTemplate TargetType="Button">
                         <Grid Width="35"
@@ -162,21 +151,21 @@
             <TextBlock Grid.Row="3">项目路径</TextBlock>
             <StackPanel Grid.Row="4" Orientation="Horizontal">
                 <TextBox Text="{Binding ProjectRootPath}"/>
-                <Button Style="{StaticResource IDCA.Window.Start.DialogButton}" 
+                <Button Style="{StaticResource IDCA.Window.DialogButton}" 
                         Command="{Binding SelectProjectPathCommand}"/>
             </StackPanel>
 
             <TextBlock Grid.Row="5">MDM文档路径</TextBlock>
             <StackPanel Grid.Row="6" Orientation="Horizontal">
                 <TextBox Text="{Binding MdmDocumentPath}"/>
-                <Button Style="{StaticResource IDCA.Window.Start.DialogButton}" 
+                <Button Style="{StaticResource IDCA.Window.DialogButton}" 
                         Command="{Binding SelectMdmDocumentPathCommand}"/>
             </StackPanel>
 
             <TextBlock Grid.Row="7">Excel配置文档路径（可选）</TextBlock>
             <StackPanel Grid.Row="8" Orientation="Horizontal">
                 <TextBox Text="{Binding ExcelSettingFilePath}"/>
-                <Button Style="{StaticResource IDCA.Window.Start.DialogButton}" 
+                <Button Style="{StaticResource IDCA.Window.DialogButton}" 
                         Command="{Binding SelectExcelSettingFilePathCommand}"/>
             </StackPanel>
             

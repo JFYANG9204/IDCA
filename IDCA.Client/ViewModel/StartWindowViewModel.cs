@@ -20,12 +20,16 @@ namespace IDCA.Client.ViewModel
             _templateDictionary = GlobalConfig.Instance.TemplateDictionary;
             _templateItems = new ObservableCollection<TemplateElementViewModel>();
             UpdateTemplateInformation();
+            GlobalConfig.Instance.SettingWindowViewModel.TemplateRootPathChanged += s => UpdateTemplateInformation();
         }
 
         readonly Config _config;
         readonly TemplateDictionary _templateDictionary;
 
         bool _mainWindowToClose = false;
+        /// <summary>
+        /// 用于控制开始窗口是否关闭
+        /// </summary>
         public bool MainWindowToClose
         {
             get { return _mainWindowToClose; }
@@ -33,6 +37,9 @@ namespace IDCA.Client.ViewModel
         }
 
         ObservableCollection<TemplateElementViewModel> _templateItems;
+        /// <summary>
+        /// 当前读取到的模板配置
+        /// </summary>
         public ObservableCollection<TemplateElementViewModel> TemplateItems
         {
             get { return _templateItems; }
@@ -40,6 +47,9 @@ namespace IDCA.Client.ViewModel
         }
 
         int _templateSelectedIndex = -1;
+        /// <summary>
+        /// 模板列表选中索引
+        /// </summary>
         public int TemplateSelectedIndex
         {
             get { return _templateSelectedIndex; }
@@ -51,18 +61,27 @@ namespace IDCA.Client.ViewModel
         }
 
         bool _isConfirmButtonEnable = false;
+        /// <summary>
+        /// 确认按钮是否可用。如果不填写所有必须的配置，需要禁用确认按钮，完成必须内容的填写才能进行下一步
+        /// </summary>
         public bool IsConfirmButtonEnable
         {
             get { return _isConfirmButtonEnable; }
             set { SetProperty(ref _isConfirmButtonEnable, value); }
         }
 
+        /// <summary>
+        /// 检查当前的必须参数是否都已有值，如果都已赋值，将确认按钮改为可用
+        /// </summary>
         void CheckConfirmEnable()
         {
             IsConfirmButtonEnable = _templateSelectedIndex >= 0 && _templateSelectedIndex < _templateItems.Count;
         }
 
         string _projectName = string.Empty;
+        /// <summary>
+        /// 项目名称
+        /// </summary>
         public string ProjectName
         {
             get { return _projectName; }
@@ -74,6 +93,9 @@ namespace IDCA.Client.ViewModel
         }
 
         string _projectRootPath = GlobalConfig.Instance.ProjectRootPath;
+        /// <summary>
+        /// 项目的根目录
+        /// </summary>
         public string ProjectRootPath
         {
             get { return _projectRootPath; }
@@ -84,6 +106,9 @@ namespace IDCA.Client.ViewModel
             }
         }
 
+        /// <summary>
+        /// 弹出文件夹选择界面并选择项目的根目录。
+        /// </summary>
         void SelectProjectPath()
         {
             object? dialogResult = WindowManager.ShowFolderBrowserDialog();
@@ -96,6 +121,9 @@ namespace IDCA.Client.ViewModel
         public ICommand SelectProjectPathCommand => new RelayCommand(SelectProjectPath);
 
         string _excelSettingFilePath = GlobalConfig.Instance.ExcelSettingFilePath;
+        /// <summary>
+        /// Excel配置文件的路径，可选参数。
+        /// </summary>
         public string ExcelSettingFilePath
         {
             get { return _excelSettingFilePath; }
@@ -106,6 +134,9 @@ namespace IDCA.Client.ViewModel
             }
         }
 
+        /// <summary>
+        /// 弹出文件选取界面并选取EXCEL配置文件。
+        /// </summary>
         void SelectExcelSettingFilePath()
         {
             object? dialogResult = WindowManager.ShowOpenFileDialog("Excel File|*.xlsx");
@@ -118,6 +149,9 @@ namespace IDCA.Client.ViewModel
         public ICommand SelectExcelSettingFilePathCommand => new RelayCommand(SelectExcelSettingFilePath);
 
         string _mdmDocumentPath = GlobalConfig.Instance.MdmDocumentPath;
+        /// <summary>
+        /// 扩展名为.mdd的MDM文档路径，可以在表格配置界面修改。
+        /// </summary>
         public string MdmDocumentPath
         {
             get { return _mdmDocumentPath; }
@@ -128,6 +162,9 @@ namespace IDCA.Client.ViewModel
             }
         }
 
+        /// <summary>
+        /// 弹出选择.mdd类型文件的文件选取窗口。
+        /// </summary>
         void SelectMdmDocumentPath()
         {
             object? dialogResult = WindowManager.ShowOpenFileDialog("MDM Document|*.mdd");
@@ -139,6 +176,10 @@ namespace IDCA.Client.ViewModel
 
         public ICommand SelectMdmDocumentPathCommand => new RelayCommand(SelectMdmDocumentPath);
 
+        /// <summary>
+        /// 确认按钮相应方法，需要隐藏当前开始窗口并打开新的表格配置窗口。
+        /// </summary>
+        /// <param name="sender"></param>
         void Confirm(object? sender)
         {
             WindowManager.HideWindow(sender);
@@ -153,12 +194,12 @@ namespace IDCA.Client.ViewModel
         }
         public ICommand ConfirmCommand => new RelayCommand<object?>(Confirm);
 
-
+        /// <summary>
+        /// 更新当前已经载入的模板列表
+        /// </summary>
         void UpdateTemplateInformation()
         {
-            GlobalConfig.Instance.TemplateDictionary.Clear();
             _templateItems.Clear();
-            _templateDictionary.LoadFromFolder(_config.Get(SpecConfigKeys.GLOBAL_TEMPLATE_ROOTPATH));
             foreach (var item in GlobalConfig.Instance.TemplateDictionary.GetTemplates())
             {
                 var templateElement = new TemplateElementViewModel(item);
@@ -166,17 +207,13 @@ namespace IDCA.Client.ViewModel
             }
         }
 
-        void LoadTemplate()
+        /// <summary>
+        /// 弹出文件夹选取窗口并更新模板列表。
+        /// </summary>
+        void ShowSettingWindow()
         {
-            string? folder = WindowManager.ShowFolderBrowserDialog();
-            if (folder != null && Directory.Exists(folder))
-            {
-                _config.Set(SpecConfigKeys.GLOBAL_TEMPLATE_ROOTPATH, folder);
-                _config.UpdateToSettings(Properties.Settings.Default);
-                Properties.Settings.Default.Save();
-                UpdateTemplateInformation();
-            }
+            WindowManager.ShowWindow("SettingWindow", GlobalConfig.Instance.SettingWindowViewModel);
         }
-        public ICommand LoadTemplateCommand => new RelayCommand(LoadTemplate);
+        public ICommand ShowSettingWindowCommand => new RelayCommand(ShowSettingWindow);
     }
 }

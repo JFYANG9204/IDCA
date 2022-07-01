@@ -1,5 +1,4 @@
 ﻿
-using IDCA.Bll;
 using IDCA.Model;
 using IDCA.Model.Spec;
 using IDCA.Model.Template;

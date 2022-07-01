@@ -5,14 +5,108 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:view="clr-namespace:IDCA.Client.View"
+    xmlns:viewmodel="clr-namespace:IDCA.Client.ViewModel" 
+    d:DataContext="{d:DesignInstance Type=viewmodel:SettingWindowViewModel}"
     mc:Ignorable="d"
-    Title="" 
+    Title="全局配置" 
+    FontFamily="{StaticResource IDCA.Font.Family}"
     Height="450"
     Width="600"
     ResizeMode="NoResize"
     Background="{StaticResource IDCA.Brushes.Window.Background}">
     <Grid>
-        
+        <TabControl Margin="10"
+                    Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"
+                    BorderBrush="{StaticResource IDCA.Brushes.Window.BorderBrush}"
+                    mah:HeaderedControlHelper.HeaderFontSize="{StaticResource IDCA.Font.Size.Content}"
+                    mah:HeaderedControlHelper.HeaderFontFamily="{StaticResource IDCA.Font.Family}"
+                    >
+            <mah:MetroTabItem Header="模板" Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}">
+                <Grid>
+                    
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40"/>
+                        <RowDefinition Height="1"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Orientation="Horizontal">
+                        <TextBlock Margin="10" 
+                                   FontSize="{StaticResource IDCA.Font.Size.Content}"
+                                   FontFamily="{StaticResource IDCA.Font.Family}"
+                                   VerticalAlignment="Center">模板根目录</TextBlock>
+                        <TextBox Height="30"
+                                 Width="250"
+                                 Margin="5"
+                                 VerticalContentAlignment="Center"
+                                 VerticalAlignment="Center"
+                                 FontFamily="{StaticResource IDCA.Font.Family}"
+                                 FontSize="{StaticResource IDCA.Font.Size.Content}"
+                                 Text="{Binding TemplateRootPath}"/>
+                        <Button Style="{StaticResource IDCA.Window.DialogButton}" Command="{Binding SelectTemplateRootPathCommand}"/>
+                    </StackPanel>
+
+                    <GridSplitter Grid.Row="1" Style="{StaticResource IDCA.GridSplitter.Horizonal}"/>
+
+                    <Grid Grid.Row="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="40"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" 
+                                   Margin="10"
+                                   FontFamily="{StaticResource IDCA.Font.Family}"
+                                   FontSize="{StaticResource IDCA.Font.Size.Content}"
+                                   Text="所有模板"/>
+                        <DataGrid Grid.Row="1"
+                                  Margin="10 0"
+                                  Style="{StaticResource IDCA.DataGrid.Base}"
+                                  Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"
+                                  ItemsSource="{Binding TemplateInfos}"
+                                  d:ItemsSource="{d:SampleData ItemCount=5}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="模板名称" Binding="{Binding Name}" Width="100"/>
+                                <DataGridTextColumn Header="模板描述" Binding="{Binding Description}" Width="150"/>
+                                <DataGridTextColumn Header="模板路径" Binding="{Binding XmlPath}" Width="150"/>
+                                <DataGridTemplateColumn>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button VerticalAlignment="Center"
+                                                    HorizontalAlignment="Center"
+                                                    Style="{StaticResource IDCA.Window.DialogButton}"
+                                                    Command="{Binding OpenXmlFolderCommand}"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                    
+                </Grid>
+            </mah:MetroTabItem>
+            <mah:MetroTabItem Header="轴">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="35"/>
+                        <RowDefinition Height="1"/>
+                        <RowDefinition Height="35"/>
+                        <RowDefinition Height="1"/>
+                        <RowDefinition Height="35"/>
+                        <RowDefinition Height="1"/>
+                        <RowDefinition Height="35"/>
+                        <RowDefinition Height="1"/>
+                        <RowDefinition Height="35"/>
+                        <RowDefinition Height="1"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="1"/>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                </Grid>
+            </mah:MetroTabItem>
+        </TabControl>
     </Grid>
 </mah:MetroWindow>

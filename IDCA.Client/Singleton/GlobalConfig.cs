@@ -1,4 +1,5 @@
-﻿using IDCA.Model;
+﻿using IDCA.Client.ViewModel;
+using IDCA.Model;
 using IDCA.Model.Template;
 
 namespace IDCA.Client.Singleton
@@ -12,6 +13,8 @@ namespace IDCA.Client.Singleton
             _templateRootPath = _config.Get(SpecConfigKeys.GLOBAL_TEMPLATE_ROOTPATH);
             _templateDictionary = new TemplateDictionary();
             _templateDictionary.LoadFromFolder(_templateRootPath);
+            _settingWindowViewModel = new SettingWindowViewModel(_config);
+            _settingWindowViewModel.LoadTemplateInfos(_templateDictionary);
         }
 
         /// <summary>
@@ -74,5 +77,12 @@ namespace IDCA.Client.Singleton
         /// 当前保存的模板文件夹路径
         /// </summary>
         public string TemplateRootPath { get => _templateRootPath; set => _templateRootPath = value; }
+
+        readonly SettingWindowViewModel _settingWindowViewModel;
+        /// <summary>
+        /// 全局配置窗口使用的ViewModel
+        /// </summary>
+        public SettingWindowViewModel SettingWindowViewModel => _settingWindowViewModel;
+
     }
 }
