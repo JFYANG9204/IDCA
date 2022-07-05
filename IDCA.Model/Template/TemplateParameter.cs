@@ -80,24 +80,38 @@ namespace IDCA.Model.Template
         /// 此类参数值为Manipulate文件中保留小数位的配置
         /// </summary>
         ManipulateDecimals = 2102,
-        
+        /// <summary>
+        /// 此类参数值为Manipulate文件中配置的Factor值
+        /// </summary>
+        ManipulateFactor = 2112,
+        /// <summary>
+        /// 此类参数值为Manipulate文件中配置连续Factor时的起始值
+        /// </summary>
+        ManipulateSequentialFactorStart = 2122,
+        /// <summary>
+        /// 此类参数值为Manipulate文件中配置连续Factor时的步进值
+        /// </summary>
+        ManipulateSequentialFactorStep = 2132,
+        /// <summary>
+        /// 此类参数值为Manipulate文件中配置连续Factor时控制是否在原有描述前添加Factor描述
+        /// </summary>
+        ManipulateSequentialFactorAppendLabel = 2142,
         /// <summary>
         /// 此类参数值为Rebase函数使用的Base行描述
         /// </summary>
-        RebaseBaseText = 2112,
+        ManipulateRebaseBaseText = 2152,
         /// <summary>
         /// 此类参数值为Rebase函数是否添加均值，需要是true或false
         /// </summary>
-        RebaseMean = 2122,
+        ManipulateRebaseMean = 2162,
         /// <summary>
         /// 此类参数值为Rebase函数添加的均值计算变量名
         /// </summary>
-        RebaseMeanVariable = 2132,
-
+        ManipulateRebaseMeanVariable = 2172,
         /// <summary>
         /// 此类参数值为向轴表达式添加均值计算时插入函数的均值计算变量名
         /// </summary>
-        ManipulateFunctionMeanVariable = 2142,
+        ManipulateFunctionMeanVariable = 2182,
 
         /// <summary>
         /// 此类参数值为Tab文件中使用的TableDocument对象
@@ -195,14 +209,21 @@ namespace IDCA.Model.Template
         {
             _name = "";
             _value = new TemplateValue();
+            _defaultValue = new TemplateValue();
             _parameters = parent;
             _usage = TemplateParameterUsage.None;
+            _useDefault = true;
+            _hasDefault = false;
         }
 
         string _name;
         TemplateValue _value;
+        readonly TemplateValue _defaultValue;
         readonly TemplateParameters _parameters;
         TemplateParameterUsage _usage;
+
+        bool _useDefault;
+        bool _hasDefault;
 
         /// <summary>
         /// 变量名
@@ -231,12 +252,22 @@ namespace IDCA.Model.Template
         }
 
         /// <summary>
+        /// 设定当前参数的值类型
+        /// </summary>
+        /// <param name="valueType"></param>
+        public void SetValueType(TemplateValueType valueType)
+        {
+            _value.ValueType = valueType;
+        }
+
+        /// <summary>
         /// 设置参数的值，允许保存多个值
         /// </summary>
         /// <param name="value">设置的参数值</param>
         public void SetValue(TemplateValue value)
         {
             _value = value;
+            _useDefault = false;
         }
 
         /// <summary>
@@ -247,6 +278,7 @@ namespace IDCA.Model.Template
         {
             _value.Value = value;
             _value.ValueType = TemplateValueType.String;
+            _useDefault = false;
         }
 
         /// <summary>
@@ -261,12 +293,24 @@ namespace IDCA.Model.Template
         }
 
         /// <summary>
+        /// 配置参数的默认值和值类型
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="valueType"></param>
+        public void SetDefaultValue(string value, TemplateValueType valueType)
+        {
+            _defaultValue.Value = value;
+            _defaultValue.ValueType = valueType;
+            _hasDefault = true;
+        }
+
+        /// <summary>
         /// 获取当前存储的参数值
         /// </summary>
         /// <returns></returns>
         public TemplateValue GetValue()
         {
-            return _value;
+            return _hasDefault && _useDefault ? _defaultValue : _value;
         }
 
         ///// <summary>

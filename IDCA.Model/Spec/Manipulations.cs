@@ -153,6 +153,8 @@ namespace IDCA.Model.Spec
         FunctionTemplate? _responseLabelFunction;
         FunctionTemplate? _definitionLabelFunction;
         FunctionTemplate? _axisAverageFunction;
+        FunctionTemplate? _singleCodeFactorFunction;
+        FunctionTemplate? _sequentialCodeFacotrFunction;
 
         readonly List<FunctionTemplate> _templates;
 
@@ -172,6 +174,8 @@ namespace IDCA.Model.Spec
             _responseLabelFunction = templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateSideResponseLabel);
             _definitionLabelFunction = templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateTypeSideResponseLabel);
             _axisAverageFunction = templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateAxisAverage);
+            _singleCodeFactorFunction = templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateSetSingleCodeFactor);
+            _sequentialCodeFacotrFunction = templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateSetSequentialCodeFactor);
         }
 
         /// <summary>
@@ -286,6 +290,7 @@ namespace IDCA.Model.Spec
                 return;
             }
             var template = (FunctionTemplate)_responseLabelFunction.Clone();
+            template.SetFunctionParameterValue(_field.Export(), TemplateValueType.String, TemplateParameterUsage.ManipulateFieldName);
             template.SetFunctionParameterValue(code, TemplateValueType.String, TemplateParameterUsage.ManipulateCategoryName);
             template.SetFunctionParameterValue(label, TemplateValueType.String, TemplateParameterUsage.ManipulateLabelText);
             Add(template);
@@ -303,6 +308,49 @@ namespace IDCA.Model.Spec
             var template = (FunctionTemplate)_definitionLabelFunction.Clone();
             template.SetFunctionParameterValue(code, TemplateValueType.String, TemplateParameterUsage.ManipulateCategoryName);
             template.SetFunctionParameterValue(label, TemplateValueType.String, TemplateParameterUsage.ManipulateLabelText);
+            Add(template);
+        }
+
+        /// <summary>
+        /// 向模板集合末尾追加修改单个码号Factor的函数模板
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="factor"></param>
+        public void AppendSingleFactorFunction(string code, double factor)
+        {
+            if (_singleCodeFactorFunction == null)
+            {
+                return;
+            }
+            var template = (FunctionTemplate)_singleCodeFactorFunction.Clone();
+            template.SetFunctionParameterValue(_field.Export(), TemplateValueType.String, TemplateParameterUsage.ManipulateFieldName);
+            template.SetFunctionParameterValue(code, TemplateValueType.String, TemplateParameterUsage.ManipulateCategoryName);
+            template.SetFunctionParameterValue(factor.ToString(), TemplateValueType.Number, TemplateParameterUsage.ManipulateFactor);
+            Add(template);
+        }
+
+        /// <summary>
+        /// 向模板集合末尾追加添加连续Factor的函数模板
+        /// </summary>
+        /// <param name="startFactor"></param>
+        /// <param name="stepFactor"></param>
+        /// <param name="excludeCodes"></param>
+        /// <param name="appendFactorLabel"></param>
+        public void AppendSequentialFactorFunction(double startFactor = 1, double stepFactor = 1, string excludeCodes = "", bool appendFactorLabel = true)
+        {
+            if (_sequentialCodeFacotrFunction == null)
+            {
+                return;
+            }
+            var template = (FunctionTemplate)_sequentialCodeFacotrFunction.Clone();
+            template.SetFunctionParameterValue(_field.Export(), TemplateParameterUsage.ManipulateFieldName);
+            template.SetFunctionParameterValue(startFactor.ToString(), TemplateParameterUsage.ManipulateSequentialFactorStart);
+            template.SetFunctionParameterValue(stepFactor.ToString(), TemplateParameterUsage.ManipulateSequentialFactorStep);
+            if (!string.IsNullOrEmpty(excludeCodes))
+            {
+                template.SetFunctionParameterValue(excludeCodes, TemplateParameterUsage.ManipulateExclude);
+            }
+            template.SetFunctionParameterValue(appendFactorLabel ? "True" : "False", TemplateParameterUsage.ManipulateSequentialFactorAppendLabel);
             Add(template);
         }
 
@@ -342,7 +390,7 @@ namespace IDCA.Model.Spec
             _axis.AppendSubTotal(config?.Get<string>(SpecConfigKeys.AXIS_SIGMA_LABEL) ?? "");
             if (addAverage && _axisAverageFunction != null)
             {
-                _axisAverageFunction.SetFunctionParameterValue(averageVariable, TemplateValueType.String, TemplateParameterUsage.RebaseMeanVariable);
+                _axisAverageFunction.SetFunctionParameterValue(averageVariable, TemplateValueType.String, TemplateParameterUsage.ManipulateRebaseMeanVariable);
                 _axis.AppendInsertFunction(_axisAverageFunction);
             }
             SetAxis(_axis);

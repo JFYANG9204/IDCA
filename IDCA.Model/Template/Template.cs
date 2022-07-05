@@ -274,8 +274,18 @@ namespace IDCA.Model.Template
         /// 此类函数会直接插入到轴表达式文本内，所以，此类函数必须要返回字符串类型的返回值。
         /// </summary>
         ManipulateAxisMean = 107,
-
+        /// <summary>
+        /// 此类函数用于在Manipulate文件中，轴表达式使用函数Rebase函数时使用的函数定义。
+        /// </summary>
         ManipulateAxisRebase = 108,
+        /// <summary>
+        /// 此类函数用于在Manipulate文件中，对单个Field中的单个Code进行Factor配置。
+        /// </summary>
+        ManipulateSetSingleCodeFactor = 109,
+        /// <summary>
+        /// 此类函数用于在Manipulate文件中，对单个Field中进行连续Factor的配置。
+        /// </summary>
+        ManipulateSetSequentialCodeFactor = 110,
 
         TableNormal = 201,
         TableGrid = 202,
@@ -350,11 +360,11 @@ namespace IDCA.Model.Template
         }
 
         /// <summary>
-        /// 设定当前模板中特定用途的参数的值
+        /// 设定当前模板中特定用途的参数的值，此方法允许修改模板已配置的参数值类型
         /// </summary>
         /// <param name="value"></param>
         /// <param name="usage"></param>
-        public void SetFunctionParameterValue(string value, TemplateValueType valueType, TemplateParameterUsage usage)
+        public TemplateParameter? SetFunctionParameterValue(string value, TemplateValueType valueType, TemplateParameterUsage usage)
         {
             TemplateParameter? parameter = _parameters[usage];
             TemplateValue? paramValue;
@@ -363,6 +373,24 @@ namespace IDCA.Model.Template
                 paramValue.Value = value;
                 paramValue.ValueType = valueType;
             }
+            return parameter;
+        }
+
+        /// <summary>
+        /// 设定当前模板中特定用途的参数的值，此方法不允许修改模板已配置的参数值类型
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="usage"></param>
+        /// <returns></returns>
+        public TemplateParameter? SetFunctionParameterValue(string value, TemplateParameterUsage usage)
+        {
+            TemplateParameter? parameter = _parameters[usage];
+            TemplateValue? paramValue = parameter?.GetValue();
+            if (paramValue != null)
+            {
+                paramValue.Value = value;
+            }
+            return parameter;
         }
 
         public override object Clone()

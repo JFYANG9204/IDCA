@@ -64,7 +64,7 @@ namespace IDCA.Model
             {
                 char ch = fieldName[i];
 
-                if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '_' || ch == '@' || ch == '#' || (ch >= '0' && ch <= '9'))
+                if (IsLegalCharater(ch))
                 {
                     builder.Append(ch);
                 }
@@ -122,6 +122,15 @@ namespace IDCA.Model
         internal static bool IsDigit(string source)
         {
             return Regex.IsMatch(source, @"[0-9.]+");
+        }
+        /// <summary>
+        /// 判断是否是合法的命名字符
+        /// </summary>
+        /// <param name="charater"></param>
+        /// <returns></returns>
+        internal static bool IsLegalCharater(char charater)
+        {
+            return Regex.IsMatch(charater.ToString(), @"[a-zA-Z_0-9$#@\u4e00-\u9fa5]");
         }
 
         /// <summary>

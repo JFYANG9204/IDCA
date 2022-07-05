@@ -10,23 +10,61 @@
     mc:Ignorable="d"
     Title="全局配置" 
     FontFamily="{StaticResource IDCA.Font.Family}"
-    Height="450"
-    Width="600"
+    Height="600"
+    Width="800"
     ResizeMode="NoResize"
     Background="{StaticResource IDCA.Brushes.Window.Background}">
+    
     <Grid>
-        <TabControl Margin="10"
-                    Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"
-                    BorderBrush="{StaticResource IDCA.Brushes.Window.BorderBrush}"
-                    mah:HeaderedControlHelper.HeaderFontSize="{StaticResource IDCA.Font.Size.Content}"
-                    mah:HeaderedControlHelper.HeaderFontFamily="{StaticResource IDCA.Font.Family}"
-                    >
-            <mah:MetroTabItem Header="模板" Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}">
+
+        <Grid.Resources>
+                <Style TargetType="TextBlock">
+                    <Setter Property="Margin" Value="5"/>
+                    <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
+                    <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="HorizontalAlignment" Value="Left"/>
+                </Style>
+                <Style TargetType="CheckBox" BasedOn="{StaticResource MahApps.Styles.CheckBox}">
+                    <Setter Property="Margin" Value="5"/>
+                    <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
+                    <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                </Style>
+                <Style TargetType="TextBox" BasedOn="{StaticResource MahApps.Styles.TextBox}">
+                    <Setter Property="Height" Value="23"/>
+                    <Setter Property="Width" Value="120"/>
+                    <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
+                    <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
+                    <Setter Property="HorizontalAlignment" Value="Left"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                </Style>
+                <Style TargetType="ComboBox" BasedOn="{StaticResource MahApps.Styles.ComboBox}">
+                    <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
+                    <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
+                    <Setter Property="Width" Value="120"/>
+                    <Setter Property="HorizontalAlignment" Value="Left"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                </Style>
+        </Grid.Resources>
+                
+        <mah:MetroAnimatedTabControl Margin="10"
+                                     Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"
+                                     BorderBrush="{StaticResource IDCA.Brushes.Window.BorderBrush}"
+                                     TabStripPlacement="Left"
+                                     mah:HeaderedControlHelper.HeaderFontSize="{StaticResource IDCA.Font.Size.Content}"
+                                     mah:HeaderedControlHelper.HeaderFontFamily="{StaticResource IDCA.Font.Family}"
+                                     mah:HeaderedControlHelper.HeaderMargin="10">
+            
+            <mah:MetroTabItem Header="模板" 
+                              Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}">
                 <Grid>
                     
                     <Grid.RowDefinitions>
                         <RowDefinition Height="40"/>
-                        <RowDefinition Height="1"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
@@ -46,15 +84,14 @@
                         <Button Style="{StaticResource IDCA.Window.DialogButton}" Command="{Binding SelectTemplateRootPathCommand}"/>
                     </StackPanel>
 
-                    <GridSplitter Grid.Row="1" Style="{StaticResource IDCA.GridSplitter.Horizonal}"/>
-
-                    <Grid Grid.Row="2">
+                    <Grid Grid.Row="1">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="40"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         <TextBlock Grid.Row="0" 
                                    Margin="10"
+                                   VerticalAlignment="Bottom"
                                    FontFamily="{StaticResource IDCA.Font.Family}"
                                    FontSize="{StaticResource IDCA.Font.Size.Content}"
                                    Text="所有模板"/>
@@ -63,17 +100,24 @@
                                   Style="{StaticResource IDCA.DataGrid.Base}"
                                   Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"
                                   ItemsSource="{Binding TemplateInfos}"
-                                  d:ItemsSource="{d:SampleData ItemCount=5}">
+                                  d:ItemsSource="{d:SampleData ItemCount=5}"
+                                  BorderThickness="0"
+                                  IsReadOnly="True">
+                            <DataGrid.Resources>
+                                <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource MahApps.Styles.DataGridColumnHeader}">
+                                    <Setter Property="Background" Value="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"/>
+                                </Style>
+                            </DataGrid.Resources>
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="模板名称" Binding="{Binding Name}" Width="100"/>
-                                <DataGridTextColumn Header="模板描述" Binding="{Binding Description}" Width="150"/>
-                                <DataGridTextColumn Header="模板路径" Binding="{Binding XmlPath}" Width="150"/>
+                                <DataGridTextColumn Header="模板名称" Binding="{Binding Name}" Width="140"/>
+                                <DataGridTextColumn Header="模板描述" Binding="{Binding Description}" Width="220"/>
+                                <DataGridTextColumn Header="模板路径" Binding="{Binding XmlPath}" Width="240"/>
                                 <DataGridTemplateColumn>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <Button VerticalAlignment="Center"
                                                     HorizontalAlignment="Center"
-                                                    Style="{StaticResource IDCA.Window.DialogButton}"
+                                                    Content="打开文件夹"
                                                     Command="{Binding OpenXmlFolderCommand}"/>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
@@ -85,28 +129,137 @@
                 </Grid>
             </mah:MetroTabItem>
             <mah:MetroTabItem Header="轴">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="35"/>
-                        <RowDefinition Height="1"/>
-                        <RowDefinition Height="35"/>
-                        <RowDefinition Height="1"/>
-                        <RowDefinition Height="35"/>
-                        <RowDefinition Height="1"/>
-                        <RowDefinition Height="35"/>
-                        <RowDefinition Height="1"/>
-                        <RowDefinition Height="35"/>
-                        <RowDefinition Height="1"/>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="2*"/>
-                        <ColumnDefinition Width="1"/>
-                        <ColumnDefinition Width="2*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                </Grid>
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                        </Grid.RowDefinitions>
+                    
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" FontWeight="Bold">轴表达式全局</TextBlock>
+                        <CheckBox Grid.Row="1" Grid.Column="0" IsChecked="{Binding AxisAddSigma}">末尾添加小计(SubTotal)</CheckBox>
+                        <TextBlock Grid.Row="1" Grid.Column="2">末尾小计(SubTotal)默认描述</TextBlock>
+                        <TextBox Grid.Row="1" Grid.Column="3" IsEnabled="{Binding AxisAddSigma}" Text="{Binding AxisSigmaLabel}"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" FontWeight="Bold">Net</TextBlock>
+                        <TextBlock Grid.Row="3" Grid.Column="0">Net前缀标签</TextBlock>
+                        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding AxisNetAheadLabel}"/>
+                        <CheckBox Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="2" IsChecked="{Binding AxisNetInsertEmptyLine}">两个Net中间插入空白行</CheckBox>
+                        <TextBlock Grid.Row="4" Grid.Column="0">Net默认类型</TextBlock>
+                        <ComboBox Grid.Row="4" Grid.Column="1" ItemsSource="{x:Static viewmodel:SettingWindowViewModel.AxisNetTypeSelection}" SelectedIndex="{Binding AxisNetType}"/>
+                        <TextBlock Grid.Row="4" Grid.Column="2">Top/Bottom Box默认位置</TextBlock>
+                        <ComboBox Grid.Row="4" Grid.Column="3" ItemsSource="{x:Static viewmodel:SettingWindowViewModel.AxisTopBottomBoxPositionSelection}" SelectedIndex="{Binding AxisTopBottomBoxPosition}"/>
+
+                        <TextBlock Grid.Row="5" Grid.Column="0" FontWeight="Bold">NPS</TextBlock>
+                        <TextBlock Grid.Row="6" Grid.Column="0">NPS默认Top Box数量</TextBlock>
+                        <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding AxisNpsTopBox}"/>
+                        <TextBlock Grid.Row="6" Grid.Column="2">NPS默认Bottom Box数量</TextBlock>
+                        <TextBox Grid.Row="6" Grid.Column="3" Text="{Binding AxisNpsBottomBox}"/>
+
+                        <TextBlock Grid.Row="7" Grid.Column="0" FontWeight="Bold">Mean/StdErr/StdDev</TextBlock>
+                        <TextBlock Grid.Row="8" Grid.Column="0">Mean默认描述</TextBlock>
+                        <TextBox Grid.Row="8" Grid.Column="1" Text="{Binding AxisMeanLabel}"/>
+                        <TextBlock Grid.Row="8" Grid.Column="2">StdErr默认描述</TextBlock>
+                        <TextBox Grid.Row="8" Grid.Column="3" Text="{Binding AxisStderrLabel}"/>
+                        <TextBlock Grid.Row="9" Grid.Column="0">StdDev默认描述</TextBlock>
+                        <TextBox Grid.Row="9" Grid.Column="1" Text="{Binding AxisStddevLabel}"/>
+
+                        <TextBlock Grid.Row="10" Grid.Column="0" FontWeight="Bold">平均提及</TextBlock>
+                        <TextBlock Grid.Row="11" Grid.Column="0">平均提及行默认描述</TextBlock>
+                        <TextBox Grid.Row="11" Grid.Column="1" Text="{Binding AxisAverageMentionLabel}"/>
+                        <CheckBox Grid.Row="11" Grid.Column="2" Grid.ColumnSpan="2" IsChecked="{Binding AxisAverageMentionBlankLine}">平均提及行前默认插入空白行</CheckBox>
+                        <TextBlock Grid.Row="12" Grid.Column="0">平均提及默认保留小数位</TextBlock>
+                        <TextBox Grid.Row="12" Grid.Column="1" Text="{Binding AxisAverageMentionDecimals}"/>
+
+                    </Grid>
+
+                </ScrollViewer>
             </mah:MetroTabItem>
-        </TabControl>
+
+            <mah:MetroTabItem Header="表格">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                    <Grid>
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="180"/>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" FontWeight="Bold">描述</TextBlock>
+                        <TextBlock Grid.Row="1" Grid.Column="0">默认Summary表格后缀</TextBlock>
+                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding TableSummaryLabel}"/>
+
+                    </Grid>
+                </ScrollViewer>
+            </mah:MetroTabItem>
+
+            <mah:MetroTabItem Header="Excel读取">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                    <Grid>
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="180"/>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" FontWeight="Bold">Net读取</TextBlock>
+                        <TextBlock Grid.Row="1" Grid.Column="0">标签和码号之间的分隔符</TextBlock>
+                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding TableSettingNetLabelCodeSeparater}"/>
+                        <TextBlock Grid.Row="1" Grid.Column="2">码号之间的分隔符</TextBlock>
+                        <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding TableSettingNetCodeSeparater}"/>
+                        <TextBlock Grid.Row="2" Grid.Column="0">码号区间的分隔符</TextBlock>
+                        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding TableSettingNetRangeSeparater}"/>
+
+                    </Grid>
+                </ScrollViewer>
+            </mah:MetroTabItem>
+            
+        </mah:MetroAnimatedTabControl>
     </Grid>
 </mah:MetroWindow>

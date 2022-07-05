@@ -227,19 +227,6 @@ namespace IDCA.Client.ViewModel
             _tables.MoveDown(viewModel.Table);
         }
 
-        /// <summary>
-        /// 空白的View Model对象
-        /// </summary>
-        /// <param name="node"></param>
-        /// <returns></returns>
-        public static TableSettingViewModel Empty(TableSettingTreeNode node)
-        {
-            return new TableSettingViewModel(new Tables(node.SpecDocument), new Config(), new TemplateCollection())
-            {
-                Node = node
-            };
-        }
-
     }
 
     public class TableSettingElementViewModel : ObservableObject
@@ -269,7 +256,7 @@ namespace IDCA.Client.ViewModel
             ViewModelConstants.TableTypeResponseSummary
         };
 
-    public TableSettingElementViewModel(Table table, Config config, TemplateCollection templates) 
+        public TableSettingElementViewModel(Table table, Config config, TemplateCollection templates) 
         {
             _table = table;
             var sideAxis = _table.SideAxis ?? _table.CreateSideAxis(AxisType.Normal);
@@ -280,6 +267,7 @@ namespace IDCA.Client.ViewModel
                 _axisOperater.CreateBasicAxisExpression(null);
             }
             _axisViewModel = new AxisSettingViewModel(sideAxis);
+            _useAxisAsSideVariable = false;
             _tableTypeSelectedIndex = 0;
             // 初始化Top/Bottom Box选项类别
             _topBottomBoxSelections = new ObservableCollection<CheckableItemViewModel>
@@ -750,6 +738,27 @@ namespace IDCA.Client.ViewModel
         ///// 此对象在父级对象中的索引
         ///// </summary>
         //public int IndexOfParent { get => _indexOfParent; set => _indexOfParent = value; }
+
+        bool _useAxisAsSideVariable;
+        /// <summary>
+        /// 是否使用轴表达式来添加Table
+        /// </summary>
+        public bool UseAxisAsSideVariable
+        {
+            get { return _useAxisAsSideVariable; }
+            set
+            {
+                SetProperty(ref _useAxisAsSideVariable, value);
+                if (value)
+                {
+                    _axisOperater.Axis.Type = AxisType.AxisVariable;
+                }
+                else
+                {
+                    _axisOperater.Axis.Type = AxisType.Normal;
+                }
+            }
+        }
 
         public ICommand AxisSettingCommand => new RelayCommand(ShowAxisSettingDialog);
         void ShowAxisSettingDialog()

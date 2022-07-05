@@ -12,7 +12,9 @@ using System.Windows.Input;
 
 namespace IDCA.Client.ViewModel
 {
-
+    /// <summary>
+    /// TableSettingWindow窗口使用的ViewModel
+    /// </summary>
     public class TableSettingWindowViewModel : ObservableObject
     {
         public TableSettingWindowViewModel(TemplateCollection template, MDMDocument mDM)
@@ -25,13 +27,13 @@ namespace IDCA.Client.ViewModel
             _spec.HeaderRemoved += OnHeaderRemoved;
             _spec.Init(mDM);
 
-            _tree = new TableSettingTreeNode("Root", _spec, null);
+            _tree = new TableSettingTreeNode("Root", _spec, GlobalConfig.Instance.OverviewViewModel);
 
-            _headerNode = new TableSettingTreeNode("表头", _spec, null) { AllowNodeRemoving = false };
+            _headerNode = new TableSettingTreeNode("表头", _spec, GlobalConfig.Instance.OverviewViewModel);
             _headerNode.SelectedChanged += OnSelectedChanged;
             _headerNode.AddNewChild += () => AppendNewHeader();
 
-            _tableNode = new TableSettingTreeNode("表侧", _spec, null) { AllowNodeRemoving = false };
+            _tableNode = new TableSettingTreeNode("表侧", _spec, GlobalConfig.Instance.OverviewViewModel);
             _tableNode.SelectedChanged += OnSelectedChanged;
             _tableNode.AddNewChild += () => AppendNewTables();
 
@@ -55,6 +57,9 @@ namespace IDCA.Client.ViewModel
         public MDMDocument MdmDocument => _mdd;
 
         string _projectPath = GlobalConfig.Instance.ProjectRootPath;
+        /// <summary>
+        /// 当前项目的根目录，此窗口可以修改，但是只能通过文件夹选择窗口选择，此属性绑定的TextBox应该是只读的。
+        /// </summary>
         public string ProjectPath
         {
             get { return _projectPath; }
@@ -66,6 +71,9 @@ namespace IDCA.Client.ViewModel
         }
 
         string _mdmDocumentPath = GlobalConfig.Instance.MdmDocumentPath;
+        /// <summary>
+        /// 当前项目的MDD文档路径，此窗口可以修改，但是只能通过文件选择窗口选择，此属性绑定的TextBox应该是只读的。
+        /// </summary>
         public string MdmDocumentPath
         {
             get { return _mdmDocumentPath; }
@@ -81,6 +89,9 @@ namespace IDCA.Client.ViewModel
         }
 
         string _excelSettingFilePath = GlobalConfig.Instance.ExcelSettingFilePath;
+        /// <summary>
+        /// 当前项目的Excel配置文档路径，此窗口可以修改，但是只能通过文件选择窗口选择，此属性绑定的TextBox应该是只读的。
+        /// </summary>
         public string ExcelSettingFilePath
         {
             get { return _excelSettingFilePath; }
@@ -95,6 +106,9 @@ namespace IDCA.Client.ViewModel
 
 
         TableSettingTreeNode _tree;
+        /// <summary>
+        /// 左侧“表头/表侧”出示的树视图
+        /// </summary>
         public TableSettingTreeNode Tree
         {
             get { return _tree; }
@@ -103,13 +117,17 @@ namespace IDCA.Client.ViewModel
 
         TableSettingTreeNode _headerNode;
         TableSettingTreeNode _tableNode;
-
+        /// <summary>
+        /// 存储表头内容的节点
+        /// </summary>
         public TableSettingTreeNode HeaderNode
         {
             get { return _headerNode; }
             set { SetProperty(ref _headerNode, value); }
         }
-
+        /// <summary>
+        /// 存储表侧内容的节点
+        /// </summary>
         public TableSettingTreeNode TableNode
         {
             get { return _tableNode; }
@@ -117,6 +135,9 @@ namespace IDCA.Client.ViewModel
         }
 
         TableSettingTreeNode? _selectedNode;
+        /// <summary>
+        /// “表头/表侧”数视图中选中的节点，如果没有选中的，值为null。
+        /// </summary>
         public TableSettingTreeNode? SelectedNode
         {
             get { return _selectedNode; }
@@ -161,7 +182,10 @@ namespace IDCA.Client.ViewModel
         {
             foreach (var node in _tableNode.Children)
             {
-                node.TableViewModel?.AddHeaderInfos(true, header.Name);
+                if (node.ViewModel is TableSettingViewModel viewModel)
+                {
+                    viewModel.AddHeaderInfos(true, header.Name);
+                }
             }
         }
 
@@ -169,7 +193,10 @@ namespace IDCA.Client.ViewModel
         {
             foreach (var node in _tableNode.Children)
             {
-                node.TableViewModel?.RemoveHeaderInfos(header.Name);
+                if (node.ViewModel is TableSettingViewModel viewModel)
+                {
+                    viewModel.RemoveHeaderInfos(header.Name);
+                }
             }
         }
 
@@ -204,12 +231,12 @@ namespace IDCA.Client.ViewModel
 
         void OnNodeRemoving(TableSettingTreeNode node)
         {
-            if (node.IsTableView)
+            if (node.ViewModel is TableSettingViewModel)
             {
                 _tableNode.RemoveChild(node);
                 _spec.RemoveTables(node.Name);
             }
-            else if (node.IsHeaderView)
+            else if (node.ViewModel is HeaderSettingViewModel)
             {
                 _headerNode.RemoveChild(node);
                 _spec.RemoveHeader(node.Name);                
@@ -246,6 +273,12 @@ namespace IDCA.Client.ViewModel
         }
         public ICommand SelectExcelSettingFileCommand => new RelayCommand(SelectExcelSettingFile);
 
+        void ShowSettingWindow()
+        {
+            WindowManager.ShowWindow("SettingWindow", GlobalConfig.Instance.SettingWindowViewModel);
+        }
+        public ICommand ShowSettingWindowCommand => new RelayCommand(ShowSettingWindow);
+
         void Execute()
         {
             _spec.Exec();
@@ -256,55 +289,59 @@ namespace IDCA.Client.ViewModel
 
     public class TableSettingTreeNode : ObservableObject
     {
-        public TableSettingTreeNode(string name, SpecDocument spec, ObservableObject? dataContext)
+        public TableSettingTreeNode(string name, SpecDocument spec, ObservableObject dataContext)
         {
             _name = name;
             _spec = spec;
 
             _children = new ObservableCollection<TableSettingTreeNode>();
 
-            _isHeaderView = false;
-            _isTableView = false;
-            _isOverView = false;
+            _viewModel = dataContext;
 
-            _allowAppendChild = true;
-            _allowNodeRemoving = true;
-
-            var type = dataContext?.GetType();
-
-            if (dataContext == null || type == null)
+            if (dataContext is OverviewViewModel)
             {
-                _headerViewModel = HeaderSettingViewModel.Empty(this);
-                _tableViewModel = TableSettingViewModel.Empty(this);
-                _overviewViewModel = new OverviewViewModel() { Node = this };
+                _allowAppendChild = true;
+                _allowNodeRemoving = false;
             }
-            else if (type.Equals(typeof(TableSettingViewModel)))
+            else
             {
-                _tableViewModel = (TableSettingViewModel)dataContext;
-                _tableViewModel.Node = this;
-                _isTableView = true;
-
-                _headerViewModel = HeaderSettingViewModel.Empty(this);
-                _overviewViewModel = new OverviewViewModel() { Node = this };
+                _allowAppendChild = false;
+                _allowNodeRemoving = true;
             }
-            else if (type.Equals(typeof(HeaderSettingViewModel)))
-            {
-                _headerViewModel = (HeaderSettingViewModel)dataContext;
-                _headerViewModel.Node = this;
-                _isHeaderView = true;
 
-                _tableViewModel = TableSettingViewModel.Empty(this);
-                _overviewViewModel = new OverviewViewModel() { Node = this };
-            }
-            else if (type.Equals(typeof(OverviewViewModel)))
-            {
-                _overviewViewModel = (OverviewViewModel)dataContext;
-                _overviewViewModel.Node = this;
-                _isOverView = true;
-
-                _tableViewModel = TableSettingViewModel.Empty(this);
-                _headerViewModel = HeaderSettingViewModel.Empty(this);
-            }
+            //if (dataContext == null || type == null)
+            //{
+            //    _headerViewModel = HeaderSettingViewModel.Empty(this);
+            //    _tableViewModel = TableSettingViewModel.Empty(this);
+            //    _overviewViewModel = new OverviewViewModel() { Node = this };
+            //}
+            //else if (type.Equals(typeof(TableSettingViewModel)))
+            //{
+            //    _tableViewModel = (TableSettingViewModel)dataContext;
+            //    _tableViewModel.Node = this;
+            //    _isTableView = true;
+            //
+            //    _headerViewModel = HeaderSettingViewModel.Empty(this);
+            //    _overviewViewModel = new OverviewViewModel() { Node = this };
+            //}
+            //else if (type.Equals(typeof(HeaderSettingViewModel)))
+            //{
+            //    _headerViewModel = (HeaderSettingViewModel)dataContext;
+            //    _headerViewModel.Node = this;
+            //    _isHeaderView = true;
+            //
+            //    _tableViewModel = TableSettingViewModel.Empty(this);
+            //    _overviewViewModel = new OverviewViewModel() { Node = this };
+            //}
+            //else if (type.Equals(typeof(OverviewViewModel)))
+            //{
+            //    _overviewViewModel = (OverviewViewModel)dataContext;
+            //    _overviewViewModel.Node = this;
+            //    _isOverView = true;
+            //
+            //    _tableViewModel = TableSettingViewModel.Empty(this);
+            //    _headerViewModel = HeaderSettingViewModel.Empty(this);
+            //}
         }
 
         readonly SpecDocument _spec;
@@ -348,47 +385,53 @@ namespace IDCA.Client.ViewModel
             set { SetProperty(ref _name, value); }
         }
 
-        bool _isTableView;
-        public bool IsTableView
-        {
-            get { return _isTableView; }
-            set { SetProperty(ref _isTableView, value); }
-        }
+        ///bool _isTableView;
+        ///public bool IsTableView
+        ///{
+        ///    get { return _isTableView; }
+        ///    set { SetProperty(ref _isTableView, value); }
+        ///}
+        ///
+        ///bool _isHeaderView;
+        ///public bool IsHeaderView
+        ///{
+        ///    get { return _isHeaderView; }
+        ///    set { SetProperty(ref _isHeaderView, value); }
+        ///}
+        ///
+        ///bool _isOverView;
+        ///public bool IsOverView
+        ///{
+        ///    get { return _isOverView; }
+        ///    set { SetProperty(ref _isOverView, value); }
+        ///}
 
-        bool _isHeaderView;
-        public bool IsHeaderView
-        {
-            get { return _isHeaderView; }
-            set { SetProperty(ref _isHeaderView, value); }
-        }
+        readonly ObservableObject _viewModel;
+        /// <summary>
+        /// 当前节点使用的ViewModel，对应不同的DaTaTemplate
+        /// </summary>
+        public ObservableObject ViewModel => _viewModel;
 
-        bool _isOverView;
-        public bool IsOverView
-        {
-            get { return _isOverView; }
-            set { SetProperty(ref _isOverView, value); }
-        }
-
-        TableSettingViewModel? _tableViewModel;
-        public TableSettingViewModel? TableViewModel
-        {
-            get { return _tableViewModel; }
-            set { SetProperty(ref _tableViewModel, value); }
-        }
-
-        HeaderSettingViewModel? _headerViewModel;
-        public HeaderSettingViewModel? HeaderViewModel
-        {
-            get { return _headerViewModel; }
-            set { SetProperty(ref _headerViewModel, value); }
-        }
-
-        OverviewViewModel? _overviewViewModel;
-        public OverviewViewModel? OverviewViewModel
-        {
-            get { return _overviewViewModel; }
-            set { SetProperty(ref _overviewViewModel, value); }
-        }
+        //TableSettingViewModel? _tableViewModel;
+        //public TableSettingViewModel? TableViewModel
+        //{
+        //    get { return _tableViewModel; }
+        //    set { SetProperty(ref _tableViewModel, value); }
+        //}
+        //
+        //HeaderSettingViewModel? _headerViewModel;
+        //public HeaderSettingViewModel? HeaderViewModel
+        //{
+        //    get { return _headerViewModel; }
+        //    set { SetProperty(ref _headerViewModel, value); }
+        //}
+        //
+        //OverviewViewModel? _overviewViewModel;
+        //public OverviewViewModel? OverviewViewModel
+        //{
+        //    get { return _overviewViewModel; }
+        //    set { SetProperty(ref _overviewViewModel, value); }
+        //}
 
         bool _isSelected;
         public bool IsSelected

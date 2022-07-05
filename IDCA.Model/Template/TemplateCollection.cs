@@ -152,8 +152,15 @@ namespace IDCA.Model.Template
             var param = parameters.NewObject();
             param.Name = TryReadStringValue(element.Attribute("name"));
             param.Usage = TryReadEnumValue<TemplateParameterUsage>(element.Attribute("usage"));
-            var valueType = TryReadEnumValue<TemplateValueType>(element.Attribute("valuetype"));
-            param.SetValue(TryReadStringValue(element.Attribute("default")), valueType);
+            param.SetValueType(TryReadEnumValue<TemplateValueType>(element.Attribute("valuetype")));
+            
+            if (element.Attribute("default") != null)
+            {
+                var defaultValue = TryReadStringValue(element.Attribute("default"));
+                var defaultValueType = TryReadEnumValue<TemplateValueType>(element.Attribute("defaultvaluetype"));
+                param.SetDefaultValue(defaultValue, defaultValueType);
+            }
+
             parameters.Add(param);
         }
 
@@ -242,18 +249,7 @@ namespace IDCA.Model.Template
 
             foreach (XElement param in element.Elements("param"))
             {
-                if (type == TemplateType.Function)
-                {
-                    ((FunctionTemplate)template).PushFunctionParameter(
-                        TryReadStringValue(param.Attribute("name")), 
-                        TryReadStringValue(param.Attribute("default")), 
-                        TryReadEnumValue<TemplateValueType>(param.Attribute("valuetype")),
-                        TryReadEnumValue<TemplateParameterUsage>(param.Attribute("usage")));
-                }
-                else
-                {
-                    LoadParameter(template.Parameters, param);
-                }
+                LoadParameter(template.Parameters, param);
             }
         }
 

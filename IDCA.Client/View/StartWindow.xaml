@@ -9,8 +9,8 @@
     xmlns:viewmodel="clr-namespace:IDCA.Client.ViewModel" 
     d:DataContext="{d:DesignInstance Type=viewmodel:StartWindowViewModel}"
     mc:Ignorable="d"
-    Height="550" 
-    Width="850"
+    Height="600" 
+    Width="950"
     Background="{StaticResource IDCA.Brushes.Window.Background}"
     TextElement.Foreground="Black"
     ResizeMode="CanMinimize"
@@ -33,21 +33,29 @@
                 <RowDefinition Height="40"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="300"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
             <TextBlock Grid.Row="0"
+                       Grid.Column="0"
+                       Grid.ColumnSpan="3"
+                       Margin="45 0"
                        Text="DataCollection Automation"
                        FontFamily="{StaticResource IDCA.Font.Family.English}"
                        FontSize="30"
                        VerticalAlignment="Center"
                        FontWeight="Bold"/>
             <TextBlock Grid.Row="1"
-                       Margin="20 0 0 0"
+                       Grid.Column="1"
                        Text="选择模板"
                        FontFamily="{StaticResource IDCA.Font.Family}"
                        FontSize="{StaticResource IDCA.Font.SubTitle}"
                        VerticalAlignment="Center"/>
             <ListBox Grid.Row="2"
-                     Margin="55 8 80 50"
-                     Width="270"
+                     Grid.Column="1"
+                     Width="300"
                      BorderThickness="0"
                      Background="Transparent" 
                      ScrollViewer.HorizontalScrollBarVisibility="Hidden"
@@ -125,23 +133,10 @@
                     Width="35"
                     Height="35"
                     HorizontalAlignment="Right"
-                    Margin="25, 20"
+                    Margin="45, 20"
                     Cursor="Hand"
-                    Command="{Binding ShowSettingWindowCommand}">
-                <Button.Template>
-                    <ControlTemplate TargetType="Button">
-                        <Grid Width="35"
-                              Height="35"
-                              Background="#00000000">
-                            <icon:PackIconOcticons Kind="Gear"
-                                                   Width="30"
-                                                   Height="30"
-                                                   VerticalAlignment="Center"
-                                                   HorizontalAlignment="Center"/>
-                        </Grid>
-                    </ControlTemplate>
-                </Button.Template>
-            </Button>
+                    Command="{Binding ShowSettingWindowCommand}"
+                    Style="{StaticResource IDCA.Button.Setting}"/>
 
             <TextBlock Grid.Row="1">项目名称</TextBlock>
             <StackPanel Grid.Row="2" Orientation="Horizontal">
@@ -172,7 +167,7 @@
             <Button Grid.Row="9"
                     Width="70"
                     Height="35"
-                    Margin="30"
+                    Margin="50"
                     FontSize="{StaticResource IDCA.Font.Size.TextBlock.Label}"
                     Background="{StaticResource IDCA.Brushes.Button.Background}"
                     HorizontalAlignment="Right"

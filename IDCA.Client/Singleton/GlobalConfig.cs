@@ -15,6 +15,7 @@ namespace IDCA.Client.Singleton
             _templateDictionary.LoadFromFolder(_templateRootPath);
             _settingWindowViewModel = new SettingWindowViewModel(_config);
             _settingWindowViewModel.LoadTemplateInfos(_templateDictionary);
+            _overviewViewModel = new OverviewViewModel();
         }
 
         /// <summary>
@@ -84,5 +85,10 @@ namespace IDCA.Client.Singleton
         /// </summary>
         public SettingWindowViewModel SettingWindowViewModel => _settingWindowViewModel;
 
+        readonly OverviewViewModel _overviewViewModel;
+        /// <summary>
+        /// 全局预览界面使用的ViewModel
+        /// </summary>
+        public OverviewViewModel OverviewViewModel => _overviewViewModel;
     }
 }
