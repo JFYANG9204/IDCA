@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace IDCA.Model.Spec
 {
@@ -111,6 +112,20 @@ namespace IDCA.Model.Spec
             return _items.Find(match);
         }
 
+        /// <summary>
+        /// 根据回调函数结果返回符合条件的已有元素列表
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        public IEnumerable<T> Elements(Func<T, bool> predicate)
+        {
+            return _items.Where(predicate);
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <returns></returns>
         public IEnumerator GetEnumerator()
         {
             return _items.GetEnumerator();

@@ -1,8 +1,10 @@
-﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
+﻿using IDCA.Client.Common;
+using Microsoft.Toolkit.Mvvm.ComponentModel;
 using System.Collections.ObjectModel;
 
 namespace IDCA.Client.ViewModel
 {
+    [ViewModelMark(SettingViewType.Overview, "IDCA.Client.View.OverviewControl", "IDCA.Client.View")]
     public class OverviewViewModel : ObservableObject
     {
         public OverviewViewModel()

@@ -1,5 +1,5 @@
-﻿using IDCA.Client.Singleton;
-using IDCA.Model;
+﻿using IDCA.Client.Common;
+using IDCA.Client.Singleton;
 using IDCA.Model.Spec;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
@@ -9,6 +9,7 @@ using System.Windows.Input;
 
 namespace IDCA.Client.ViewModel
 {
+    [ViewModelMark(SettingViewType.HeaderSetting, "IDCA.Client.View.HeaderSettingView", "IDCA.Client.View")]
     public class HeaderSettingViewModel : ObservableObject
     {
 

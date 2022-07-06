@@ -205,19 +205,8 @@
                 </TreeView>
             </Border>
 
-            <ContentPresenter Grid.Column="1" Content="{Binding SelectedNode}" ContentTemplateSelector="{StaticResource IDCA.ViewModel.Selector}"/>
-
-            <!--<view:OverviewControl Grid.Column="1"
-                                  DataContext="{Binding SelectedNode.OverviewViewModel}"
-                                  Visibility="{Binding Node.IsOverView, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-            
-            <view:HeaderSettingView Grid.Column="1" 
-                                    DataContext="{Binding SelectedNode.HeaderViewModel}"
-                                    Visibility="{Binding Node.IsHeaderView, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-            
-            <view:TableSettingView Grid.Column="1" 
-                                   DataContext="{Binding SelectedNode.TableViewModel}"
-                                   Visibility="{Binding Node.IsTableView, Converter={StaticResource BooleanToVisibilityConverter}}"/>-->
+            <view:TableSettingContentPresenter Grid.Column="1" ViewModel="{Binding SelectedNode.ViewModel}"/>
+            <!--<ContentPresenter Grid.Column="1" Content="{Binding SelectedNode}" ContentTemplateSelector="{StaticResource IDCA.ViewModel.Selector}"/>-->
 
         </Grid>
     </Grid>

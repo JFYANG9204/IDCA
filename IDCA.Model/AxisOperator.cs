@@ -3,6 +3,7 @@ using IDCA.Model.Spec;
 using IDCA.Model.Template;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace IDCA.Model
@@ -23,7 +24,7 @@ namespace IDCA.Model
             _appendMean = false;
             _appendAverage = false;
 
-            _axisMeanFunction = _templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateAxisMean);
+            _axisMeanFunction = _templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateAxisInsertMean);
             //_axisAverageFunction = _templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateAxisAverage);
 
             _meanVariable = string.Empty;
@@ -625,6 +626,75 @@ namespace IDCA.Model
             AppendAverageMention();
         }
 
+        /// <summary>
+        /// 根据<seealso cref="AxisNetType"/>调整现有轴元素的顺序
+        /// </summary>
+        /// <param name="netType"></param>
+        public void UpdateNetType(AxisNetType netType)
+        {
+            var elements = _axis.Elements(e => e.Template.ElementType == AxisElementType.Net || e.Template.ElementType == AxisElementType.Combine);
+            if (!elements.Any())
+            {
+                return;
+            }
+
+            AxisElement? sigma = null;
+            var subtotals = _axis.Elements(e => e.Template.ElementType == AxisElementType.SubTotal);
+            if (subtotals.Any())
+            {
+                sigma = subtotals.Last();
+            }
+
+            if (netType == AxisNetType.CombineAfterSigma || (netType == AxisNetType.CombineBetweenAllCategoryAndSigma && sigma == null))
+            {
+                foreach (var item in elements)
+                {
+                    _axis.Remove(item);
+                    _axis.Add(item);
+                }
+            }
+            else if (netType == AxisNetType.CombineBetweenAllCategoryAndSigma && sigma != null)
+            {
+                foreach (var item in elements)
+                {
+                    _axis.Remove(item);
+                }
+
+                int sigmaIndex = _axis.IndexOf(sigma);
+                if (sigmaIndex <= 0)
+                {
+                    return;
+                }
+
+                int count = 0;
+                foreach (var item in elements)
+                {
+                    _axis.Insert(sigmaIndex - 1 + count, item);
+                    count++;
+                }
+            }
+            else if (netType == AxisNetType.CombineBeforeAllCategory)
+            {
+                var bases = _axis.Elements(e => e.Template.ElementType == AxisElementType.Base);
+                if (bases.Any())
+                {
+                    var firstBase = bases.First();
+                    int insertStartIndex = _axis.IndexOf(firstBase) + 1;
+                    if (_axis[insertStartIndex + 1]?.Template.ElementType == AxisElementType.Text)
+                    {
+                        insertStartIndex++;
+                    }
+
+                    int count = 0;
+                    foreach (var item in elements)
+                    {
+                        _axis.Remove(item);
+                        _axis.Insert(insertStartIndex + count, item);
+                        count++;
+                    }
+                }
+            }
+        }
 
     }
 

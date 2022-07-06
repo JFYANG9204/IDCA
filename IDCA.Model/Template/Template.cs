@@ -273,7 +273,7 @@ namespace IDCA.Model.Template
         /// 此类函数用于在Manipulate文件中，向轴表达式中插入计算平均值的内容。
         /// 此类函数会直接插入到轴表达式文本内，所以，此类函数必须要返回字符串类型的返回值。
         /// </summary>
-        ManipulateAxisMean = 107,
+        ManipulateAxisInsertMean = 107,
         /// <summary>
         /// 此类函数用于在Manipulate文件中，轴表达式使用函数Rebase函数时使用的函数定义。
         /// </summary>

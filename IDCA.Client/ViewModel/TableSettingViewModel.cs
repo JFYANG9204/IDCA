@@ -1,4 +1,5 @@
 ﻿
+using IDCA.Client.Common;
 using IDCA.Model;
 using IDCA.Model.Spec;
 using IDCA.Model.Template;
@@ -16,6 +17,7 @@ namespace IDCA.Client.ViewModel
     /// TableSettingView控件使用的View Model对象，应该在TableSettingWindowViewModel类的
     /// 下一级。
     /// </summary>
+    [ViewModelMark(SettingViewType.TableSetting, "IDCA.Client.View.TableSettingView", "IDCA.Client.View")]
     public class TableSettingViewModel : ObservableObject
     {
 
@@ -231,21 +233,6 @@ namespace IDCA.Client.ViewModel
 
     public class TableSettingElementViewModel : ObservableObject
     {
-        /// <summary>
-        /// 当前表格添加Net的类型
-        /// </summary>
-        public static readonly string[] TableNetTypeSelections =
-        {
-            "标准Net",
-            "在具体选项前的Combine",
-            "在Subtotal和具体选项之间的Combine",
-            "放在最后的Combine",
-        };
-
-        /// <summary>
-        /// 当前表格表侧Factor赋值的顺序，正序时递增，逆序时递减。
-        /// </summary>
-        public static readonly string[] FactorSequence = { "正序", "逆序" };
 
         // 初始化表格类型
         public static readonly string[] TableTypeSelections = { 
@@ -260,55 +247,20 @@ namespace IDCA.Client.ViewModel
         {
             _table = table;
             var sideAxis = _table.SideAxis ?? _table.CreateSideAxis(AxisType.Normal);
-            _axisOperater = new AxisOperator(sideAxis, config, templates);
+            _axisOperator = new AxisOperator(sideAxis, config, templates);
             if (sideAxis.Count == 0)
             {
                 // 如果是空表达式，创建基础的表达式
-                _axisOperater.CreateBasicAxisExpression(null);
+                _axisOperator.CreateBasicAxisExpression(null);
             }
-            _axisViewModel = new AxisSettingViewModel(sideAxis);
-            _useAxisAsSideVariable = false;
+            _axisViewModel = new AxisSettingViewModel(this, _axisOperator);
             _tableTypeSelectedIndex = 0;
-            // 初始化Top/Bottom Box选项类别
-            _topBottomBoxSelections = new ObservableCollection<CheckableItemViewModel>
-            {
-                CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisTop1BoxName),
-                CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisTop2BoxName),
-                CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisTop3BoxName),
-                CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisTop4BoxName),
-                CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisTop5BoxName),
-                CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisTop6BoxName),
-                CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisTop7BoxName),
-                CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisBottom1BoxName),
-                CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisBottom2BoxName),
-                CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisBottom3BoxName),
-                CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisBottom4BoxName),
-                CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisBottom5BoxName),
-                CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisBottom6BoxName),
-                CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisBottom7BoxName),
-                CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisNpsName)
-            };
-            // Factor Sequence
-            _factorSequenceSelectedIndex = 0;
-            // Axis Operator
-            _npsTopBox = _axisOperater.NpsTopBox.ToString();
-            _npsBottomBox = _axisOperater.NpsBottomBox.ToString();
-            _donotAppendMeanOrAverage = true;
-            _appendMean = false;
-            _appendAverage = false;
-            _meanVariable = string.Empty;
         }
 
-        CheckableItemViewModel CreateTableTopBottomBoxSelectionItem(string label)
-        {
-            var vm = new CheckableItemViewModel(label, OnTableTopBottomBoxNameCheckedChanged);
-            vm.Selected += () => UpdateTableTopBottomBoxName();
-            return vm;
-        }
 
         readonly Table _table;
         readonly AxisSettingViewModel _axisViewModel;
-        readonly AxisOperator _axisOperater;        
+        readonly AxisOperator _axisOperator;        
 
         Metadata? _metadata;
         /// <summary>
@@ -414,81 +366,6 @@ namespace IDCA.Client.ViewModel
             }
         }
 
-        bool _donotAppendMeanOrAverage;
-        /// <summary>
-        /// 不添加均值或平均提及，与AppendMean和AppendAverage互斥
-        /// </summary>
-        public bool DonotAppendMeanOrAverage
-        {
-            get { return _donotAppendMeanOrAverage; }
-            set 
-            { 
-                SetProperty(ref _donotAppendMeanOrAverage, value);
-                if (value)
-                {
-                    AppendMean = false;
-                    AppendAverage = false;
-                    _axisOperater.AppendMean = false;
-                    _axisOperater.AppendAverage = false;
-                }
-            }
-        }
-
-        bool _appendMean;
-        /// <summary>
-        /// 添加计算均值，与DonotAppendMeanOrAverage和AppendAverage互斥
-        /// </summary>
-        public bool AppendMean
-        {
-            get { return _appendMean; }
-            set
-            {
-                SetProperty(ref _appendMean, value);
-                _axisOperater.AppendMean = value;
-                if (value)
-                {
-                    DonotAppendMeanOrAverage = false;
-                    AppendAverage = false;
-                }
-                UpdateAxisExpression();
-            }
-        }
-
-        bool _appendAverage;
-        /// <summary>
-        /// 添加计算平均提及，与DonotAppendMeanOrAverage和AppendMean互斥
-        /// </summary>
-        public bool AppendAverage
-        {
-            get { return _appendAverage; }
-            set
-            {
-                SetProperty(ref _appendAverage, value);
-                _axisOperater.AppendAverage = value;
-                if (value)
-                {
-                    DonotAppendMeanOrAverage = false;
-                    AppendMean = false;
-                }
-                UpdateAxisExpression();
-            }
-        }
-
-        string _meanVariable;
-        /// <summary>
-        /// 添加计算均值时使用的变量
-        /// </summary>
-        public string MeanVariable
-        {
-            get { return _meanVariable; }
-            set
-            {
-                SetProperty(ref _meanVariable, value);
-                _axisOperater.MeanVariable = value;
-                UpdateAxisExpression();
-            }
-        }
-
         int _tableTypeSelectedIndex;
         /// <summary>
         /// TableType下拉框选择的索引，配置选项顺序应该和TableType枚举的顺序相同
@@ -501,176 +378,6 @@ namespace IDCA.Client.ViewModel
                 SetProperty(ref _tableTypeSelectedIndex, value);
                 _table.Type = (TableType)_tableTypeSelectedIndex;
             }
-        }
-
-        ObservableCollection<CheckableItemViewModel> _topBottomBoxSelections;
-        /// <summary>
-        /// 表格轴表达式需要添加的Top/Bottom Box类型的勾选选项
-        /// </summary>
-        public ObservableCollection<CheckableItemViewModel> TopBottomBoxSelections
-        {
-            get { return _topBottomBoxSelections; }
-            set { SetProperty(ref _topBottomBoxSelections, value); }
-        }
-
-        string _topBottomBoxName = string.Empty;
-        /// <summary>
-        /// 当前已选中的Top/Bottom Box的配置名，中间用逗号分隔
-        /// </summary>
-        public string TopBottomBoxName
-        {
-            get { return _topBottomBoxName; }
-            set { SetProperty(ref _topBottomBoxName, value); }
-        }
-
-        /// <summary>
-        /// 获取当前已选中的Box数值，如果未选中，返回null
-        /// </summary>
-        /// <returns></returns>
-        public int[]? GetTopBottomBox()
-        {
-            var selectedBox = _topBottomBoxSelections.Where(s => s.Checked && s.Name != ViewModelConstants.AxisNpsName);
-            if (!selectedBox.Any())
-            {
-                return null;
-            }
-
-            return selectedBox.Select(s =>
-            {
-                return s.Name switch
-                {
-                    ViewModelConstants.AxisTop1BoxName => 1,
-                    ViewModelConstants.AxisTop2BoxName => 2,
-                    ViewModelConstants.AxisTop3BoxName => 3,
-                    ViewModelConstants.AxisTop4BoxName => 4,
-                    ViewModelConstants.AxisTop5BoxName => 5,
-                    ViewModelConstants.AxisTop6BoxName => 6,
-                    ViewModelConstants.AxisTop7BoxName => 7,
-                    ViewModelConstants.AxisBottom1BoxName => -1,
-                    ViewModelConstants.AxisBottom2BoxName => -2,
-                    ViewModelConstants.AxisBottom3BoxName => -3,
-                    ViewModelConstants.AxisBottom4BoxName => -4,
-                    ViewModelConstants.AxisBottom5BoxName => -5,
-                    ViewModelConstants.AxisBottom6BoxName => -6,
-                    ViewModelConstants.AxisBottom7BoxName => -7,
-                    _ => 0
-                };
-            }).ToArray();
-        }
-
-        /// <summary>
-        /// 判定当前是否选中了NPS
-        /// </summary>
-        /// <returns></returns>
-        public bool SelectedNps()
-        {
-            return _topBottomBoxSelections.Any(e => e.Checked && e.Name == ViewModelConstants.AxisNpsName);
-        }
-
-        void UpdateAxisExpression()
-        {
-            var boxes = GetTopBottomBox();
-            var nps = SelectedNps();
-            if (boxes != null)
-            {
-                _axisOperater.CreateTopBottomBoxAxisExpression(_baseText, nps, boxes);
-                _axisViewModel.LoadFromAxis(_axisOperater.Axis);
-                return;
-            }
-            // 只添加NPS
-            if (nps)
-            {
-                _axisOperater.CreateTopBottomBoxAxisExpression(_baseText, true);
-                _axisViewModel.LoadFromAxis(_axisOperater.Axis);
-                return;
-            }
-
-            _axisOperater.CreateBasicAxisExpression(_baseText);
-            _axisViewModel.LoadFromAxis(_axisOperater.Axis);
-        }
-
-        int _factorSequenceSelectedIndex;
-        /// <summary>
-        /// 当前表格Factor赋值顺序选择索引，修改时同步修改Axis对象配置
-        /// </summary>
-        public int FactorSequenceSelectedIndex
-        {
-            get { return _factorSequenceSelectedIndex; }
-            set 
-            {
-                SetProperty(ref _factorSequenceSelectedIndex, value);
-                _axisOperater.IsTopBottomBoxReversed = value == 1;
-                UpdateAxisExpression();
-            }
-        }
-
-        string _npsTopBox;
-        /// <summary>
-        /// Nps使用的Top Box包含的选项数量
-        /// </summary>
-        public string NpsTopBox
-        {
-            get { return _npsTopBox; }
-            set
-            {
-                SetProperty(ref _npsTopBox, value);
-                if (int.TryParse(value, out int iValue) && iValue > 0)
-                {
-                    _axisOperater.NpsTopBox = iValue;
-                }
-            }
-        }
-
-        string _npsBottomBox;
-        /// <summary>
-        /// Nps使用的Bottom Box包含的选项数量
-        /// </summary>
-        public string NpsBottomBox
-        {
-            get { return _npsBottomBox; }
-            set
-            {
-                SetProperty(ref _npsBottomBox, value);
-                if (int.TryParse(value, out int iValue) && iValue > 0)
-                {
-                    _axisOperater.NpsBottomBox = iValue;
-                }
-            }
-        }
-
-        void UpdateTableTopBottomBoxName()
-        {
-            TopBottomBoxName = string.Join(',',
-                _topBottomBoxSelections.Where(t => t.Checked)
-                                            .Select(t => t.Name));
-        }
-
-        void OnTableTopBottomBoxNameCheckedChanged(CheckableItemViewModel _)
-        {
-            UpdateTableTopBottomBoxName();
-        }
-
-        int _netTypeSelectedIndex = 0;
-        /// <summary>
-        /// 当前表格添加Net的类型的选中索引
-        /// </summary>
-        public int NetTypeSelectedIndex
-        {
-            get { return _netTypeSelectedIndex; }
-            set 
-            { 
-                SetProperty(ref _netTypeSelectedIndex, value);
-                _axisOperater.NetType = (AxisNetType)value;
-            }
-        }
-
-        /// <summary>
-        /// 获取当前配置的表格Net类型
-        /// </summary>
-        /// <returns></returns>
-        public AxisNetType GetTableNetType()
-        {
-            return (AxisNetType)_netTypeSelectedIndex;
         }
 
         string _variableName = string.Empty;
@@ -733,32 +440,6 @@ namespace IDCA.Client.ViewModel
             set { SetProperty(ref _tableAppendLabel, value); }
         }
 
-        //int _indexOfParent = 0;
-        ///// <summary>
-        ///// 此对象在父级对象中的索引
-        ///// </summary>
-        //public int IndexOfParent { get => _indexOfParent; set => _indexOfParent = value; }
-
-        bool _useAxisAsSideVariable;
-        /// <summary>
-        /// 是否使用轴表达式来添加Table
-        /// </summary>
-        public bool UseAxisAsSideVariable
-        {
-            get { return _useAxisAsSideVariable; }
-            set
-            {
-                SetProperty(ref _useAxisAsSideVariable, value);
-                if (value)
-                {
-                    _axisOperater.Axis.Type = AxisType.AxisVariable;
-                }
-                else
-                {
-                    _axisOperater.Axis.Type = AxisType.Normal;
-                }
-            }
-        }
 
         public ICommand AxisSettingCommand => new RelayCommand(ShowAxisSettingDialog);
         void ShowAxisSettingDialog()

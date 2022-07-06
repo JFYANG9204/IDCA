@@ -24,5 +24,6 @@
         <Setter Property="RowHeaderWidth" Value="20"/>
         <Setter Property="ColumnHeaderHeight" Value="35"/>
         <Setter Property="AllowDrop" Value="True"/>
+        <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True"/>
     </Style>
 </ResourceDictionary>

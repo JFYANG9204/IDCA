@@ -8,8 +8,8 @@
         xmlns:viewmodel="clr-namespace:IDCA.Client.ViewModel" 
         d:DataContext="{d:DesignInstance Type=viewmodel:AxisSettingViewModel}"
         mc:Ignorable="d"
-        Height="600" 
-        Width="900"
+        Height="800" 
+        Width="1200"
         ResizeMode="NoResize"
         Background="{StaticResource IDCA.Brushes.Window.Background}">
 
@@ -49,25 +49,25 @@
 
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="10"/>
-            <ColumnDefinition Width="900"/>
+            <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="10"/>
         </Grid.ColumnDefinitions>
 
-        <Grid Grid.Row="1"
-              Grid.Column="1">
+        <Grid Grid.Row="1" Grid.Column="1">
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="550"/>
-                <ColumnDefinition Width="310"/>
+                <ColumnDefinition Width="1.5*"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
             <Grid Grid.Column="0">
 
                 <Grid.RowDefinitions>
                     <RowDefinition Height="30"/>
-                    <RowDefinition Height="340"/>
+                    <RowDefinition Height="160"/>
+                    <RowDefinition Height="*"/>
                     <RowDefinition Height="30"/>
-                    <RowDefinition Height="165"/>
+                    <RowDefinition Height="0.4*"/>
                 </Grid.RowDefinitions>
 
                 <TextBlock Grid.Row="0"
@@ -77,6 +77,94 @@
                            VerticalAlignment="Top"/>
 
                 <Grid Grid.Row="1">
+
+                    <Grid.Resources>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
+                            <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="Margin" Value="5"/>
+                        </Style>
+                        <Style TargetType="ComboBox" BasedOn="{StaticResource MahApps.Styles.ComboBox}">
+                            <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
+                            <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            <Setter Property="Margin" Value="5"/>
+                        </Style>
+                        <Style TargetType="TextBox" BasedOn="{StaticResource MahApps.Styles.TextBox}">
+                            <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
+                            <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            <Setter Property="Margin" Value="5"/>
+                        </Style>
+                        <Style TargetType="CheckBox" BasedOn="{StaticResource MahApps.Styles.CheckBox}">
+                            <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
+                            <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            <Setter Property="Margin" Value="5"/>
+                        </Style>
+                    </Grid.Resources>
+                    
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0">Net类型</TextBlock>
+                    <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{x:Static viewmodel:AxisSettingViewModel.TableNetTypeSelections}" SelectedIndex="{Binding NetTypeSelectedIndex}"/>
+                    <CheckBox Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2" IsChecked="{Binding AddContinuousFactor}">添加连续Factor赋值</CheckBox>
+
+                    <TextBlock Grid.Row="0" Grid.Column="4">Factor赋值顺序</TextBlock>
+                    <ComboBox Grid.Row="0" 
+                              Grid.Column="5" 
+                              IsEnabled="{Binding AddContinuousFactor}"
+                              ItemsSource="{x:Static viewmodel:AxisSettingViewModel.FactorSequence}"
+                              SelectedIndex="{Binding FactorSequenceSelectedIndex}"/>
+
+                    <TextBlock Grid.Row="1" Grid.Column="0">Top/Bottom/NPS</TextBlock>
+                    <ComboBox Grid.Row="1"
+                              Grid.Column="1" 
+                              Text="{Binding TopBottomBoxName}"
+                              IsReadOnly="True"
+                              ItemsSource="{Binding TopBottomBoxSelections}">
+                        <ComboBox.ItemTemplate>
+                            <ItemContainerTemplate>
+                                <CheckBox Content="{Binding Name}" IsChecked="{Binding Checked}"/>
+                            </ItemContainerTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <TextBlock Grid.Row="1" Grid.Column="2">NPS Top Box</TextBlock>
+                    <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding NpsTopBox}"/>
+                    <TextBlock Grid.Row="1" Grid.Column="4">NPS Bottom Box</TextBlock>
+                    <TextBox Grid.Row="1" Grid.Column="5" Text="{Binding NpsBottomBox}"/>
+
+                    <CheckBox Grid.Row="2" Grid.Column="0" IsChecked="{Binding AppendMean}">添加均值</CheckBox>
+                    <TextBlock Grid.Row="2" Grid.Column="2">均值变量</TextBlock>
+                    <TextBox Grid.Row="2" Grid.Column="3" IsEnabled="{Binding AppendMean}" Text="{Binding MeanVariable}"/>
+
+                    <CheckBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" IsChecked="{Binding AppendAverage}">添加平均提及</CheckBox>
+                    <TextBlock Grid.Row="3" Grid.Column="2">跳过码号</TextBlock>
+                    <TextBox Grid.Row="3" Grid.Column="3" Text="{Binding AverageSkipCodes}"/>
+                    <TextBlock Grid.Row="3" Grid.Column="4">保留小数位数</TextBlock>
+                    <TextBox Grid.Row="3" Grid.Column="5" Text="{Binding AverageDecimals}"/>
+
+                </Grid>
+                
+                <Grid Grid.Row="2">
                     
                     <Grid.Resources>
                         <Style TargetType="Button">
@@ -92,9 +180,9 @@
                     </Grid.Resources>
 
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="285"/>
+                        <ColumnDefinition Width="*"/>
                         <!--<ColumnDefinition Width="40"/>-->
-                        <ColumnDefinition Width="275"/>
+                        <ColumnDefinition Width="*"/>
                         <!--<ColumnDefinition Width="40"/>-->
                     </Grid.ColumnDefinitions>
 
@@ -107,7 +195,6 @@
                                    FontWeight="Bold"/>
 
                         <ListBox Margin="10 5"
-                                 Height="300"
                                  BorderThickness="0"
                                  FontSize="{StaticResource IDCA.Font.Size.Content}"
                                  Background="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=Background}"
@@ -129,7 +216,7 @@
                                             </Style>
                                         </Grid.Resources>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="200"/>
+                                            <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="30"/>
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Grid.Column="0" 
@@ -147,7 +234,7 @@
 
                     </StackPanel>
 
-                    <StackPanel Grid.Column="2">
+                    <StackPanel Grid.Column="1">
 
                         <TextBlock Margin="10 10 0 5"
                                    Text="现有轴元素"
@@ -155,23 +242,7 @@
                                    FontSize="15"
                                    FontWeight="Bold"/>
 
-                        <!--<ListBox Margin="10 5"
-                                 Height="250"
-                                 FontSize="13"
-                                 BorderThickness="0"
-                                 Background="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=Background}"
-                                 ItemsSource="{Binding AxisCurrentElements}"
-                                 SelectedIndex="{Binding AxisCurrentElementsSelectIndex}"
-                                 d:ItemsSource="{d:SampleData ItemCount=5}">
-                            <ListBox.Resources>
-                                <Style TargetType="ListBoxItem">
-                                    <Setter Property="Background" Value="{Binding RelativeSource={RelativeSource AncestorType=ListBox}, Path=Background}"/>
-                                </Style>
-                            </ListBox.Resources>
-                        </ListBox>-->
-
                         <TreeView Margin="10 5"
-                                  Height="300"
                                   FontSize="{StaticResource IDCA.Font.Size.Content}"
                                   BorderThickness="0"
                                   Background="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=Background}"
@@ -194,11 +265,11 @@
                                             </Style>
                                         </Grid.Resources>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="75"/>
+                                            <ColumnDefinition MinWidth="160" Width="*"/>
                                             <ColumnDefinition Width="120"/>
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Grid.Column="0" 
-                                                   FontSize="13"
+                                                   FontSize="{StaticResource IDCA.Font.Size.Content}"
                                                    FontFamily="{StaticResource IDCA.Font.Family}"
                                                    HorizontalAlignment="Left" 
                                                    VerticalAlignment="Center"
@@ -233,151 +304,20 @@
 
                     </StackPanel>
                     
-
-                    <!--<Grid Grid.Row="1"
-                          Grid.Column="1">
-
-                        --><!--<Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="40"/>
-                            --><!--<RowDefinition Height="40"/>--><!--
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>-->
-
-                        <!--<Button Grid.Row="1"
-                                Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"
-                                Cursor="Hand"
-                                Command="{Binding AppendTreeNodeCommand}">
-                            <Button.Template>
-                                <ControlTemplate TargetType="Button">
-                                    <Canvas Background="{TemplateBinding Background}"
-                                            Height="30"
-                                            Width="30"
-                                            VerticalAlignment="Center"
-                                            HorizontalAlignment="Center">
-                                        <iconPacks:PackIconMaterial Kind="ChevronDoubleRight"
-                                                                    Height="30"
-                                                                    Width="30"/>
-                                        --><!--<Path Stroke="DarkGray"
-                                              StrokeThickness="0.5"
-                                              Fill="{TemplateBinding Foreground}"
-                                              Data="M 15,8 20,8 35,20 20,32 15,32 30,20z"/>
-                                        <Path Stroke="DarkGray"
-                                              StrokeThickness="0.5"
-                                              Fill="{TemplateBinding Foreground}"
-                                              Data="M 5,8 10,8 25,20 10,32 5,32 20,20z"/>--><!--
-                                    </Canvas>
-                                </ControlTemplate>
-                            </Button.Template>
-                        </Button>-->
-
-                        <!--<Button Grid.Row="2"
-                                Cursor="Hand"
-                                Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"
-                                Command="{Binding RemoveTreeNodeCommand}">
-                            <Button.Template>
-                                <ControlTemplate TargetType="Button">
-                                    <Canvas Background="{TemplateBinding Background}"
-                                            Height="30"
-                                            Width="30"
-                                            VerticalAlignment="Center"
-                                            HorizontalAlignment="Center">
-                                        <iconPacks:PackIconMaterial Kind="ChevronDoubleLeft"
-                                                                    Height="30"
-                                                                    Width="30"/>
-                                        --><!--<Path Stroke="DarkGray"
-                                              StrokeThickness="0.5"
-                                              Fill="{TemplateBinding Foreground}"
-                                              Data="M 25,8 20,8 5,20 20,32 25,32 10,20z"/>
-                                        <Path Stroke="DarkGray"
-                                              StrokeThickness="0.5"
-                                              Fill="{TemplateBinding Foreground}"
-                                              Data="M 35,8 30,8 15,20 30,32 35,32 20,20z"/>--><!--
-                                    </Canvas>
-                                </ControlTemplate>
-                            </Button.Template>
-                        </Button>--><!--
-
-                    </Grid>-->
-
-                    <!--<Grid Grid.Column="3" Grid.Row="1">
-
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="40"/>
-                            <RowDefinition Height="40"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-
-                        <Button Grid.Row="1"
-                                Cursor="Hand"
-                                Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"
-                                Command="{Binding MoveUpCommand}">
-                            <Button.Template>
-                                <ControlTemplate TargetType="Button">
-                                    <Canvas Background="{TemplateBinding Background}"
-                                            Height="30"
-                                            Width="30"
-                                            VerticalAlignment="Center"
-                                            HorizontalAlignment="Center">
-                                        <iconPacks:PackIconMaterial Kind="ChevronDoubleUp"
-                                                                    Height="30"
-                                                                    Width="30"/>
-                                        --><!--<Path Stroke="DarkGray"
-                                              StrokeThickness="0.5"
-                                              Fill="{TemplateBinding Foreground}"
-                                              Data="M20,5 8,20 8,25 20,10 32,25 32,20z"/>
-                                        <Path Stroke="DarkGray"
-                                              StrokeThickness="0.5"
-                                              Fill="{TemplateBinding Foreground}"
-                                              Data="M20,15 8,30 8,35 20,20 32,35 32,30z"/>--><!--
-                                    </Canvas>
-                                </ControlTemplate>
-                            </Button.Template>
-                        </Button>
-
-                        <Button Grid.Row="2"
-                                Cursor="Hand"
-                                Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"
-                                Command="{Binding MoveDownCommand}">
-                            <Button.Template>
-                                <ControlTemplate TargetType="Button">
-                                    <Canvas Background="{TemplateBinding Background}"
-                                            Height="30"
-                                            Width="30"
-                                            VerticalAlignment="Center"
-                                            HorizontalAlignment="Center">
-                                        <iconPacks:PackIconMaterial Kind="ChevronDoubleDown"
-                                                                    Height="30"
-                                                                    Width="30"/>
-                                        --><!--<Path Stroke="DarkGray"
-                                              StrokeThickness="0.5"
-                                              Fill="{TemplateBinding Foreground}"
-                                              Data="M20,35 8,20 8,15 20,30 32,15 32,20z"/>
-                                        <Path Stroke="DarkGray"
-                                              StrokeThickness="0.5"
-                                              Fill="{TemplateBinding Foreground}"
-                                              Data="M20,25 8,10 8,5 20,20 32,5 32,10z"/>--><!--
-                                    </Canvas>
-                                </ControlTemplate>
-                            </Button.Template>
-                        </Button>
-
-                    </Grid>-->
-                    
                 </Grid>
 
-                <TextBlock Grid.Row="2"
+                <TextBlock Grid.Row="3"
                            Margin="10 0 0 0"
                            Text="轴表达式"
                            VerticalAlignment="Center"
                            FontSize="15"
                            FontWeight="Bold"/>
 
-                <TextBox Grid.Row="3"
-                         Width="530"
-                         Height="125"
-                         VerticalAlignment="Top"
+                <TextBox Grid.Row="4"
+                         Margin="10"
+                         Height="Auto"
+                         VerticalAlignment="Stretch"
+                         HorizontalAlignment="Stretch"
                          VerticalContentAlignment="Top"
                          FontFamily="{StaticResource IDCA.Font.Family}"
                          FontSize="{StaticResource IDCA.Font.Size.Content}"
@@ -391,109 +331,105 @@
 
                 <Grid.RowDefinitions>
                     <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="0.8*"/>
+                    <RowDefinition Height="30"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <StackPanel Grid.Row="1"
-                            Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}">
+                <TextBlock Grid.Row="1"
+                           Margin="10 10 0 5"
+                           Text="详细配置"
+                           VerticalAlignment="Bottom"
+                           FontSize="15"
+                           FontWeight="Bold"/>
 
-                    <TextBlock Grid.Row="1"
-                               Margin="10 10 0 5"
-                               Text="详细配置"
-                               VerticalAlignment="Bottom"
-                               FontSize="15"
-                               FontWeight="Bold"/>
+                <ScrollViewer Grid.Row="2" Margin="5" VerticalScrollBarVisibility="Auto">
+                    <ItemsControl BorderThickness="0"
+                                  Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"
+                                  ItemsSource="{Binding SelectedNode.Details}"
+                                  d:ItemsSource="{d:SampleData ItemCount=5}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" 
+                                            Height="30"
+                                            Margin="2">
+                                    <TextBlock Width="180"
+                                               Margin="5 2"
+                                               FontSize="{StaticResource IDCA.Font.Size.Content}"
+                                               VerticalAlignment="Center"
+                                               Text="{Binding Name}"/>
+                                    <Grid>
+                                        <TextBox Width="140"
+                                                 Height="25"
+                                                 VerticalContentAlignment="Center"
+                                                 Text="{Binding Text}"
+                                                 Visibility="{Binding IsTextBox, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                        <ComboBox Width="140"
+                                                  Height="25"
+                                                  FontSize="{StaticResource IDCA.Font.Size.Content}"
+                                                  FontFamily="{StaticResource IDCA.Font.Family}"
+                                                  HorizontalContentAlignment="Center"
+                                                  VerticalContentAlignment="Center"
+                                                  ItemsSource="{Binding Selections}"
+                                                  SelectedIndex="{Binding SelectedIndex}"
+                                                  Visibility="{Binding IsComboBox, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                    </Grid>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
 
-                    <ScrollViewer Height="150" 
-                                  Width="310"
-                                  VerticalScrollBarVisibility="Auto">
-                        <ItemsControl BorderThickness="0"
-                                      Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"
-                                      ItemsSource="{Binding SelectedNode.Details}"
-                                      d:ItemsSource="{d:SampleData ItemCount=5}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel Orientation="Horizontal" 
-                                                Height="35"
-                                                Margin="2">
-                                        <TextBlock Width="80"
-                                                   Margin="5 2"
-                                                   VerticalAlignment="Center"
-                                                   Text="{Binding Name}"/>
-                                        <Grid Width="180" 
-                                              Height="35">
-                                            <TextBox Width="180"
-                                                     Height="30"
-                                                     VerticalContentAlignment="Center"
-                                                     Text="{Binding Text}"
-                                                     Visibility="{Binding IsTextBox, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                                            <ComboBox Width="180"
-                                                      Height="30"
-                                                      FontSize="13"
-                                                      FontFamily="{StaticResource IDCA.Font.Family}"
-                                                      HorizontalContentAlignment="Center"
-                                                      VerticalContentAlignment="Center"
-                                                      ItemsSource="{Binding Selections}"
-                                                      SelectedIndex="{Binding SelectedIndex}"
-                                                      Visibility="{Binding IsComboBox, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                                        </Grid>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                        
-                    </ScrollViewer>
+                </ScrollViewer>
 
-                    <TextBlock Grid.Row="3"
-                               Margin="10 10 0 5"
-                               Text="后缀配置"
-                               VerticalAlignment="Bottom"
-                               FontSize="15"
-                               FontWeight="Bold"/>
+                <TextBlock Grid.Row="3"
+                           Margin="10 10 0 5"
+                           Text="后缀配置"
+                           VerticalAlignment="Bottom"
+                           FontSize="15"
+                           FontWeight="Bold"/>
 
-                    <ScrollViewer Height="280" 
-                                  Width="310"
-                                  VerticalScrollBarVisibility="Auto">
+                <ScrollViewer Grid.Row="4" Margin="5" VerticalScrollBarVisibility="Auto">
 
-                        <ItemsControl BorderThickness="0"
-                                      ItemsSource="{Binding SelectedNode.Suffixes}"
-                                      d:ItemsSource="{d:SampleData ItemCount=10}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel Height="45"
-                                                Width="280"
-                                                HorizontalAlignment="Left"
-                                                Orientation="Horizontal">
-                                        <CheckBox Margin="3 5" 
-                                                  Width="170"
-                                                  VerticalAlignment="Center"
-                                                  IsChecked="{Binding Checked}"
-                                                  Content="{Binding Name}"
-                                                  Cursor="Hand"/>
-                                        <Canvas Width="90"
-                                                Height="30"
-                                                VerticalAlignment="Center">
-                                            <ComboBox Width="90"
-                                                      Height="30"
-                                                      FontSize="{StaticResource IDCA.Font.Size.Content}"
-                                                      FontFamily="{StaticResource IDCA.Font.Family}"
-                                                      HorizontalContentAlignment="Center"
-                                                      VerticalContentAlignment="Center"
-                                                      Visibility="{Binding IsComboBox, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                                      SelectedIndex="{Binding SelectedIndex}"
-                                                      ItemsSource="{Binding Selections}"/>
-                                            <TextBox Width="90"
-                                                     Height="30"
-                                                     Visibility="{Binding IsTextBox, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                                     Text="{Binding Text}"/>
-                                        </Canvas>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </ScrollViewer>
-                </StackPanel>
-                
+                    <ItemsControl BorderThickness="0"
+                                  ItemsSource="{Binding SelectedNode.Suffixes}"
+                                  d:ItemsSource="{d:SampleData ItemCount=10}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Margin="2" 
+                                            Height="30"
+                                            HorizontalAlignment="Left"
+                                            Orientation="Horizontal">
+                                    <CheckBox Margin="3 5" 
+                                              Width="200"
+                                              VerticalAlignment="Center"
+                                              FontSize="{StaticResource IDCA.Font.Size.Content}"
+                                              IsChecked="{Binding Checked}"
+                                              Content="{Binding Name}"
+                                              Cursor="Hand"/>
+                                    <Canvas Width="150"
+                                            Height="30"
+                                            VerticalAlignment="Center">
+                                        <ComboBox Width="140"
+                                                  Margin="2"
+                                                  FontSize="{StaticResource IDCA.Font.Size.Content}"
+                                                  FontFamily="{StaticResource IDCA.Font.Family}"
+                                                  HorizontalContentAlignment="Center"
+                                                  VerticalContentAlignment="Center"
+                                                  Visibility="{Binding IsComboBox, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                  SelectedIndex="{Binding SelectedIndex}"
+                                                  ItemsSource="{Binding Selections}"/>
+                                        <TextBox Width="140"
+                                                 Margin="2"
+                                                 Visibility="{Binding IsTextBox, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                 Text="{Binding Text}"/>
+                                    </Canvas>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
                 <!--<StackPanel Orientation="Horizontal"
                             HorizontalAlignment="Right"
                             Grid.Row="5">

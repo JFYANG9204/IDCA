@@ -106,7 +106,7 @@
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
-                <DataGridTemplateColumn Header="筛选器" Width="62">
+                <!--<DataGridTemplateColumn Header="筛选器" Width="62">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <view:PopupButton Width="40" 
@@ -168,7 +168,7 @@
                             </view:PopupButton>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                </DataGridTemplateColumn>-->
                 <DataGridTextColumn Header="追加标签" Width="100" Binding="{Binding TableAppendLabel}">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
@@ -187,7 +187,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="Box/Mean" Width="92">
+                <!--<DataGridTemplateColumn Header="Box/Mean" Width="92">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <view:PopupButton Width="40"
@@ -337,8 +337,8 @@
                             </view:PopupButton>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="Net类型" Width="75">
+                </DataGridTemplateColumn>-->
+                <!--<DataGridTemplateColumn Header="Net类型" Width="75">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ComboBox Background="{Binding Path=Background, RelativeSource={RelativeSource AncestorType=DataGridCell}}"
@@ -348,7 +348,7 @@
                                       SelectedIndex="{Binding NetTypeSelectedIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                </DataGridTemplateColumn>-->
                 <DataGridTemplateColumn Header="轴表达式" Width="70">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
@@ -360,7 +360,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridCheckBoxColumn Header="使用轴表达式出表" Binding="{Binding UseAxisAsSideVariable, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <!--<DataGridCheckBoxColumn Header="使用轴表达式出表" Binding="{Binding UseAxisAsSideVariable, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>-->
                 <DataGridCheckBoxColumn Header="新建变量" Width="75" Binding="{Binding AddNewVariable, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <DataGridTemplateColumn Header="配置变量" Width="75">
                     <DataGridTemplateColumn.CellTemplate>
