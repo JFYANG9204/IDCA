@@ -16,12 +16,12 @@ namespace IDCA.Model.Spec
             _projectPath = projectPath;
             _projectDescription = string.Empty;
             _objectType = SpecObjectType.Document;
-            _manipulations = new Manipulations(this);
             _scripts = new ScriptCollection(this);
             _templates = template;
             _config = config;
             _dmsMetadata = new MetadataCollection(this, config);
             _metadata = new MetadataCollection(this, config);
+            _manipulations = new Manipulations(this);
         }
 
         public SpecDocument(Config config) : this("", new TemplateCollection(), config)

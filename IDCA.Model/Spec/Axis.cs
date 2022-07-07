@@ -122,7 +122,7 @@ namespace IDCA.Model.Spec
             };
         }
 
-        AxisElement AppendElement(AxisElementType type, string? label, Action<AxisElement>? callback, params string[] parameters)
+        AxisElement AppendElement(AxisElementType type, string? label, Action<AxisElement>? callback, params object[] parameters)
         {
             AxisElement element = NewObject();
             element.Template.ElementType = type;
@@ -130,7 +130,7 @@ namespace IDCA.Model.Spec
             callback?.Invoke(element);
             foreach (var param in parameters)
             {
-                if (!string.IsNullOrEmpty(param))
+                if (!string.IsNullOrEmpty(param.ToString()))
                 {
                     var parameter = element.Template.NewParameter();
                     parameter.SetValue(param);
@@ -153,6 +153,15 @@ namespace IDCA.Model.Spec
                 return AppendElement(type, label, expr => expr.Name = $"{name}{CountIf(type) + 1}", variable);
             }
             return AppendElement(type, label, expr => expr.Name = $"{name}{CountIf(type) + 1}", variable, expression);
+        }
+
+        AxisElement AppendNamedMeanLike(AxisElementType type, string name, string? label = null, string variable = "", string expression = "")
+        {
+            if (string.IsNullOrEmpty(expression))
+            {
+                return AppendElement(type, label, e => e.Name = name, variable);
+            }
+            return AppendElement(type, label, e => e.Name = name, variable, expression);
         }
 
         /// <summary>
@@ -268,6 +277,19 @@ namespace IDCA.Model.Spec
         }
 
         /// <summary>
+        /// 向当前集合的末尾追加一个可命名的Mean类型轴元素
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="label"></param>
+        /// <param name="variable"></param>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public AxisElement AppendNamedMean(string name, string? label = null, string variable = "", string expression = "")
+        {
+            return AppendNamedMeanLike(AxisElementType.Mean, name, label, variable, expression);
+        }
+
+        /// <summary>
         /// 向当前集合的末尾添加一个Mean类型的轴表达式元素，可以添加标签描述
         /// </summary>
         /// <param name="label">可添加的描述</param>
@@ -280,6 +302,19 @@ namespace IDCA.Model.Spec
         }
 
         /// <summary>
+        /// 向当前集合末尾添加一个可以命名的StdErr类型的轴表达式元素
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="label"></param>
+        /// <param name="variable"></param>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public AxisElement AppendNamedStdErr(string name, string? label = null, string variable = "", string expression = "")
+        {
+            return AppendNamedMeanLike(AxisElementType.StdErr, name, label, variable, expression);
+        }
+
+        /// <summary>
         /// 向当前集合的末尾添加一个StdErr类型的轴表达式元素，可以添加标签描述
         /// </summary>
         /// <param name="label">可添加的描述</param>
@@ -289,6 +324,19 @@ namespace IDCA.Model.Spec
         public AxisElement AppendStdErr(string? label = null, string variable = "", string expression = "")
         {
             return AppendMeanLike(AxisElementType.StdErr, label, "stderr", variable, expression);
+        }
+
+        /// <summary>
+        /// 向当前集合的末尾添加一个可命名的StdDev类型的轴表达式元素
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="label"></param>
+        /// <param name="variable"></param>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public AxisElement AppendNamedStdDev(string name, string? label = null, string variable = "", string expression = "")
+        {
+            return AppendNamedMeanLike(AxisElementType.StdDev, name, label, variable, expression);
         }
 
         /// <summary>
@@ -466,7 +514,7 @@ namespace IDCA.Model.Spec
         /// <param name="function"></param>
         public AxisElement AppendInsertFunction(FunctionTemplate? function = null)
         {
-            return AppendElement(AxisElementType.InsertFunctionOrVariable, "", null, function == null ? "" : function.Exec());
+            return AppendElement(AxisElementType.InsertFunctionOrVariable, "", null, function == null ? "" : function);
         }
 
         ///// <summary>

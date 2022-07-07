@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.IO;
 using System.Text;
 
 namespace IDCA.Model.Template
@@ -151,7 +152,7 @@ namespace IDCA.Model.Template
             _directory = "";
             _fileName = "";
             _flag = FileTemplateFlags.None;
-            _content = new StringBuilder();
+            //_content = new StringBuilder();
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             _encoding = Encoding.GetEncoding("GB2312");
         }
@@ -161,7 +162,7 @@ namespace IDCA.Model.Template
             _directory = template.Directory;
             _fileName = template.FileName;
             _flag = FileTemplateFlags.None;
-            _content = new StringBuilder();
+            //_content = new StringBuilder();
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             _encoding = Encoding.GetEncoding("GB2312");
         }
@@ -169,7 +170,7 @@ namespace IDCA.Model.Template
         string _directory;
         string _fileName;
         FileTemplateFlags _flag;
-        protected StringBuilder _content;
+        //protected StringBuilder _content;
         Encoding _encoding;
 
         /// <summary>
@@ -184,42 +185,51 @@ namespace IDCA.Model.Template
         /// 文件类型标记
         /// </summary>
         public FileTemplateFlags Flag { get => _flag; set => _flag = value; }
-        /// <summary>
-        /// 文件文本模板内容，所有需要替换的内容需要满足格式 ：$[variable]，变量名不区分大小写
-        /// </summary>
-        public string Content { get => _content.ToString(); }
+        ///// <summary>
+        ///// 文件文本模板内容，所有需要替换的内容需要满足格式 ：$[variable]，变量名不区分大小写
+        ///// </summary>
+        //public string Content { get => _content.ToString(); }
         /// <summary>
         /// 当前文本的编码格式
         /// </summary>
         public Encoding Encoding { get => _encoding; set => _encoding = value; }
 
-        /// <summary>
-        /// 设置当前的文本内容，会清除之前已有的内容
-        /// </summary>
-        /// <param name="content"></param>
-        public void SetContent(string content)
-        {
-            _content.Clear();
-            _content.Append(content);
-        }
+        ///// <summary>
+        ///// 设置当前的文本内容，会清除之前已有的内容
+        ///// </summary>
+        ///// <param name="content"></param>
+        //public void SetContent(string content)
+        //{
+        //    _content.Clear();
+        //    _content.Append(content);
+        //}
 
+        ///// <summary>
+        ///// 向当前的内容后追加新的文本内容，会在之前添加新行
+        ///// </summary>
+        ///// <param name="value"></param>
+        //public void AppendLine(string value)
+        //{
+        //    _content.AppendLine(value);
+        //}
         /// <summary>
-        /// 向当前的内容后追加新的文本内容，会在之前添加新行
+        /// <inheritdoc/>
         /// </summary>
-        /// <param name="value"></param>
-        public void AppendLine(string value)
-        {
-            _content.AppendLine(value);
-        }
-
+        /// <returns></returns>
         public override string Exec()
         {
-            string result = _content.ToString();
+            var path = Path.Combine(Directory, FileName);
+            if (!File.Exists(path))
+            {
+                return string.Empty;
+            }
+
+            var result = FileHelper.TryReadTextFile(path, _encoding);
             if (_parameters.Count > 0)
             {
                 foreach (TemplateParameter parameter in Parameters)
                 {
-                    result = result.Replace(parameter.ToString(), parameter.GetValue()?.Value, StringComparison.OrdinalIgnoreCase);
+                    result = result.Replace(parameter.ToString(), parameter.GetValue()?.Value.ToString(), StringComparison.OrdinalIgnoreCase);
                 }
             }
             return result;
@@ -268,7 +278,7 @@ namespace IDCA.Model.Template
         /// 注意：
         /// 此类函数会直接插入到轴表达式文本内，所以，此类函数必须要返回字符串类型的返回值。
         /// </summary>
-        ManipulateAxisAverage = 106,
+        ManipulateAxisInsertAverage = 106,
         /// <summary>
         /// 此类函数用于在Manipulate文件中，向轴表达式中插入计算平均值的内容。
         /// 此类函数会直接插入到轴表达式文本内，所以，此类函数必须要返回字符串类型的返回值。
@@ -335,8 +345,8 @@ namespace IDCA.Model.Template
             TemplateParameter? parameter = _parameters[TemplateParameterUsage.FunctionName];
             if (parameter != null)
             {
-                var functionName = parameter.GetValue();
-                return functionName is null ? string.Empty : functionName.Value;
+                var functionName = parameter.GetValue().Value;
+                return functionName.ToString() ?? string.Empty;
             }
             return string.Empty;
         }
@@ -364,7 +374,7 @@ namespace IDCA.Model.Template
         /// </summary>
         /// <param name="value"></param>
         /// <param name="usage"></param>
-        public TemplateParameter? SetFunctionParameterValue(string value, TemplateValueType valueType, TemplateParameterUsage usage)
+        public TemplateParameter? SetFunctionParameterValue(object value, TemplateValueType valueType, TemplateParameterUsage usage)
         {
             TemplateParameter? parameter = _parameters[usage];
             TemplateValue? paramValue;
@@ -382,7 +392,7 @@ namespace IDCA.Model.Template
         /// <param name="value"></param>
         /// <param name="usage"></param>
         /// <returns></returns>
-        public TemplateParameter? SetFunctionParameterValue(string value, TemplateParameterUsage usage)
+        public TemplateParameter? SetFunctionParameterValue(object value, TemplateParameterUsage usage)
         {
             TemplateParameter? parameter = _parameters[usage];
             TemplateValue? paramValue = parameter?.GetValue();
@@ -403,7 +413,7 @@ namespace IDCA.Model.Template
         public override string Exec()
         {
             TemplateParameter? functionNameParam = _parameters[TemplateParameterUsage.FunctionName];
-            string functionName = functionNameParam?.GetValue()?.Value ?? string.Empty;
+            string functionName = functionNameParam?.GetValue()?.Value.ToString() ?? string.Empty;
             StringBuilder result = new();
             result.Append(functionName);
             result.Append('(');

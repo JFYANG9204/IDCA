@@ -51,13 +51,28 @@ namespace IDCA.Model
             {
                 return;
             }
+
+            var templateContent = new StringBuilder(template.Exec());
             if (!string.IsNullOrEmpty(content))
             {
-                template.AppendLine(content);
+                templateContent.AppendLine(content);
             }
-            WriteToFile(Path.Combine(projectPath, template.Directory, template.FileName), template.Exec());
+            WriteToFile(Path.Combine(projectPath, template.Directory, template.FileName), templateContent.ToString());
         }
 
+        /// <summary>
+        /// 读取文本文件内容，如果文件不存在，返回空字符串
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string TryReadTextFile(string path, Encoding encoding)
+        {
+            if (!string.IsNullOrEmpty(path) && File.Exists(path))
+            {
+                return File.ReadAllText(path, encoding);
+            }
+            return string.Empty;
+        }
 
     }
 }

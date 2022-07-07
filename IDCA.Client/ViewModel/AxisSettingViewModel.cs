@@ -43,6 +43,7 @@ namespace IDCA.Client.ViewModel
             _averageSkipCodes = "";
             _averageDecimals = "";
             _meanVariable = string.Empty;
+            _meanFilter = string.Empty;
             // 初始化Top/Bottom Box选项类别
             _topBottomBoxSelections = new ObservableCollection<CheckableItemViewModel>
             {
@@ -189,7 +190,7 @@ namespace IDCA.Client.ViewModel
             return _topBottomBoxSelections.Any(e => e.Checked && e.Name == ViewModelConstants.AxisNpsName);
         }
 
-        void UpdateAxisExpression()
+        void UpdateAxisTopBottomBox()
         {
             var boxes = GetTopBottomBox();
             var nps = SelectedNps();
@@ -238,7 +239,7 @@ namespace IDCA.Client.ViewModel
             {
                 SetProperty(ref _netTypeSelectedIndex, value);
                 _axisOperator.NetType = (AxisNetType)value;
-                _axisOperator.UpdateNetType((AxisNetType)value);
+                _axisOperator.Update((AxisNetType)value);
                 LoadFromAxis(_axisOperator.Axis);
             }
         }
@@ -267,23 +268,13 @@ namespace IDCA.Client.ViewModel
                 if (value)
                 {
                     AppendAverage = false;
+                    _axisOperator.AppendMeanStdDevStdErr();
                 }
                 else
                 {
-                    var existMeanFunction = _axis.Find(e => e.Template.ElementType == AxisElementType.InsertFunctionOrVariable &&
-                        e.Template.GetParameter(0)?.GetValue() is FunctionTemplate functionTemplate &&
-                        functionTemplate.Flag == FunctionTemplateFlags.ManipulateAxisInsertMean);
-                    if (existMeanFunction != null)
-                    {
-                        _axis.Remove(existMeanFunction);
-                    }
-                    else
-                    {
-                        _axis.RemoveIf(e => e.Template.ElementType == AxisElementType.Mean ||
-                                            e.Template.ElementType == AxisElementType.StdDev ||
-                                            e.Template.ElementType == AxisElementType.StdErr);
-                    }
+                    _axisOperator.RemoveMeanStdDevStdErr();
                 }
+                LoadFromAxis(_axis);
                 UpdateAxisExpressionText();
             }
         }
@@ -299,14 +290,17 @@ namespace IDCA.Client.ViewModel
             {
                 SetProperty(ref _appendAverage, value);
                 _axisOperator.AppendAverage = value;
+                
                 if (value)
                 {
                     AppendMean = false;
+                    _axisOperator.AppendAverageMention();
                 }
                 else
                 {
-
+                    _axisOperator.RemoveAverageMention();
                 }
+                LoadFromAxis(_axis);
                 UpdateAxisExpressionText();
             }
         }
@@ -318,7 +312,23 @@ namespace IDCA.Client.ViewModel
         public string AverageSkipCodes
         {
             get { return _averageSkipCodes; }
-            set { SetProperty(ref _averageSkipCodes, value); }
+            set 
+            { 
+                SetProperty(ref _averageSkipCodes, value);
+                _axisOperator.AverageSkipCodes = value;
+                if (!string.IsNullOrEmpty(value))
+                {
+                    var netTotal = _axisOperator.First(e => e.Name.Equals(AxisOperator.AXIS_AVERAGE_SUBTOTAL_NAME));
+                    if (netTotal != null)
+                    {
+                        var parameter = netTotal.Template.GetParameter(0);
+                        if (parameter != null)
+                        {
+                            parameter.SetValue($"..,^{value.Replace(",", ",^")}");
+                        }
+                    }
+                }
+            }
         }
 
         string _averageDecimals;
@@ -333,6 +343,29 @@ namespace IDCA.Client.ViewModel
                 if (int.TryParse(value, out int i))
                 {
                     SetProperty(ref _averageDecimals, value);
+                    
+                    var manipulation = _parent.Manipulation;
+                    var func = manipulation?.First(FunctionTemplateFlags.ManipulateSideAverage);
+                    if (func != null)
+                    {
+                        func.SetFunctionParameterValue(i, TemplateParameterUsage.ManipulateDecimals);
+                    }
+                    else
+                    {
+                        var derived = _axisOperator.First(e => e.Name.Equals(AxisOperator.AXIS_AVERAGE_DERIVED_NAME));
+                        if (derived != null)
+                        {
+                            var suffix = derived.Suffix[AxisElementSuffixType.Decimals];
+                            if (suffix == null)
+                            {
+                                derived.Suffix.AppendDecimals(i);
+                            }
+                            else
+                            {
+                                suffix.Value = i;
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -348,7 +381,22 @@ namespace IDCA.Client.ViewModel
             {
                 SetProperty(ref _meanVariable, value);
                 _axisOperator.MeanVariable = value;
-                UpdateAxisExpression();
+                UpdateAxisExpressionText();
+            }
+        }
+
+        string _meanFilter;
+        /// <summary>
+        /// 当前轴表达式添加均值时使用的Filter表达式
+        /// </summary>
+        public string MeanFilter
+        {
+            get { return _meanFilter; }
+            set
+            {
+                SetProperty(ref _meanFilter, value);
+                _axisOperator.MeanFilter = value;
+                UpdateAxisExpressionText();
             }
         }
 
@@ -359,7 +407,21 @@ namespace IDCA.Client.ViewModel
         public bool AddContinuousFactor
         {
             get { return _addContinuousFactor; }
-            set { SetProperty(ref _addContinuousFactor, value); }
+            set 
+            { 
+                SetProperty(ref _addContinuousFactor, value);
+                if (_parent.Manipulation != null)
+                {
+                    if (value)
+                    {
+                        _parent.Manipulation.AppendSequentialFactorFunction(1, _factorSequenceSelectedIndex == 0 ? 1 : -1, _averageSkipCodes, true);
+                    }
+                    else
+                    {
+                        _parent.Manipulation.RemoveAll(FunctionTemplateFlags.ManipulateSetSequentialCodeFactor);
+                    }
+                }
+            }
         }
 
         int _factorSequenceSelectedIndex;
@@ -373,7 +435,16 @@ namespace IDCA.Client.ViewModel
             {
                 SetProperty(ref _factorSequenceSelectedIndex, value);
                 _axisOperator.IsTopBottomBoxReversed = value == 1;
-                UpdateAxisExpression();
+                UpdateAxisTopBottomBox();
+                if (_parent.Manipulation != null)
+                {
+                    var func = _parent.Manipulation.First(FunctionTemplateFlags.ManipulateSideAverage);
+                    var parameter = func?.Parameters[TemplateParameterUsage.ManipulateSequentialFactorStep];
+                    if (parameter != null)
+                    {
+                        parameter.GetValue().Value = value == 0 ? 1 : -1;
+                    }
+                }
             }
         }
 
@@ -390,6 +461,7 @@ namespace IDCA.Client.ViewModel
                 if (int.TryParse(value, out int iValue) && iValue > 0)
                 {
                     _axisOperator.NpsTopBox = iValue;
+                    UpdateAxisTopBottomBox();
                 }
             }
         }
@@ -407,6 +479,7 @@ namespace IDCA.Client.ViewModel
                 if (int.TryParse(value, out int iValue) && iValue > 0)
                 {
                     _axisOperator.NpsBottomBox = iValue;
+                    UpdateAxisTopBottomBox();
                 }
             }
         }
@@ -609,7 +682,7 @@ namespace IDCA.Client.ViewModel
 
             if (success)
             {
-                UpdateAxisExpression();
+                UpdateAxisTopBottomBox();
             }
         }
 

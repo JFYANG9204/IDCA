@@ -14,6 +14,14 @@ namespace IDCA.Model
     public class AxisOperator
     {
 
+        public const string AXIS_AVERAGE_BASE_NAME = "AverageBase";
+        public const string AXIS_AVERAGE_SUBTOTAL_NAME = "AverageSubTotal";
+        public const string AXIS_AVERAGE_DERIVED_NAME = "AverageMention";
+
+        public const string AXIS_MEAN_MEANVALUE = "MeanValue";
+        public const string AXIS_MEAN_STDDEVVALUE = "StddevValue";
+        public const string AXIS_MEAN_STDERRVALUE = "StderrValue";
+
         public AxisOperator(Axis axis, Config config, TemplateCollection templates)
         {
             _axis = axis;
@@ -23,17 +31,31 @@ namespace IDCA.Model
 
             _appendMean = false;
             _appendAverage = false;
+            _averageSkipCodes = string.Empty;
 
             _axisMeanFunction = _templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateAxisInsertMean);
             //_axisAverageFunction = _templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateAxisAverage);
 
             _meanVariable = string.Empty;
+            _meanFilter = string.Empty;
         }
 
         readonly Axis _axis;
         readonly Config _config;
         readonly TemplateCollection _templates;
-        
+
+        bool _hasMean = false;
+        bool _hasAxisAverage = false;
+
+        /// <summary>
+        /// 当前轴是否已经在末尾添加了均值元素
+        /// </summary>
+        public bool HasMean => _hasMean;
+        /// <summary>
+        /// 当前轴是否已经在末尾添加了平均提及计算的相关元素
+        /// </summary>
+        public bool HasAxisAverage => _hasAxisAverage;
+
         /// <summary>
         /// 当前修改器修改的轴表达式对象
         /// </summary>
@@ -78,23 +100,23 @@ namespace IDCA.Model
         // 默认的Base行描述
         string _baseText = SpecConfigDefaultValue.AXIS_BASE_LABEL;
         // 是否添加Sigma行小计
-        bool _addSigma = false;
+        bool _addSigma;
         // Sigma行的默认描述
         string _sigmaLabel = SpecConfigDefaultValue.AXIS_SIGMA_LABEL;
         // 计算均值行的默认描述
         string _averageMentionLabel = SpecConfigDefaultValue.AXIS_AVERAGE_MENTION_LABEL;
         // 计算均值行的保留小数位数
-        int _averageMentionDecimals = 2;
+        int _averageMentionDecimals;
         // 是否在均值行前插入空白行
-        bool _averageMentionBlanckRow = true;
+        bool _averageMentionBlanckRow;
         // 是否在两个Net中间插入空白行
-        bool _emptyLineSeparator = false;
+        bool _emptyLineSeparator;
         // Net行标签开头描述
         string _netAheadLabel = SpecConfigDefaultValue.AXIS_NET_AHEAD_LABEL;
         // 用于计算NPS的Top Box选项数量
-        int _npsTopBox = 2;
+        int _npsTopBox;
         // 用于计算NPS的Bottom Box选项数量
-        int _npsBottomBox = 6;
+        int _npsBottomBox;
         // Net配置中描述和码号两部分的分隔符号
         string _netLabelSeparater = SpecConfigDefaultValue.TABLE_SETTING_NET_LABEL_CODE_SEPARATER;
         // 单独码号的分隔符号，例如"V1,V2,V3"中的','
@@ -165,6 +187,16 @@ namespace IDCA.Model
             }
         }
 
+        string _averageSkipCodes;
+        /// <summary>
+        /// 当前轴表达式添加平均提及数时跳过的码号
+        /// </summary>
+        public string AverageSkipCodes
+        {
+            get { return _averageSkipCodes; }
+            set { _averageSkipCodes = value; }
+        }
+
         string _meanVariable;
         /// <summary>
         /// 用于计算均值/标准差/标准误差的变量，可以是null
@@ -175,6 +207,17 @@ namespace IDCA.Model
             set { _meanVariable = value; }
         }
 
+        string _meanFilter;
+        /// <summary>
+        /// 计算均值/标准差/标准误差时使用的Filter表达式
+        /// </summary>
+        public string MeanFilter
+        {
+            get { return _meanFilter; }
+            set { _meanFilter = value; }
+        }
+
+
         Field? _field = null;
         /// <summary>
         /// 当前轴表达式对应变量的MDMField对象，用来查询使用的码号
@@ -183,6 +226,38 @@ namespace IDCA.Model
         {
             get { return _field; }
             set { _field = value; }
+        }
+
+        /// <summary>
+        /// 在当前表达式中查找第一个指定类型的下级元素，如果没找到，返回null
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public AxisElement? First(AxisElementType type)
+        {
+            return _axis.Find(e => e.Template.ElementType == type);
+        }
+
+        /// <summary>
+        /// 在当前表达式中查找第一个指定类型的下级元素，如果没找到，返回null
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        public AxisElement? First(Predicate<AxisElement> predicate)
+        {
+            return _axis.Find(predicate);
+        }
+
+        /// <summary>
+        /// 遍历轴表达式元素并执行回调函数
+        /// </summary>
+        /// <param name="callback"></param>
+        public void All(Action<AxisElement> callback)
+        {
+            foreach (AxisElement element in _axis)
+            {
+                callback(element);
+            }
         }
 
         /// <summary>
@@ -296,31 +371,73 @@ namespace IDCA.Model
             _axis.AppendNet("", "..").Suffix.AppendIsHidden(true);
         }
 
-        void AppendMeanStdDevStdErr()
+        /// <summary>
+        /// 向当前轴末尾追加平均数/标准误差/标准差轴元素
+        /// </summary>
+        public void AppendMeanStdDevStdErr()
         {
-            if (!_appendMean)
+            if (!_appendMean || _hasMean)
             {
                 return;
             }
 
             // 优先添加已有的函数模板
-            if (_axisMeanFunction != null)
+            if (_axisMeanFunction != null && (string.IsNullOrEmpty(_meanFilter) || (!string.IsNullOrEmpty(_meanFilter) && _axisMeanFunction.Parameters[TemplateParameterUsage.MannipulateFilter] != null)))
             {
-                _axisMeanFunction.SetFunctionParameterValue(_meanVariable, TemplateValueType.Variable, TemplateParameterUsage.ManipulateFunctionMeanVariable);
+                _axisMeanFunction.SetFunctionParameterValue(_meanVariable, TemplateValueType.Variable, TemplateParameterUsage.ManipulateMeanVariable);
+                if (!string.IsNullOrEmpty(_meanFilter))
+                {
+                    _axisMeanFunction.SetFunctionParameterValue(_meanFilter, TemplateValueType.String, TemplateParameterUsage.MannipulateFilter);
+                }
                 _axis.AppendInsertFunction(_axisMeanFunction);
             }
             else
             {
-                _axis.AppendText();
-                _axis.AppendMean(SpecConfigDefaultValue.AXIS_MEAN_LABEL, _meanVariable).Suffix.AppendDecimals(2);
-                _axis.AppendStdDev(SpecConfigDefaultValue.AXIS_STDDEV_LABEL, _meanVariable).Suffix.AppendDecimals(2);
-                _axis.AppendStdErr(SpecConfigDefaultValue.AXIS_STDERR_LABEL, _meanVariable).Suffix.AppendDecimals(2);
+                if (_axis[^1].Template.ElementType != AxisElementType.Text)
+                {
+                    _axis.AppendText();
+                }
+                _axis.AppendNamedMean(AXIS_MEAN_MEANVALUE, SpecConfigDefaultValue.AXIS_MEAN_LABEL, _meanVariable, _meanFilter).Suffix.AppendDecimals(2);
+                _axis.AppendNamedStdDev(AXIS_MEAN_STDDEVVALUE, SpecConfigDefaultValue.AXIS_STDDEV_LABEL, _meanVariable, _meanFilter).Suffix.AppendDecimals(2);
+                _axis.AppendNamedStdErr(AXIS_MEAN_STDERRVALUE, SpecConfigDefaultValue.AXIS_STDERR_LABEL, _meanVariable, _meanFilter).Suffix.AppendDecimals(2);
             }
+
+            _hasMean = true;
         }
 
-        void AppendAverageMention()
+        /// <summary>
+        /// 移除当前轴中已经添加MEAN/STDDEV/STDERR类型的轴元素
+        /// </summary>
+        public void RemoveMeanStdDevStdErr()
         {
-            if (!_appendAverage)
+            if (!_hasMean)
+            {
+                return;
+            }
+
+            FunctionTemplate? param;
+
+            _axis.RemoveIf(e => e.Name.Equals(AXIS_MEAN_MEANVALUE) ||
+                                e.Name.Equals(AXIS_MEAN_STDDEVVALUE) ||
+                                e.Name.Equals(AXIS_MEAN_STDERRVALUE) || (
+                                e.Template.ElementType == AxisElementType.InsertFunctionOrVariable &&
+                                (param = e.Template.GetParameter(0)?.GetValue() as FunctionTemplate) != null &&
+                                param.Flag == FunctionTemplateFlags.ManipulateAxisInsertMean));
+            
+            if (_axis[^1].Template.ElementType == AxisElementType.Text)
+            {
+                _axis.RemoveAt(_axis.Count - 1);
+            }
+
+            _hasMean = false;
+        }
+
+        /// <summary>
+        /// 向当前轴的末尾追加计算平均提及的相关元素
+        /// </summary>
+        public void AppendAverageMention()
+        {
+            if (!_appendAverage || _hasAxisAverage)
             {
                 return;
             }
@@ -336,14 +453,37 @@ namespace IDCA.Model
             //else
             //{
             _axis.AppendSubTotal().Suffix.AppendIsHidden(true);
-            if (_averageMentionBlanckRow)
+            if (_averageMentionBlanckRow && _axis[^1].Template.ElementType != AxisElementType.Text)
             {
                 _axis.AppendText();
             }
-            _axis.AppendNamedNet("AverageBase").Suffix.AppendIsHidden(true);
-            _axis.AppendSubTotal("AverageSubTotal").Suffix.AppendIsHidden(true);
-            _axis.AppendNamedDerived("AverageMention", _averageMentionLabel, "AverageSubTotal/AverageBase").Suffix.AppendDecimals(_averageMentionDecimals);
+            _axis.AppendNamedNet(AXIS_AVERAGE_BASE_NAME, null, $"..{(string.IsNullOrEmpty(_averageSkipCodes) ? "" : $",^{_averageSkipCodes.Replace(",", ",^")}")}").Suffix.AppendIsHidden(true);
+            _axis.AppendSubTotal(AXIS_AVERAGE_SUBTOTAL_NAME).Suffix.AppendIsHidden(true);
+            _axis.AppendNamedDerived(AXIS_AVERAGE_DERIVED_NAME, _averageMentionLabel, "AverageSubTotal/AverageBase").Suffix.AppendDecimals(_averageMentionDecimals);
+            _hasAxisAverage = true;
             //}
+        }
+
+        /// <summary>
+        /// 移除当前已经添加在末尾的平均提及计算元素
+        /// </summary>
+        public void RemoveAverageMention()
+        {
+            if (!_hasAxisAverage)
+            {
+                return;
+            }
+
+            _axis.RemoveIf(e => e.Name.Equals(AXIS_AVERAGE_BASE_NAME) || 
+                                e.Name.Equals(AXIS_AVERAGE_DERIVED_NAME) ||
+                                e.Name.Equals(AXIS_AVERAGE_SUBTOTAL_NAME));
+
+            if (_axis[^1].Template.ElementType == AxisElementType.Text)
+            {
+                _axis.RemoveAt(_axis.Count - 1);
+            }
+
+            _hasAxisAverage = false;
         }
 
         /// <summary>
@@ -630,7 +770,7 @@ namespace IDCA.Model
         /// 根据<seealso cref="AxisNetType"/>调整现有轴元素的顺序
         /// </summary>
         /// <param name="netType"></param>
-        public void UpdateNetType(AxisNetType netType)
+        public void Update(AxisNetType netType)
         {
             var elements = _axis.Elements(e => e.Template.ElementType == AxisElementType.Net || e.Template.ElementType == AxisElementType.Combine);
             if (!elements.Any())
@@ -695,6 +835,7 @@ namespace IDCA.Model
                 }
             }
         }
+
 
     }
 

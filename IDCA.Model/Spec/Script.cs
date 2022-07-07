@@ -81,6 +81,12 @@ namespace IDCA.Model.Spec
         }
 
         Tuple<string, string>[] _fields = Array.Empty<Tuple<string, string>>();
+
+        /// <summary>
+        /// 当前脚本的层级深度
+        /// </summary>
+        public int LevelDepth => _fields.Length;
+
         /// <summary>
         /// 向当前级别集合的末尾添加新的变量名和码号
         /// 如果Code为null，当只有一级时，是顶级变量，如果是下级Field，Code部分默认为..
@@ -130,7 +136,7 @@ namespace IDCA.Model.Spec
             {
                 char c = field[i];
                 // []外部的字符是为变量名
-                if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '@' || c == '_' || c == '#' || (c >= '0' && c <= '9'))
+                if (StringHelper.IsLegalCharater(c))
                 {
                     variable.Append(c);
                 }
@@ -199,7 +205,7 @@ namespace IDCA.Model.Spec
         {
             get
             {
-                if (_fields.Length == 1)
+                if (_fields.Length <= 1)
                 {
                     return Array.Empty<(string, string)>();
                 }
@@ -211,6 +217,50 @@ namespace IDCA.Model.Spec
                 return result;
             }
         }
+
+        /// <summary>
+        /// 比较字符串是否匹配当前Field，或者是当前多级Field中的一部分
+        /// </summary>
+        /// <param name="field">对比的Field脚本内容</param>
+        /// <param name="exact">是否要求完全匹配</param>
+        /// <returns></returns>
+        public bool MatchField(string field, bool exact = true)
+        {
+            var fieldScript = FromString(this, field);
+            // 如果匹配对象层级长度大于现有层级长度，则不可能匹配成功，返回false
+            if (fieldScript.LevelDepth > LevelDepth)
+            {
+                return false;
+            }
+            // 如果准确匹配，要求两个脚本层级必须相同，不相同则返回false，相同时对比逻辑同一般情况
+            if (exact && fieldScript.LevelDepth != LevelDepth)
+            {
+                return false;
+            }
+            // 如果第一层变量名不匹配，返回false
+            if (!TopLevel.Equals(fieldScript.TopLevel, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+            // 比较下层变量，以比较的对象长度为准
+            var currentSubLevels = SubLevels;
+            var matchSubLevels = fieldScript.SubLevels;
+            for (int i = 0; i < matchSubLevels.Length; i++)
+            {
+                if (i >= currentSubLevels.Length)
+                {
+                    return false;
+                }
+
+                if (!currentSubLevels[i].Item1.Equals(matchSubLevels[i].Item1, StringComparison.OrdinalIgnoreCase) ||
+                    !currentSubLevels[i].Item2.Equals(matchSubLevels[i].Item2, StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
 
         public override string Export()
         {

@@ -14,11 +14,23 @@ namespace IDCA.Model.Spec
         {
             _document = document;
             _templates = document.Templates;
-            _nameCache = new Dictionary<string, Manipulation>();
         }
 
-        readonly Dictionary<string, Manipulation> _nameCache;
         readonly TemplateCollection _templates;
+
+        /// <summary>
+        /// 获取指定Field的Manipulation对象
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="exact"></param>
+        /// <returns></returns>
+        public Manipulation? this[string name, bool exact = true]
+        {
+            get
+            {
+                return _items.Find(e => e.Field.MatchField(name, exact));
+            }
+        }
 
         /// <summary>
         /// 判断当前集合中是否已存在对应Field的配置，不区分大小写
@@ -27,21 +39,16 @@ namespace IDCA.Model.Spec
         /// <returns></returns>
         public bool Exist(string name)
         {
-            return _nameCache.ContainsKey(name.ToLower());
+            return _items.Exists(e => e.Field.MatchField(name, true));
         }
 
         /// <summary>
         /// 移除指定名称的Manipulation元素
         /// </summary>
         /// <param name="name"></param>
-        public void Remove(string name)
+        public void Remove(string name, bool exact = true)
         {
-            var lowerName = name.ToLower();
-            if (_nameCache.ContainsKey(lowerName))
-            {
-                _items.Remove(_nameCache[lowerName]);
-                _nameCache.Remove(lowerName);
-            }
+            _items.RemoveAll(e => e.Field.MatchField(name, exact));
         }
 
         /// <summary>
@@ -57,23 +64,86 @@ namespace IDCA.Model.Spec
         }
 
         /// <summary>
+        /// 从MDM文档列表名载入对象并创建修改标签的函数，如果列表名不存在，将跳过添加修改标签函数的步骤
+        /// </summary>
+        /// <param name="typeName"></param>
+        /// <returns></returns>
+        public Manipulation FromType(string typeName)
+        {
+            var exist = this[typeName];
+            if (exist != null)
+            {
+                return exist;
+            }
+
+            Manipulation manipulation = CreateManipulation();
+            manipulation.SetField(typeName);
+
+            var type = Document?.MDMDocument?.Types[typeName];
+            if (type != null)
+            {
+                foreach (Element category in type.Categories)
+                {
+                    manipulation.AppendDefinitionLabelFunction(category.Name, category.Label);
+                }
+            }
+
+            return manipulation;
+        }
+
+        /// <summary>
         /// 从MDM文档列表对象创建基础的修改标签函数脚本
         /// </summary>
         /// <param name="type"></param>
         public Manipulation FromType(MDM.Type type)
         {
-            string lowerName = type.Name.ToLower();
-            if (_nameCache.ContainsKey(lowerName))
+            var exist = this[type.Name];
+            if (exist != null)
             {
-                return _nameCache[lowerName];
+                return exist;
             }
 
             Manipulation manipulation = CreateManipulation();
             manipulation.SetField(type.Name);
-            _nameCache.Add(lowerName, manipulation);
             foreach (Element category in type.Categories)
             {
                 manipulation.AppendDefinitionLabelFunction(category.Name, category.Label);
+            }
+            return manipulation;
+        }
+
+        /// <summary>
+        /// 从Field名称载入MDM对象并添加标题配置、轴配置和码号描述配置，如果提供的变量名不存在，将跳过添加码号描述配置的步骤。
+        /// </summary>
+        /// <param name="fieldName"></param>
+        /// <param name="title"></param>
+        /// <returns></returns>
+        public Manipulation FromField(string fieldName, string title)
+        {
+            var exist = this[fieldName];
+            if (exist != null)
+            {
+                return exist;
+            }
+
+            var manipulation = CreateManipulation();
+            manipulation.SetField(fieldName);
+            manipulation.AppendTitleTextFunction(title);
+            // 检查MDM文档配置
+            var mdmField = Document?.MDMDocument?.Fields[fieldName];
+            if (mdmField != null)
+            {
+                if (mdmField.Class == null)
+                {
+                    manipulation.SetDefaultAxis();
+                }
+                if (mdmField.Categories != null)
+                {
+                    foreach (Element element in mdmField.Categories)
+                    {
+                        manipulation.AppendResponseLabelFunction(element.Name, element.Label);
+                    }
+                }
             }
             return manipulation;
         }
@@ -84,14 +154,13 @@ namespace IDCA.Model.Spec
         /// <param name="type"></param>
         public Manipulation FromField(Field field, string title)
         {
-            string lowerName = field.FullName.ToLower();
-            if (_nameCache.ContainsKey(lowerName))
+            var exist = this[field.FullName];
+            if (exist != null)
             {
-                return _nameCache[lowerName];
+                return exist;
             }
 
             Manipulation manipulation = CreateManipulation();
-            _nameCache.Add(lowerName, manipulation);
             manipulation.SetField(field.FullName);
             manipulation.AppendTitleTextFunction(title);
             // 如果是最下级变量，添加Axis轴表达式
@@ -146,17 +215,23 @@ namespace IDCA.Model.Spec
         }
 
         readonly FieldScript _field;
-        readonly Axis _axis;
+        Axis _axis;
 
         FunctionTemplate? _titleFunction;
         FunctionTemplate? _axisFunction;
         FunctionTemplate? _responseLabelFunction;
         FunctionTemplate? _definitionLabelFunction;
-        FunctionTemplate? _axisAverageFunction;
+        FunctionTemplate? _sideAxisFunction;
         FunctionTemplate? _singleCodeFactorFunction;
         FunctionTemplate? _sequentialCodeFacotrFunction;
+        FunctionTemplate? _axisInsertaverageMentionFunction;
 
         readonly List<FunctionTemplate> _templates;
+
+        /// <summary>
+        /// 当前Manipulation对象修改的MDMField对象名
+        /// </summary>
+        public FieldScript Field => _field;
 
         /// <summary>
         /// 当前Field的表侧轴表达式，同一个对象只能有一个
@@ -173,9 +248,10 @@ namespace IDCA.Model.Spec
             _axisFunction = templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateSideAxis);
             _responseLabelFunction = templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateSideResponseLabel);
             _definitionLabelFunction = templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateTypeSideResponseLabel);
-            _axisAverageFunction = templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateAxisAverage);
+            _sideAxisFunction = templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateSideAverage);
             _singleCodeFactorFunction = templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateSetSingleCodeFactor);
             _sequentialCodeFacotrFunction = templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateSetSequentialCodeFactor);
+            _axisInsertaverageMentionFunction = templates.TryGet<FunctionTemplate, FunctionTemplateFlags>(FunctionTemplateFlags.ManipulateAxisInsertAverage);
         }
 
         /// <summary>
@@ -205,9 +281,14 @@ namespace IDCA.Model.Spec
                 return _definitionLabelFunction != null;
             }
 
-            if (flags == FunctionTemplateFlags.ManipulateAxisAverage)
+            if (flags == FunctionTemplateFlags.ManipulateAxisInsertAverage)
             {
-                return _axisAverageFunction != null;
+                return _axisInsertaverageMentionFunction != null;
+            }
+
+            if (flags == FunctionTemplateFlags.ManipulateSideAverage)
+            {
+                return _sideAxisFunction != null;
             }
 
             return false;
@@ -232,6 +313,16 @@ namespace IDCA.Model.Spec
             {
                 callback(template);
             }
+        }
+
+        /// <summary>
+        /// 获取当前集合中第一个符合指定类型的函数模板，如果没有此类型，返回null
+        /// </summary>
+        /// <param name="flags"></param>
+        /// <returns></returns>
+        public FunctionTemplate? First(FunctionTemplateFlags flags)
+        {
+            return _templates.Find(t => t.Flag == flags);
         }
 
         void Add(FunctionTemplate functionTemplate)
@@ -259,8 +350,8 @@ namespace IDCA.Model.Spec
                 return;
             }
             var template = (FunctionTemplate)_titleFunction.Clone();
-            template.SetFunctionParameterValue(_field.Export(), TemplateValueType.String, TemplateParameterUsage.ManipulateFieldName);
-            template.SetFunctionParameterValue(title, TemplateValueType.String, TemplateParameterUsage.ManipulateLabelText);
+            template.SetFunctionParameterValue(_field.Export(), TemplateParameterUsage.ManipulateFieldName);
+            template.SetFunctionParameterValue(title, TemplateParameterUsage.ManipulateLabelText);
             Add(template);
         }
 
@@ -268,15 +359,15 @@ namespace IDCA.Model.Spec
         /// 向模板集合末尾追加修改轴表达式的函数模板
         /// </summary>
         /// <param name="axis"></param>
-        public void AppendAxisFunction(string axis)
+        public void AppendAxisFunction(Axis axis)
         {
             if (_axisFunction == null)
             {
                 return;
             }
             var template = (FunctionTemplate)_axisFunction.Clone();
-            template.SetFunctionParameterValue(_field.Export(), TemplateValueType.String, TemplateParameterUsage.ManipulateFieldName);
-            template.SetFunctionParameterValue(axis, TemplateValueType.String, TemplateParameterUsage.ManipulateSideAxis);
+            template.SetFunctionParameterValue(_field.Export(), TemplateParameterUsage.ManipulateFieldName);
+            template.SetFunctionParameterValue(axis, TemplateParameterUsage.ManipulateSideAxis);
             Add(template);
         }
 
@@ -290,9 +381,9 @@ namespace IDCA.Model.Spec
                 return;
             }
             var template = (FunctionTemplate)_responseLabelFunction.Clone();
-            template.SetFunctionParameterValue(_field.Export(), TemplateValueType.String, TemplateParameterUsage.ManipulateFieldName);
-            template.SetFunctionParameterValue(code, TemplateValueType.String, TemplateParameterUsage.ManipulateCategoryName);
-            template.SetFunctionParameterValue(label, TemplateValueType.String, TemplateParameterUsage.ManipulateLabelText);
+            template.SetFunctionParameterValue(_field.Export(), TemplateParameterUsage.ManipulateFieldName);
+            template.SetFunctionParameterValue(code, TemplateParameterUsage.ManipulateCategoryName);
+            template.SetFunctionParameterValue(label, TemplateParameterUsage.ManipulateLabelText);
             Add(template);
         }
 
@@ -306,9 +397,27 @@ namespace IDCA.Model.Spec
                 return;
             }
             var template = (FunctionTemplate)_definitionLabelFunction.Clone();
-            template.SetFunctionParameterValue(code, TemplateValueType.String, TemplateParameterUsage.ManipulateCategoryName);
-            template.SetFunctionParameterValue(label, TemplateValueType.String, TemplateParameterUsage.ManipulateLabelText);
+            template.SetFunctionParameterValue(code, TemplateParameterUsage.ManipulateCategoryName);
+            template.SetFunctionParameterValue(label, TemplateParameterUsage.ManipulateLabelText);
             Add(template);
+        }
+
+        /// <summary>
+        /// 向模板集合末尾追加配置平均提及计算的函数模板
+        /// </summary>
+        /// <param name="skipCodes"></param>
+        /// <param name="rowLabel"></param>
+        /// <param name="decimals"></param>
+        public void AppendAverageMentionFunction(string skipCodes = "", string rowLabel = "", int decimals = 2)
+        {
+            if (_sideAxisFunction == null)
+            {
+                return;
+            }
+            var template = (FunctionTemplate)_sideAxisFunction.Clone();
+            template.SetFunctionParameterValue(skipCodes, TemplateParameterUsage.ManipulateExclude);
+            template.SetFunctionParameterValue(rowLabel, TemplateParameterUsage.ManipulateLabelText);
+            template.SetFunctionParameterValue(decimals.ToString(), TemplateParameterUsage.ManipulateDecimals);
         }
 
         /// <summary>
@@ -323,8 +432,8 @@ namespace IDCA.Model.Spec
                 return;
             }
             var template = (FunctionTemplate)_singleCodeFactorFunction.Clone();
-            template.SetFunctionParameterValue(_field.Export(), TemplateValueType.String, TemplateParameterUsage.ManipulateFieldName);
-            template.SetFunctionParameterValue(code, TemplateValueType.String, TemplateParameterUsage.ManipulateCategoryName);
+            template.SetFunctionParameterValue(_field.Export(), TemplateParameterUsage.ManipulateFieldName);
+            template.SetFunctionParameterValue(code, TemplateParameterUsage.ManipulateCategoryName);
             template.SetFunctionParameterValue(factor.ToString(), TemplateValueType.Number, TemplateParameterUsage.ManipulateFactor);
             Add(template);
         }
@@ -360,6 +469,7 @@ namespace IDCA.Model.Spec
         /// <param name="axis"></param>
         public void SetAxis(Axis axis)
         {
+            _axis = axis;
             if (_axisFunction == null)
             {
                 return;
@@ -370,7 +480,7 @@ namespace IDCA.Model.Spec
                 template = (FunctionTemplate)_axisFunction.Clone();
                 Add(template);
             }
-            template.SetFunctionParameterValue(axis.ToString(), TemplateValueType.String, TemplateParameterUsage.ManipulateSideAxis);
+            template.SetFunctionParameterValue(axis, TemplateValueType.String, TemplateParameterUsage.ManipulateSideAxis);
         }
 
         /// <summary>
@@ -387,11 +497,11 @@ namespace IDCA.Model.Spec
             _axis.AppendText();
             _axis.AppendCategoryRange();
             _axis.AppendText();
-            _axis.AppendSubTotal(config?.Get<string>(SpecConfigKeys.AXIS_SIGMA_LABEL) ?? "");
-            if (addAverage && _axisAverageFunction != null)
+            _axis.AppendSubTotal(config?.Get(SpecConfigKeys.AXIS_SIGMA_LABEL) ?? "");
+            if (addAverage && _axisInsertaverageMentionFunction != null)
             {
-                _axisAverageFunction.SetFunctionParameterValue(averageVariable, TemplateValueType.String, TemplateParameterUsage.ManipulateRebaseMeanVariable);
-                _axis.AppendInsertFunction(_axisAverageFunction);
+                _axisInsertaverageMentionFunction.SetFunctionParameterValue(averageVariable, TemplateValueType.String, TemplateParameterUsage.ManipulateRebaseMeanVariable);
+                _axis.AppendInsertFunction(_sideAxisFunction);
             }
             SetAxis(_axis);
         }

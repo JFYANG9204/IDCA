@@ -41,14 +41,14 @@ namespace IDCA.Model.Template
         {
         }
 
-        public TemplateValue(string value, TemplateValueType valueType)
+        public TemplateValue(object value, TemplateValueType valueType)
         {
             _value = value;
             _valueType = valueType;
         }
 
         TemplateValueType _valueType = TemplateValueType.String;
-        string _value = string.Empty;
+        object _value = string.Empty;
         /// <summary>
         /// 值类型
         /// </summary>
@@ -56,7 +56,7 @@ namespace IDCA.Model.Template
         /// <summary>
         /// 字符串类型的值
         /// </summary>
-        public string Value { get => _value; set => _value = value; }
+        public object Value { get => _value; set => _value = value; }
 
         public override string ToString()
         {
@@ -64,7 +64,7 @@ namespace IDCA.Model.Template
             {
                 TemplateValueType.String => $"\"{_value}\"",
                 TemplateValueType.Categorical => $"{{{_value}}}",
-                _ => _value
+                _ => _value.ToString() ?? ""
             };
         }
 

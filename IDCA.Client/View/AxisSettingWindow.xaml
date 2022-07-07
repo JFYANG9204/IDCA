@@ -56,7 +56,7 @@
         <Grid Grid.Row="1" Grid.Column="1">
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1.5*"/>
+                <ColumnDefinition Width="2*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
@@ -155,12 +155,12 @@
                     <CheckBox Grid.Row="2" Grid.Column="0" IsChecked="{Binding AppendMean}">添加均值</CheckBox>
                     <TextBlock Grid.Row="2" Grid.Column="2">均值变量</TextBlock>
                     <TextBox Grid.Row="2" Grid.Column="3" IsEnabled="{Binding AppendMean}" Text="{Binding MeanVariable}"/>
+                    <TextBlock Grid.Row="2" Grid.Column="4">均值筛选器</TextBlock>
+                    <TextBox Grid.Row="2" Grid.Column="5" Text="{Binding MeanFilter}"/>
 
                     <CheckBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" IsChecked="{Binding AppendAverage}">添加平均提及</CheckBox>
                     <TextBlock Grid.Row="3" Grid.Column="2">跳过码号</TextBlock>
                     <TextBox Grid.Row="3" Grid.Column="3" Text="{Binding AverageSkipCodes}"/>
-                    <TextBlock Grid.Row="3" Grid.Column="4">保留小数位数</TextBlock>
-                    <TextBox Grid.Row="3" Grid.Column="5" Text="{Binding AverageDecimals}"/>
 
                 </Grid>
                 
@@ -188,13 +188,13 @@
 
                     <StackPanel Grid.Column="0">
                         
-                        <TextBlock Margin="10 10 0 5"
+                        <TextBlock Margin="10 20 0 5"
                                    Text="可用轴元素"
                                    VerticalAlignment="Bottom"
                                    FontSize="15"
                                    FontWeight="Bold"/>
 
-                        <ListBox Margin="10 5"
+                        <ListBox Margin="10"
                                  BorderThickness="0"
                                  FontSize="{StaticResource IDCA.Font.Size.Content}"
                                  Background="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=Background}"
@@ -236,13 +236,13 @@
 
                     <StackPanel Grid.Column="1">
 
-                        <TextBlock Margin="10 10 0 5"
+                        <TextBlock Margin="10 20 0 5"
                                    Text="现有轴元素"
                                    VerticalAlignment="Bottom"
                                    FontSize="15"
                                    FontWeight="Bold"/>
 
-                        <TreeView Margin="10 5"
+                        <TreeView Margin="10"
                                   FontSize="{StaticResource IDCA.Font.Size.Content}"
                                   BorderThickness="0"
                                   Background="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=Background}"
@@ -344,7 +344,7 @@
                            FontSize="15"
                            FontWeight="Bold"/>
 
-                <ScrollViewer Grid.Row="2" Margin="5" VerticalScrollBarVisibility="Auto">
+                <ScrollViewer Grid.Row="2" Margin="10" VerticalScrollBarVisibility="Auto">
                     <ItemsControl BorderThickness="0"
                                   Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"
                                   ItemsSource="{Binding SelectedNode.Details}"
@@ -389,7 +389,7 @@
                            FontSize="15"
                            FontWeight="Bold"/>
 
-                <ScrollViewer Grid.Row="4" Margin="5" VerticalScrollBarVisibility="Auto">
+                <ScrollViewer Grid.Row="4" Margin="10" VerticalScrollBarVisibility="Auto">
 
                     <ItemsControl BorderThickness="0"
                                   ItemsSource="{Binding SelectedNode.Suffixes}"

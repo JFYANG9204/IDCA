@@ -260,7 +260,18 @@ namespace IDCA.Client.ViewModel
 
         readonly Table _table;
         readonly AxisSettingViewModel _axisViewModel;
-        readonly AxisOperator _axisOperator;        
+        readonly AxisOperator _axisOperator;
+
+        Model.Spec.Manipulation? _manipulation;
+        /// <summary>
+        /// 当前表格使用的Manipulation对象，如果同一个变量的表头重复出现，
+        /// 应当只有第一个对象此属性不为null，后续对象应当为null
+        /// </summary>
+        public Model.Spec.Manipulation? Manipulation
+        {
+            get => _manipulation;
+            set => _manipulation = value;
+        }
 
         Metadata? _metadata;
         /// <summary>
@@ -387,7 +398,20 @@ namespace IDCA.Client.ViewModel
         public string VariableName
         {
             get { return _variableName; }
-            set { SetProperty(ref _variableName, value); }
+            set 
+            { 
+                SetProperty(ref _variableName, value);
+                var manipulations = _table.Document?.Manipulations;
+                if (manipulations != null)
+                {
+                    if (_manipulation != null)
+                    {
+                        manipulations.Remove(_manipulation);
+                    }
+                    _manipulation = manipulations.FromField(value, _title);
+                    _manipulation.SetAxis(_axisOperator.Axis);
+                }
+            }
         }
 
         string _title = string.Empty;
@@ -397,7 +421,22 @@ namespace IDCA.Client.ViewModel
         public string Title
         {
             get { return _title; }
-            set { SetProperty(ref _title, value); }
+            set 
+            { 
+                SetProperty(ref _title, value);
+                if (_manipulation != null)
+                {
+                    var titleFunction = _manipulation.First(FunctionTemplateFlags.ManipulateTitleLabel);
+                    if (titleFunction == null)
+                    {
+                        _manipulation.AppendTitleTextFunction(value);
+                    }
+                    else
+                    {
+                        titleFunction.SetFunctionParameterValue(value, TemplateParameterUsage.ManipulateLabelText);
+                    }
+                }
+            }
         }
 
         string _baseText = string.Empty;
@@ -407,7 +446,21 @@ namespace IDCA.Client.ViewModel
         public string BaseText
         {
             get { return _baseText; }
-            set { SetProperty(ref _baseText, value); }
+            set 
+            { 
+                SetProperty(ref _baseText, value);
+                // 同步修改轴表达式中的配置
+                var e = _axisOperator.First(AxisElementType.Base);
+                if (e != null)
+                {
+                    e.Description = value;
+                }
+                // 如果当前 Manipulation == null，表示当前变量不是第一次出现，需要将描述同步修改到Table对象中
+                if (_manipulation == null)
+                {
+                    _table.TableBase = value;
+                }
+            }
         }
 
         string _baseFilter = string.Empty;
@@ -417,7 +470,22 @@ namespace IDCA.Client.ViewModel
         public string BaseFilter
         {
             get { return _baseFilter; }
-            set { SetProperty(ref _baseFilter, value); }
+            set 
+            { 
+                SetProperty(ref _baseFilter, value);
+                // 同步修改轴表达式中的配置
+                var e = _axisOperator.First(AxisElementType.Base);
+                if (e != null)
+                {
+                    var parameter = e.Template.GetParameter(0);
+                    if (parameter == null)
+                    {
+                        parameter = e.Template.NewParameter();
+                        e.Template.PushParameter(parameter);
+                    }
+                    parameter.SetValue(value);
+                }
+            }
         }
 
         string _tableFilter = string.Empty;
@@ -427,7 +495,11 @@ namespace IDCA.Client.ViewModel
         public string TableFilter
         {
             get { return _tableFilter; }
-            set { SetProperty(ref _tableFilter, value); }
+            set 
+            { 
+                SetProperty(ref _tableFilter, value);
+                _table.FilterInTableFile = value;
+            }
         }
 
         string _tableAppendLabel = string.Empty;
@@ -437,7 +509,11 @@ namespace IDCA.Client.ViewModel
         public string TableAppendLabel
         {
             get { return _tableAppendLabel; }
-            set { SetProperty(ref _tableAppendLabel, value); }
+            set 
+            { 
+                SetProperty(ref _tableAppendLabel, value);
+                _table.LabelInTableFile = value;
+            }
         }
 
 

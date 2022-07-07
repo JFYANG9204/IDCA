@@ -112,15 +112,6 @@ namespace IDCA.Model.Template
             LoadNodeElements(root, "function", TemplateType.Function);
         }
 
-        static string TryReadTextFile(string path)
-        {
-            if (!string.IsNullOrEmpty(path) && File.Exists(path))
-            {
-                return File.ReadAllText(path);
-            }
-            return string.Empty;
-        }
-
         static string TryReadStringValue(XAttribute? attribute)
         {
             return attribute is null ? string.Empty : attribute.Value;
@@ -183,15 +174,13 @@ namespace IDCA.Model.Template
             {
                 case TemplateType.File:
                     {
-                        string fileName, directory;
                         FileTemplateFlags fileFlag = TryReadEnumValue<FileTemplateFlags>(element.Attribute("flag"));
                         template = new FileTemplate
                         {
-                            Directory = directory = TryReadStringValue(element.Attribute("path")),
-                            FileName = fileName = TryReadStringValue(element.Attribute("filename")),
+                            Directory = TryReadStringValue(element.Attribute("path")),
+                            FileName = TryReadStringValue(element.Attribute("filename")),
                             Flag = fileFlag
                         };
-                        ((FileTemplate)template).SetContent(TryReadTextFile(Path.Combine(_path, directory, fileName)));
 
                         if (fileFlag == FileTemplateFlags.LibraryFile)
                         {
@@ -231,7 +220,6 @@ namespace IDCA.Model.Template
                                     Directory = path,
                                     Flag = FileTemplateFlags.LibraryFile
                                 };
-                                fileTemplate.SetContent(TryReadTextFile(file));
                                 _libraryFileTemplates.Add(fileTemplate);
                             }
                         }

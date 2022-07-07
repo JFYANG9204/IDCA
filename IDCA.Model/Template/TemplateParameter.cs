@@ -111,7 +111,11 @@ namespace IDCA.Model.Template
         /// <summary>
         /// 此类参数值为向轴表达式添加均值计算时插入函数的均值计算变量名
         /// </summary>
-        ManipulateFunctionMeanVariable = 2182,
+        ManipulateMeanVariable = 2182,
+        /// <summary>
+        /// 此类参数值为Manipulate文件中所有的筛选器表达式
+        /// </summary>
+        MannipulateFilter = 2192,
 
         /// <summary>
         /// 此类参数值为Tab文件中使用的TableDocument对象
