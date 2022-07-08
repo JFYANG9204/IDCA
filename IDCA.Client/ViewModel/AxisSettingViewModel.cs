@@ -26,7 +26,7 @@ namespace IDCA.Client.ViewModel
             for (int i = 0; i < _axisDefaultElements.Length; i++)
             {
                 var ele = _axisDefaultElements[i];
-                var type = (AxisElementType)(i + 1);
+                var type = (AxisElementType)(i + 2);
                 _availableElements.Add(new AvailableElement(ele, type, e => AppendTreeNode(e)));
             }
             _availableSelectedIndex = -1;
@@ -275,7 +275,6 @@ namespace IDCA.Client.ViewModel
                     _axisOperator.RemoveMeanStdDevStdErr();
                 }
                 LoadFromAxis(_axis);
-                UpdateAxisExpressionText();
             }
         }
 
@@ -301,7 +300,6 @@ namespace IDCA.Client.ViewModel
                     _axisOperator.RemoveAverageMention();
                 }
                 LoadFromAxis(_axis);
-                UpdateAxisExpressionText();
             }
         }
 
@@ -316,18 +314,9 @@ namespace IDCA.Client.ViewModel
             { 
                 SetProperty(ref _averageSkipCodes, value);
                 _axisOperator.AverageSkipCodes = value;
-                if (!string.IsNullOrEmpty(value))
-                {
-                    var netTotal = _axisOperator.First(e => e.Name.Equals(AxisOperator.AXIS_AVERAGE_SUBTOTAL_NAME));
-                    if (netTotal != null)
-                    {
-                        var parameter = netTotal.Template.GetParameter(0);
-                        if (parameter != null)
-                        {
-                            parameter.SetValue($"..,^{value.Replace(",", ",^")}");
-                        }
-                    }
-                }
+                _axisOperator.UpdateAverageSkipCodes(value);
+                LoadFromAxis(_axis);
+                UpdateAxisExpressionText();
             }
         }
 
@@ -352,7 +341,7 @@ namespace IDCA.Client.ViewModel
                     }
                     else
                     {
-                        var derived = _axisOperator.First(e => e.Name.Equals(AxisOperator.AXIS_AVERAGE_DERIVED_NAME));
+                        var derived = _axisOperator.First(e => e.Name.Equals(AxisConstants.AxisAverageDerivedName));
                         if (derived != null)
                         {
                             var suffix = derived.Suffix[AxisElementSuffixType.Decimals];
@@ -366,6 +355,8 @@ namespace IDCA.Client.ViewModel
                             }
                         }
                     }
+
+                    UpdateAxisExpressionText();
                 }
             }
         }
@@ -381,6 +372,7 @@ namespace IDCA.Client.ViewModel
             {
                 SetProperty(ref _meanVariable, value);
                 _axisOperator.MeanVariable = value;
+                _axisOperator.UpdateMeanVariable(value);
                 UpdateAxisExpressionText();
             }
         }
@@ -396,6 +388,7 @@ namespace IDCA.Client.ViewModel
             {
                 SetProperty(ref _meanFilter, value);
                 _axisOperator.MeanFilter = value;
+                _axisOperator.UpdateMeanFilter(value);
                 UpdateAxisExpressionText();
             }
         }
@@ -510,7 +503,6 @@ namespace IDCA.Client.ViewModel
         {
             "Category元素",
             "Category区间",
-            "插入变量或函数",
             "文本行(text)",
             "基数(base)",
             "未加权基数(unweightedbase)",
@@ -682,7 +674,7 @@ namespace IDCA.Client.ViewModel
 
             if (success)
             {
-                UpdateAxisTopBottomBox();
+                UpdateAxisExpressionText();
             }
         }
 
@@ -931,13 +923,13 @@ namespace IDCA.Client.ViewModel
             foreach (AxisElement element in axis)
             {
                 var node = new AxisTreeNode(this, element, OnSelectedChanged);
-                node.LoadFromAxisElement(element);
+                //node.LoadFromAxisElement(element);
                 node.Removing += RemoveTreeNode;
                 node.MovingUp += n => MoveTreeNode(n);
                 node.MovingDown += n => MoveTreeNode(n, true);
                 _tree.Add(node);
             }
-            _axisExpression = axis.ToString();
+            UpdateAxisExpressionText();
         }
 
     }
@@ -1221,6 +1213,7 @@ namespace IDCA.Client.ViewModel
             _type = AxisElementDetailType.None;
             _selectedIndex = 1;
             _selections = new ObservableCollection<string>();
+            _isReadOnly = false;
         }
 
         public AxisElementDetailViewModel(AxisElementDetailType type) : this()
@@ -1284,6 +1277,16 @@ namespace IDCA.Client.ViewModel
         {
             get { return _indexOfElement; }
             set { _indexOfElement = value; }
+        }
+
+        bool _isReadOnly;
+        /// <summary>
+        /// 使用的控件是否是只读的
+        /// </summary>
+        public bool IsReadOnly
+        {
+            get { return _isReadOnly; }
+            set { SetProperty(ref _isReadOnly, value); }
         }
 
         string _name;
@@ -1459,7 +1462,8 @@ namespace IDCA.Client.ViewModel
                 case AxisElementDetailType.Exclude:
                     IsComboBox = true;
                     Selections.Clear();
-                    SetSelections("true", "false");
+                    SetSelections("True", "False");
+                    SelectedIndex = element.Exclude ? 0 : 1;
                     break;
                 case AxisElementDetailType.Filter:
                 case AxisElementDetailType.VariableName:
@@ -1489,7 +1493,7 @@ namespace IDCA.Client.ViewModel
                         _name = ViewModelConstants.AxisElementDetailCutOff;
                     }
                     
-                    if (_indexOfElement > 0 && _indexOfElement < element.Template.Count)
+                    if (_indexOfElement >= 0 && _indexOfElement < element.Template.Count)
                     {
                         var parameter = element.Template.GetParameter(_indexOfElement)?.GetValue().ToString();
                         _text = parameter ?? string.Empty;
@@ -1508,6 +1512,11 @@ namespace IDCA.Client.ViewModel
     {
         [AxisDescription("")]
         None,
+        [AxisDescription(
+            ViewModelConstants.AxisElementDetailType,
+            IsComboBox = false,
+            IsTextBox = true)]
+        Type,
         [AxisDescription(
             ViewModelConstants.AxisElementDetailName,
             IsComboBox = false,
@@ -1572,23 +1581,23 @@ namespace IDCA.Client.ViewModel
             // CalculationScope=AllElements|PrecedingElements
             InitSuffixSelectionItem(AxisElementSuffixType.CalculationScope, "AllElements", "PrecedingElements");
             // CountsOnly=True|False
-            InitSuffixSelectionItem(AxisElementSuffixType.CountsOnly, "true", "false");
+            InitSuffixSelectionItem(AxisElementSuffixType.CountsOnly, "True", "False");
             // Decimals=DecimalPlaces
             InitSuffixTextBoxItem(AxisElementSuffixType.Decimals);
             // Factor=FactorValue
             InitSuffixTextBoxItem(AxisElementSuffixType.Factor);
             // IsFixed=True|False
-            InitSuffixSelectionItem(AxisElementSuffixType.IsFixed, "true", "false");
+            InitSuffixSelectionItem(AxisElementSuffixType.IsFixed, "True", "False");
             // IsHidden=True|False
-            InitSuffixSelectionItem(AxisElementSuffixType.IsHidden, "true", "false");
+            InitSuffixSelectionItem(AxisElementSuffixType.IsHidden, "True", "False");
             // IsHiddenWhenColumn = True | False
-            InitSuffixSelectionItem(AxisElementSuffixType.IsHiddenWhenColumn, "true", "false");
+            InitSuffixSelectionItem(AxisElementSuffixType.IsHiddenWhenColumn, "True", "False");
             // IsHiddenWhenRow=True|False
-            InitSuffixSelectionItem(AxisElementSuffixType.IsHiddenWhenRow, "true", "false");
+            InitSuffixSelectionItem(AxisElementSuffixType.IsHiddenWhenRow, "True", "False");
             // IncludeInBase=True|False
-            InitSuffixSelectionItem(AxisElementSuffixType.IncludeInBase, "true", "false");
+            InitSuffixSelectionItem(AxisElementSuffixType.IncludeInBase, "True", "False");
             // IsUnweighted=True|False
-            InitSuffixSelectionItem(AxisElementSuffixType.IsUnweighted, "true", "false");
+            InitSuffixSelectionItem(AxisElementSuffixType.IsUnweighted, "True", "False");
             // Multiplier=MultiplierVariable
             InitSuffixTextBoxItem(AxisElementSuffixType.Multiplier);
             // Weight=WeightVariable
@@ -1881,6 +1890,14 @@ namespace IDCA.Client.ViewModel
         /// <param name="type"></param>
         public void InitDetail(AxisElementType type)
         {
+            // 名称
+            var typeDetail = new AxisElementDetailViewModel(AxisElementDetailType.Type)
+            {
+                IsReadOnly = true,
+                Text = type.ToString()
+            };
+            Details.Add(typeDetail);
+
             switch (type)
             {
                 case AxisElementType.InsertFunctionOrVariable:
@@ -1959,7 +1976,7 @@ namespace IDCA.Client.ViewModel
             get { return _name; }
             set
             {
-                if (_root.NodeNames.Contains(value.ToLower()))
+                if (_root.NodeNames.Contains(value.ToLower()) || !AxisConstants.CheckName(value))
                 {
                     return;
                 }
@@ -2005,9 +2022,9 @@ namespace IDCA.Client.ViewModel
         public void PushChild(AxisTreeNode node)
         {
             _children.Add(node);
-            var parameter = _axisElement.Template.NewParameter();
-            parameter.SetValue(node.AxisElement);
-            _axisElement.Template.PushParameter(parameter);
+            //var parameter = _axisElement.Template.NewParameter();
+            //parameter.SetValue(node.AxisElement);
+            //_axisElement.Template.PushParameter(parameter);
             node.Parent = this;
         }
         /// <summary>
@@ -2142,6 +2159,13 @@ namespace IDCA.Client.ViewModel
             _elementType = element.Template.ElementType;
             // Detail
             Details.Clear();
+
+            Details.Add(new AxisElementDetailViewModel(AxisElementDetailType.Type)
+            {
+                IsReadOnly = true,
+                Text = element.Template.ElementType.ToString()
+            });
+
             switch (_elementType)
             {
                 case AxisElementType.InsertFunctionOrVariable:
@@ -2233,7 +2257,7 @@ namespace IDCA.Client.ViewModel
                                     viewModel.SelectedNode = n;
                                 }
                             });
-                        child.LoadFromAxisElement(subElement);
+                        //child.LoadFromAxisElement(subElement);
                         PushChild(child);
                     }
                 }

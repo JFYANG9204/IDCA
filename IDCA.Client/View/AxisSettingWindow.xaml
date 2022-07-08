@@ -179,6 +179,11 @@
                         </Style>
                     </Grid.Resources>
 
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <!--<ColumnDefinition Width="40"/>-->
@@ -186,71 +191,76 @@
                         <!--<ColumnDefinition Width="40"/>-->
                     </Grid.ColumnDefinitions>
 
-                    <StackPanel Grid.Column="0">
                         
-                        <TextBlock Margin="10 20 0 5"
-                                   Text="可用轴元素"
-                                   VerticalAlignment="Bottom"
-                                   FontSize="15"
-                                   FontWeight="Bold"/>
+                    <TextBlock Grid.Row="0"
+                               Grid.Column="0"
+                               Margin="10 20 0 5"
+                               Text="可用轴元素"
+                               VerticalAlignment="Bottom"
+                               FontSize="15"
+                               FontWeight="Bold"/>
 
-                        <ListBox Margin="10"
-                                 BorderThickness="0"
-                                 FontSize="{StaticResource IDCA.Font.Size.Content}"
-                                 Background="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=Background}"
-                                 ItemsSource="{Binding AvailableElements}"
-                                 SelectedIndex="{Binding AvailableSelectedIndex}"
-                                 d:ItemsSource="{d:SampleData ItemCount=5}">
-                            <ListBox.Resources>
-                                <Style TargetType="ListBoxItem" BasedOn="{StaticResource MahApps.Styles.ListBoxItem}">
-                                    <Setter Property="Background" Value="{Binding RelativeSource={RelativeSource AncestorType=ListBox}, Path=Background}"/>
-                                </Style>
-                            </ListBox.Resources>
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid Height="30"
-                                          Width="{Binding RelativeSource={RelativeSource AncestorType=ListBox, Mode=FindAncestor}, Path=Width}">
-                                        <Grid.Resources>
-                                            <Style TargetType="Button">
-                                                <Setter Property="Cursor" Value="Hand"/>
-                                            </Style>
-                                        </Grid.Resources>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="30"/>
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Column="0" 
-                                                   FontSize="13"
-                                                   FontFamily="{StaticResource IDCA.Font.Family}"
-                                                   VerticalAlignment="Center" 
-                                                   Text="{Binding Name}"/>
-                                        <Button Grid.Column="1" 
-                                                Style="{StaticResource IDCA.Button.Add}"
-                                                Command="{Binding AddCommand}"/>
-                                    </Grid>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
+                    <ListBox Grid.Row="1" 
+                             Grid.Column="0"
+                             Margin="10"
+                             BorderThickness="0"
+                             FontSize="{StaticResource IDCA.Font.Size.Content}"
+                             Background="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=Background}"
+                             ItemsSource="{Binding AvailableElements}"
+                             SelectedIndex="{Binding AvailableSelectedIndex}"
+                             d:ItemsSource="{d:SampleData ItemCount=5}">
+                        <ListBox.Resources>
+                            <Style TargetType="ListBoxItem" BasedOn="{StaticResource MahApps.Styles.ListBoxItem}">
+                                <Setter Property="Background" Value="{Binding RelativeSource={RelativeSource AncestorType=ListBox, Mode=FindAncestor}, Path=Background}"/>
+                            </Style>
+                        </ListBox.Resources>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Height="30"
+                                      Width="{Binding RelativeSource={RelativeSource AncestorType=ListBox, Mode=FindAncestor}, Path=Width}">
+                                    <Grid.Resources>
+                                        <Style TargetType="Button">
+                                            <Setter Property="Cursor" Value="Hand"/>
+                                        </Style>
+                                    </Grid.Resources>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="30"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" 
+                                               FontSize="13"
+                                               FontFamily="{StaticResource IDCA.Font.Family}"
+                                               VerticalAlignment="Center" 
+                                               Text="{Binding Name}"/>
+                                    <Button Grid.Column="1" 
+                                            Style="{StaticResource IDCA.Button.Add}"
+                                            Command="{Binding AddCommand}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
 
-                    </StackPanel>
+                    <TextBlock Grid.Row="0" 
+                               Grid.Column="1"
+                               Margin="10 20 0 5"
+                               Text="现有轴元素"
+                               VerticalAlignment="Bottom"
+                               FontSize="15"
+                               FontWeight="Bold"/>
 
-                    <StackPanel Grid.Column="1">
-
-                        <TextBlock Margin="10 20 0 5"
-                                   Text="现有轴元素"
-                                   VerticalAlignment="Bottom"
-                                   FontSize="15"
-                                   FontWeight="Bold"/>
-
-                        <TreeView Margin="10"
-                                  FontSize="{StaticResource IDCA.Font.Size.Content}"
+                    <ScrollViewer Grid.Row="1" 
+                                  Grid.Column="1"
+                                  Margin="10"
+                                  VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Auto">
+                        <TreeView FontSize="{StaticResource IDCA.Font.Size.Content}"
                                   BorderThickness="0"
-                                  Background="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=Background}"
+                                  Background="{StaticResource IDCA.Brushes.Window.Background}"
                                   ItemsSource="{Binding Tree}"
                                   d:ItemsSource="{d:SampleData ItemCount=5}">
                             <TreeView.ItemContainerStyle>
                                 <Style TargetType="TreeViewItem">
-                                    <Setter Property="Background" Value="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=Background}"/>
+                                    <Setter Property="Background" Value="{StaticResource IDCA.Brushes.Window.Background}"/>
                                     <Setter Property="IsSelected" Value="{Binding IsSelected}"/>
                                 </Style>
                             </TreeView.ItemContainerStyle>
@@ -265,7 +275,7 @@
                                             </Style>
                                         </Grid.Resources>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition MinWidth="160" Width="*"/>
+                                            <ColumnDefinition MinWidth="180" Width="*"/>
                                             <ColumnDefinition Width="120"/>
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Grid.Column="0" 
@@ -301,8 +311,8 @@
                                 </HierarchicalDataTemplate>
                             </TreeView.ItemTemplate>
                         </TreeView>
-
-                    </StackPanel>
+                        
+                    </ScrollViewer>
                     
                 </Grid>
 
@@ -346,7 +356,7 @@
 
                 <ScrollViewer Grid.Row="2" Margin="10" VerticalScrollBarVisibility="Auto">
                     <ItemsControl BorderThickness="0"
-                                  Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"
+                                  Background="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=Background}"
                                   ItemsSource="{Binding SelectedNode.Details}"
                                   d:ItemsSource="{d:SampleData ItemCount=5}">
                         <ItemsControl.ItemTemplate>
@@ -364,6 +374,7 @@
                                                  Height="25"
                                                  VerticalContentAlignment="Center"
                                                  Text="{Binding Text}"
+                                                 IsReadOnly="{Binding IsReadOnly}"
                                                  Visibility="{Binding IsTextBox, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                                         <ComboBox Width="140"
                                                   Height="25"
@@ -373,6 +384,7 @@
                                                   VerticalContentAlignment="Center"
                                                   ItemsSource="{Binding Selections}"
                                                   SelectedIndex="{Binding SelectedIndex}"
+                                                  IsReadOnly="{Binding IsReadOnly}"
                                                   Visibility="{Binding IsComboBox, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                                     </Grid>
                                 </StackPanel>

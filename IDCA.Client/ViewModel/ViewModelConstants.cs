@@ -10,6 +10,7 @@ namespace IDCA.Client.ViewModel
         public const string TableTypeMeanSummary = "数值均值表";
         public const string TableTypeResponseSummary = "选项均值表";
         // Axis Detail部分配置描述
+        public const string AxisElementDetailType = "类型";
         public const string AxisElementDetailName = "变量名";
         public const string AxisElementDetailDescription = "描述";
         public const string AxisElementDetailFilter = "筛选条件";

@@ -9,14 +9,23 @@ namespace IDCA.Model.Spec
         public AxisParser(SpecObject parent)
         {
             _axis = new Axis(parent, AxisType.Normal);
+            _axisElement = new AxisElement(parent);
         }
 
         public AxisParser(Axis axis)
         {
             _axis = axis;
+            _axisElement = new AxisElement(axis);
+        }
+
+        public AxisParser(AxisElement element)
+        {
+            _axis = new Axis(element, AxisType.Normal);
+            _axisElement = element;
         }
 
         readonly Axis _axis;
+        readonly AxisElement _axisElement;
 
         int _pos = 0;
         string _current = string.Empty;
@@ -291,6 +300,7 @@ namespace IDCA.Model.Spec
             if (_type == ParserElementType.Dotdot)
             {
                 element.Template.ElementType = AxisElementType.CategoryRange;
+                element.Name = "CategoryRange";
                 Next();
                 if (_type == ParserElementType.ElementName)
                 {
@@ -429,6 +439,23 @@ namespace IDCA.Model.Spec
             }
 
             return _axis;
+        }
+
+        public AxisElement ParseToElement(string expression)
+        {
+            _exp = expression;
+            _length = _exp.Length;
+
+            var t = Next();
+            while (t != ParserElementType.None)
+            {
+                var parameter = _axisElement.Template.NewParameter();
+                parameter.SetValue(ReadElement(_axisElement));
+                _axisElement.Template.PushParameter(parameter);
+                t = Next();
+            }
+
+            return _axisElement;
         }
 
         static bool IsSpace(char character)

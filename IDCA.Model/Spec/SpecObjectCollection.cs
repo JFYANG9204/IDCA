@@ -113,6 +113,16 @@ namespace IDCA.Model.Spec
         }
 
         /// <summary>
+        /// 根据回调函数查找匹配的最后一个对象
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        public T? Last(Func<T, bool> predicate)
+        {
+            return _items.Last(predicate);
+        }
+
+        /// <summary>
         /// 根据回调函数结果返回符合条件的已有元素列表
         /// </summary>
         /// <param name="predicate"></param>

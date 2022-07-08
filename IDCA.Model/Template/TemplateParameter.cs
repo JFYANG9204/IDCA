@@ -115,7 +115,7 @@ namespace IDCA.Model.Template
         /// <summary>
         /// 此类参数值为Manipulate文件中所有的筛选器表达式
         /// </summary>
-        MannipulateFilter = 2192,
+        ManipulateFilter = 2192,
 
         /// <summary>
         /// 此类参数值为Tab文件中使用的TableDocument对象

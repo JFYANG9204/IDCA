@@ -9,19 +9,46 @@ using System.Text;
 namespace IDCA.Model
 {
     /// <summary>
+    /// 轴表达式操作类保留元素名
+    /// </summary>
+    public class AxisConstants
+    {
+        public const string AxisAverageAheadSubTotalName = "AverageAheadSubTotal";
+        public const string AxisAverageInsertEmtpyLineName = "AverageInsertEmptyLine";
+        public const string AxisAverageBaseNetName = "AverageBase";
+        public const string AxisAverageSubTotalName = "AverageSubTotal";
+        public const string AxisAverageDerivedName = "AverageMention";
+
+        public const string AxisMeanValueName = "MeanValue";
+        public const string AxisStdDevValueName = "StdDevValue";
+        public const string AxisStdErrValueName = "StdErrValue";
+
+        /// <summary>
+        /// 检查名称字符串是否是保留名，如果可用，返回true
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static bool CheckName(string name)
+        {
+            return !(
+                name.Equals(AxisAverageAheadSubTotalName, StringComparison.OrdinalIgnoreCase) ||
+                name.Equals(AxisAverageInsertEmtpyLineName, StringComparison.OrdinalIgnoreCase) ||
+                name.Equals(AxisAverageBaseNetName, StringComparison.OrdinalIgnoreCase) ||
+                name.Equals(AxisAverageSubTotalName, StringComparison.OrdinalIgnoreCase) ||
+                name.Equals(AxisAverageDerivedName, StringComparison.OrdinalIgnoreCase) ||
+                name.Equals(AxisMeanValueName, StringComparison.OrdinalIgnoreCase) ||
+                name.Equals(AxisStdDevValueName, StringComparison.OrdinalIgnoreCase) ||
+                name.Equals(AxisStdErrValueName, StringComparison.OrdinalIgnoreCase));
+        }
+
+    }
+
+
+    /// <summary>
     /// 轴表达式操作类，用于生成各种样式的轴表达式
     /// </summary>
     public class AxisOperator
     {
-
-        public const string AXIS_AVERAGE_BASE_NAME = "AverageBase";
-        public const string AXIS_AVERAGE_SUBTOTAL_NAME = "AverageSubTotal";
-        public const string AXIS_AVERAGE_DERIVED_NAME = "AverageMention";
-
-        public const string AXIS_MEAN_MEANVALUE = "MeanValue";
-        public const string AXIS_MEAN_STDDEVVALUE = "StddevValue";
-        public const string AXIS_MEAN_STDERRVALUE = "StderrValue";
-
         public AxisOperator(Axis axis, Config config, TemplateCollection templates)
         {
             _axis = axis;
@@ -249,6 +276,16 @@ namespace IDCA.Model
         }
 
         /// <summary>
+        /// 根据回调函数查找最后一个符合条件的对象，如果没找到，返回null
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public AxisElement? Last(AxisElementType type)
+        {
+            return _axis.Last(e => e.Template.ElementType == type);
+        }
+
+        /// <summary>
         /// 遍历轴表达式元素并执行回调函数
         /// </summary>
         /// <param name="callback"></param>
@@ -382,12 +419,12 @@ namespace IDCA.Model
             }
 
             // 优先添加已有的函数模板
-            if (_axisMeanFunction != null && (string.IsNullOrEmpty(_meanFilter) || (!string.IsNullOrEmpty(_meanFilter) && _axisMeanFunction.Parameters[TemplateParameterUsage.MannipulateFilter] != null)))
+            if (_axisMeanFunction != null && (string.IsNullOrEmpty(_meanFilter) || (!string.IsNullOrEmpty(_meanFilter) && _axisMeanFunction.Parameters[TemplateParameterUsage.ManipulateFilter] != null)))
             {
                 _axisMeanFunction.SetFunctionParameterValue(_meanVariable, TemplateValueType.Variable, TemplateParameterUsage.ManipulateMeanVariable);
                 if (!string.IsNullOrEmpty(_meanFilter))
                 {
-                    _axisMeanFunction.SetFunctionParameterValue(_meanFilter, TemplateValueType.String, TemplateParameterUsage.MannipulateFilter);
+                    _axisMeanFunction.SetFunctionParameterValue(_meanFilter, TemplateValueType.String, TemplateParameterUsage.ManipulateFilter);
                 }
                 _axis.AppendInsertFunction(_axisMeanFunction);
             }
@@ -397,9 +434,9 @@ namespace IDCA.Model
                 {
                     _axis.AppendText();
                 }
-                _axis.AppendNamedMean(AXIS_MEAN_MEANVALUE, SpecConfigDefaultValue.AXIS_MEAN_LABEL, _meanVariable, _meanFilter).Suffix.AppendDecimals(2);
-                _axis.AppendNamedStdDev(AXIS_MEAN_STDDEVVALUE, SpecConfigDefaultValue.AXIS_STDDEV_LABEL, _meanVariable, _meanFilter).Suffix.AppendDecimals(2);
-                _axis.AppendNamedStdErr(AXIS_MEAN_STDERRVALUE, SpecConfigDefaultValue.AXIS_STDERR_LABEL, _meanVariable, _meanFilter).Suffix.AppendDecimals(2);
+                _axis.AppendNamedMean(AxisConstants.AxisMeanValueName, SpecConfigDefaultValue.AXIS_MEAN_LABEL, _meanVariable, _meanFilter).Suffix.AppendDecimals(2);
+                _axis.AppendNamedStdDev(AxisConstants.AxisStdDevValueName, SpecConfigDefaultValue.AXIS_STDDEV_LABEL, _meanVariable, _meanFilter).Suffix.AppendDecimals(2);
+                _axis.AppendNamedStdErr(AxisConstants.AxisStdErrValueName, SpecConfigDefaultValue.AXIS_STDERR_LABEL, _meanVariable, _meanFilter).Suffix.AppendDecimals(2);
             }
 
             _hasMean = true;
@@ -417,9 +454,9 @@ namespace IDCA.Model
 
             FunctionTemplate? param;
 
-            _axis.RemoveIf(e => e.Name.Equals(AXIS_MEAN_MEANVALUE) ||
-                                e.Name.Equals(AXIS_MEAN_STDDEVVALUE) ||
-                                e.Name.Equals(AXIS_MEAN_STDERRVALUE) || (
+            _axis.RemoveIf(e => e.Name.Equals(AxisConstants.AxisMeanValueName) ||
+                                e.Name.Equals(AxisConstants.AxisStdDevValueName) ||
+                                e.Name.Equals(AxisConstants.AxisStdErrValueName) || (
                                 e.Template.ElementType == AxisElementType.InsertFunctionOrVariable &&
                                 (param = e.Template.GetParameter(0)?.GetValue() as FunctionTemplate) != null &&
                                 param.Flag == FunctionTemplateFlags.ManipulateAxisInsertMean));
@@ -452,14 +489,38 @@ namespace IDCA.Model
             //}
             //else
             //{
-            _axis.AppendSubTotal().Suffix.AppendIsHidden(true);
+
+            bool needSubtotal = false;
+            var lastSubtotal = Last(AxisElementType.SubTotal);
+            if (lastSubtotal == null)
+            {
+                needSubtotal = true;
+            }
+            else
+            {
+                int index = _axis.IndexOf(lastSubtotal) + 1;
+                for (int i = index; i < _axis.Count; i++)
+                {
+                    if (_axis[i].Template.ElementType != AxisElementType.Text)
+                    {
+                        needSubtotal = true;
+                        break;
+                    }
+                }
+            }
+
+            if (needSubtotal)
+            {
+                _axis.AppendNamedSubTotal(AxisConstants.AxisAverageAheadSubTotalName).Suffix.AppendIsHidden(true);
+            }
+
             if (_averageMentionBlanckRow && _axis[^1].Template.ElementType != AxisElementType.Text)
             {
-                _axis.AppendText();
+                _axis.AppendNamedText(AxisConstants.AxisAverageInsertEmtpyLineName);
             }
-            _axis.AppendNamedNet(AXIS_AVERAGE_BASE_NAME, null, $"..{(string.IsNullOrEmpty(_averageSkipCodes) ? "" : $",^{_averageSkipCodes.Replace(",", ",^")}")}").Suffix.AppendIsHidden(true);
-            _axis.AppendSubTotal(AXIS_AVERAGE_SUBTOTAL_NAME).Suffix.AppendIsHidden(true);
-            _axis.AppendNamedDerived(AXIS_AVERAGE_DERIVED_NAME, _averageMentionLabel, "AverageSubTotal/AverageBase").Suffix.AppendDecimals(_averageMentionDecimals);
+            _axis.AppendNamedNet(AxisConstants.AxisAverageBaseNetName, null, $"..{(string.IsNullOrEmpty(_averageSkipCodes) ? "" : $",^{_averageSkipCodes.Replace(",", ",^")}")}").Suffix.AppendIsHidden(true);
+            _axis.AppendNamedSubTotal(AxisConstants.AxisAverageSubTotalName).Suffix.AppendIsHidden(true);
+            _axis.AppendNamedDerived(AxisConstants.AxisAverageDerivedName, _averageMentionLabel, "AverageSubTotal/AverageBase").Suffix.AppendDecimals(_averageMentionDecimals);
             _hasAxisAverage = true;
             //}
         }
@@ -474,9 +535,11 @@ namespace IDCA.Model
                 return;
             }
 
-            _axis.RemoveIf(e => e.Name.Equals(AXIS_AVERAGE_BASE_NAME) || 
-                                e.Name.Equals(AXIS_AVERAGE_DERIVED_NAME) ||
-                                e.Name.Equals(AXIS_AVERAGE_SUBTOTAL_NAME));
+            _axis.RemoveIf(e => e.Name.Equals(AxisConstants.AxisAverageBaseNetName) || 
+                                e.Name.Equals(AxisConstants.AxisAverageDerivedName) ||
+                                e.Name.Equals(AxisConstants.AxisAverageSubTotalName) ||
+                                e.Name.Equals(AxisConstants.AxisAverageAheadSubTotalName) ||
+                                e.Name.Equals(AxisConstants.AxisAverageInsertEmtpyLineName));
 
             if (_axis[^1].Template.ElementType == AxisElementType.Text)
             {
@@ -836,6 +899,106 @@ namespace IDCA.Model
             }
         }
 
+        void UpdateParameter(string elementName, int parameterIndex, string value)
+        {
+            var element = _axis.Find(e => e.Name.Equals(elementName, StringComparison.OrdinalIgnoreCase));
+            if (element != null)
+            {
+                var parameter = element.Template.GetParameter(parameterIndex);
+                if (parameter == null)
+                {
+                    for (int i = 0; i <= parameterIndex; i++)
+                    {
+                        if (element.Template.GetParameter(i) == null)
+                        {
+                            parameter = element.Template.NewParameter();
+                            element.Template.PushParameter(parameter);
+                        }
+                    }
+                }
+                parameter?.SetValue(value);
+            }
+        }
+
+        /// <summary>
+        /// 更新轴表达式中的均值变量配置
+        /// </summary>
+        /// <param name="meanVariable"></param>
+        public void UpdateMeanVariable(string meanVariable)
+        {
+            var meanFunc = _axis.Find(e => e.Template.ElementType == AxisElementType.InsertFunctionOrVariable &&
+                                           e.Template.GetParameter(0)?.GetValue() is FunctionTemplate funcTemplate &&
+                                           funcTemplate.Flag == FunctionTemplateFlags.ManipulateAxisInsertMean);
+
+            if (meanFunc != null)
+            {
+                if (meanFunc.Template.GetParameter(0)?.GetValue() is FunctionTemplate func)
+                {
+                    func.SetFunctionParameterValue(meanVariable, TemplateParameterUsage.ManipulateMeanVariable);
+                }
+            }
+            else
+            {
+                UpdateParameter(AxisConstants.AxisMeanValueName, 0, meanVariable);
+                UpdateParameter(AxisConstants.AxisStdDevValueName, 0, meanVariable);
+                UpdateParameter(AxisConstants.AxisStdErrValueName, 0, meanVariable);
+            }
+
+        }
+
+        /// <summary>
+        /// 更新当前轴表达式中均值计算中的Filter表达式
+        /// </summary>
+        /// <param name="filter"></param>
+        public void UpdateMeanFilter(string filter)
+        {
+            var meanFunc = _axis.Find(e => e.Template.ElementType == AxisElementType.InsertFunctionOrVariable &&
+                                           e.Template.GetParameter(0)?.GetValue() is FunctionTemplate funcTemplate &&
+                                           funcTemplate.Flag == FunctionTemplateFlags.ManipulateAxisInsertMean);
+
+            if (meanFunc != null)
+            {
+                if (meanFunc.Template.GetParameter(0)?.GetValue() is FunctionTemplate func)
+                {
+                    func.SetFunctionParameterValue(filter, TemplateParameterUsage.ManipulateFilter);
+                }
+            }
+            else
+            {
+                UpdateParameter(AxisConstants.AxisMeanValueName, 1, filter);
+                UpdateParameter(AxisConstants.AxisStdDevValueName, 1, filter);
+                UpdateParameter(AxisConstants.AxisStdErrValueName, 1, filter);
+            }
+        }
+
+        /// <summary>
+        /// 更新当前轴表达式均值计算中跳过码号内容
+        /// </summary>
+        /// <param name="codes"></param>
+        public void UpdateAverageSkipCodes(string codes)
+        {
+            var averageFunc = _axis.Find(e => e.Template.ElementType == AxisElementType.InsertFunctionOrVariable &&
+                                              e.Template.GetParameter(0)?.GetValue() is FunctionTemplate funcTemplate &&
+                                              funcTemplate.Flag == FunctionTemplateFlags.ManipulateAxisInsertAverage);
+
+            if (averageFunc != null)
+            {
+                if (averageFunc.Template.GetParameter(0)?.GetValue() is FunctionTemplate func)
+                {
+                    func.SetFunctionParameterValue(codes, TemplateParameterUsage.ManipulateExclude);
+                }
+            }
+            else
+            {
+                var netTotal = _axis.Find(e => e.Name.Equals(AxisConstants.AxisAverageBaseNetName, StringComparison.OrdinalIgnoreCase));
+                if (netTotal != null)
+                {
+                    netTotal.Template.ClearParameter();
+                    string codeExpression = $"..{(string.IsNullOrEmpty(codes) ? "" : $",^{codes.Replace(",", ",^")}")}";
+                    Axis.ReadNetElement(netTotal, codeExpression);
+                }
+            }
+        }
 
     }
 
