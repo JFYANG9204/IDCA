@@ -243,24 +243,36 @@ namespace IDCA.Client.ViewModel
             ViewModelConstants.TableTypeResponseSummary
         };
 
+        /**
+         *  由于一个变量可能在表格配置中出现多次，为了避免重复设定轴表达式，在ViewModel中设定_axisViewModel/_axisOperator/_manipulate为
+         *  可空类型，其中，
+         *      + 如果_manipulation不为null，表示这个变量是第一次出现，需要同步追加Manipulation文件中的内容，同时_axsiViewModel和_axsiOperator绑定轴配置；
+         *      + 如果_manipulation为null，同时_axisViewModel和_axisOperator不为null，表示此表格表侧变量追加轴表达式，将体现在Table文件中。
+         */
+
         public TableSettingElementViewModel(Table table, Config config, TemplateCollection templates) 
         {
             _table = table;
-            var sideAxis = _table.SideAxis ?? _table.CreateSideAxis(AxisType.Normal);
-            _axisOperator = new AxisOperator(sideAxis, config, templates);
-            if (sideAxis.Count == 0)
-            {
+            _config = config;
+            _templates = templates;
+            _isAxisSettingButtonEnabled = false;
+            //var sideAxis = _table.SideAxis ?? _table.CreateSideAxis(AxisType.Normal);
+            //_axisOperator = new AxisOperator(sideAxis, config, templates);
+            //if (sideAxis.Count == 0)
+            //{
                 // 如果是空表达式，创建基础的表达式
-                _axisOperator.CreateBasicAxisExpression(null);
-            }
-            _axisViewModel = new AxisSettingViewModel(this, _axisOperator);
+                //_axisOperator.CreateBasicAxisExpression(null);
+            //}
+            //_axisViewModel = new AxisSettingViewModel(this, _axisOperator);
             _tableTypeSelectedIndex = 0;
         }
 
+        readonly Config _config;
+        readonly TemplateCollection _templates;
 
         readonly Table _table;
-        readonly AxisSettingViewModel _axisViewModel;
-        readonly AxisOperator _axisOperator;
+        AxisSettingViewModel? _axisViewModel;
+        AxisOperator? _axisOperator;
 
         Model.Spec.Manipulation? _manipulation;
         /// <summary>
@@ -281,6 +293,43 @@ namespace IDCA.Client.ViewModel
         {
             get => _metadata;
             set => _metadata = value;
+        }
+
+        bool _isAxisSettingButtonEnabled;
+        /// <summary>
+        /// 控制轴表达式配置窗口按钮是否可用
+        /// </summary>
+        public bool IsAxisSettingButtonEnabled
+        {
+            get { return _isAxisSettingButtonEnabled; }
+            set 
+            { 
+                SetProperty(ref _isAxisSettingButtonEnabled, value);
+                if (value)
+                {
+                    if (_axisOperator == null)
+                    {
+                        if (_manipulation != null)
+                        {
+                            _axisOperator = new AxisOperator(_manipulation.Axis, _config, _templates);
+                            _axisViewModel = new AxisSettingViewModel(this, _axisOperator);
+                        }
+                        else
+                        {
+                            _axisOperator = new AxisOperator(_table.CreateSideAxis(AxisType.Normal), _config, _templates);
+                            _axisViewModel = new AxisSettingViewModel(this, _axisOperator);
+                        }
+                    }
+                }
+                else
+                {
+                    if (_manipulation == null)
+                    {
+                        _axisOperator = null;
+                        _axisViewModel = null;
+                    }
+                }
+            }
         }
 
         VariableSettingViewModel? _variableSettingViewModel;
@@ -409,7 +458,11 @@ namespace IDCA.Client.ViewModel
                         manipulations.Remove(_manipulation);
                     }
                     _manipulation = manipulations.FromField(value, _title);
-                    _manipulation.SetAxis(_axisOperator.Axis);
+                    IsAxisSettingButtonEnabled = true;
+                    if (_axisOperator != null)
+                    {
+                        _manipulation.SetAxis(_axisOperator.Axis);
+                    }
                 }
             }
         }
@@ -450,7 +503,7 @@ namespace IDCA.Client.ViewModel
             { 
                 SetProperty(ref _baseText, value);
                 // 同步修改轴表达式中的配置
-                var e = _axisOperator.First(AxisElementType.Base);
+                var e = _axisOperator?.First(AxisElementType.Base);
                 if (e != null)
                 {
                     e.Description = value;
@@ -474,7 +527,7 @@ namespace IDCA.Client.ViewModel
             { 
                 SetProperty(ref _baseFilter, value);
                 // 同步修改轴表达式中的配置
-                var e = _axisOperator.First(AxisElementType.Base);
+                var e = _axisOperator?.First(AxisElementType.Base);
                 if (e != null)
                 {
                     var parameter = e.Template.GetParameter(0);

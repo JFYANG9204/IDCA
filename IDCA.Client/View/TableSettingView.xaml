@@ -352,7 +352,8 @@
                 <DataGridTemplateColumn Header="轴表达式" Width="70">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button Background="{Binding Path=Background, RelativeSource={RelativeSource AncestorType=DataGridCell}}"
+                            <Button IsEnabled="{Binding IsAxisSettingButtonEnabled}"
+                                    Background="{Binding Path=Background, RelativeSource={RelativeSource AncestorType=DataGridCell}}"
                                     Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource AncestorType=DataGridCell}}"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Stretch"
