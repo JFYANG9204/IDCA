@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:view="clr-namespace:IDCA.Client.View"
              xmlns:viewmodel="clr-namespace:IDCA.Client.ViewModel" 
              d:DataContext="{d:DesignInstance Type=viewmodel:TableSettingViewModel}"
              mc:Ignorable="d" 
@@ -349,6 +348,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>-->
+                <DataGridCheckBoxColumn Header="追加轴表达式" Binding="{Binding IsAxisSettingButtonEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <DataGridTemplateColumn Header="轴表达式" Width="70">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>

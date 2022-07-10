@@ -204,7 +204,7 @@ namespace IDCA.Client.ViewModel
         public ICommand PushNewElementCommand => new RelayCommand(Push);
         void Push()
         {
-            var element = new TableSettingElementViewModel(_tables.NewTable(), _config, _templates);
+            var element = new TableSettingElementViewModel(this, _tables.NewTable(), _config, _templates);
             element.Removing += RemoveElementAt;
             element.MovingUp += MoveElementUp;
             element.MovingDown += MoveElementDown;
@@ -250,8 +250,9 @@ namespace IDCA.Client.ViewModel
          *      + 如果_manipulation为null，同时_axisViewModel和_axisOperator不为null，表示此表格表侧变量追加轴表达式，将体现在Table文件中。
          */
 
-        public TableSettingElementViewModel(Table table, Config config, TemplateCollection templates) 
+        public TableSettingElementViewModel(TableSettingViewModel parent, Table table, Config config, TemplateCollection templates) 
         {
+            _parent = parent;
             _table = table;
             _config = config;
             _templates = templates;
@@ -269,8 +270,9 @@ namespace IDCA.Client.ViewModel
 
         readonly Config _config;
         readonly TemplateCollection _templates;
-
         readonly Table _table;
+        readonly TableSettingViewModel _parent;
+
         AxisSettingViewModel? _axisViewModel;
         AxisOperator? _axisOperator;
 
@@ -305,31 +307,94 @@ namespace IDCA.Client.ViewModel
             set 
             { 
                 SetProperty(ref _isAxisSettingButtonEnabled, value);
-                if (value)
+                CheckManipulationAxis();
+            }
+        }
+
+        /// <summary>
+        /// 在修改<see cref="IsAxisSettingButtonEnabled"/>后，
+        /// 检查是否需要更新轴对象和Manipulation对象
+        /// </summary>
+        void CheckManipulationAxis()
+        {
+            if (_isAxisSettingButtonEnabled)
+            {
+                if (_axisOperator == null)
                 {
-                    if (_axisOperator == null)
+                    if (_manipulation != null)
                     {
-                        if (_manipulation != null)
-                        {
-                            _axisOperator = new AxisOperator(_manipulation.Axis, _config, _templates);
-                            _axisViewModel = new AxisSettingViewModel(this, _axisOperator);
-                        }
-                        else
-                        {
-                            _axisOperator = new AxisOperator(_table.CreateSideAxis(AxisType.Normal), _config, _templates);
-                            _axisViewModel = new AxisSettingViewModel(this, _axisOperator);
-                        }
+                        _axisOperator = new AxisOperator(_manipulation.Axis, _config, _templates);
+                        _table.UseSideAxis = false;
+                    }
+                    else
+                    {
+                        _axisOperator = new AxisOperator(_table.SideAxis ?? _table.CreateSideAxis(AxisType.Normal), _config, _templates);
+                        _table.UseSideAxis = true;
                     }
                 }
                 else
                 {
-                    if (_manipulation == null)
+                    if (_manipulation != null && _manipulation.Axis != _axisOperator.Axis)
                     {
-                        _axisOperator = null;
-                        _axisViewModel = null;
+                        _axisOperator = new AxisOperator(_manipulation.Axis, _config, _templates);
+                        _table.SetSideAxis(_manipulation.Axis);
                     }
+                    _table.UseSideAxis = _manipulation == null;
+                }
+
+                if (_axisViewModel == null)
+                {
+                    _axisViewModel = new AxisSettingViewModel(this, _axisOperator);
                 }
             }
+            else
+            {
+                _table.UseSideAxis = false;
+            }
+        }
+
+        /// <summary>
+        /// 在修改<see cref="VariableName"/>后，
+        /// 检查是否需要更新轴对象和Manipulation对象
+        /// </summary>
+        void CheckManipulationAxis(string oldValue)
+        {
+            string newValue = _variableName;
+            var manipulations = _table.Document?.Manipulations;
+
+            if (manipulations == null)
+            {
+                if (_manipulation != null)
+                {
+                    _manipulation = null;
+                }
+                return;
+            }
+
+            if (_manipulation != null)
+            {
+                // 检查修改变量名是否在Manipulation集合中，如果之前已修改过，
+                // 则此对象不再修改之前的配置
+                var existed = _parent.ElementList.Where(e => e.VariableName.Equals(oldValue, StringComparison.OrdinalIgnoreCase));
+                // 如果当前对象已配置Manipulation对象，
+                // 检查是否已有同名变量对象，如果存在，将Manipulation转移到其他对象，
+                // 如果没有，移除已存在的对象
+                if (existed.Count() > 1)
+                {
+                    existed.ElementAt(1).Manipulation = _manipulation;
+                    _manipulation = null;
+                }
+                else
+                {
+                    manipulations.Remove(_manipulation);
+                }
+            }
+
+            _manipulation = manipulations.FromField(_variableName, _title);
+            // 启用轴表达式配置
+            SetProperty(ref _isAxisSettingButtonEnabled, true);
+            _axisOperator = new AxisOperator(_manipulation.Axis, _config, _templates);
+            _axisViewModel = new AxisSettingViewModel(this, _axisOperator);
         }
 
         VariableSettingViewModel? _variableSettingViewModel;
@@ -448,22 +513,11 @@ namespace IDCA.Client.ViewModel
         {
             get { return _variableName; }
             set 
-            { 
+            {
+                string oldValue = _variableName;
+                value = value.Replace(" ", "");
                 SetProperty(ref _variableName, value);
-                var manipulations = _table.Document?.Manipulations;
-                if (manipulations != null)
-                {
-                    if (_manipulation != null)
-                    {
-                        manipulations.Remove(_manipulation);
-                    }
-                    _manipulation = manipulations.FromField(value, _title);
-                    IsAxisSettingButtonEnabled = true;
-                    if (_axisOperator != null)
-                    {
-                        _manipulation.SetAxis(_axisOperator.Axis);
-                    }
-                }
+                CheckManipulationAxis(oldValue);
             }
         }
 

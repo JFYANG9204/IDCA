@@ -6,6 +6,7 @@ using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using System;
 using System.Collections.ObjectModel;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Windows.Input;
@@ -42,7 +43,7 @@ namespace IDCA.Client.ViewModel
             _tableSettingNetRangeSeparater = _config.Get(SpecConfigKeys.TABLE_SETTING_NET_RANGE_SEPARATER);
         }
 
-        readonly object _settings;
+        readonly ApplicationSettingsBase _settings;
         readonly Config _config;
 
         void SynchronizeProperty<T>(ref T field, T newValue, ConfigInfo<T> info)
@@ -50,6 +51,7 @@ namespace IDCA.Client.ViewModel
             SetProperty(ref field, newValue);
             _config.Set(info, newValue);
             _config.Synchronize(_settings);
+            _settings.Save();
         }
 
         // Global Configs
@@ -226,6 +228,7 @@ namespace IDCA.Client.ViewModel
                     SetProperty(ref _axisNpsTopBox, value);
                     _config.Set(SpecConfigKeys.AXIS_NPS_TOP_BOX, i);
                     _config.Synchronize(_settings);
+                    _settings.Save();
                 }
             }
         }
@@ -244,6 +247,7 @@ namespace IDCA.Client.ViewModel
                     SetProperty(ref _axisNpsBottomBox, value);
                     _config.Set(SpecConfigKeys.AXIS_NPS_BOTTOM_BOX, i);
                     _config.Synchronize(_settings);
+                    _settings.Save();
                 }
             }
         }
@@ -347,6 +351,7 @@ namespace IDCA.Client.ViewModel
                     SetProperty(ref _axisAverageMentionDecimals, value);
                     _config.Set(SpecConfigKeys.AXIS_AVERAGE_MENTION_DECIMALS, i);
                     _config.Synchronize(_settings);
+                    _settings.Save();
                 }
             }
         }

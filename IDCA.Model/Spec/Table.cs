@@ -281,6 +281,16 @@ namespace IDCA.Model.Spec
             }
         }
 
+        bool _useSideAxis = false;
+        /// <summary>
+        /// 当前表格是否使用额外的轴表达式配置
+        /// </summary>
+        public bool UseSideAxis
+        {
+            get => _useSideAxis;
+            set => _useSideAxis = value;
+        }
+
         Axis? _sideAxis = null;
         /// <summary>
         /// 当前表格的表侧轴表达式配置
@@ -293,6 +303,7 @@ namespace IDCA.Model.Spec
         /// <returns></returns>
         public Axis CreateSideAxis(AxisType type)
         {
+            _useSideAxis = true;
             return _sideAxis = new Axis(this, type);
         }
         /// <summary>
@@ -303,6 +314,7 @@ namespace IDCA.Model.Spec
         {
             if (axis.Parent == this)
             {
+                _useSideAxis = true;
                 _sideAxis = axis;
             }
         }
@@ -318,7 +330,7 @@ namespace IDCA.Model.Spec
                 string side, banner;
                 if (_sideAxis != null)
                 {
-                    side = _sideAxis.Type == AxisType.AxisVariable ? _sideAxis.ToString() : $"{_field.Export()}{_sideAxis}";
+                    side = _sideAxis.Type == AxisType.AxisVariable ? _sideAxis.ToString() : $"{_field.Export()}{(_useSideAxis ? _sideAxis : "")}";
                 }
                 else
                 {
@@ -326,7 +338,7 @@ namespace IDCA.Model.Spec
                 }
 
                 TemplateValueType bannerType = _type == TableType.Grid ? TemplateValueType.String : _banner.ValueType;
-                if (_headerAxis != null && _headerAxis.Type == AxisType.Normal)
+                if (_headerAxis != null && _headerAxis.Type == AxisType.Normal && _type != TableType.GridSlice)
                 {
                     banner = _type == TableType.Grid ? $"{_field.TopLevel}{_headerAxis}" : $"{_banner}{_headerAxis}";
                 }
@@ -354,6 +366,14 @@ namespace IDCA.Model.Spec
                     _tableBase, 
                     TemplateValueType.String, 
                     TemplateParameterUsage.TableBaseText);
+                // grid slice table append axis
+                if (_type == TableType.GridSlice && _useSideAxis)
+                {
+                    _tableFunctionTemplate.SetFunctionParameterValue(
+                        _sideAxis?.ToString() ?? "",
+                        TemplateValueType.String,
+                        TemplateParameterUsage.TableGridSliceAdditionAxis);
+                }
                 result.AppendLine(_tableFunctionTemplate.Exec());
                 // table label
                 if (!string.IsNullOrEmpty(_labelInTableFile) && 

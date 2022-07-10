@@ -297,11 +297,30 @@ namespace IDCA.Model.Template
         /// </summary>
         ManipulateSetSequentialCodeFactor = 110,
 
+        /// <summary>
+        /// Table文件中添加普通表格的函数
+        /// </summary>
         TableNormal = 201,
+        /// <summary>
+        /// Table文件中添加Grid表格的函数
+        /// </summary>
         TableGrid = 202,
+        /// <summary>
+        /// Table文件中添加Grid表的单个表头表格
+        /// </summary>
         TableGridSlice = 203,
+        /// <summary>
+        /// Table文件中添加均值计算表格
+        /// </summary>
         TableMeanSummary = 204,
+        /// <summary>
+        /// Table文件中添加循环变量指定选项值的表格
+        /// </summary>
         TableResponseSummary = 205,
+        /// <summary>
+        /// Table文件中创建自动Coding的函数或语句
+        /// </summary>
+        TableCreateCategorizedVariable = 206,
 
         TableFilter = 301,
         TableLabel = 302,
