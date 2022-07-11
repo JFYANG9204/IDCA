@@ -297,6 +297,21 @@ namespace IDCA.Client.ViewModel
             set => _metadata = value;
         }
 
+        bool _addAdditionalAxis;
+        /// <summary>
+        /// 是否追加额外的轴表达式
+        /// </summary>
+        public bool AddAdditionalAxis
+        {
+            get { return _addAdditionalAxis; }
+            set
+            {
+                SetProperty(ref _addAdditionalAxis, value);
+                IsAxisSettingButtonEnabled = value;
+            }
+        }
+
+
         bool _isAxisSettingButtonEnabled;
         /// <summary>
         /// 控制轴表达式配置窗口按钮是否可用
@@ -331,12 +346,14 @@ namespace IDCA.Client.ViewModel
                         _axisOperator = new AxisOperator(_table.SideAxis ?? _table.CreateSideAxis(AxisType.Normal), _config, _templates);
                         _table.UseSideAxis = true;
                     }
+                    _axisOperator.CreateBasicAxisExpression(_baseText);
                 }
                 else
                 {
                     if (_manipulation != null && _manipulation.Axis != _axisOperator.Axis)
                     {
                         _axisOperator = new AxisOperator(_manipulation.Axis, _config, _templates);
+                        _axisOperator.CreateBasicAxisExpression(_baseText);
                         _table.SetSideAxis(_manipulation.Axis);
                     }
                     _table.UseSideAxis = _manipulation == null;
@@ -373,6 +390,8 @@ namespace IDCA.Client.ViewModel
 
             if (_manipulation != null)
             {
+                // 检查旧值
+
                 // 检查修改变量名是否在Manipulation集合中，如果之前已修改过，
                 // 则此对象不再修改之前的配置
                 var existed = _parent.ElementList.Where(e => e.VariableName.Equals(oldValue, StringComparison.OrdinalIgnoreCase));
@@ -382,19 +401,26 @@ namespace IDCA.Client.ViewModel
                 if (existed.Count() > 1)
                 {
                     existed.ElementAt(1).Manipulation = _manipulation;
-                    _manipulation = null;
                 }
                 else
                 {
                     manipulations.Remove(_manipulation);
                 }
+                _manipulation = null;
+            }
+
+            // 检查新值是否已存在，因为此处代码执行时，这个对象已经添加进了_parent.ElementList中，符合newValue值的VariableName至少有1个。
+            if (_parent.ElementList.Count(e => e.VariableName.Equals(newValue, StringComparison.OrdinalIgnoreCase)) > 1)
+            {
+                IsAxisSettingButtonEnabled = false;
+                return;
             }
 
             _manipulation = manipulations.FromField(_variableName, _title);
             // 启用轴表达式配置
-            SetProperty(ref _isAxisSettingButtonEnabled, true);
-            _axisOperator = new AxisOperator(_manipulation.Axis, _config, _templates);
-            _axisViewModel = new AxisSettingViewModel(this, _axisOperator);
+            IsAxisSettingButtonEnabled = true;
+            //_axisOperator = new AxisOperator(_manipulation.Axis, _config, _templates);
+            //_axisViewModel = new AxisSettingViewModel(this, _axisOperator);
         }
 
         VariableSettingViewModel? _variableSettingViewModel;

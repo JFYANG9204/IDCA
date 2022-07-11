@@ -107,7 +107,7 @@ namespace IDCA.Model.MDM
         protected string _id = string.Empty;
         protected string _name = string.Empty;
 
-        public T? this[string name] => _cache.ContainsKey(name.ToLower()) ? _cache[name.ToLower()] : default;
+        public T? this[string name] => !string.IsNullOrEmpty(name) && _cache.ContainsKey(name.ToLower()) ? _cache[name.ToLower()] : default;
 
         public Labels? Labels { get => _labels; internal set => _labels = value; }
         public string Label

@@ -348,7 +348,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>-->
-                <DataGridCheckBoxColumn Header="追加轴表达式" Binding="{Binding IsAxisSettingButtonEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <DataGridCheckBoxColumn Header="追加轴表达式" Binding="{Binding AddAdditionalAxis, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <DataGridTemplateColumn Header="轴表达式" Width="70">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>

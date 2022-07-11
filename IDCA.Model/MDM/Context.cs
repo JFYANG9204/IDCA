@@ -78,7 +78,7 @@ namespace IDCA.Model.MDM
             _objectType = MDMObjectType.Contexts;
         }
 
-        public Context? this[string name] => _cache.ContainsKey(name.ToLower()) ? _cache[name.ToLower()] : null;
+        public Context? this[string name] => !string.IsNullOrEmpty(name) && _cache.ContainsKey(name.ToLower()) ? _cache[name.ToLower()] : null;
 
         readonly Dictionary<string, Context> _cache = new();
         string _base;

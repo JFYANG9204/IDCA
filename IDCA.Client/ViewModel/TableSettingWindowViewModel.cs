@@ -8,6 +8,7 @@ using Microsoft.Toolkit.Mvvm.Input;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Windows.Input;
 
 namespace IDCA.Client.ViewModel
@@ -19,6 +20,25 @@ namespace IDCA.Client.ViewModel
     {
         public TableSettingWindowViewModel(TemplateCollection template, MDMDocument mDM)
         {
+            _mdm = mDM;
+            _contextSelections = new ObservableCollection<string>(mDM.Contexts.Select(c => c.Name));
+            _contextSelectedItem = string.Empty;
+            if (_contextSelections.Count > 0 && 
+                !string.IsNullOrEmpty(mDM.Context) &&
+                _contextSelections.Contains(mDM.Context, StringComparer.OrdinalIgnoreCase))
+            {
+                _contextSelectedItem = _contextSelections.First(e => e.Equals(mDM.Context, StringComparison.OrdinalIgnoreCase));
+            }
+
+            _languageSelections = new ObservableCollection<string>(mDM.Languages.Select(l => l.LongCode));
+            _languageSelectedItem = string.Empty;
+            if (_languageSelections.Count > 0 &&
+                !string.IsNullOrEmpty(mDM.Language) &&
+                _languageSelections.Contains(mDM.Language, StringComparer.OrdinalIgnoreCase))
+            {
+                _languageSelectedItem = _languageSelections.First(e => e.Equals(mDM.Language, StringComparison.OrdinalIgnoreCase));
+            }
+
             _spec = new SpecDocument(GlobalConfig.Instance.ProjectRootPath, template, GlobalConfig.Instance.Config)
             {
                 ProjectDescription = GlobalConfig.Instance.ProjectName
@@ -42,19 +62,19 @@ namespace IDCA.Client.ViewModel
 
             _selectedNode = _headerNode;
 
-            _mdd = new MDMDocument();
-            if (!string.IsNullOrEmpty(GlobalConfig.Instance.MdmDocumentPath) &&
-                File.Exists(GlobalConfig.Instance.MdmDocumentPath))
-            {
-                _mdd.Open(GlobalConfig.Instance.MdmDocumentPath);
-            }
+            //_mdd = new MDMDocument();
+            //if (!string.IsNullOrEmpty(GlobalConfig.Instance.MdmDocumentPath) &&
+            //    File.Exists(GlobalConfig.Instance.MdmDocumentPath))
+            //{
+            //    _mdd.Open(GlobalConfig.Instance.MdmDocumentPath);
+            //}
         }
 
         readonly SpecDocument _spec;
-        readonly MDMDocument _mdd;
+        readonly MDMDocument _mdm;
 
         public SpecDocument SpecDocument => _spec;
-        public MDMDocument MdmDocument => _mdd;
+        public MDMDocument MdmDocument => _mdm;
 
         string _projectPath = GlobalConfig.Instance.ProjectRootPath;
         /// <summary>
@@ -79,11 +99,28 @@ namespace IDCA.Client.ViewModel
             get { return _mdmDocumentPath; }
             set
             {
-                if (!string.IsNullOrEmpty(value) && File.Exists(value))
+                if (!string.IsNullOrEmpty(value) && 
+                    File.Exists(value) &&
+                    !GlobalConfig.Instance.MdmDocumentPath.Equals(value, StringComparison.OrdinalIgnoreCase))
                 {
+                    GlobalConfig.Instance.MdmDocumentPath = value;
                     SetProperty(ref _mdmDocumentPath, value);
-                    _mdd.Close();
-                    _mdd.Open(value);
+                    _mdm.Close();
+                    _mdm.Open(value);
+
+                    ContextSelections = new ObservableCollection<string>(_mdm.Contexts.Select(c => c.Name));
+                    if (!string.IsNullOrEmpty(_mdm.Context) &&
+                        _contextSelections.Contains(_mdm.Context, StringComparer.OrdinalIgnoreCase))
+                    {
+                        ContextSelectedItem = _contextSelections.First(e => e.Equals(_mdm.Context, StringComparison.OrdinalIgnoreCase));
+                    }
+
+                    LanguageSelections = new ObservableCollection<string>(_mdm.Languages.Select(l => l.LongCode));
+                    if (!string.IsNullOrEmpty(_mdm.Language) &&
+                        _languageSelections.Contains(_mdm.Language, StringComparer.OrdinalIgnoreCase))
+                    {
+                        LanguageSelectedItem = _languageSelections.First(e => e.Equals(_mdm.Language, StringComparison.OrdinalIgnoreCase));
+                    }
                 }
             }
         }
@@ -101,6 +138,60 @@ namespace IDCA.Client.ViewModel
                 {
                     SetProperty(ref _excelSettingFilePath, value);
                 }
+            }
+        }
+
+        ObservableCollection<string> _contextSelections;
+        /// <summary>
+        /// 当前MDM文档的所有Context类型
+        /// </summary>
+        public ObservableCollection<string> ContextSelections
+        {
+            get { return _contextSelections; }
+            set { SetProperty(ref _contextSelections, value); }
+        }
+
+        string _contextSelectedItem;
+        /// <summary>
+        /// 当前选中的MDM文档的Context类型
+        /// </summary>
+        public string ContextSelectedItem
+        {
+            get { return _contextSelectedItem; }
+            set
+            {
+                if (!string.IsNullOrEmpty(_contextSelectedItem) && !_contextSelectedItem.Equals(value, StringComparison.OrdinalIgnoreCase))
+                {
+                    _mdm.SetContext(value);
+                }
+                SetProperty(ref _contextSelectedItem, value);
+            }
+        }
+
+        ObservableCollection<string> _languageSelections;
+        /// <summary>
+        /// 当前MDM文档的所有语言类型
+        /// </summary>
+        public ObservableCollection<string> LanguageSelections
+        {
+            get { return _languageSelections; }
+            set { SetProperty(ref _languageSelections, value); }
+        }
+
+        string _languageSelectedItem;
+        /// <summary>
+        /// 当前选中的MDM文档的Language类型
+        /// </summary>
+        public string LanguageSelectedItem
+        {
+            get { return _languageSelectedItem; }
+            set
+            {
+                if (!string.IsNullOrEmpty(_languageSelectedItem) && !_languageSelectedItem.Equals(value, StringComparison.OrdinalIgnoreCase))
+                {
+                    _mdm.SetLanguage(value);
+                }
+                SetProperty(ref _languageSelectedItem, value);
             }
         }
 
