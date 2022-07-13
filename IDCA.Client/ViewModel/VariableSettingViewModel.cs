@@ -37,6 +37,8 @@ namespace IDCA.Client.ViewModel
             _fields = new ObservableCollection<VariableSettingViewModel>();
             _fieldTypeSelectedIndex = 0;
             _fieldTypeSelectedItem = "";
+            // Overview
+            _overViewText = string.Empty;
         }
 
         readonly Metadata _metadata;
@@ -96,7 +98,7 @@ namespace IDCA.Client.ViewModel
             }
         }
 
-        string[] _fieldTypes =
+        public static readonly string[] FieldTypes =
         {
             "Long",
             "Double",
@@ -104,14 +106,6 @@ namespace IDCA.Client.ViewModel
             "Info",
             "Categorical",
         };
-        /// <summary>
-        /// 当前可用的变量类型
-        /// </summary>
-        public string[] FieldTypes
-        {
-            get { return _fieldTypes; }
-            set { SetProperty(ref _fieldTypes, value); }
-        }
 
         string _fieldTypeSelectedItem;
         /// <summary>
@@ -376,6 +370,22 @@ namespace IDCA.Client.ViewModel
         /// </summary>
         public ICommand RemoveSelfCommand => new RelayCommand(RemoveSelf);
 
+        // OverView
+        string _overViewText;
+        /// <summary>
+        /// 当前配置的元数据脚本内容
+        /// </summary>
+        public string OverViewText
+        {
+            get { return _overViewText; }
+            set { SetProperty(ref _overViewText, value); }
+        }
+
+        public void UpdateOverViewText()
+        {
+            OverViewText = _metadata.ToString() ?? string.Empty;
+        }
+
     }
 
     /// <summary>
@@ -555,8 +565,7 @@ namespace IDCA.Client.ViewModel
         {
             _property = property;
             _name = _property.Name;
-            _value = _property.Value;
-            _isString = _property.IsString;
+            _value = _property.IsString ? $"\"{_property.Value}\"" : _property.Value;
         }
 
         readonly MetadataProperty _property;
@@ -629,27 +638,36 @@ namespace IDCA.Client.ViewModel
             }
             set
             {
-                _property.Value = value;
+                if (value.StartsWith("\"") && value.EndsWith("\""))
+                {
+                    _property.Value = value[1..^1];
+                    _property.IsString = true;
+                }
+                else
+                {
+                    _property.Value = value;
+                    _property.IsString = false;
+                }
                 SetProperty(ref _value, value);
             }
         }
 
-        bool _isString;
-        /// <summary>
-        /// 当前的属性值是否是字符串格式，可修改
-        /// </summary>
-        public bool IsString
-        {
-            get
-            {
-                return _isString;
-            }
-            set
-            {
-                _property.IsString = value;
-                SetProperty(ref _isString, value);
-            }
-        }
+        //bool _isString;
+        ///// <summary>
+        ///// 当前的属性值是否是字符串格式，可修改
+        ///// </summary>
+        //public bool IsString
+        //{
+        //    get
+        //    {
+        //        return _isString;
+        //    }
+        //    set
+        //    {
+        //        _property.IsString = value;
+        //        SetProperty(ref _isString, value);
+        //    }
+        //}
 
     }
 

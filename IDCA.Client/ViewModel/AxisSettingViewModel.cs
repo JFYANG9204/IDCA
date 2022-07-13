@@ -30,7 +30,6 @@ namespace IDCA.Client.ViewModel
                 _availableElements.Add(new AvailableElement(ele, type, e => AppendTreeNode(e)));
             }
             _availableSelectedIndex = -1;
-            _topBottomBoxSelections = new ObservableCollection<CheckableItemViewModel>();
             _useAxisAsSideVariable = false;
             // Factor Sequence
             _addContinuousFactor = false;
@@ -44,48 +43,11 @@ namespace IDCA.Client.ViewModel
             _averageDecimals = "";
             _meanVariable = string.Empty;
             _meanFilter = string.Empty;
-            // 初始化Top/Bottom Box选项类别
-            _topBottomBoxSelections = new ObservableCollection<CheckableItemViewModel>
-            {
-                CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisTop1BoxName),
-                CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisTop2BoxName),
-                CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisTop3BoxName),
-                CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisTop4BoxName),
-                CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisTop5BoxName),
-                CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisTop6BoxName),
-                CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisTop7BoxName),
-                CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisBottom1BoxName),
-                CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisBottom2BoxName),
-                CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisBottom3BoxName),
-                CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisBottom4BoxName),
-                CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisBottom5BoxName),
-                CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisBottom6BoxName),
-                CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisBottom7BoxName),
-                CreateTableTopBottomBoxSelectionItem(ViewModelConstants.AxisNpsName)
-            };
+            _topBottomBoxSelectedItems = new ObservableCollection<string>();
             _tree = new ObservableCollection<AxisTreeNode>();
             _nodeNames = new HashSet<string>();
             LoadFromAxis(Axis);
         }
-        CheckableItemViewModel CreateTableTopBottomBoxSelectionItem(string label)
-        {
-            var vm = new CheckableItemViewModel(label, OnTableTopBottomBoxNameCheckedChanged);
-            vm.Selected += () => UpdateTableTopBottomBoxName();
-            return vm;
-        }
-
-        void UpdateTableTopBottomBoxName()
-        {
-            TopBottomBoxName = string.Join(',',
-                _topBottomBoxSelections.Where(t => t.Checked)
-                                            .Select(t => t.Name));
-        }
-
-        void OnTableTopBottomBoxNameCheckedChanged(CheckableItemViewModel _)
-        {
-            UpdateTableTopBottomBoxName();
-        }
-
 
         readonly TableSettingElementViewModel _parent;
         readonly AxisOperator _axisOperator;
@@ -126,14 +88,35 @@ namespace IDCA.Client.ViewModel
             AxisExpression = _axis.ToString();
         }
 
-        ObservableCollection<CheckableItemViewModel> _topBottomBoxSelections;
         /// <summary>
         /// 表格轴表达式需要添加的Top/Bottom Box类型的勾选选项
         /// </summary>
-        public ObservableCollection<CheckableItemViewModel> TopBottomBoxSelections
+        public static readonly string[] TopBottomBoxSelections =
         {
-            get { return _topBottomBoxSelections; }
-            set { SetProperty(ref _topBottomBoxSelections, value); }
+            ViewModelConstants.AxisTop1BoxName,
+            ViewModelConstants.AxisTop2BoxName,
+            ViewModelConstants.AxisTop3BoxName,
+            ViewModelConstants.AxisTop4BoxName,
+            ViewModelConstants.AxisTop5BoxName,
+            ViewModelConstants.AxisTop6BoxName,
+            ViewModelConstants.AxisTop7BoxName,
+            ViewModelConstants.AxisBottom1BoxName,
+            ViewModelConstants.AxisBottom2BoxName,
+            ViewModelConstants.AxisBottom3BoxName,
+            ViewModelConstants.AxisBottom4BoxName,
+            ViewModelConstants.AxisBottom5BoxName,
+            ViewModelConstants.AxisBottom6BoxName,
+            ViewModelConstants.AxisBottom7BoxName,
+        };
+
+        ObservableCollection<string> _topBottomBoxSelectedItems;
+        /// <summary>
+        /// Top/Bottom Box多选菜单选中项
+        /// </summary>
+        public ObservableCollection<string> TopBottomBoxSelectedItems
+        {
+            get { return _topBottomBoxSelectedItems; }
+            set { SetProperty(ref _topBottomBoxSelectedItems, value); }
         }
 
         string _topBottomBoxName = string.Empty;
@@ -152,15 +135,14 @@ namespace IDCA.Client.ViewModel
         /// <returns></returns>
         public int[]? GetTopBottomBox()
         {
-            var selectedBox = _topBottomBoxSelections.Where(s => s.Checked && s.Name != ViewModelConstants.AxisNpsName);
-            if (!selectedBox.Any())
+            if (_topBottomBoxSelectedItems.Count == 0)
             {
                 return null;
             }
 
-            return selectedBox.Select(s =>
+            return _topBottomBoxSelectedItems.Select(s =>
             {
-                return s.Name switch
+                return s switch
                 {
                     ViewModelConstants.AxisTop1BoxName => 1,
                     ViewModelConstants.AxisTop2BoxName => 2,
@@ -187,7 +169,7 @@ namespace IDCA.Client.ViewModel
         /// <returns></returns>
         public bool SelectedNps()
         {
-            return _topBottomBoxSelections.Any(e => e.Checked && e.Name == ViewModelConstants.AxisNpsName);
+            return _topBottomBoxSelectedItems.Contains(ViewModelConstants.AxisNpsName);
         }
 
         void UpdateAxisTopBottomBox()

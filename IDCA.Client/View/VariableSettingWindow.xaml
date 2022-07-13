@@ -8,8 +8,8 @@
                  d:DataContext="{d:DesignInstance Type=viewmodel:VariableSettingViewModel}"
                  mc:Ignorable="d"
                  Title="" 
-                 Height="680" 
-                 Width="800"
+                 Height="800" 
+                 MinWidth="1200"
                  Background="{StaticResource IDCA.Brushes.Window.Background}">
 
     <Window.Resources>
@@ -17,11 +17,11 @@
         <Style TargetType="TextBlock">
             <Setter Property="Margin" Value="5"/>
             <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
-            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
         <Style TargetType="TextBox" BasedOn="{StaticResource MahApps.Styles.TextBox}">
-            <Setter Property="Height" Value="25"/>
+            <Setter Property="Margin" Value="5"/>
             <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
             <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
@@ -29,117 +29,105 @@
         </Style>
         <Style TargetType="ComboBox" BasedOn="{StaticResource MahApps.Styles.ComboBox}">
             <Setter Property="Width" Value="60"/>
-            <Setter Property="Height" Value="25"/>
-            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Height" Value="23"/>
+            <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
             <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
         </Style>
         <Style TargetType="CheckBox" BasedOn="{StaticResource MahApps.Styles.CheckBox}">
-            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
             <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style x:Key="IDCA.VariableSetting.DataGrid.ElementStyle" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
+            <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+        <Style TargetType="DataGrid" BasedOn="{StaticResource MahApps.Styles.DataGrid}">
+            <Setter Property="Margin" Value="10 5"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
+            <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
+            <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="HorizontalScrollBarVisibility" Value="Hidden"/>
+            <Setter Property="GridLinesVisibility" Value="Vertical"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="VerticalGridLinesBrush" Value="{StaticResource IDCA.Burshes.DataGrid.Separater}"/>
+            <Setter Property="AutoGenerateColumns" Value="False"/>
+            <Setter Property="CanUserAddRows" Value="True"/>
+            <Setter Property="CanUserDeleteRows" Value="True"/>
+            <Setter Property="CanUserReorderColumns" Value="False"/>
+            <Setter Property="CanUserResizeColumns" Value="False"/>
+            <Setter Property="CanUserResizeRows" Value="False"/>
+            <Setter Property="CanUserSortColumns" Value="False"/>
+            <Setter Property="RowHeaderWidth" Value="20"/>
+            <Setter Property="ColumnHeaderHeight" Value="35"/>
+            <Setter Property="AllowDrop" Value="False"/>
+            <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True"/>
         </Style>
     </Window.Resources>
     
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="10"/>
+            <RowDefinition Height="40"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="10"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="10"/>
+            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="300"/>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="10"/>
         </Grid.ColumnDefinitions>
 
-        <Grid Grid.Row="1"
-              Grid.Column="1">
+        <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal">
+            <TextBlock>变量名</TextBlock>
+            <TextBox Width="120" 
+                     Height="23"
+                     VerticalContentAlignment="Center"
+                     Text="{Binding Name}"/>
+            <TextBlock>变量类型</TextBlock>
+            <ComboBox Width="150"
+                      Height="23"
+                      FontSize="{StaticResource IDCA.Font.Size.Content}"
+                      ItemsSource="{x:Static viewmodel:VariableSettingViewModel.FieldTypes}"
+                      SelectedIndex="{Binding FieldTypeSelectedIndex}"
+                      SelectedItem="{Binding FieldTypeSelectedItem}"/>
+        </StackPanel>
+
+        <Grid Grid.Row="1" Grid.Column="0">
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="35"/>
+                <RowDefinition Height="*"/>
                 <RowDefinition Height="35"/>
-                <RowDefinition Height="165"/>
+                <RowDefinition Height="*"/>
                 <RowDefinition Height="35"/>
-                <RowDefinition Height="175"/>
-                <RowDefinition Height="35"/>
-                <RowDefinition Height="165"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <StackPanel Grid.Row="0" Orientation="Horizontal">
-                <TextBlock FontSize="15">变量名</TextBlock>
-                <TextBox MinWidth="70" 
-                         Height="25"
-                         Style="{StaticResource IDCA.Font.Base}"
-                         VerticalContentAlignment="Center"
-                         Text="{Binding Name}"/>
-                <TextBlock FontSize="15">变量类型</TextBlock>
-                <ComboBox MaxWidth="100"
-                          ItemsSource="{Binding FieldTypes}"
-                          SelectedIndex="{Binding FieldTypeSelectedIndex}"
-                          SelectedItem="{Binding FieldTypeSelectedItem}"/>
-            </StackPanel>
-            <Grid Grid.Row="1">
+            <Grid Grid.Row="0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="80"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" FontSize="15">属性配置</TextBlock>
+                <TextBlock Grid.Column="0">属性配置</TextBlock>
                 <Button Grid.Column="1" 
                         HorizontalAlignment="Right"
                         Style="{StaticResource IDCA.Button.Add}"
                         Command="{Binding NewPropertyCommand}"/>
             </Grid>
 
-            <DataGrid Grid.Row="2"
+            <DataGrid Grid.Row="1"
                       ItemsSource="{Binding Properties}"
-                      d:ItemsSource="{d:SampleData ItemCount=5}"
-                      Style="{StaticResource IDCA.DataGrid.Base}">
+                      d:ItemsSource="{d:SampleData ItemCount=5}">
                 <DataGrid.Columns>
-                    <DataGridTextColumn>
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="VerticalAlignment" Value="Center"/>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                        <DataGridTextColumn.Header>
-                            <TextBlock>属性名</TextBlock>
-                        </DataGridTextColumn.Header>
-                        <DataGridTextColumn.Binding>
-                            <Binding Path="Name"/>
-                        </DataGridTextColumn.Binding>
-                    </DataGridTextColumn>
-                    <DataGridTextColumn>
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="VerticalAlignment" Value="Center"/>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                        <DataGridTextColumn.Header>
-                            <TextBlock>属性值</TextBlock>
-                        </DataGridTextColumn.Header>
-                        <DataGridTextColumn.Binding>
-                            <Binding Path="Value"/>
-                        </DataGridTextColumn.Binding>
-                    </DataGridTextColumn>
-                    <DataGridCheckBoxColumn>
-                        <DataGridCheckBoxColumn.ElementStyle>
-                            <Style TargetType="CheckBox">
-                                <Setter Property="VerticalAlignment" Value="Center"/>
-                                <Setter Property="HorizontalAlignment" Value="Center"/>
-                            </Style>
-                        </DataGridCheckBoxColumn.ElementStyle>
-                        <DataGridCheckBoxColumn.Header>
-                            <TextBlock>字符串值</TextBlock>
-                        </DataGridCheckBoxColumn.Header>
-                        <DataGridCheckBoxColumn.Binding>
-                            <Binding Path="IsString"/>
-                        </DataGridCheckBoxColumn.Binding>
-                    </DataGridCheckBoxColumn>
+                    <DataGridTextColumn Header="属性名" Binding="{Binding Name}" Width="130"/>
+                    <DataGridTextColumn Header="属性值" Binding="{Binding Value}" Width="80"/>
                     <DataGridTemplateColumn>
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
@@ -151,67 +139,14 @@
                 </DataGrid.Columns>
             </DataGrid>
             
-            <!--<Grid Grid.Row="2">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="30"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <Grid Grid.Row="0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="85"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="90"/>
-                        <ColumnDefinition Width="30"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Margin="5">属性名</TextBlock>
-                    <TextBlock Grid.Column="1" Margin="5">属性值</TextBlock>
-                    <TextBlock Grid.Column="2" Margin="5">字符串值类型</TextBlock>
-                </Grid>
-                <ScrollViewer Grid.Row="1" Margin="5">
-                    <ItemsControl Grid.Row="2"
-                                  BorderThickness="0"
-                                  Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"
-                                  ItemsSource="{Binding Properties}"
-                                  d:ItemsSource="{d:SampleData ItemCount=5}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Grid Height="30">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="80"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="70"/>
-                                        <ColumnDefinition Width="30"/>
-                                    </Grid.ColumnDefinitions>
-                                    <TextBox Grid.Column="0" 
-                                             Margin="0"
-                                             Width="70"
-                                             BorderThickness="0"
-                                             Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"
-                                             Text="{Binding Name}"/>
-                                    <TextBox Grid.Column="1"
-                                             Width="40"
-                                             Height="25"/>
-                                    <CheckBox Grid.Column="2"
-                                              Margin="5"
-                                              IsChecked="{Binding IsString}">字符值</CheckBox>
-                                    <Button Grid.Column="3" 
-                                            Style="{StaticResource IDCA.Button.Remove}"
-                                            Command="{Binding RemoveCommand}"/>
-                                </Grid>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ScrollViewer>
-            </Grid>-->
-
-            <Grid Grid.Row="3" Grid.Column="1">
+            <Grid Grid.Row="2">
 
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="90"/>
+                    <ColumnDefinition Width="40"/>
                 </Grid.ColumnDefinitions>
             
-                <TextBlock Grid.Column="0" FontSize="15">下级变量</TextBlock>
+                <TextBlock>下级变量</TextBlock>
                 <Button Grid.Column="1"
                         HorizontalAlignment="Right"
                         Style="{StaticResource IDCA.Button.Add}"
@@ -219,8 +154,9 @@
                 
             </Grid>
 
-            <TreeView Grid.Row="4"
-                      Margin="5"
+            <TreeView Grid.Row="3"
+                      Margin="10 0"
+                      Background="Transparent"
                       ItemsSource="{Binding Fields}"
                       d:ItemsSource="{d:SampleData ItemCount=5}">
                 <TreeView.ItemContainerStyle>
@@ -256,14 +192,14 @@
                 </TreeView.ItemTemplate>
             </TreeView>
 
-            <Grid Grid.Row="5" Grid.Column="1">
+            <Grid Grid.Row="4" Grid.Column="1">
 
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="90"/>
+                    <ColumnDefinition Width="40"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Column="0" FontSize="15">下级变量属性配置</TextBlock>
+                <TextBlock>下级变量属性配置</TextBlock>
                 <Button Grid.Column="1"
                         HorizontalAlignment="Right"
                         Style="{StaticResource IDCA.Button.Add}"
@@ -273,51 +209,12 @@
             </Grid>
 
 
-            <DataGrid Grid.Row="6"
+            <DataGrid Grid.Row="5"
                       ItemsSource="{Binding SelectedField.Properties}"
-                      d:ItemsSource="{d:SampleData ItemCount=5}"
-                      Style="{StaticResource IDCA.DataGrid.Base}">
+                      d:ItemsSource="{d:SampleData ItemCount=5}">
                 <DataGrid.Columns>
-                    <DataGridTextColumn>
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="VerticalAlignment" Value="Center"/>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                        <DataGridTextColumn.Header>
-                            <TextBlock>属性名</TextBlock>
-                        </DataGridTextColumn.Header>
-                        <DataGridTextColumn.Binding>
-                            <Binding Path="Name"/>
-                        </DataGridTextColumn.Binding>
-                    </DataGridTextColumn>
-                    <DataGridTextColumn>
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="VerticalAlignment" Value="Center"/>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                        <DataGridTextColumn.Header>
-                            <TextBlock>属性值</TextBlock>
-                        </DataGridTextColumn.Header>
-                        <DataGridTextColumn.Binding>
-                            <Binding Path="Value"/>
-                        </DataGridTextColumn.Binding>
-                    </DataGridTextColumn>
-                    <DataGridCheckBoxColumn>
-                        <DataGridCheckBoxColumn.ElementStyle>
-                            <Style TargetType="CheckBox">
-                                <Setter Property="VerticalAlignment" Value="Center"/>
-                                <Setter Property="HorizontalAlignment" Value="Center"/>
-                            </Style>
-                        </DataGridCheckBoxColumn.ElementStyle>
-                        <DataGridCheckBoxColumn.Header>
-                            <TextBlock>字符串值</TextBlock>
-                        </DataGridCheckBoxColumn.Header>
-                        <DataGridCheckBoxColumn.Binding>
-                            <Binding Path="IsString"/>
-                        </DataGridCheckBoxColumn.Binding>
-                    </DataGridCheckBoxColumn>
+                    <DataGridTextColumn Header="属性名" Binding="{Binding Name}" Width="130"/>
+                    <DataGridTextColumn Header="属性值" Binding="{Binding Value}" Width="80"/>
                     <DataGridTemplateColumn>
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
@@ -329,48 +226,9 @@
                 </DataGrid.Columns>
             </DataGrid>
 
-            <!--<ScrollViewer Grid.Row="6" Margin="5" VerticalScrollBarVisibility="Auto">
-                <ItemsControl Grid.Row="2"
-                              DataContext="{Binding SelectedField}"
-                              BorderThickness="0"
-                              Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"
-                              ItemsSource="{Binding Properties}"
-                              d:ItemsSource="{d:SampleData ItemCount=5}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Grid Height="30">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="80"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="70"/>
-                                    <ColumnDefinition Width="30"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBox Grid.Column="0" 
-                                         Margin="0"
-                                         Width="80"
-                                         Height="25"
-                                         BorderThickness="0"
-                                         Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"
-                                         Text="{Binding Name}"/>
-                                <TextBox Grid.Column="1"
-                                         Width="40"
-                                         Height="25"/>
-                                <CheckBox Grid.Column="2"
-                                          Margin="5"
-                                          IsChecked="{Binding IsString}">字符值</CheckBox>
-                                <Button Grid.Column="3" 
-                                        Style="{StaticResource IDCA.Button.Remove}"
-                                        Command="{Binding RemoveCommand}"/>
-                            </Grid>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>-->
-
         </Grid>
         
-        <Grid Grid.Row="1" 
-              Grid.Column="2">
+        <Grid Grid.Row="1" Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="35"/>
                 <RowDefinition Height="*"/>
@@ -392,35 +250,10 @@
             <DataGrid Grid.Row="1"
                       ItemsSource="{Binding Categories}"
                       d:ItemsSource="{d:SampleData ItemCount=5}"
-                      Style="{StaticResource IDCA.DataGrid.Base}"
                       SelectedItem="{Binding SelectedCategory}">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Width="80">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="VerticalAlignment" Value="Center"/>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                        <DataGridTextColumn.Header>
-                            <TextBlock>码号名</TextBlock>
-                        </DataGridTextColumn.Header>
-                        <DataGridTextColumn.Binding>
-                            <Binding Path="Name"/>
-                        </DataGridTextColumn.Binding>
-                    </DataGridTextColumn>
-                    <DataGridTextColumn Width="120">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="VerticalAlignment" Value="Center"/>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                        <DataGridTextColumn.Header>
-                            <TextBlock>描述</TextBlock>
-                        </DataGridTextColumn.Header>
-                        <DataGridTextColumn.Binding>
-                            <Binding Path="Description"/>
-                        </DataGridTextColumn.Binding>
-                    </DataGridTextColumn>
+                    <DataGridTextColumn Width="80" Header="码号名" Binding="{Binding Name}"/>
+                    <DataGridTextColumn Width="130" Header="描述" Binding="{Binding Description}"/>
                     <DataGridTemplateColumn>
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
@@ -431,34 +264,6 @@
                     </DataGridTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
-
-            <!--<ListView Grid.Row="1"
-                      Margin="5"
-                      BorderThickness="0"
-                      Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"
-                      ItemsSource="{Binding Categories}"
-                      d:ItemsSource="{d:SampleData ItemCount=5}"
-                      SelectedItem="{Binding SelectedCategory}">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Height="25" Orientation="Horizontal">
-                            <TextBox Grid.Column="0" 
-                                     Margin="0"
-                                     Width="60"
-                                     BorderThickness="0"
-                                     Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"
-                                     Text="{Binding Name}"/>
-                            <TextBlock Text="{Binding Description}"
-                                       FontSize="13"
-                                       FontFamily="{StaticResource IDCA.Font.Family}"
-                                       Margin="5"
-                                       Width="120"/>
-                            <Button Style="{StaticResource IDCA.Button.Remove}"
-                                    Command="{Binding RemoveCommand}"/>
-                        </StackPanel>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>-->
                 
             <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
@@ -476,35 +281,10 @@
             <DataGrid Grid.Row="3"
                       ItemsSource="{Binding SelectedField.Categories}"
                       d:ItemsSource="{d:SampleData ItemCount=5}"
-                      Style="{StaticResource IDCA.DataGrid.Base}"
                       SelectedItem="{Binding SelectedField.SelectedCategory}">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Width="80">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="VerticalAlignment" Value="Center"/>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                        <DataGridTextColumn.Header>
-                            <TextBlock>码号名</TextBlock>
-                        </DataGridTextColumn.Header>
-                        <DataGridTextColumn.Binding>
-                            <Binding Path="Name"/>
-                        </DataGridTextColumn.Binding>
-                    </DataGridTextColumn>
-                    <DataGridTextColumn Width="120">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="VerticalAlignment" Value="Center"/>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                        <DataGridTextColumn.Header>
-                            <TextBlock>描述</TextBlock>
-                        </DataGridTextColumn.Header>
-                        <DataGridTextColumn.Binding>
-                            <Binding Path="Description"/>
-                        </DataGridTextColumn.Binding>
-                    </DataGridTextColumn>
+                    <DataGridTextColumn Width="80" Header="码号名" Binding="{Binding Name}"/>
+                    <DataGridTextColumn Width="130" Header="描述" Binding="{Binding Description}"/>
                     <DataGridTemplateColumn>
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
@@ -545,7 +325,7 @@
 
         </Grid>
 
-        <Grid Grid.Column="3" Grid.Row="1">
+        <Grid Grid.Column="2" Grid.Row="1">
             
             <Grid.RowDefinitions>
                 <RowDefinition Height="35"/>
@@ -573,49 +353,10 @@
 
             <DataGrid Grid.Row="1"
                       ItemsSource="{Binding SelectedCategory.Properties}"
-                      d:ItemsSource="{d:SampleData ItemCount=5}"
-                      Style="{StaticResource IDCA.DataGrid.Base}">
+                      d:ItemsSource="{d:SampleData ItemCount=5}">
                 <DataGrid.Columns>
-                    <DataGridTextColumn>
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="VerticalAlignment" Value="Center"/>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                        <DataGridTextColumn.Header>
-                            <TextBlock>属性名</TextBlock>
-                        </DataGridTextColumn.Header>
-                        <DataGridTextColumn.Binding>
-                            <Binding Path="Name"/>
-                        </DataGridTextColumn.Binding>
-                    </DataGridTextColumn>
-                    <DataGridTextColumn>
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="VerticalAlignment" Value="Center"/>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                        <DataGridTextColumn.Header>
-                            <TextBlock>属性值</TextBlock>
-                        </DataGridTextColumn.Header>
-                        <DataGridTextColumn.Binding>
-                            <Binding Path="Value"/>
-                        </DataGridTextColumn.Binding>
-                    </DataGridTextColumn>
-                    <DataGridCheckBoxColumn>
-                        <DataGridCheckBoxColumn.ElementStyle>
-                            <Style TargetType="CheckBox">
-                                <Setter Property="VerticalAlignment" Value="Center"/>
-                                <Setter Property="HorizontalAlignment" Value="Center"/>
-                            </Style>
-                        </DataGridCheckBoxColumn.ElementStyle>
-                        <DataGridCheckBoxColumn.Header>
-                            <TextBlock>字符串值</TextBlock>
-                        </DataGridCheckBoxColumn.Header>
-                        <DataGridCheckBoxColumn.Binding>
-                            <Binding Path="IsString"/>
-                        </DataGridCheckBoxColumn.Binding>
-                    </DataGridCheckBoxColumn>
+                    <DataGridTextColumn Header="属性名" Binding="{Binding Name}" Width="130"/>
+                    <DataGridTextColumn Header="属性值" Binding="{Binding Value}" Width="80"/>
                     <DataGridTemplateColumn>
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
@@ -668,7 +409,7 @@
             <ScrollViewer Grid.Row="3" Margin="5" VerticalScrollBarVisibility="Auto">
                 <ItemsControl Grid.Row="2"
                               BorderThickness="0"
-                              Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"
+                              Background="Transparent"
                               DataContext="{Binding SelectedCategory}"
                               ItemsSource="{Binding Suffixes}"
                               d:ItemsSource="{d:SampleData ItemCount=5}">
@@ -714,49 +455,10 @@
 
             <DataGrid Grid.Row="5"
                       ItemsSource="{Binding SelectedField.SelectedCategory.Properties}"
-                      d:ItemsSource="{d:SampleData ItemCount=5}"
-                      Style="{StaticResource IDCA.DataGrid.Base}">
+                      d:ItemsSource="{d:SampleData ItemCount=5}">
                 <DataGrid.Columns>
-                    <DataGridTextColumn>
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="VerticalAlignment" Value="Center"/>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                        <DataGridTextColumn.Header>
-                            <TextBlock>属性名</TextBlock>
-                        </DataGridTextColumn.Header>
-                        <DataGridTextColumn.Binding>
-                            <Binding Path="Name"/>
-                        </DataGridTextColumn.Binding>
-                    </DataGridTextColumn>
-                    <DataGridTextColumn>
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="VerticalAlignment" Value="Center"/>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                        <DataGridTextColumn.Header>
-                            <TextBlock>属性值</TextBlock>
-                        </DataGridTextColumn.Header>
-                        <DataGridTextColumn.Binding>
-                            <Binding Path="Value"/>
-                        </DataGridTextColumn.Binding>
-                    </DataGridTextColumn>
-                    <DataGridCheckBoxColumn>
-                        <DataGridCheckBoxColumn.ElementStyle>
-                            <Style TargetType="CheckBox">
-                                <Setter Property="VerticalAlignment" Value="Center"/>
-                                <Setter Property="HorizontalAlignment" Value="Center"/>
-                            </Style>
-                        </DataGridCheckBoxColumn.ElementStyle>
-                        <DataGridCheckBoxColumn.Header>
-                            <TextBlock>字符串值</TextBlock>
-                        </DataGridCheckBoxColumn.Header>
-                        <DataGridCheckBoxColumn.Binding>
-                            <Binding Path="IsString"/>
-                        </DataGridCheckBoxColumn.Binding>
-                    </DataGridCheckBoxColumn>
+                    <DataGridTextColumn Header="属性名" Binding="{Binding Name}" Width="130"/>
+                    <DataGridTextColumn Header="属性值" Binding="{Binding Value}" Width="80"/>
                     <DataGridTemplateColumn>
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
@@ -767,49 +469,12 @@
                     </DataGridTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
-
-            <!--<ScrollViewer Grid.Row="5" Margin="5" VerticalScrollBarVisibility="Auto">
-                <ItemsControl Grid.Row="2"
-                              BorderThickness="0"
-                              Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"
-                              DataContext="{Binding SelectedField.SelectedCategory}"
-                              ItemsSource="{Binding Properties}"
-                              d:ItemsSource="{d:SampleData ItemCount=5}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Grid Height="30">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="80"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="70"/>
-                                    <ColumnDefinition Width="30"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBox Grid.Column="0" 
-                                         Margin="0"
-                                         Width="80"
-                                         BorderThickness="0"
-                                         Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"
-                                         Text="{Binding Name}"/>
-                                <TextBox Grid.Column="1"
-                                         Width="40"
-                                         Height="25"/>
-                                <CheckBox Grid.Column="2"
-                                          Margin="5"
-                                          IsChecked="{Binding IsString}">字符值</CheckBox>
-                                <Button Grid.Column="3" 
-                                        Style="{StaticResource IDCA.Button.Remove}"
-                                        Command="{Binding RemoveCommand}"/>
-                            </Grid>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>-->
             
             <TextBlock Grid.Row="6" FontSize="15">下级变量Category后缀配置</TextBlock>
             <ScrollViewer Grid.Row="7" Margin="5" VerticalScrollBarVisibility="Auto">
                 <ItemsControl Grid.Row="2"
                               BorderThickness="0"
-                              Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"
+                              Background="Transparent"
                               DataContext="{Binding SelectedField.SelectedCategory}"
                               ItemsSource="{Binding Suffixes}"
                               d:ItemsSource="{d:SampleData ItemCount=5}">
@@ -817,13 +482,13 @@
                         <DataTemplate>
                             <Grid Height="35">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="140"/>
                                     <ColumnDefinition Width="100"/>
                                 </Grid.ColumnDefinitions>
                                 <CheckBox Grid.Column="0" Content="{Binding Name}" IsChecked="{Binding IsChecked}"/>
                                 <TextBox Grid.Column="1"
                                          Width="90"
-                                         Height="25"
+                                         Height="20"
                                          Margin="5"
                                          Text="{Binding Value}"
                                          Visibility="{Binding IsTextBox, Converter={StaticResource BooleanToVisibilityConverter}}"/>
@@ -841,5 +506,15 @@
             </ScrollViewer>
 
         </Grid>
+
+        <Grid Grid.Row="1" Grid.Column="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="35"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0">脚本预览</TextBlock>
+            <TextBox Grid.Row="1" Margin="10" VerticalAlignment="Stretch" TextWrapping="Wrap" Text="{Binding OverViewText}"/>
+        </Grid>
+        
     </Grid>
 </mah:MetroWindow>

@@ -420,6 +420,7 @@ namespace IDCA.Model.Spec
             _name = name;
             _properties = new Dictionary<string, MetadataProperty>();
             _indentLevel = 0;
+            _suffix = new Dictionary<MetadataCategoricalSuffixType, string>();
         }
 
         int _indentLevel;
@@ -449,6 +450,10 @@ namespace IDCA.Model.Spec
 
         string? _listName;
         /// <summary>
+        /// 当前Category变量引用的列表名
+        /// </summary>
+        public string? ListName => _listName;
+        /// <summary>
         /// 配置当前引用的列表名称
         /// </summary>
         /// <param name="listName"></param>
@@ -456,6 +461,10 @@ namespace IDCA.Model.Spec
         {
             _listName = listName;
         }
+        /// <summary>
+        /// 当前Category对象是否引用列表
+        /// </summary>
+        public bool UseList => !string.IsNullOrEmpty(_listName);
 
         readonly Dictionary<string, MetadataProperty> _properties;
         /// <summary>
@@ -510,7 +519,7 @@ namespace IDCA.Model.Spec
             }
         }
 
-        readonly Dictionary<MetadataCategoricalSuffixType, string> _suffix = new();
+        readonly Dictionary<MetadataCategoricalSuffixType, string> _suffix;
 
         /// <summary>
         /// 配置后缀类型和数据值，如果配置值为null，将会移除对应类型的后缀配置

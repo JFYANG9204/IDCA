@@ -92,6 +92,13 @@
                             <Setter Property="VerticalContentAlignment" Value="Center"/>
                             <Setter Property="Margin" Value="5"/>
                         </Style>
+                        <Style TargetType="mah:MultiSelectionComboBox" BasedOn="{StaticResource MahApps.Styles.MultiSelectionComboBox.Horizontal}">
+                            <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
+                            <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            <Setter Property="Margin" Value="5"/>
+                        </Style>
                         <Style TargetType="TextBox" BasedOn="{StaticResource MahApps.Styles.TextBox}">
                             <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
                             <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
@@ -136,17 +143,19 @@
                               SelectedIndex="{Binding FactorSequenceSelectedIndex}"/>
 
                     <TextBlock Grid.Row="1" Grid.Column="0">Top/Bottom/NPS</TextBlock>
-                    <ComboBox Grid.Row="1"
-                              Grid.Column="1" 
-                              Text="{Binding TopBottomBoxName}"
-                              IsReadOnly="True"
-                              ItemsSource="{Binding TopBottomBoxSelections}">
-                        <ComboBox.ItemTemplate>
-                            <ItemContainerTemplate>
-                                <CheckBox Content="{Binding Name}" IsChecked="{Binding Checked}"/>
-                            </ItemContainerTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
+                    <mah:MultiSelectionComboBox Grid.Row="1"
+                                                Grid.Column="1"
+                                                BorderBrush="{x:Static SystemColors.ControlDarkBrush}"
+                                                mah:MultiSelectorHelper.SelectedItems="{Binding TopBottomBoxSelectedItems}"
+                                                ItemsSource="{x:Static viewmodel:AxisSettingViewModel.TopBottomBoxSelections}"
+                                                Separator=";"
+                                                ObjectToStringComparer="{mah:DefaultObjectToStringComparer}"
+                                                StringToObjectParser="{x:Static mah:DefaultStringToObjectParser.Instance}"
+                                                VerticalScrollBarVisibility="Disabled"
+                                                HorizontalScrollBarVisibility="Hidden"
+                                                ScrollViewer.CanContentScroll="True"
+                                                />
+
                     <TextBlock Grid.Row="1" Grid.Column="2">NPS Top Box</TextBlock>
                     <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding NpsTopBox}"/>
                     <TextBlock Grid.Row="1" Grid.Column="4">NPS Bottom Box</TextBlock>
@@ -156,7 +165,7 @@
                     <TextBlock Grid.Row="2" Grid.Column="2">均值变量</TextBlock>
                     <TextBox Grid.Row="2" Grid.Column="3" IsEnabled="{Binding AppendMean}" Text="{Binding MeanVariable}"/>
                     <TextBlock Grid.Row="2" Grid.Column="4">均值筛选器</TextBlock>
-                    <TextBox Grid.Row="2" Grid.Column="5" Text="{Binding MeanFilter}"/>
+                    <TextBox Grid.Row="2" Grid.Column="5" IsEnabled="{Binding AppendMean}" Text="{Binding MeanFilter}"/>
 
                     <CheckBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" IsChecked="{Binding AppendAverage}">添加平均提及</CheckBox>
                     <TextBlock Grid.Row="3" Grid.Column="2">跳过码号</TextBlock>
@@ -166,19 +175,6 @@
                 
                 <Grid Grid.Row="2">
                     
-                    <Grid.Resources>
-                        <Style TargetType="Button">
-                            <Setter Property="Background" Value="White"/>
-                            <Setter Property="Foreground" Value="#FFEFEFEF"/>
-                            <Style.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Background" Value="#FFDADADA"/>
-                                    <Setter Property="Foreground" Value="DarkGray"/>
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Grid.Resources>
-
                     <Grid.RowDefinitions>
                         <RowDefinition Height="40"/>
                         <RowDefinition Height="*"/>
@@ -261,7 +257,7 @@
                             <TreeView.ItemContainerStyle>
                                 <Style TargetType="TreeViewItem">
                                     <Setter Property="Background" Value="{StaticResource IDCA.Brushes.Window.Background}"/>
-                                    <Setter Property="IsSelected" Value="{Binding IsSelected}"/>
+                                    <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                 </Style>
                             </TreeView.ItemContainerStyle>
                             <TreeView.ItemTemplate>

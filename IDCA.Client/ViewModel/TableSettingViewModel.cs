@@ -26,8 +26,8 @@ namespace IDCA.Client.ViewModel
             _elementList = new ObservableCollection<TableSettingElementViewModel>();
             _tableName = tables.Name;
             _tables = tables;
-            _headers = new ObservableCollection<CheckableItemViewModel>();
-            _checkedHeaders = string.Empty;
+            _headers = new ObservableCollection<string>();
+            _headersToShow = new ObservableCollection<string>();
             _config = config;
             _templates = templates;
         }
@@ -68,11 +68,11 @@ namespace IDCA.Client.ViewModel
             remove { _beforeRemoved -= value; }
         }
 
-        ObservableCollection<CheckableItemViewModel> _headers;
+        ObservableCollection<string> _headers;
         /// <summary>
         /// 此对象允许配置的所有表头信息，允许外部更新这个集合的内容。
         /// </summary>
-        public ObservableCollection<CheckableItemViewModel> Headers
+        public ObservableCollection<string> Headers
         {
             get { return _headers; }
             set { SetProperty(ref _headers, value); }
@@ -92,15 +92,11 @@ namespace IDCA.Client.ViewModel
             foreach (string header in headerNames)
             {
                 // 表头名称不允许重复，如果有重复的直接跳过
-                if (!_headers.Any(i => i.Name.Equals(header, StringComparison.OrdinalIgnoreCase)))
+                if (!_headers.Contains(header, StringComparer.OrdinalIgnoreCase))
                 {
-                    var info = new CheckableItemViewModel(header);
-                    info.CheckedChanged += i => UpdateCheckedHeaders();
-                    info.Selected += () => UpdateCheckedHeaders();
-                    _headers.Add(info);
+                    _headers.Add(header);
                 }
             }
-            UpdateCheckedHeaders();
         }
 
         /// <summary>
@@ -111,44 +107,19 @@ namespace IDCA.Client.ViewModel
         {
             foreach (string header in headerNames)
             {
-                var exist = _headers.First(h => h.Name.Equals(header, StringComparison.OrdinalIgnoreCase));
-                if (exist != null)
-                {
-                    _headers.Remove(exist);
-                }
+                _headers.Remove(header);
             }
-            UpdateCheckedHeaders();
         }
 
-        /// <summary>
-        /// 获取当前所有已选中的表头名称
-        /// </summary>
-        /// <returns></returns>
-        public string[] GetSelectedHeaders()
-        {
-            return _headers.Where(h => h.Checked)
-                           .Select(h => h.Name)
-                           .ToArray();
-        }
-
-        string _checkedHeaders;
+        ObservableCollection<string> _headersToShow;
         /// <summary>
         /// 当前表头列表中所有选中的表头名，中间以逗号分隔
         /// </summary>
-        public string CheckedHeaders
+        public ObservableCollection<string> HeadersToShow
         {
-            get { return _checkedHeaders; }
-            set { SetProperty(ref _checkedHeaders, value); }
+            get { return _headersToShow; }
+            set { SetProperty(ref _headersToShow, value); }
         }
-
-        void UpdateCheckedHeaders()
-        {
-            CheckedHeaders = string.Join(',', GetSelectedHeaders());
-        }
-        /// <summary>
-        /// 当出示表头选中时触发的命令
-        /// </summary>
-        public ICommand HeaderSelectedCommand => new RelayCommand(UpdateCheckedHeaders);
 
         string _tableName;
         /// <summary>

@@ -1,6 +1,7 @@
 ﻿<UserControl x:Class="IDCA.Client.View.TableSettingView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:viewmodel="clr-namespace:IDCA.Client.ViewModel" 
@@ -51,24 +52,22 @@
             <TextBox Text="{Binding TableName}" />
             
             <TextBlock>出示表头</TextBlock>
-            <ComboBox Width="150" 
-                      Height="30" 
-                      Margin="5"
-                      IsEditable="True"
-                      IsReadOnly="True"
-                      FontSize="{StaticResource IDCA.Font.Size.Content}"
-                      FontFamily="{StaticResource IDCA.Font.Family}"
-                      Text="{Binding CheckedHeaders}"
-                      ItemsSource="{Binding Headers}">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <CheckBox IsChecked="{Binding Checked}"
-                                  Content="{Binding Name}"
-                                  Margin="0"/>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
-            
+            <mah:MultiSelectionComboBox Width="150" 
+                                        Height="30" 
+                                        Margin="5"
+                                        FontSize="{StaticResource IDCA.Font.Size.Content}"
+                                        FontFamily="{StaticResource IDCA.Font.Family}"
+                                        BorderBrush="{x:Static SystemColors.ControlDarkBrush}"
+                                        Separator=";"
+                                        ObjectToStringComparer="{mah:DefaultObjectToStringComparer}"
+                                        StringToObjectParser="{x:Static mah:DefaultStringToObjectParser.Instance}"
+                                        ItemsSource="{Binding Headers}"
+                                        mah:MultiSelectorHelper.SelectedItems="{Binding HeadersToShow}"
+                                        ScrollViewer.CanContentScroll="True"
+                                        VerticalScrollBarVisibility="Hidden"
+                                        HorizontalScrollBarVisibility="Hidden"
+                                        Style="{StaticResource MahApps.Styles.MultiSelectionComboBox.Horizontal}"/>
+
             <Button Style="{StaticResource IDCA.TableSettingView.HeaderButton}" Command="{Binding PushNewElementCommand}">添加表格</Button>
             
         </StackPanel>

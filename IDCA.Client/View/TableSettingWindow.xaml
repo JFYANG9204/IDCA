@@ -137,7 +137,7 @@
 
                 <TextBlock FontWeight="Bold">语言类型</TextBlock>
                 <ComboBox SelectedItem="{Binding LanguageSelectedItem}" ItemsSource="{Binding LanguageSelections}"/>
-
+                
             </StackPanel>
 
             <StackPanel Grid.Column="1" Orientation="Horizontal">
@@ -186,7 +186,7 @@
                           d:ItemsSource="{d:SampleData ItemCount=5}">
                     <TreeView.ItemContainerStyle>
                         <Style TargetType="TreeViewItem" BasedOn="{StaticResource MahApps.Styles.TreeViewItem}">
-                            <Setter Property="IsSelected" Value="{Binding IsSelected}"/>
+                            <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                             <Setter Property="Background" Value="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"/>
                         </Style>
                     </TreeView.ItemContainerStyle>
