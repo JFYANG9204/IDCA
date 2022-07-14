@@ -144,8 +144,31 @@ namespace IDCA.Model.Spec
         public void SetBoundary(MetadataRangeType rangeType, string? lbound = null, string? ubound = null)
         {
             _rangeType = rangeType;
-            _lowerBoundary = lbound;
-            _upperBoundary = ubound;
+            if (_type == MetadataType.Categorical || _type == MetadataType.Long)
+            {
+                if (lbound == null)
+                {
+                    _lowerBoundary = null;
+                }
+                else if (int.TryParse(lbound, out _))
+                {
+                    _lowerBoundary = lbound;
+                }
+
+                if (ubound == null)
+                {
+                    _upperBoundary = null;
+                }
+                else if (int.TryParse(ubound, out _))
+                {
+                    _upperBoundary = ubound;
+                }
+            }
+            else if (_type == MetadataType.Text)
+            {
+                _lowerBoundary = lbound;
+                _upperBoundary = ubound;
+            }
         }
 
         readonly List<Metadata> _fields;
@@ -249,18 +272,19 @@ namespace IDCA.Model.Spec
                 builder.Append($" \"{_description}\"");
             }
             // Properties
-            builder.AppendLine();
             if (_properties.Count > 0)
             {
                 int count = 0;
+                builder.AppendLine();
                 builder.AppendLine($"{new string(' ', IndentLevel * 8)}[");
                 foreach (var property in _properties)
                 {
-                    builder.AppendLine($"{new string(' ', IndentLevel * 12)}{property}{(++count == _properties.Count ? "," : "")}");
+                    builder.AppendLine($"{new string(' ', IndentLevel * 12)}{property}{(++count < _properties.Count ? "," : "")}");
                 }
-                builder.AppendLine($"{new string(' ', IndentLevel * 8)}]");
+                builder.Append($"{new string(' ', IndentLevel * 8)}]");
             }
             // type
+            builder.AppendLine();
             switch (_type)
             {
                 case MetadataType.Long:
@@ -305,10 +329,10 @@ namespace IDCA.Model.Spec
                 }
                 builder.Append(']');
             }
-            builder.AppendLine();
             // Categorical
             if (_type == MetadataType.CategoricalLoop || _type == MetadataType.Categorical)
             {
+                builder.AppendLine();
                 builder.AppendLine($"{indent}{{");
                 for (int i = 0; i < _categories.Count; i++)
                 {
@@ -330,7 +354,7 @@ namespace IDCA.Model.Spec
                 {
                     builder.AppendLine(sub.Export());
                 }
-                builder.AppendLine($"{indent}) expand");
+                builder.Append($"{indent}) expand");
             }
             // End
             if (_axis != null && 

@@ -21,6 +21,12 @@ namespace IDCA.Client.ViewModel
         {
             _metadata = metadata;
             _name = metadata.Name;
+            _isBoundaryEnabled = metadata.Type == MetadataType.Categorical ||
+                                 metadata.Type == MetadataType.Long ||
+                                 metadata.Type == MetadataType.CategoricalLoop ||
+                                 metadata.Type == MetadataType.NumericLoop;
+            _upperBoundary = string.Empty;
+            _lowerBoundary = string.Empty;
             // 属性初始化
             _properties = new ObservableCollection<MetadataPropertyViewModel>();
             foreach (var property in metadata.Properties)
@@ -35,10 +41,11 @@ namespace IDCA.Client.ViewModel
             }
             // Fields
             _fields = new ObservableCollection<VariableSettingViewModel>();
-            _fieldTypeSelectedIndex = 0;
-            _fieldTypeSelectedItem = "";
+            _fieldTypeSelectedIndex = (int)metadata.Type;
+            _fieldTypeSelectedItem = _fieldTypeSelectedIndex >= 0 && _fieldTypeSelectedIndex < FieldTypes.Length ? 
+                FieldTypes[_fieldTypeSelectedIndex] : "";
             // Overview
-            _overViewText = string.Empty;
+            _overViewText = _metadata.Export();
         }
 
         readonly Metadata _metadata;
@@ -98,6 +105,60 @@ namespace IDCA.Client.ViewModel
             }
         }
 
+        bool _isBoundaryEnabled;
+        /// <summary>
+        /// 上下限配置是否可用
+        /// </summary>
+        public bool IsBoundaryEnabled
+        {
+            get { return _isBoundaryEnabled; }
+            set { SetProperty(ref _isBoundaryEnabled, value); }
+        }
+
+        string _upperBoundary;
+        /// <summary>
+        /// 选项上限
+        /// </summary>
+        public string UpperBoundary
+        {
+            get { return _upperBoundary; }
+            set
+            {
+                SetProperty(ref _upperBoundary, value);
+                if (!string.IsNullOrEmpty(value) && value.Equals(_lowerBoundary))
+                {
+                    _metadata.SetBoundary(MetadataRangeType.Exact, value, value);
+                }
+                else
+                {
+                    _metadata.SetBoundary(MetadataRangeType.Any, _lowerBoundary, value);
+                }
+                UpdateOverViewText();
+            }
+        }
+
+        string _lowerBoundary;
+        /// <summary>
+        /// 选项下限
+        /// </summary>
+        public string LowerBoundary
+        {
+            get { return _lowerBoundary; }
+            set
+            {
+                SetProperty(ref _lowerBoundary, value);
+                if (!string.IsNullOrEmpty(value) && value.Equals(_upperBoundary))
+                {
+                    _metadata.SetBoundary(MetadataRangeType.Exact, value, value);
+                }
+                else
+                {
+                    _metadata.SetBoundary(MetadataRangeType.Any, value, _upperBoundary);
+                }
+                UpdateOverViewText();
+            }
+        }
+
         public static readonly string[] FieldTypes =
         {
             "Long",
@@ -127,7 +188,24 @@ namespace IDCA.Client.ViewModel
             set 
             { 
                 SetProperty(ref _fieldTypeSelectedIndex, value);
-                _metadata.Type = (MetadataType)_fieldTypeSelectedIndex;
+                var type = (MetadataType)value;
+                if (type == MetadataType.Categorical && _fields.Count > 0)
+                {
+                    _metadata.Type = MetadataType.CategoricalLoop;
+                }
+                else if (type == MetadataType.Long && _fields.Count > 0)
+                {
+                    _metadata.Type = MetadataType.NumericLoop;
+                }
+                else
+                {
+                    _metadata.Type = (MetadataType)_fieldTypeSelectedIndex;
+                }
+
+                IsBoundaryEnabled = type == MetadataType.Categorical || type == MetadataType.CategoricalLoop ||
+                                    type == MetadataType.Long || type == MetadataType.NumericLoop;
+
+                UpdateOverViewText();
             }
         }
 
@@ -160,6 +238,7 @@ namespace IDCA.Client.ViewModel
         {
             _properties.Remove(property);
             _metadata.RemoveProperty(property.Name);
+            UpdateOverViewText();
         }
 
         /// <summary>
@@ -177,7 +256,9 @@ namespace IDCA.Client.ViewModel
             var vm = new MetadataPropertyViewModel(metadataProperty);
             vm.BeforeRenamed += ValidatePropertyName;
             vm.Removing += RemoveProperty;
+            vm.NameOrValueChanged += vm => UpdateOverViewText();
             _properties.Add(vm);
+            UpdateOverViewText();
         }
         /// <summary>
         /// 用于响应添加新Property按钮操作的命令
@@ -203,6 +284,7 @@ namespace IDCA.Client.ViewModel
         {
             _categories.Remove(categorical);
             _metadata.RemoveCategorical(categorical.Name);
+            UpdateOverViewText();
         }
 
         MetadataCategoryViewModel? _selectedCategory;
@@ -222,7 +304,9 @@ namespace IDCA.Client.ViewModel
         {
             var vm = new MetadataCategoryViewModel(_metadata.NewCategorical());
             vm.Removing += RemoveCategorical;
+            vm.ContentChanged += vm => UpdateOverViewText();
             _categories.Add(vm);
+            UpdateOverViewText();
         }
         public ICommand NewCategoricalCommand => new RelayCommand(NewCategorical);
 
@@ -321,6 +405,7 @@ namespace IDCA.Client.ViewModel
                     _metadata.Type = MetadataType.Long;
                 }
             }
+            UpdateOverViewText();
         }
 
         void NewField()
@@ -344,17 +429,18 @@ namespace IDCA.Client.ViewModel
                 vm.Selected += _selected;
             }
             _fields.Add(vm);
-            if (_parent != null)
+            if (_parent == null)
             {
-                if (_parent.Metadata.Type == MetadataType.Categorical)
+                if (_metadata.Type == MetadataType.Categorical)
                 {
-                    _parent.Metadata.Type = MetadataType.CategoricalLoop;
+                    _metadata.Type = MetadataType.CategoricalLoop;
                 }
-                else if (_parent.Metadata.Type == MetadataType.Long)
+                else if (_metadata.Type == MetadataType.Long)
                 {
-                    _parent.Metadata.Type = MetadataType.NumericLoop;
+                    _metadata.Type = MetadataType.NumericLoop;
                 }
             }
+            UpdateOverViewText();
         }
         /// <summary>
         /// 向当前元数据中追加新的下级变量时执行的命令
@@ -381,9 +467,17 @@ namespace IDCA.Client.ViewModel
             set { SetProperty(ref _overViewText, value); }
         }
 
-        public void UpdateOverViewText()
+        /// <summary>
+        /// 更新预览文本
+        /// </summary>
+        void UpdateOverViewText()
         {
-            OverViewText = _metadata.ToString() ?? string.Empty;
+            var parent = this;
+            while (parent.Parent != null)
+            {
+                parent = parent.Parent;
+            }
+            parent.OverViewText = parent.Metadata.Export();
         }
 
     }
@@ -412,15 +506,23 @@ namespace IDCA.Client.ViewModel
             // Suffix
             _suffixViewModels = new ObservableCollection<MetadataCategoricalSuffixViewModel>
             {
-                new MetadataCategoricalSuffixViewModel(_categorical, MetadataCategoricalSuffixType.ElementType),
-                new MetadataCategoricalSuffixViewModel(_categorical, MetadataCategoricalSuffixType.Exclusive),
-                new MetadataCategoricalSuffixViewModel(_categorical, MetadataCategoricalSuffixType.Expression),
-                new MetadataCategoricalSuffixViewModel(_categorical, MetadataCategoricalSuffixType.Factor),
-                new MetadataCategoricalSuffixViewModel(_categorical, MetadataCategoricalSuffixType.Fix),
-                new MetadataCategoricalSuffixViewModel(_categorical, MetadataCategoricalSuffixType.Keycode),
-                new MetadataCategoricalSuffixViewModel(_categorical, MetadataCategoricalSuffixType.NoFilter)
+                CreateSuffixViewModel(MetadataCategoricalSuffixType.ElementType),
+                CreateSuffixViewModel(MetadataCategoricalSuffixType.Exclusive),
+                CreateSuffixViewModel(MetadataCategoricalSuffixType.Expression),
+                CreateSuffixViewModel(MetadataCategoricalSuffixType.Factor),
+                CreateSuffixViewModel(MetadataCategoricalSuffixType.Fix),
+                CreateSuffixViewModel(MetadataCategoricalSuffixType.Keycode),
+                CreateSuffixViewModel(MetadataCategoricalSuffixType.NoFilter)
             };
 
+        }
+
+        MetadataCategoricalSuffixViewModel CreateSuffixViewModel(MetadataCategoricalSuffixType type)
+        {
+            var suffix = new MetadataCategoricalSuffixViewModel(_categorical, type);
+            suffix.CheckChanged += vm => OnContentChanged();
+            suffix.ValueChanged += vm => OnContentChanged();
+            return suffix;
         }
 
         readonly MetadataCategorical _categorical;
@@ -437,6 +539,21 @@ namespace IDCA.Client.ViewModel
         {
             get { return _suffixViewModels; }
             set { SetProperty(ref _suffixViewModels, value); }
+        }
+
+        Action<MetadataCategoryViewModel>? _contentChanged;
+        /// <summary>
+        /// 当内容有变化时触发的事件
+        /// </summary>
+        public event Action<MetadataCategoryViewModel> ContentChanged
+        {
+            add { _contentChanged += value; }
+            remove { _contentChanged -= value; }
+        }
+
+        void OnContentChanged()
+        {
+            _contentChanged?.Invoke(this);
         }
 
         Action<MetadataCategoryViewModel>? _removing;
@@ -487,6 +604,7 @@ namespace IDCA.Client.ViewModel
         {
             _properties.Remove(property);
             _categorical.RemoveProperty(property.Name);
+            
         }
 
         /// <summary>
@@ -504,6 +622,7 @@ namespace IDCA.Client.ViewModel
             var vm = new MetadataPropertyViewModel(metadataProperty);
             vm.BeforeRenamed += ValidatePropertyName;
             vm.Removing += RemoveProperty;
+            vm.NameOrValueChanged += vm => OnContentChanged();
             _properties.Add(vm);
         }
         /// <summary>
@@ -531,6 +650,7 @@ namespace IDCA.Client.ViewModel
                 {
                     SetProperty(ref _name, value);
                     _categorical.Name = value;
+                    OnContentChanged();
                 }
             }
         }
@@ -546,6 +666,7 @@ namespace IDCA.Client.ViewModel
             {
                 SetProperty(ref _description, value);
                 _categorical.Description = value;
+                OnContentChanged();
             }
         }
 
@@ -595,6 +716,16 @@ namespace IDCA.Client.ViewModel
             remove { _removing -= value; }
         }
 
+        Action<MetadataPropertyViewModel>? _nameOrValueChanged;
+        /// <summary>
+        /// 当属性名或值更改后触发的事件
+        /// </summary>
+        public event Action<MetadataPropertyViewModel> NameOrValueChanged
+        {
+            add { _nameOrValueChanged += value; }
+            remove { _nameOrValueChanged -= value; }
+        }
+
         void Remove()
         {
             _removing?.Invoke(this);
@@ -622,6 +753,7 @@ namespace IDCA.Client.ViewModel
                 {
                     _property.Name = value;
                     SetProperty(ref _name, value);
+                    _nameOrValueChanged?.Invoke(this);
                 }
             }
         }
@@ -649,6 +781,7 @@ namespace IDCA.Client.ViewModel
                     _property.IsString = false;
                 }
                 SetProperty(ref _value, value);
+                _nameOrValueChanged?.Invoke(this);
             }
         }
 
@@ -719,6 +852,26 @@ namespace IDCA.Client.ViewModel
         readonly MetadataCategorical _categorical;
         readonly MetadataCategoricalSuffixType _type;
 
+        Action<MetadataCategoricalSuffixViewModel>? _checkedChanged;
+        /// <summary>
+        /// 当勾选状态发生改变时触发的事件
+        /// </summary>
+        public event Action<MetadataCategoricalSuffixViewModel> CheckChanged
+        {
+            add { _checkedChanged += value; }
+            remove { _checkedChanged -= value; }
+        }
+
+        Action<MetadataCategoricalSuffixViewModel>? _valueChanged;
+        /// <summary>
+        /// 当值发生改变时触发的事件
+        /// </summary>
+        public event Action<MetadataCategoricalSuffixViewModel> ValueChanged
+        {
+            add { _valueChanged += value; }
+            remove { _valueChanged -= value; }
+        }
+
         bool _isChecked;
         /// <summary>
         /// 当前的后缀类型是否选中，控制是否添加进Categorical类型的后缀集合中
@@ -737,6 +890,7 @@ namespace IDCA.Client.ViewModel
                 {
                     _categorical.SetSuffix(_type, null);
                 }
+                _checkedChanged?.Invoke(this);
             }
         }
 
@@ -764,6 +918,7 @@ namespace IDCA.Client.ViewModel
                 if (_isChecked)
                 {
                     _categorical.SetSuffix(_type, value);
+                    _valueChanged?.Invoke(this);
                 }
             }
         }
@@ -823,6 +978,7 @@ namespace IDCA.Client.ViewModel
             {
                 SetProperty(ref _valueSelection, value);
                 Value = value;
+                _valueChanged?.Invoke(this);
             }
         }
 

@@ -1,5 +1,6 @@
 ﻿<UserControl x:Class="IDCA.Client.View.TableSettingView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:behavior="clr-namespace:IDCA.Client.View.Behavior"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -72,11 +73,26 @@
             
         </StackPanel>
 
-        <DataGrid Grid.Row="1"
+        <Popup x:Name="DataGridDragDrop"
+               AllowsTransparency="True"
+               IsHitTestVisible="False"
+               Placement="RelativePoint"
+               PlacementTarget="{Binding ElementName=MainDataGrid}">
+            <ContentPresenter x:Name="DataGridDragDropContent"/>
+        </Popup>
+
+        <DataGrid x:Name="MainDataGrid"
+                  Grid.Row="1"
                   Style="{StaticResource IDCA.DataGrid.Base}"
                   ItemsSource="{Binding ElementList}"
                   d:ItemsSource="{d:SampleData ItemCount=5}"
-                  RowHeaderWidth="30">
+                  HeadersVisibility="All"
+                  SelectionMode="Single"
+                  SelectionUnit="CellOrRowHeader"
+                  RowHeaderWidth="30"
+                  RowHeaderStyle="{StaticResource MahApps.Styles.DataGridRowHeader.Azure}"
+                  behavior:DataGridDragDropRowBehavior.Enabled="True"
+                  behavior:DataGridDragDropRowBehavior.PopupControl="{Binding ElementName=DataGridDragDrop}">
             <DataGrid.Resources>
                 <Style TargetType="TextBlock">
                     <Setter Property="VerticalAlignment" Value="Center"/>
@@ -104,69 +120,6 @@
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
-                <!--<DataGridTemplateColumn Header="筛选器" Width="62">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <view:PopupButton Width="40" 
-                                              Height="20"
-                                              Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource AncestorType=DataGridCell}}"
-                                              HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"
-                                              Cursor="Hand">
-                                <Border BorderBrush="{StaticResource IDCA.Brushes.Window.BorderBrush}"
-                                        BorderThickness="1">
-                                    <Grid Width="301"
-                                          Height="85"
-                                          Background="White">
-                                        <Grid.Resources>
-                                            <Style TargetType="TextBlock">
-                                                <Setter Property="HorizontalAlignment" Value="Left"/>
-                                                <Setter Property="VerticalAlignment" Value="Center"/>
-                                                <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
-                                                <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
-                                                <Setter Property="Margin" Value="10 5"/>
-                                            </Style>
-                                            <Style TargetType="TextBox" BasedOn="{StaticResource MahApps.Styles.TextBox}">
-                                                <Setter Property="HorizontalAlignment" Value="Center"/>
-                                                <Setter Property="VerticalAlignment" Value="Center"/>
-                                                <Setter Property="VerticalContentAlignment" Value="Center"/>
-                                                <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
-                                                <Setter Property="Height" Value="25"/>
-                                                <Setter Property="Width" Value="180"/>
-                                                <Setter Property="Margin" Value="10 5"/>
-                                            </Style>
-                                        </Grid.Resources>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="*"/>
-                                            <RowDefinition Height="1"/>
-                                            <RowDefinition Height="*"/>
-                                        </Grid.RowDefinitions>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="90"/>
-                                            <ColumnDefinition Width="1"/>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Row="0" Grid.Column="0" Foreground="Black">Base筛选器</TextBlock>
-                                        <TextBlock Grid.Row="2" Grid.Column="0" Foreground="Black">表格筛选器</TextBlock>
-
-                                        <GridSplitter Grid.Row="1"
-                                                      Grid.Column="0"
-                                                      Grid.ColumnSpan="3"
-                                                      Style="{StaticResource IDCA.GridSplitter.Horizonal}"/>
-
-                                        <GridSplitter Grid.Column="1"
-                                                      Grid.Row="0"
-                                                      Grid.RowSpan="3"
-                                                      Style="{StaticResource IDCA.GridSplitter.Vertical}"/>
-
-                                        <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding BaseFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                        <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding TableFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                    </Grid>
-                                </Border>
-                            </view:PopupButton>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>-->
                 <DataGridTextColumn Header="追加标签" Width="100" Binding="{Binding TableAppendLabel}">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
@@ -177,7 +130,8 @@
                 <DataGridTemplateColumn Header="表格类型" Width="80">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <ComboBox Background="{Binding Path=Background, RelativeSource={RelativeSource AncestorType=DataGridCell}}"
+                            <ComboBox VerticalAlignment="Stretch"
+                                      Background="Transparent"
                                       Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource AncestorType=DataGridCell}}"
                                       ItemsSource="{x:Static viewmodel:TableSettingElementViewModel.TableTypeSelections}"
                                       SelectedIndex="{Binding TableTypeSelectedIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -185,168 +139,6 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <!--<DataGridTemplateColumn Header="Box/Mean" Width="92">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <view:PopupButton Width="40"
-                                              Height="20"
-                                              Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource AncestorType=DataGridCell}}"
-                                              HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"
-                                              Cursor="Hand">
-                                <Border Width="404"
-                                        Height="252"
-                                        BorderThickness="1"
-                                        BorderBrush="{StaticResource IDCA.Brushes.Window.BorderBrush}"
-                                        Background="White">
-                                    <Grid>
-
-                                        <Grid.Resources>
-                                            <Style TargetType="CheckBox" BasedOn="{StaticResource MahApps.Styles.CheckBox}">
-                                                <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
-                                                <Setter Property="Margin" Value="2"/>
-                                                <Setter Property="VerticalAlignment" Value="Center"/>
-                                                <Setter Property="VerticalContentAlignment" Value="Center"/>
-                                                <Setter Property="Height" Value="23"/>
-                                            </Style>
-                                            <Style TargetType="TextBlock">
-                                                <Setter Property="Margin" Value="2"/>
-                                                <Setter Property="Foreground" Value="Black"/>
-                                                <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
-                                                <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
-                                                <Setter Property="VerticalAlignment" Value="Center"/>
-                                                <Setter Property="HorizontalAlignment" Value="Left"/>
-                                            </Style>
-                                            <Style TargetType="TextBox" BasedOn="{StaticResource MahApps.Styles.TextBox}">
-                                                <Setter Property="Margin" Value="2"/>
-                                                <Setter Property="Height" Value="23"/>
-                                                <Setter Property="VerticalContentAlignment" Value="Center"/>
-                                                <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
-                                                <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
-                                            </Style>
-                                        </Grid.Resources>
-
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="35"/>
-                                            <RowDefinition Height="1"/>
-                                            <RowDefinition Height="35"/>
-                                            <RowDefinition Height="1"/>
-                                            <RowDefinition Height="35"/>
-                                            <RowDefinition Height="1"/>
-                                            <RowDefinition Height="35"/>
-                                            <RowDefinition Height="1"/>
-                                            <RowDefinition Height="35"/>
-                                            <RowDefinition Height="1"/>
-                                            <RowDefinition Height="35"/>
-                                            <RowDefinition Height="1"/>
-                                            <RowDefinition Height="35"/>
-                                        </Grid.RowDefinitions>
-
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="90"/>
-                                            <ColumnDefinition Width="1"/>
-                                            <ColumnDefinition Width="120"/>
-                                            <ColumnDefinition Width="1"/>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
-
-                                        <GridSplitter Grid.Column="1" Grid.RowSpan="13" Style="{StaticResource IDCA.GridSplitter.Vertical}"/>
-                                        <GridSplitter Grid.Column="3" Grid.RowSpan="13" Style="{StaticResource IDCA.GridSplitter.Vertical}"/>
-
-                                        <GridSplitter Grid.Row="1"  Grid.Column="0" Grid.ColumnSpan="5" Style="{StaticResource IDCA.GridSplitter.Horizonal}"/>
-                                        <GridSplitter Grid.Row="3"  Grid.Column="0" Grid.ColumnSpan="5" Style="{StaticResource IDCA.GridSplitter.Horizonal}"/>
-                                        <GridSplitter Grid.Row="5"  Grid.Column="0" Grid.ColumnSpan="5" Style="{StaticResource IDCA.GridSplitter.Horizonal}"/>
-                                        <GridSplitter Grid.Row="7"  Grid.Column="0" Grid.ColumnSpan="5" Style="{StaticResource IDCA.GridSplitter.Horizonal}"/>
-                                        <GridSplitter Grid.Row="9"  Grid.Column="0" Grid.ColumnSpan="5" Style="{StaticResource IDCA.GridSplitter.Horizonal}"/>
-                                        <GridSplitter Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="5" Style="{StaticResource IDCA.GridSplitter.Horizonal}"/>
-
-                                        <CheckBox Grid.Column="0" Grid.Row="0" Content="{x:Static viewmodel:ViewModelConstants.AxisTop1BoxName}" IsChecked="{Binding TopBottomBoxSelections[0].Checked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                        <CheckBox Grid.Column="0" Grid.Row="2" Content="{x:Static viewmodel:ViewModelConstants.AxisTop2BoxName}" IsChecked="{Binding TopBottomBoxSelections[1].Checked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                        <CheckBox Grid.Column="0" Grid.Row="4" Content="{x:Static viewmodel:ViewModelConstants.AxisTop3BoxName}" IsChecked="{Binding TopBottomBoxSelections[2].Checked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                        <CheckBox Grid.Column="0" Grid.Row="6" Content="{x:Static viewmodel:ViewModelConstants.AxisTop4BoxName}" IsChecked="{Binding TopBottomBoxSelections[3].Checked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                        <CheckBox Grid.Column="0" Grid.Row="8" Content="{x:Static viewmodel:ViewModelConstants.AxisTop5BoxName}" IsChecked="{Binding TopBottomBoxSelections[4].Checked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                        <CheckBox Grid.Column="0" Grid.Row="10" Content="{x:Static viewmodel:ViewModelConstants.AxisTop6BoxName}" IsChecked="{Binding TopBottomBoxSelections[5].Checked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                        <CheckBox Grid.Column="0" Grid.Row="12" Content="{x:Static viewmodel:ViewModelConstants.AxisTop7BoxName}" IsChecked="{Binding TopBottomBoxSelections[6].Checked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-
-                                        <CheckBox Grid.Column="2" Grid.Row="0" Content="{x:Static viewmodel:ViewModelConstants.AxisBottom1BoxName}" IsChecked="{Binding TopBottomBoxSelections[7].Checked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                        <CheckBox Grid.Column="2" Grid.Row="2" Content="{x:Static viewmodel:ViewModelConstants.AxisBottom2BoxName}" IsChecked="{Binding TopBottomBoxSelections[8].Checked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                        <CheckBox Grid.Column="2" Grid.Row="4" Content="{x:Static viewmodel:ViewModelConstants.AxisBottom3BoxName}" IsChecked="{Binding TopBottomBoxSelections[9].Checked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                        <CheckBox Grid.Column="2" Grid.Row="6" Content="{x:Static viewmodel:ViewModelConstants.AxisBottom4BoxName}" IsChecked="{Binding TopBottomBoxSelections[10].Checked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                        <CheckBox Grid.Column="2" Grid.Row="8" Content="{x:Static viewmodel:ViewModelConstants.AxisBottom5BoxName}" IsChecked="{Binding TopBottomBoxSelections[11].Checked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                        <CheckBox Grid.Column="2" Grid.Row="10" Content="{x:Static viewmodel:ViewModelConstants.AxisBottom6BoxName}" IsChecked="{Binding TopBottomBoxSelections[12].Checked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                        <CheckBox Grid.Column="2" Grid.Row="12" Content="{x:Static viewmodel:ViewModelConstants.AxisBottom7BoxName}" IsChecked="{Binding TopBottomBoxSelections[13].Checked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-
-                                        <StackPanel Orientation="Horizontal" Grid.Column="4" Grid.Row="0">
-                                            <TextBlock>码号赋值顺序</TextBlock>
-                                            <ComboBox FontFamily="{StaticResource IDCA.Font.Family}"
-                                                      FontSize="{StaticResource IDCA.Font.Size.Content}"
-                                                      Height="23" 
-                                                      VerticalAlignment="Center"
-                                                      ItemsSource="{x:Static viewmodel:TableSettingElementViewModel.FactorSequence}"
-                                                      SelectedIndex="{Binding FactorSequenceSelectedIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                        </StackPanel>
-                                        
-                                        <CheckBox Grid.Column="4" 
-                                                  Grid.Row="2" 
-                                                  Content="{x:Static viewmodel:ViewModelConstants.AxisNpsName}" 
-                                                  IsChecked="{Binding TopBottomBoxSelections[14].Checked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-
-                                        <Grid Grid.Column="4"
-                                              Grid.Row="4"
-                                              Grid.RowSpan="8">
-
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="35"/>
-                                                <RowDefinition Height="1"/>
-                                                <RowDefinition Height="35"/>
-                                                <RowDefinition Height="1"/>
-                                                <RowDefinition Height="35"/>
-                                                <RowDefinition Height="1"/>
-                                                <RowDefinition Height="35"/>
-                                                <RowDefinition Height="1"/>
-                                                <RowDefinition Height="35"/>
-                                            </Grid.RowDefinitions>
-
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="1.5*"/>
-                                                <ColumnDefinition Width="1"/>
-                                                <ColumnDefinition Width="*"/>
-                                            </Grid.ColumnDefinitions>
-
-                                            <GridSplitter Grid.Column="1" Grid.Row="0" Grid.RowSpan="8" Style="{StaticResource IDCA.GridSplitter.Vertical}"/>
-                                            
-                                            <TextBlock Grid.Row="0" Grid.Column="0">NPS Top Box</TextBlock>
-                                            <TextBlock Grid.Row="2" Grid.Column="0">NPS Bottom Box</TextBlock>
-
-                                            <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding NpsTopBox, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                            <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding NpsBottomBox, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-
-                                            <CheckBox Grid.Row="4" Grid.Column="0" Content="添加均值" IsChecked="{Binding AppendMean, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                            
-                                            <TextBlock Grid.Row="6" Grid.Column="0">均值计算变量</TextBlock>
-                                            <TextBox Grid.Row="6" Grid.Column="2" IsEnabled="{Binding AppendMean}" Text="{Binding MeanVariable, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-
-                                        </Grid>
-
-                                        <CheckBox Grid.Row="12" Grid.Column="4" Content="添加平均提及" IsChecked="{Binding AppendAverage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                        
-                                    </Grid>
-                                </Border>
-                            </view:PopupButton>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>-->
-                <!--<DataGridTemplateColumn Header="Net类型" Width="75">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <ComboBox Background="{Binding Path=Background, RelativeSource={RelativeSource AncestorType=DataGridCell}}"
-                                      Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource AncestorType=DataGridCell}}"
-                                      VerticalContentAlignment="Center"
-                                      ItemsSource="{x:Static viewmodel:TableSettingElementViewModel.TableNetTypeSelections}"
-                                      SelectedIndex="{Binding NetTypeSelectedIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>-->
                 <DataGridCheckBoxColumn Header="追加轴表达式" Binding="{Binding AddAdditionalAxis, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <DataGridTemplateColumn Header="轴表达式" Width="70">
                     <DataGridTemplateColumn.CellTemplate>
@@ -360,7 +152,6 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <!--<DataGridCheckBoxColumn Header="使用轴表达式出表" Binding="{Binding UseAxisAsSideVariable, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>-->
                 <DataGridCheckBoxColumn Header="新建变量" Width="75" Binding="{Binding AddNewVariable, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <DataGridTemplateColumn Header="配置变量" Width="75">
                     <DataGridTemplateColumn.CellTemplate>

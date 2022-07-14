@@ -7,9 +7,10 @@
                  xmlns:viewmodel="clr-namespace:IDCA.Client.ViewModel" 
                  d:DataContext="{d:DesignInstance Type=viewmodel:VariableSettingViewModel}"
                  mc:Ignorable="d"
-                 Title="" 
+                 Title="新建变量配置" 
                  Height="800" 
                  MinWidth="1200"
+                 ResizeMode="NoResize"
                  Background="{StaticResource IDCA.Brushes.Window.Background}">
 
     <Window.Resources>
@@ -46,35 +47,26 @@
             <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
             <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Background" Value="{StaticResource IDCA.Brushes.Window.Background}"/>
         </Style>
-        <Style TargetType="DataGrid" BasedOn="{StaticResource MahApps.Styles.DataGrid}">
+        <Style TargetType="DataGrid" BasedOn="{StaticResource IDCA.DataGrid.Base}">
             <Setter Property="Margin" Value="10 5"/>
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
-            <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
-            <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
-            <Setter Property="HorizontalScrollBarVisibility" Value="Hidden"/>
             <Setter Property="GridLinesVisibility" Value="Vertical"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="VerticalGridLinesBrush" Value="{StaticResource IDCA.Burshes.DataGrid.Separater}"/>
-            <Setter Property="AutoGenerateColumns" Value="False"/>
-            <Setter Property="CanUserAddRows" Value="True"/>
-            <Setter Property="CanUserDeleteRows" Value="True"/>
-            <Setter Property="CanUserReorderColumns" Value="False"/>
-            <Setter Property="CanUserResizeColumns" Value="False"/>
-            <Setter Property="CanUserResizeRows" Value="False"/>
-            <Setter Property="CanUserSortColumns" Value="False"/>
-            <Setter Property="RowHeaderWidth" Value="20"/>
-            <Setter Property="ColumnHeaderHeight" Value="35"/>
-            <Setter Property="AllowDrop" Value="False"/>
-            <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True"/>
+            <Setter Property="ColumnHeaderStyle">
+                <Setter.Value>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="Margin" Value="2"/>
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="SeparatorVisibility" Value="Collapsed"/>
+                    </Style>
+                </Setter.Value>
+            </Setter>
         </Style>
     </Window.Resources>
     
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="40"/>
+            <RowDefinition Height="50"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -84,29 +76,43 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal">
+        <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4" Orientation="Horizontal">
             <TextBlock>变量名</TextBlock>
-            <TextBox Width="120" 
+            <TextBox Width="130" 
                      Height="23"
                      VerticalContentAlignment="Center"
                      Text="{Binding Name}"/>
             <TextBlock>变量类型</TextBlock>
-            <ComboBox Width="150"
+            <ComboBox Width="130"
                       Height="23"
                       FontSize="{StaticResource IDCA.Font.Size.Content}"
                       ItemsSource="{x:Static viewmodel:VariableSettingViewModel.FieldTypes}"
                       SelectedIndex="{Binding FieldTypeSelectedIndex}"
                       SelectedItem="{Binding FieldTypeSelectedItem}"/>
+            <TextBlock>选项下限</TextBlock>
+            <TextBox Width="100"
+                     Height="23"
+                     IsEnabled="{Binding IsBoundaryEnabled}"
+                     FontSize="{StaticResource IDCA.Font.Size.Content}"
+                     FontFamily="{StaticResource IDCA.Font.Family}"
+                     Text="{Binding LowerBoundary}"/>
+            <TextBlock>选项上限</TextBlock>
+            <TextBox Width="100"
+                     Height="23"
+                     IsEnabled="{Binding IsBoundaryEnabled}"
+                     FontSize="{StaticResource IDCA.Font.Size.Content}"
+                     FontFamily="{StaticResource IDCA.Font.Family}"
+                     Text="{Binding UpperBoundary}"/>
         </StackPanel>
 
         <Grid Grid.Row="1" Grid.Column="0">
 
             <Grid.RowDefinitions>
-                <RowDefinition Height="35"/>
+                <RowDefinition Height="45"/>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="35"/>
+                <RowDefinition Height="45"/>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="35"/>
+                <RowDefinition Height="45"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
@@ -157,6 +163,8 @@
             <TreeView Grid.Row="3"
                       Margin="10 0"
                       Background="Transparent"
+                      BorderThickness="1"
+                      BorderBrush="{StaticResource IDCA.Brushes.Window.BorderBrush}"
                       ItemsSource="{Binding Fields}"
                       d:ItemsSource="{d:SampleData ItemCount=5}">
                 <TreeView.ItemContainerStyle>
@@ -169,20 +177,18 @@
                         <StackPanel Height="35" 
                                     Width="{Binding RelativeSource={RelativeSource AncestorType=TreeView}, Path=Width}"
                                     Orientation="Horizontal">
-                            <TextBox Text="{Binding Name}"
-                                     VerticalAlignment="Center"
-                                     FontSize="13"
-                                     FontFamily="{StaticResource IDCA.Font.Family}"
-                                     Width="50"
-                                     Margin="5"/>
-                            <ComboBox Height="25"
-                                      Width="70"
-                                      Margin="5"
-                                      FontSize="13"
-                                      FontFamily="{StaticResource IDCA.Font.Family}"
-                                      ItemsSource="{Binding FieldTypes}"
-                                      SelectedIndex="{Binding FieldTypeSelectedIndex}"
-                                      SelectedItem="{Binding FieldTypeSelectedItem}"/>
+                            <TextBlock Margin="5"
+                                       Width="70"
+                                       FontSize="{StaticResource IDCA.Font.Size.Content}"
+                                       FontFamily="{StaticResource IDCA.Font.Family}"
+                                       VerticalAlignment="Center"
+                                       Text="{Binding Name}"/>
+                            <TextBlock Margin="5"
+                                       Width="80"
+                                       FontSize="{StaticResource IDCA.Font.Size.Content}"
+                                       FontFamily="{StaticResource IDCA.Font.Family}"
+                                       VerticalAlignment="Center"
+                                       Text="{Binding FieldTypeSelectedItem}"/>
                             <Button Style="{StaticResource IDCA.Button.Add}"
                                     Command="{Binding NewFieldCommand}"/>
                             <Button Style="{StaticResource IDCA.Button.Remove}"
@@ -210,6 +216,7 @@
 
 
             <DataGrid Grid.Row="5"
+                      Margin="10 5 10 20"
                       ItemsSource="{Binding SelectedField.Properties}"
                       d:ItemsSource="{d:SampleData ItemCount=5}">
                 <DataGrid.Columns>
@@ -230,9 +237,12 @@
         
         <Grid Grid.Row="1" Grid.Column="1">
             <Grid.RowDefinitions>
-                <RowDefinition Height="35"/>
+                <RowDefinition Height="45"/>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="35"/>
+                <RowDefinition Height="45"/>
+                <RowDefinition Height="45"/>
+                <RowDefinition Height="45"/>
+                <RowDefinition Height="45"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Grid Grid.Row="0">
@@ -264,8 +274,49 @@
                     </DataGridTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
-                
+
             <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0">下级变量名</TextBlock>
+                <TextBox Grid.Column="1" 
+                         Margin="5"
+                         Width="100"
+                         HorizontalAlignment="Left"
+                         Text="{Binding SelectedField.Name}"/>
+            </Grid>
+
+            <Grid Grid.Row="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0">下级变量类型</TextBlock>
+                <ComboBox Grid.Column="1" 
+                          Margin="5"
+                          Width="100"
+                          HorizontalAlignment="Left"
+                          ItemsSource="{x:Static viewmodel:VariableSettingViewModel.FieldTypes}"
+                          SelectedIndex="{Binding SelectedField.FieldTypeSelectedIndex}"
+                          SelectedItem="{Binding SelectedField.FieldTypeSelectedItem}"/>
+            </Grid>
+
+            <Grid Grid.Row="4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" IsEnabled="{Binding SelectedField.IsBoundaryEnabled}">选项下限</TextBlock>
+                <TextBox Grid.Column="1" IsEnabled="{Binding SelectedField.IsBoundaryEnabled}" Text="{Binding SelectedField.LowerBoundary}"/>
+                <TextBlock Grid.Column="2" IsEnabled="{Binding SelectedField.IsBoundaryEnabled}">选项上限</TextBlock>
+                <TextBox Grid.Column="3" IsEnabled="{Binding SelectedField.IsBoundaryEnabled}" Text="{Binding SelectedField.UpperBoundary}"/>
+            </Grid>
+
+            <Grid Grid.Row="5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="60"/>
@@ -278,7 +329,8 @@
                         Command="{Binding NewCategoricalCommand}" Cursor="Hand">添加</Button>
             </Grid>
 
-            <DataGrid Grid.Row="3"
+            <DataGrid Grid.Row="6"
+                      Margin="10 5 10 20"
                       ItemsSource="{Binding SelectedField.Categories}"
                       d:ItemsSource="{d:SampleData ItemCount=5}"
                       SelectedItem="{Binding SelectedField.SelectedCategory}">
@@ -296,46 +348,20 @@
                 </DataGrid.Columns>
             </DataGrid>
 
-            <!--<ListView Grid.Row="3"
-                      Margin="5"
-                      BorderThickness="0"
-                      Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"
-                      DataContext="{Binding SelectedField}"
-                      ItemsSource="{Binding Categories}"
-                      d:ItemsSource="{d:SampleData ItemCount=5}"
-                      SelectedItem="{Binding SelectedCategory}">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Height="25" Orientation="Horizontal">
-                            <TextBox Grid.Column="0" 
-                                     Margin="0"
-                                     Width="60"
-                                     BorderThickness="0"
-                                     Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"
-                                     Text="{Binding Name}"/>
-                            <TextBlock Text="{Binding Description}"
-                                       Margin="5"
-                                       Width="120"/>
-                            <Button Style="{StaticResource IDCA.Button.Remove}"
-                                    Command="{Binding RemoveCommand}" Cursor="Hand"/>
-                        </StackPanel>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>-->
-
         </Grid>
 
         <Grid Grid.Column="2" Grid.Row="1">
             
             <Grid.RowDefinitions>
-                <RowDefinition Height="35"/>
+                <RowDefinition Height="45"/>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="35"/>
+                <RowDefinition Height="45"/>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="35"/>
+                <RowDefinition Height="45"/>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="35"/>
+                <RowDefinition Height="45"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="20"/>
             </Grid.RowDefinitions>
             
             <Grid Grid.Row="0">
@@ -406,7 +432,9 @@
             </ScrollViewer>-->
             
             <TextBlock Grid.Row="2" FontSize="15">Category后缀配置</TextBlock>
-            <ScrollViewer Grid.Row="3" Margin="5" VerticalScrollBarVisibility="Auto">
+            <ScrollViewer Grid.Row="3" 
+                          Margin="5" 
+                          VerticalScrollBarVisibility="Auto">
                 <ItemsControl Grid.Row="2"
                               BorderThickness="0"
                               Background="Transparent"
@@ -415,7 +443,7 @@
                               d:ItemsSource="{d:SampleData ItemCount=5}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Grid Height="35">
+                            <Grid Height="40">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="120"/>
                                     <ColumnDefinition Width="100"/>
@@ -480,7 +508,7 @@
                               d:ItemsSource="{d:SampleData ItemCount=5}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Grid Height="35">
+                            <Grid Height="40">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="140"/>
                                     <ColumnDefinition Width="100"/>
@@ -509,11 +537,20 @@
 
         <Grid Grid.Row="1" Grid.Column="3">
             <Grid.RowDefinitions>
-                <RowDefinition Height="35"/>
+                <RowDefinition Height="45"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0">脚本预览</TextBlock>
-            <TextBox Grid.Row="1" Margin="10" VerticalAlignment="Stretch" TextWrapping="Wrap" Text="{Binding OverViewText}"/>
+            <TextBox Grid.Row="1" 
+                     IsReadOnly="True" 
+                     Margin="10 5 10 20"
+                     FontFamily="{StaticResource IDCA.Font.Family}"
+                     FontSize="{StaticResource IDCA.Font.Size.Content}"
+                     HorizontalAlignment="Stretch"
+                     VerticalAlignment="Stretch"
+                     VerticalContentAlignment="Top"
+                     TextWrapping="Wrap" 
+                     Text="{Binding OverViewText}"/>
         </Grid>
         
     </Grid>
