@@ -1,13 +1,13 @@
 ﻿
 using IDCA.Client.ViewModel.Common;
-using MahApps.Metro.Controls;
+using System.Windows;
 
 namespace IDCA.Client.View
 {
     /// <summary>
     /// TableSettingWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class TableSettingWindow : MetroWindow
+    public partial class TableSettingWindow : Window
     {
         public TableSettingWindow()
         {

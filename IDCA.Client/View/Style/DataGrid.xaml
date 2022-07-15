@@ -1,10 +1,125 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:helper="clr-namespace:IDCA.Client.View.Helper">
+
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+        <ResourceDictionary Source="Colors.xaml"/>
     </ResourceDictionary.MergedDictionaries>
     
-    <Style x:Key="IDCA.DataGrid.Base" TargetType="DataGrid" BasedOn="{StaticResource MahApps.Styles.DataGrid}">
+    <Style x:Key="IDCA.Styles.DataGridColumnHeader" TargetType="DataGridColumnHeader">
+        <Setter Property="Background" Value="{DynamicResource IDCA.Brushes.Background}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource IDCA.Brushes.BorderBrush}"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="{DynamicResource IDCA.Brushes.Foreground}"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="MinHeight" Value="25"/>
+        <Setter Property="MinWidth" Value="0"/>
+        <Setter Property="Padding" Value="{Binding RelativeSource={RelativeSource AncestorType=DataGrid, Mode=FindAncestor}, Path=(helper:DataGridHelper.ColumnHeaderPadding), Mode=OneWay, FallbackValue=0, TargetNullValue=0}"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Path=Column.IsReadOnly, RelativeSource={RelativeSource Mode=Self}, Mode=OneWay, FallbackValue=False, TargetNullValue=False}" Value="True">
+                <Setter Property="Background" Value="{DynamicResource IDCA.Brushes.Gray9}"/>
+            </DataTrigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsMouseOver" Value="True"/>
+                    <Condition Property="SortDirection" Value="{x:Null}"/>
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{DynamicResource IDCA.Brushes.Button.Background.MouseOver}"/>
+            </MultiTrigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="IDCA.Styles.DataGridRowHeader" TargetType="DataGridRowHeader">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource IDCA.Brushes.Gray5}"/>
+        <Setter Property="BorderThickness" Value="0 0 1 0"/>
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Margin" Value="0"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource IDCA.Brushes.Accent3}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="IDCA.Styles.DataGridCell" TargetType="DataGridCell">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="Padding" Value="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=(helper:DataGridHelper.CellPadding), FallbackValue=0, TargetNullValue=0, Mode=OneWay}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="DataGridCell">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
+                        <ContentPresenter Margin="{TemplateBinding Padding}"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          Content="{TemplateBinding Content}"
+                                          ContentStringFormat="{TemplateBinding ContentStringFormat}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Foreground" Value="{StaticResource IDCA.Brushes.DataGrid.Selection.Text}"/>
+                <Setter Property="Background" Value="{StaticResource IDCA.Brushes.DataGrid.Selection.Background}"/>
+            </Trigger>
+            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                <Setter Property="BorderBrush" Value="{StaticResource IDCA.Brushes.DataGrid.Selection.BorderBrush.Focus}"/>
+            </Trigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsSelected" Value="True"/>
+                    <Condition Property="Selector.IsSelectionActive" Value="False"/>
+                </MultiTrigger.Conditions>
+                <Setter Property="Foreground" Value="{StaticResource IDCA.Brushes.DataGrid.Selection.Text.Inactive}"/>
+                <Setter Property="Background" Value="{StaticResource IDCA.Brushes.DataGrid.Selection.Background.Inactive}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource IDCA.Brushes.DataGrid.Selection.BorderBrush.Inactive}"/>
+            </MultiTrigger>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource IDCA.Brushes.DataGrid.Selection.Background.MouseOver}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource IDCA.Brushes.DataGrid.Selection.BorderBrush.MouseOver}"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+            </Trigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsEnabled" Value="False"/>
+                    <Condition Property="IsSelected" Value="True"/>
+                </MultiTrigger.Conditions>
+                <Setter Property="Foreground" Value="{StaticResource IDCA.Brushes.DataGrid.Selection.Text.Disabled}"/>
+                <Setter Property="Background" Value="{StaticResource IDCA.Brushes.DataGrid.Selection.Background.Disabled}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource IDCA.Brushes.DataGrid.Selection.BorderBrush.Disabled}"/>
+            </MultiTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="IDCA.Styles.DataGridRow" TargetType="DataGridRow">
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="Validation.ErrorTemplate" Value="{x:Null}"/>
+        <Setter Property="helper:DataGridHelper.CellPadding" Value="{Binding Path=(helper:DataGridHelper.CellPadding), FallbackValue=0, TargetNullValue=0, Mode=OneWay, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+        
+    </Style>
+    
+    <Style TargetType="DataGrid">
         <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
         <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
         <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
@@ -25,5 +140,9 @@
         <Setter Property="ColumnHeaderHeight" Value="35"/>
         <Setter Property="AllowDrop" Value="True"/>
         <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True"/>
+        <Setter Property="CellStyle" Value="{StaticResource IDCA.Styles.DataGridCell}"/>
+        <Setter Property="ColumnHeaderStyle" Value="{StaticResource IDCA.Styles.DataGridColumnHeader}"/>
+        <Setter Property="RowHeaderStyle" Value="{StaticResource IDCA.Styles.DataGridRowHeader}"/>
+        <Setter Property="RowStyle" Value="{StaticResource IDCA.Styles.DataGridRow}"/>
     </Style>
 </ResourceDictionary>

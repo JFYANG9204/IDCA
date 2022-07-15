@@ -53,7 +53,7 @@
             <TextBox Text="{Binding TableName}" />
             
             <TextBlock>出示表头</TextBlock>
-            <mah:MultiSelectionComboBox Width="150" 
+            <!--<mah:MultiSelectionComboBox Width="150" 
                                         Height="30" 
                                         Margin="5"
                                         FontSize="{StaticResource IDCA.Font.Size.Content}"
@@ -67,7 +67,7 @@
                                         ScrollViewer.CanContentScroll="True"
                                         VerticalScrollBarVisibility="Hidden"
                                         HorizontalScrollBarVisibility="Hidden"
-                                        Style="{StaticResource MahApps.Styles.MultiSelectionComboBox.Horizontal}"/>
+                                        Style="{StaticResource MahApps.Styles.MultiSelectionComboBox.Horizontal}"/>-->
 
             <Button Style="{StaticResource IDCA.TableSettingView.HeaderButton}" Command="{Binding PushNewElementCommand}">添加表格</Button>
             
