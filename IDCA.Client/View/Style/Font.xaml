@@ -15,5 +15,7 @@
         <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
         <Setter Property="FontSize" Value="15"/>
     </Style>
-    
+
+    <sys:Double x:Key="IDCA.Font.Size.Button">14</sys:Double>
+
 </ResourceDictionary>

@@ -48,13 +48,13 @@
             
             <StackPanel Grid.Column="0" Orientation="Horizontal">
                 <StackPanel.Resources>
-                    <Style TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button}">
+                    <Style TargetType="Button">
                         <Setter Property="Margin" Value="5"/>
                         <Setter Property="Width" Value="60"/>
                         <Setter Property="Height" Value="20"/>
                         <Setter Property="Cursor" Value="Hand"/>
                     </Style>
-                    <Style TargetType="TextBox" BasedOn="{StaticResource MahApps.Styles.TextBox}">
+                    <Style TargetType="TextBox">
                         <Setter Property="Width" Value="120"/>
                         <Setter Property="Height" Value="25"/>
                         <Setter Property="IsReadOnly" Value="True"/>
@@ -67,7 +67,7 @@
                         <Setter Property="VerticalAlignment" Value="Center"/>
                         <Setter Property="Margin" Value="15 5"/>
                     </Style>
-                    <Style TargetType="ComboBox" BasedOn="{StaticResource MahApps.Styles.ComboBox}">
+                    <Style TargetType="ComboBox">
                         <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
                         <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
                         <Setter Property="Margin" Value="5"/>
@@ -143,7 +143,7 @@
                 <Button Height="40"
                         Width="60"
                         Command="{Binding ShowSettingWindowCommand}"
-                        Style="{StaticResource IDCA.Button.Setting}"/>
+                        Style="{StaticResource IDCA.Styles.Button.Setting}"/>
                 <Button Height="40"
                         Width="60"
                         Cursor="Hand"
@@ -207,17 +207,15 @@
                                            VerticalAlignment="Center"
                                            Text="{Binding Name}"/>
                                 <Button Grid.Column="1"
-                                        Style="{StaticResource IDCA.Button.Add}"
+                                        Style="{StaticResource IDCA.Styles.Button.Add}"
                                         Foreground="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem}, Path=Foreground}"
                                         Visibility="{Binding AllowAppendChild, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                        Command="{Binding AddChildCommand}" 
-                                        Cursor="Hand"/>
+                                        Command="{Binding AddChildCommand}"/>
                                 <Button Grid.Column="1"
-                                        Style="{StaticResource IDCA.Button.Remove}"
+                                        Style="{StaticResource IDCA.Styles.Button.Remove}"
                                         Foreground="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem}, Path=Foreground}"
                                         Visibility="{Binding AllowNodeRemoving, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                        Command="{Binding RemoveCommand}"
-                                        Cursor="Hand"/>
+                                        Command="{Binding RemoveCommand}"/>
                             </Grid>
                         </HierarchicalDataTemplate>
                     </TreeView.ItemTemplate>

@@ -81,7 +81,7 @@
                                  FontFamily="{StaticResource IDCA.Font.Family}"
                                  FontSize="{StaticResource IDCA.Font.Size.Content}"
                                  Text="{Binding TemplateRootPath}"/>
-                        <Button Style="{StaticResource IDCA.Window.DialogButton}" Command="{Binding SelectTemplateRootPathCommand}"/>
+                        <Button Style="{StaticResource IDCA.Styles.Button.Dialog}" Command="{Binding SelectTemplateRootPathCommand}"/>
                     </StackPanel>
 
                     <Grid Grid.Row="1">

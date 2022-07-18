@@ -84,7 +84,7 @@
                             <Setter Property="VerticalAlignment" Value="Center"/>
                             <Setter Property="Margin" Value="5"/>
                         </Style>
-                        <Style TargetType="ComboBox" BasedOn="{StaticResource MahApps.Styles.ComboBox}">
+                        <Style TargetType="ComboBox">
                             <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
                             <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
                             <Setter Property="VerticalAlignment" Value="Center"/>
@@ -98,14 +98,14 @@
                             <Setter Property="VerticalContentAlignment" Value="Center"/>
                             <Setter Property="Margin" Value="5"/>
                         </Style>-->
-                        <Style TargetType="TextBox" BasedOn="{StaticResource MahApps.Styles.TextBox}">
+                        <Style TargetType="TextBox">
                             <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
                             <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
                             <Setter Property="VerticalAlignment" Value="Center"/>
                             <Setter Property="VerticalContentAlignment" Value="Center"/>
                             <Setter Property="Margin" Value="5"/>
                         </Style>
-                        <Style TargetType="CheckBox" BasedOn="{StaticResource MahApps.Styles.CheckBox}">
+                        <Style TargetType="CheckBox">
                             <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
                             <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
                             <Setter Property="VerticalAlignment" Value="Center"/>
@@ -205,7 +205,7 @@
                              SelectedIndex="{Binding AvailableSelectedIndex}"
                              d:ItemsSource="{d:SampleData ItemCount=5}">
                         <ListBox.Resources>
-                            <Style TargetType="ListBoxItem" BasedOn="{StaticResource MahApps.Styles.ListBoxItem}">
+                            <Style TargetType="ListBoxItem">
                                 <Setter Property="Background" Value="{Binding RelativeSource={RelativeSource AncestorType=ListBox, Mode=FindAncestor}, Path=Background}"/>
                             </Style>
                         </ListBox.Resources>
@@ -228,7 +228,7 @@
                                                VerticalAlignment="Center" 
                                                Text="{Binding Name}"/>
                                     <Button Grid.Column="1" 
-                                            Style="{StaticResource IDCA.Button.Add}"
+                                            Style="{StaticResource IDCA.Styles.Button.Add}"
                                             Command="{Binding AddCommand}"/>
                                 </Grid>
                             </DataTemplate>
@@ -289,17 +289,17 @@
                                                 <ColumnDefinition Width="30"/>
                                             </Grid.ColumnDefinitions>
                                             <Button Grid.Column="0" 
-                                                    Style="{StaticResource IDCA.Button.Add}"
+                                                    Style="{StaticResource IDCA.Styles.Button.Add}"
                                                     Visibility="{Binding AllowChildren, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                     Command="{Binding AddChildCommand}"/>
                                             <Button Grid.Column="1" 
-                                                    Style="{StaticResource IDCA.Button.ArrowUp}"
+                                                    Style="{StaticResource IDCA.Styles.Button.ArrowUp}"
                                                     Command="{Binding MoveUpCommand}"/>
                                             <Button Grid.Column="2" 
-                                                    Style="{StaticResource IDCA.Button.ArrowDown}"
+                                                    Style="{StaticResource IDCA.Styles.Button.ArrowDown}"
                                                     Command="{Binding MoveDownCommand}"/>
                                             <Button Grid.Column="3" 
-                                                    Style="{StaticResource IDCA.Button.Remove}"
+                                                    Style="{StaticResource IDCA.Styles.Button.Remove}"
                                                     Command="{Binding RemoveCommand}"/>
                                         </Grid>
                                     </Grid>
@@ -437,29 +437,6 @@
                     </ItemsControl>
                 </ScrollViewer>
 
-                <!--<StackPanel Orientation="Horizontal"
-                            HorizontalAlignment="Right"
-                            Grid.Row="5">
-
-                    <Button Width="90"
-                            Height="30"
-                            Margin="5"
-                            FontSize="13"
-                            VerticalAlignment="Bottom"
-                            Command="{Binding ConfirmCommand}"
-                            CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}}"
-                            >确定</Button>
-                                        
-                    <Button Width="90"
-                            Height="30"
-                            Margin="5"
-                            FontSize="13"
-                            VerticalAlignment="Bottom"
-                            Command="{Binding CancelCommand}"
-                            CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}}"
-                            >取消</Button>
-
-                </StackPanel>-->
 
             </Grid>
 

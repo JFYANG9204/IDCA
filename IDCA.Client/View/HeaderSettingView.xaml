@@ -17,7 +17,7 @@
                 <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.TextBlock.Label}"/>
                 <Setter Property="VerticalAlignment" Value="Center"/>
             </Style>
-            <Style TargetType="TextBox" BasedOn="{StaticResource MahApps.Styles.TextBox}">
+            <Style TargetType="TextBox">
                 <Setter Property="Margin" Value="5"/>
                 <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
                 <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
@@ -25,7 +25,7 @@
                 <Setter Property="VerticalAlignment" Value="Center"/>
                 <Setter Property="VerticalContentAlignment" Value="Center"/>
             </Style>
-            <Style TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button}">
+            <Style TargetType="Button">
                 <Setter Property="Margin" Value="5"/>
                 <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
                 <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
@@ -51,7 +51,6 @@
         </StackPanel>
 
         <DataGrid Grid.Row="1"
-                  Style="{StaticResource IDCA.DataGrid.Base}"
                   ItemsSource="{Binding Elements}"
                   d:ItemsSource="{d:SampleData ItemCount=5}"
                   >
@@ -98,7 +97,7 @@
                 <DataGridTemplateColumn Width="35">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button Style="{StaticResource IDCA.Button.Close}"
+                            <Button Style="{StaticResource IDCA.Styles.Button.Close}"
                                     Command="{Binding RemoveCommand}"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>

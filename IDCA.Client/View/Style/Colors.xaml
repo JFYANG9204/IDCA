@@ -27,7 +27,7 @@
     <Color x:Key="IDCA.Colors.ListBox.Item.Selected.Background">#FF006CBE</Color>
     <Color x:Key="IDCA.Colors.ListBox.Item.Selected.Foreground">White</Color>
     
-    <Color x:Key="IDCA.Colors.Window.Background">#FFFBFBFB</Color>
+    <Color x:Key="IDCA.Colors.Window.Background">White</Color>
     <Color x:Key="IDCA.Colors.Window.Background.Toolbar">#FFFBFBFB</Color>
     <Color x:Key="IDCA.Colors.Window.Borderbrush">LightGray</Color>
     <Color x:Key="IDCA.Colors.Window.HeaderButton.Minimize.Background">CornflowerBlue</Color>
@@ -37,6 +37,8 @@
     <Color x:Key="IDCA.Colors.Window.HeaderButton.Foreground">Gray</Color>
     <Color x:Key="IDCA.Colors.Window.HeaderButton.Foreground.Click">White</Color>
 
+    <Color x:Key="IDCA.Colors.Control.Background.Disabled">#FFA59F93</Color>
+    
     <Color x:Key="IDCA.Colors.Button.Background">#FFF3F3F3</Color>
     <Color x:Key="IDCA.Colors.Button.Background.Click">LightGray</Color>
     <Color x:Key="IDCA.Colors.Button.Background.MouseOver">#FFB9D1EA</Color>
@@ -65,6 +67,9 @@
     <SolidColorBrush x:Key="IDCA.Brushes.Foreground" Color="{StaticResource IDCA.Colors.Foreground}"/>
     <SolidColorBrush x:Key="IDCA.Brushes.Background" Color="{StaticResource IDCA.Colors.Background}"/>
     <SolidColorBrush x:Key="IDCA.Brushes.BorderBrush" Color="{StaticResource IDCA.Colors.BorderBrush}"/>
+
+    <SolidColorBrush x:Key="IDCA.Brushes.Control.Background" Color="{StaticResource IDCA.Colors.Background}"/>
+    <SolidColorBrush x:Key="IDCA.Brushes.Control.Background.Disabled" Color="{StaticResource IDCA.Colors.Control.Background.Disabled}"/>
 
     <SolidColorBrush x:Key="IDCA.Brushes.ListBox.Item.Dark" Color="{StaticResource IDCA.Colors.ListBox.Item.Dark}"/>
     <SolidColorBrush x:Key="IDCA.Brushes.ListBox.Item.Selected.Background" Color="{StaticResource IDCA.Colors.ListBox.Item.Selected.Background}"/>

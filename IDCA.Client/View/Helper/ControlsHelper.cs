@@ -66,5 +66,25 @@ namespace IDCA.Client.View.Helper
             element.SetValue(IsReadOnlyProperty, value);
         }
 
+
+        public static readonly DependencyProperty RecognizesAccessKeyProperty =
+            DependencyProperty.RegisterAttached(
+                "RecognizesAccessKey",
+                typeof(bool),
+                typeof(ControlsHelper),
+                new FrameworkPropertyMetadata(true));
+
+        [AttachedPropertyBrowsableForType(typeof(ContentControl))]
+        public static bool GetRecognizesAccessKey(UIElement element)
+        {
+            return (bool)element.GetValue(RecognizesAccessKeyProperty);
+        }
+
+        [AttachedPropertyBrowsableForType(typeof(ContentControl))]
+        public static void SetRecognizesAccessKey(UIElement element, bool value)
+        {
+            element.SetValue(RecognizesAccessKeyProperty, value);
+        }
+
     }
 }
