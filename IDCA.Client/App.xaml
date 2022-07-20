@@ -8,10 +8,10 @@
                 <ResourceDictionary Source="View/Style/Font.xaml"/>
                 <ResourceDictionary Source="View/Style/Colors.xaml"/>
                 <ResourceDictionary Source="View/Style/Button.xaml"/>
-                <ResourceDictionary Source="View/Style/GridSplitter.xaml"/>
+                <ResourceDictionary Source="View/Style/CheckBox.xaml"/>
                 <ResourceDictionary Source="View/Style/DataGrid.xaml"/>
-                <ResourceDictionary Source="View/Style/TabControl.xaml"/>
-                <ResourceDictionary Source="View/Style/Window.xaml"/>
+                <ResourceDictionary Source="View/Style/ListBox.xaml"/>
+                <ResourceDictionary Source="View/Style/ComboBox.xaml"/>
                 <ResourceDictionary Source="View/Style/TableSettingContentPresenter.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

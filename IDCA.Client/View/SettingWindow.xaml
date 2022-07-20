@@ -55,8 +55,6 @@
                     Background="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Background}"
                     BorderBrush="{StaticResource IDCA.Brushes.Window.BorderBrush}"
                     TabStripPlacement="Left"
-                    helper:HeaderedControlHelper.HeaderFontFamily="{StaticResource IDCA.Font.Family}"
-                    helper:HeaderedControlHelper.HeaderFontSize="{StaticResource IDCA.Font.Size.Content}"
                     >
 
             <TabItem Header="模板" 

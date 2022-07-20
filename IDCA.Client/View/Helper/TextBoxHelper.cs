@@ -7,24 +7,6 @@ namespace IDCA.Client.View.Helper
     public static class TextBoxHelper
     {
 
-        public static readonly DependencyProperty ClearTextButtonProperty =
-            DependencyProperty.RegisterAttached(
-                "ClearTextButton",
-                typeof(bool),
-                typeof(TextBoxHelper),
-                new FrameworkPropertyMetadata());
-
-        public static bool GetClearTextButton(DependencyObject d)
-        {
-            return (bool)d.GetValue(ClearTextButtonProperty);
-        }
-
-
-        public static void SetClearTextButton(DependencyObject d, bool value)
-        {
-            d.SetValue(ClearTextButtonProperty, value);
-        }
-
         public static readonly DependencyProperty ButtonWidthProperty =
             DependencyProperty.RegisterAttached(
                 "ButtonWidth",
@@ -42,41 +24,23 @@ namespace IDCA.Client.View.Helper
             d.SetValue(ButtonWidthProperty, value);
         }
 
+
         public static readonly DependencyProperty ButtonCommandProperty =
             DependencyProperty.RegisterAttached(
                 "ButtonCommand",
                 typeof(ICommand),
-                typeof(TextBoxHelper));
-
-        public static ICommand? GetButtonCommand(UIElement element)
-        {
-            return (ICommand?)element.GetValue(ButtonCommandProperty);
-        }
-
-        public static void SetButtonCommand(UIElement element, ICommand? value)
-        {
-            element.SetValue(ButtonCommandProperty, value);
-        }
-
-        public static readonly DependencyProperty ButtonCommandParameterProperty =
-            DependencyProperty.RegisterAttached(
-                "ButtonCommandParameter",
-                typeof(object),
                 typeof(TextBoxHelper),
                 new FrameworkPropertyMetadata(null));
 
-        public static object GetButtonCommandParameter(DependencyObject d)
+        public static ICommand? GetButtonCommand(DependencyObject d)
         {
-            return d.GetValue(ButtonCommandParameterProperty);
+            return (ICommand?)d.GetValue(ButtonCommandProperty);
         }
 
-        public static void SetButtonCommandParameter(DependencyObject d, object value)
+        public static void SetButtonCommand(DependencyObject d, ICommand? value)
         {
-            d.SetValue(ButtonCommandParameterProperty, value);
+            d.SetValue(ButtonCommandProperty, value);
         }
-
-
-
 
     }
 }

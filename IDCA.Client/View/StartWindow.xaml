@@ -59,13 +59,8 @@
                      ScrollViewer.HorizontalScrollBarVisibility="Hidden"
                      ItemsSource="{Binding TemplateItems}"
                      SelectedIndex="{Binding TemplateSelectedIndex}"
+                     ItemContainerStyle="{StaticResource IDCA.Styles.ListBoxItem}"
                      d:ItemsSource="{d:SampleData ItemCount=5}">
-                <ListBox.Resources>
-                    <Style TargetType="ListBoxItem">
-                        <Setter Property="Background" Value="Transparent"/>
-                        <Setter Property="Margin" Value="5"/>
-                    </Style>
-                </ListBox.Resources>
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid Width="240"
@@ -166,8 +161,6 @@
                     Width="70"
                     Height="35"
                     Margin="50"
-                    FontSize="{StaticResource IDCA.Font.Size.TextBlock.Label}"
-                    Background="{StaticResource IDCA.Brushes.Button.Background}"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Center"
                     IsEnabled="{Binding IsConfirmButtonEnable}"

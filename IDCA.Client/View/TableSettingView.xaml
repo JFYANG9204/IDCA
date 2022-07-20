@@ -164,7 +164,7 @@
                 <DataGridTemplateColumn>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button Style="{StaticResource IDCA.Button.Close}" Command="{Binding RemoveCommand}"/>
+                            <Button Style="{StaticResource IDCA.Styles.Button.Close}" Command="{Binding RemoveCommand}" Cursor="Hand"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
