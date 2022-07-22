@@ -88,18 +88,18 @@
                                PlacementTarget="{Binding ElementName=PART_ToggleButton}"
                                PopupAnimation="{DynamicResource {x:Static SystemParameters.ComboBoxPopupAnimationKey}}">
                             <Popup.Effect>
-                                <DropShadowEffect BlurRadius="5" 
-                                                  Color="Black" 
-                                                  Direction="270" 
-                                                  Opacity="1"
-                                                  ShadowDepth="10"/>
+                                <DropShadowEffect ShadowDepth="5"
+                                                  BlurRadius="3"
+                                                  Direction="270"/>
                             </Popup.Effect>
-                            <ScrollViewer Background="{StaticResource IDCA.Brushes.Background}" 
-                                          Foreground="{StaticResource IDCA.Brushes.Foreground}"
-                                          HorizontalScrollBarVisibility="Auto"
-                                          VerticalScrollBarVisibility="Auto">
-                                <ItemsPresenter/>
-                            </ScrollViewer>
+                            <Border BorderBrush="{StaticResource IDCA.Brushes.BorderBrush}"
+                                    BorderThickness="1"
+                                    Background="{StaticResource IDCA.Brushes.Background}">
+                                <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                                              VerticalScrollBarVisibility="Auto">
+                                    <ItemsPresenter/>
+                                </ScrollViewer>
+                            </Border>
                         </Popup>
                     </Grid>
                     <ControlTemplate.Triggers>

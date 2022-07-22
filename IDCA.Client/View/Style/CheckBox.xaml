@@ -71,7 +71,7 @@
                                 <Condition Property="IsPressed" Value="True"/>
                             </MultiTrigger.Conditions>
                             <Setter Property="BorderBrush" Value="{StaticResource IDCA.Brushes.AccentBase}"/>
-                            <Setter TargetName="CheckRectangle" Property="Fill" Value="{StaticResource IDCA.Colors.Button.Background.MouseOver}"/>
+                            <Setter TargetName="CheckRectangle" Property="Fill" Value="{StaticResource IDCA.Brushes.Button.Background.MouseOver}"/>
                         </MultiTrigger>
                         <Trigger Property="IsChecked" Value="True">
                             <Setter TargetName="CheckRectangle" Property="Fill" Value="{StaticResource IDCA.Brushes.Foreground}"/>

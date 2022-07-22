@@ -8,16 +8,16 @@ namespace IDCA.Client.ViewModel
 
         public AxisDescriptionAttribute()
         {
+            _controlType = ValueSettingControlType.TextBox;
             _description = string.Empty;
-            _isTextBox = true;
-            _isComboBox = false;
             _selections = Array.Empty<string>();
             _indexOfParent = 0;
         }
 
-        public AxisDescriptionAttribute(string description) : this()
+        public AxisDescriptionAttribute(string description, ValueSettingControlType controlType) : this()
         {
             _description = description;
+            _controlType = controlType;
         }
 
         string _description;
@@ -28,19 +28,27 @@ namespace IDCA.Client.ViewModel
             set { _description = value; }
         }
 
-        bool _isTextBox;
-        public bool IsTextBox
+        ValueSettingControlType _controlType;
+
+        public ValueSettingControlType ControlType
         {
-            get { return _isTextBox; }
-            set { _isTextBox = value; }
+            get { return _controlType; }
+            set { _controlType = value; }
         }
 
-        bool _isComboBox;
-        public bool IsComboBox
-        {
-            get { return _isComboBox; }
-            set { _isComboBox = value; }
-        }
+        //bool _isTextBox;
+        //public bool IsTextBox
+        //{
+        //    get { return _isTextBox; }
+        //    set { _isTextBox = value; }
+        //}
+        //
+        //bool _isComboBox;
+        //public bool IsComboBox
+        //{
+        //    get { return _isComboBox; }
+        //    set { _isComboBox = value; }
+        //}
 
         string[] _selections;
         public string[] Selections

@@ -918,19 +918,18 @@ namespace IDCA.Client.ViewModel
     /// <summary>
     /// AxisSettingView中，AxisElement后缀列表使用的ViewModel
     /// </summary>
-    public class AxisElementSuffixViewModel : ObservableObject
+    public class AxisElementSuffixViewModel : ObservableObject, IValueSettingTemplate
     {
 
-        public AxisElementSuffixViewModel(AxisTreeNode node, AxisElementSuffixType type, AxisElement axisElement)
+        public AxisElementSuffixViewModel(AxisTreeNode node, AxisElementSuffixType type, AxisElement axisElement, ValueSettingControlType controlType)
         {
             _type = type;
+            _controlType = controlType;
             _name = string.Empty;
             _text = string.Empty;
             _selectedIndex = 0;
             _selections = new ObservableCollection<string>();
             _checked = false;
-            _isTextBox = true;
-            _isComboBox = false;
             _axisElement = axisElement;
             _node = node;
         }
@@ -1008,11 +1007,11 @@ namespace IDCA.Client.ViewModel
             }
         }
 
-        ObservableCollection<string> _selections;
+        IList<string> _selections;
         /// <summary>
         /// 如果后缀值用ComboBox选取，此属性值是ComboBox的可选值
         /// </summary>
-        public ObservableCollection<string> Selections
+        public IList<string> Selections
         {
             get
             {
@@ -1038,37 +1037,41 @@ namespace IDCA.Client.ViewModel
             }
         }
 
-        bool _isTextBox;
-        /// <summary>
-        /// 当前值用TextBox填入
-        /// </summary>
-        public bool IsTextBox
-        {
-            get
-            {
-                return _isTextBox;
-            }
-            set
-            {
-                SetProperty(ref _isTextBox, value);
-            }
-        }
+        ValueSettingControlType _controlType;
 
-        bool _isComboBox;
-        /// <summary>
-        /// 当前值用ComboBox选取
-        /// </summary>
-        public bool IsComboBox
-        {
-            get
-            {
-                return _isComboBox;
-            }
-            set
-            {
-                SetProperty(ref _isComboBox, value);
-            }
-        }
+        public ValueSettingControlType ControlType => _controlType;
+
+        //bool _isTextBox;
+        ///// <summary>
+        ///// 当前值用TextBox填入
+        ///// </summary>
+        //public bool IsTextBox
+        //{
+        //    get
+        //    {
+        //        return _isTextBox;
+        //    }
+        //    set
+        //    {
+        //        SetProperty(ref _isTextBox, value);
+        //    }
+        //}
+        //
+        //bool _isComboBox;
+        ///// <summary>
+        ///// 当前值用ComboBox选取
+        ///// </summary>
+        //public bool IsComboBox
+        //{
+        //    get
+        //    {
+        //        return _isComboBox;
+        //    }
+        //    set
+        //    {
+        //        SetProperty(ref _isComboBox, value);
+        //    }
+        //}
         /// <summary>
         /// 向当前值选项末尾添加新的值
         /// </summary>
@@ -1077,7 +1080,7 @@ namespace IDCA.Client.ViewModel
         {
             foreach (var item in seletions)
             {
-                _selections.Add(item);
+                _selections.Append(item);
             }
         }
         /// <summary>
@@ -1086,7 +1089,7 @@ namespace IDCA.Client.ViewModel
         /// <returns></returns>
         public string GetValue()
         {
-            if (_isTextBox)
+            if (_controlType == ValueSettingControlType.TextBox)
             {
                 return _text;
             }
@@ -1136,14 +1139,14 @@ namespace IDCA.Client.ViewModel
                 case AxisElementSuffixType.IsHiddenWhenRow:
                 case AxisElementSuffixType.IncludeInBase:
                 case AxisElementSuffixType.IsUnweighted:
-                    IsComboBox = true;
+                    _controlType = ValueSettingControlType.ComboBox;
                     break;
 
                 case AxisElementSuffixType.Decimals:
                 case AxisElementSuffixType.Factor:
                 case AxisElementSuffixType.Multiplier:
                 case AxisElementSuffixType.Weight:
-                    IsTextBox = true;
+                    _controlType = ValueSettingControlType.TextBox;
                     break;
 
                 case AxisElementSuffixType.None:
@@ -1151,9 +1154,8 @@ namespace IDCA.Client.ViewModel
                     break;
             }
 
-            if (!string.IsNullOrEmpty(_text) && _isComboBox && _selections.Count > 0)
+            if (!string.IsNullOrEmpty(_text) && _controlType == ValueSettingControlType.ComboBox && _selections.Any())
             {
-                SelectedIndex = _selections.IndexOf(_text);
             }
         }
 
@@ -1184,14 +1186,12 @@ namespace IDCA.Client.ViewModel
     /// 存储AxisSettingView里AxisElement树节点详细配置的ViewModel。
     /// 存储配置值的控件可以是TextBox或者ComboBox。
     /// </summary>
-    public class AxisElementDetailViewModel : ObservableObject
+    public class AxisElementDetailViewModel : ObservableObject, IValueSettingTemplate
     {
         public AxisElementDetailViewModel()
         {
             _name = string.Empty;
             _text = string.Empty;
-            _isTextBox = true;
-            _isComboBox = false;
             _type = AxisElementDetailType.None;
             _selectedIndex = 1;
             _selections = new ObservableCollection<string>();
@@ -1209,8 +1209,6 @@ namespace IDCA.Client.ViewModel
                 if (attr != null && (desc = attr.First()) != null)
                 {
                     _name = desc.Description;
-                    _isTextBox = desc.IsTextBox;
-                    _isComboBox = desc.IsComboBox;
                     foreach (string s in desc.Selections)
                     {
                         _selections.Add(s);
@@ -1250,6 +1248,10 @@ namespace IDCA.Client.ViewModel
             get { return _type; }
             set { _type = value; }
         }
+
+        ValueSettingControlType _controlType;
+
+        public ValueSettingControlType ControlType => _controlType;
 
         int _indexOfElement = -1;
         /// <summary>
@@ -1299,39 +1301,39 @@ namespace IDCA.Client.ViewModel
             }
         }
 
-        bool _isTextBox;
-        /// <summary>
-        /// 当前配置值控件是否是TextBox，和IsComboBox不能同时为true。
-        /// </summary>
-        public bool IsTextBox
-        {
-            get { return _isTextBox; }
-            set
-            {
-                SetProperty(ref _isTextBox, value);
-                if (value)
-                {
-                    IsComboBox = false;
-                }
-            }
-        }
-
-        bool _isComboBox;
-        /// <summary>
-        /// 当前配置值控件是否是ComboBox，和IsTextBox不能同时为true。
-        /// </summary>
-        public bool IsComboBox
-        {
-            get { return _isComboBox; }
-            set
-            {
-                SetProperty(ref _isComboBox, value);
-                if (value)
-                {
-                    IsTextBox = false;
-                }
-            }
-        }
+        //bool _isTextBox;
+        ///// <summary>
+        ///// 当前配置值控件是否是TextBox，和IsComboBox不能同时为true。
+        ///// </summary>
+        //public bool IsTextBox
+        //{
+        //    get { return _isTextBox; }
+        //    set
+        //    {
+        //        SetProperty(ref _isTextBox, value);
+        //        if (value)
+        //        {
+        //            IsComboBox = false;
+        //        }
+        //    }
+        //}
+        //
+        //bool _isComboBox;
+        ///// <summary>
+        ///// 当前配置值控件是否是ComboBox，和IsTextBox不能同时为true。
+        ///// </summary>
+        //public bool IsComboBox
+        //{
+        //    get { return _isComboBox; }
+        //    set
+        //    {
+        //        SetProperty(ref _isComboBox, value);
+        //        if (value)
+        //        {
+        //            IsTextBox = false;
+        //        }
+        //    }
+        //}
 
         int _selectedIndex;
         /// <summary>
@@ -1348,11 +1350,11 @@ namespace IDCA.Client.ViewModel
             }
         }
 
-        ObservableCollection<string> _selections;
+        IList<string> _selections;
         /// <summary>
         /// 绑定ComboBox内的选项内容。
         /// </summary>
-        public ObservableCollection<string> Selections
+        public IList<string> Selections
         {
             get { return _selections; }
             set { SetProperty(ref _selections, value); }
@@ -1374,7 +1376,7 @@ namespace IDCA.Client.ViewModel
         /// <returns></returns>
         public string GetValue()
         {
-            if (_isComboBox)
+            if (_controlType == ValueSettingControlType.ComboBox)
             {
                 return _selectedIndex >= 0 && _selectedIndex < _selections.Count ?
                     _selections[_selectedIndex] : string.Empty;
@@ -1432,17 +1434,17 @@ namespace IDCA.Client.ViewModel
             switch (_type)
             {
                 case AxisElementDetailType.Name:
-                    IsTextBox = true;
+                    _controlType = ValueSettingControlType.TextBox;
                     _name = ViewModelConstants.AxisElementDetailName;
                     _text = element.Name;
                     break;
                 case AxisElementDetailType.Description:
-                    IsTextBox = true;
+                    _controlType = ValueSettingControlType.TextBox;
                     _name = ViewModelConstants.AxisElementDetailDescription;
                     _text = string.IsNullOrEmpty(element.Description) ? string.Empty : element.Description;
                     break;
                 case AxisElementDetailType.Exclude:
-                    IsComboBox = true;
+                    _controlType = ValueSettingControlType.ComboBox;
                     Selections.Clear();
                     SetSelections("True", "False");
                     SelectedIndex = element.Exclude ? 0 : 1;
@@ -1452,7 +1454,7 @@ namespace IDCA.Client.ViewModel
                 case AxisElementDetailType.CutOff:
                 case AxisElementDetailType.CategoryUpperBoundary:
                 case AxisElementDetailType.CategoryLowerBoundary:
-                    IsTextBox = true;
+                    _controlType = ValueSettingControlType.TextBox;
 
                     if (_type == AxisElementDetailType.Filter)
                     {
@@ -1492,53 +1494,25 @@ namespace IDCA.Client.ViewModel
 
     public enum AxisElementDetailType
     {
-        [AxisDescription("")]
+        [AxisDescription()]
         None,
-        [AxisDescription(
-            ViewModelConstants.AxisElementDetailType,
-            IsComboBox = false,
-            IsTextBox = true)]
+        [AxisDescription(ViewModelConstants.AxisElementDetailType, ValueSettingControlType.TextBox)]
         Type,
-        [AxisDescription(
-            ViewModelConstants.AxisElementDetailName,
-            IsComboBox = false,
-            IsTextBox = true)]
+        [AxisDescription(ViewModelConstants.AxisElementDetailName, ValueSettingControlType.TextBox)]
         Name,
-        [AxisDescription(
-            ViewModelConstants.AxisElementDetailDescription,
-            IsComboBox = false,
-            IsTextBox = true)]
+        [AxisDescription(ViewModelConstants.AxisElementDetailDescription, ValueSettingControlType.TextBox)]
         Description,
-        [AxisDescription(
-            ViewModelConstants.AxisElementDetailExclude,
-            IsComboBox = true,
-            IsTextBox = false,
-            Selections = new string[] { "true", "false" })]
+        [AxisDescription(ViewModelConstants.AxisElementDetailExclude, ValueSettingControlType.ComboBox, Selections = new string[] { "true", "false" })]
         Exclude,
-        [AxisDescription(
-            ViewModelConstants.AxisElementDetailFilter,
-            IsComboBox = false,
-            IsTextBox = true)]
+        [AxisDescription(ViewModelConstants.AxisElementDetailFilter, ValueSettingControlType.TextBox)]
         Filter,
-        [AxisDescription(
-            ViewModelConstants.AxisElementDetailVariableName,
-            IsComboBox = false,
-            IsTextBox = true)]
+        [AxisDescription(ViewModelConstants.AxisElementDetailVariableName, ValueSettingControlType.TextBox)]
         VariableName,
-        [AxisDescription(
-            ViewModelConstants.AxisElementDetailCutOff,
-            IsComboBox = false,
-            IsTextBox = true)]
+        [AxisDescription(ViewModelConstants.AxisElementDetailCutOff, ValueSettingControlType.TextBox)]
         CutOff,
-        [AxisDescription(
-            ViewModelConstants.AxisElementDetailCategoryUpperBoundary,
-            IsComboBox = false,
-            IsTextBox = true)]
+        [AxisDescription(ViewModelConstants.AxisElementDetailCategoryUpperBoundary, ValueSettingControlType.TextBox)]
         CategoryUpperBoundary,
-        [AxisDescription(
-            ViewModelConstants.AxisElementDetailCategoryLowerBoundary,
-            IsComboBox = false,
-            IsTextBox = true)]
+        [AxisDescription(ViewModelConstants.AxisElementDetailCategoryLowerBoundary, ValueSettingControlType.TextBox)]
         CategoryLowerBoundary
     }
 
@@ -1782,22 +1756,18 @@ namespace IDCA.Client.ViewModel
 
         void InitSuffixTextBoxItem(AxisElementSuffixType type)
         {
-            var element = new AxisElementSuffixViewModel(this, type, _axisElement)
+            var element = new AxisElementSuffixViewModel(this, type, _axisElement, ValueSettingControlType.TextBox)
             {
                 Name = type.ToString(),
-                IsComboBox = false,
-                IsTextBox = true
             };
             _suffixes.Add(element);
         }
 
         void InitSuffixSelectionItem(AxisElementSuffixType type, params string[] selections)
         {
-            var element = new AxisElementSuffixViewModel(this, type, _axisElement)
+            var element = new AxisElementSuffixViewModel(this, type, _axisElement, ValueSettingControlType.ComboBox)
             {
                 Name = type.ToString(),
-                IsComboBox = true,
-                IsTextBox = false,
             };
             element.AddSelections(selections);
             _suffixes.Add(element);

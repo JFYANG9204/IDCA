@@ -11,6 +11,7 @@
                 <ResourceDictionary Source="View/Style/CheckBox.xaml"/>
                 <ResourceDictionary Source="View/Style/DataGrid.xaml"/>
                 <ResourceDictionary Source="View/Style/ListBox.xaml"/>
+                <ResourceDictionary Source="View/Style/TextBox.xaml"/>
                 <ResourceDictionary Source="View/Style/ComboBox.xaml"/>
                 <ResourceDictionary Source="View/Style/TableSettingContentPresenter.xaml"/>
             </ResourceDictionary.MergedDictionaries>
