@@ -5,7 +5,11 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Blue.xaml" />
                 <ResourceDictionary Source="View/Style/Font.xaml"/>
+                <ResourceDictionary Source="View/Style/TextBlock.xaml"/>
                 <ResourceDictionary Source="View/Style/Colors.xaml"/>
                 <ResourceDictionary Source="View/Style/Button.xaml"/>
                 <ResourceDictionary Source="View/Style/CheckBox.xaml"/>
@@ -14,6 +18,7 @@
                 <ResourceDictionary Source="View/Style/TextBox.xaml"/>
                 <ResourceDictionary Source="View/Style/ComboBox.xaml"/>
                 <ResourceDictionary Source="View/Style/TableSettingContentPresenter.xaml"/>
+                <ResourceDictionary Source="View/Style/MultiSelectionComboBox.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

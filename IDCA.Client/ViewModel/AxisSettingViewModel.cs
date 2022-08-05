@@ -1,8 +1,8 @@
-﻿using IDCA.Model;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using IDCA.Model;
 using IDCA.Model.Spec;
 using IDCA.Model.Template;
-using Microsoft.Toolkit.Mvvm.ComponentModel;
-using Microsoft.Toolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -1080,7 +1080,7 @@ namespace IDCA.Client.ViewModel
         {
             foreach (var item in seletions)
             {
-                _selections.Append(item);
+                _selections.Add(item);
             }
         }
         /// <summary>
@@ -1154,9 +1154,11 @@ namespace IDCA.Client.ViewModel
                     break;
             }
 
-            if (!string.IsNullOrEmpty(_text) && _controlType == ValueSettingControlType.ComboBox && _selections.Any())
+            if (!string.IsNullOrEmpty(_text) && _controlType == ValueSettingControlType.ComboBox && _selections.Count > 0)
             {
+                _selectedIndex = _selections.IndexOf(_text);
             }
+
         }
 
         void UpdateAxisExpression()
@@ -1204,15 +1206,18 @@ namespace IDCA.Client.ViewModel
             FieldInfo? info = t.GetField(type.ToString());
             if (info != null)
             {
-                var attr = info.GetCustomAttributes<AxisDescriptionAttribute>();
-                AxisDescriptionAttribute? desc;
-                if (attr != null && (desc = attr.First()) != null)
+                var attr = info.GetCustomAttributes<AxisDescriptionAttribute>()?.First();
+                if (attr != null)
                 {
-                    _name = desc.Description;
-                    foreach (string s in desc.Selections)
+                    _name = attr.Description;
+                    if (attr.Selections.Length > 0)
                     {
-                        _selections.Add(s);
+                        foreach (string s in attr.Selections)
+                        {
+                            _selections.Add(s);
+                        }
                     }
+                    _controlType = attr.ControlType;
                 }
             }
             _type = type;
@@ -1846,7 +1851,7 @@ namespace IDCA.Client.ViewModel
             var typeDetail = new AxisElementDetailViewModel(AxisElementDetailType.Type)
             {
                 IsReadOnly = true,
-                Text = type.ToString()
+                Text = type.ToString(),
             };
             Details.Add(typeDetail);
 

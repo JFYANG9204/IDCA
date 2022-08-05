@@ -1,10 +1,10 @@
 ﻿
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using IDCA.Client.Common;
 using IDCA.Model;
 using IDCA.Model.Spec;
 using IDCA.Model.Template;
-using Microsoft.Toolkit.Mvvm.ComponentModel;
-using Microsoft.Toolkit.Mvvm.Input;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -237,6 +237,7 @@ namespace IDCA.Client.ViewModel
             //}
             //_axisViewModel = new AxisSettingViewModel(this, _axisOperator);
             _tableTypeSelectedIndex = 0;
+            _tableTypeSelectedItem = TableTypeSelections[0];
         }
 
         readonly Config _config;
@@ -244,7 +245,7 @@ namespace IDCA.Client.ViewModel
         readonly Table _table;
         readonly TableSettingViewModel _parent;
 
-        AxisSettingViewModel? _axisViewModel;
+        //AxisSettingViewModel? _axisViewModel;
         AxisOperator? _axisOperator;
 
         Model.Spec.Manipulation? _manipulation;
@@ -330,10 +331,10 @@ namespace IDCA.Client.ViewModel
                     _table.UseSideAxis = _manipulation == null;
                 }
 
-                if (_axisViewModel == null)
-                {
-                    _axisViewModel = new AxisSettingViewModel(this, _axisOperator);
-                }
+                //if (_axisViewModel == null)
+                //{
+                //    _axisViewModel = new AxisSettingViewModel(this, _axisOperator);
+                //}
             }
             else
             {
@@ -502,6 +503,25 @@ namespace IDCA.Client.ViewModel
             }
         }
 
+
+        string _tableTypeSelectedItem;
+        /// <summary>
+        /// TableType下拉框选择的选项名
+        /// </summary>
+        public string TableTypeSelectedItem
+        {
+            get { return _tableTypeSelectedItem; }
+            set
+            {
+                SetProperty(ref _tableTypeSelectedItem, value);
+                var index = Array.IndexOf(TableTypeSelections, value);
+                if (index >= 0)
+                {
+                    _table.Type = (TableType)index;
+                }
+            }
+        }
+
         string _variableName = string.Empty;
         /// <summary>
         /// 当前表格配置使用的变量名
@@ -624,7 +644,21 @@ namespace IDCA.Client.ViewModel
         public ICommand AxisSettingCommand => new RelayCommand(ShowAxisSettingDialog);
         void ShowAxisSettingDialog()
         {
-            Common.WindowManager.ShowWindow("AxisSettingWindow", _axisViewModel);
+            if (_axisOperator == null)
+            {
+                if (_manipulation != null)
+                {
+                    _axisOperator = new AxisOperator(_manipulation.Axis, _config, _templates);
+                    _table.UseSideAxis = false;
+                }
+                else
+                {
+                    _axisOperator = new AxisOperator(_table.SideAxis ?? _table.CreateSideAxis(AxisType.Normal), _config, _templates);
+                    _table.UseSideAxis = true;
+                }
+                _axisOperator.CreateBasicAxisExpression(_baseText);
+            }
+            Common.WindowManager.ShowWindow("AxisSettingWindow", new AxisSettingViewModel(this, _axisOperator));
         }
 
         public ICommand NewVariableSettingCommand => new RelayCommand(ShowNewVariableSettingDialog);

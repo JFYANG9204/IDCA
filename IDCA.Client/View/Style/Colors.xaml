@@ -94,9 +94,11 @@
      <SolidColorBrush x:Key="IDCA.Brushes.MultiSelection.Background" Color="{StaticResource IDCA.Colors.MultiSelection.Background}"/>
 
     <SolidColorBrush x:Key="IDCA.Burshes.DataGrid.Separater" Color="{StaticResource IDCA.Colors.Window.Borderbrush}"/>
-    
+
+    <SolidColorBrush x:Key="IDCA.Brushes.DataGridColumnHeader.Background" Color="{StaticResource IDCA.Colors.Gray7}"/>
     <SolidColorBrush x:Key="IDCA.Brushes.DataGridColumnHeader.Background.ReadOnly" Color="{StaticResource IDCA.Colors.Gray9}"/>
     <SolidColorBrush x:Key="IDCA.Brushes.DataGridColumnHeader.Background.MouseOver" Color="{StaticResource IDCA.Colors.Gray8}"/>
+    <SolidColorBrush x:Key="IDCA.Brushes.DataGridColumnHeader.BorderBrush" Color="{StaticResource IDCA.Colors.Gray7}"/>
     <SolidColorBrush x:Key="IDCA.Brushes.DataGrid.Selection.Background" Color="{StaticResource IDCA.Colors.Accent}"/>
     <SolidColorBrush x:Key="IDCA.Brushes.DataGrid.Selection.Background.Disabled" Color="{StaticResource IDCA.Colors.Gray7}"/>
     <SolidColorBrush x:Key="IDCA.Brushes.DataGrid.Selection.Background.Inactive" Color="{StaticResource IDCA.Colors.Accent3}"/>

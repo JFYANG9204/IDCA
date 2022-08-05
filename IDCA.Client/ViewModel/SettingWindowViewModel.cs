@@ -1,9 +1,9 @@
-﻿using IDCA.Client.Singleton;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using IDCA.Client.Singleton;
 using IDCA.Client.ViewModel.Common;
 using IDCA.Model;
 using IDCA.Model.Template;
-using Microsoft.Toolkit.Mvvm.ComponentModel;
-using Microsoft.Toolkit.Mvvm.Input;
 using System;
 using System.Collections.ObjectModel;
 using System.Configuration;

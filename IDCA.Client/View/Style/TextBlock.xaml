@@ -1,0 +1,13 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Style x:Key="IDCA.Styles.TextBlock.Label" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
+        <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.TextBlock.Label}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Margin" Value="5"/>
+    </Style>
+
+    <Style TargetType="TextBlock" BasedOn="{StaticResource IDCA.Styles.TextBlock.Label}"/>
+
+</ResourceDictionary>

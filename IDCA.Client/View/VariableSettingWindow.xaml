@@ -6,62 +6,11 @@
         xmlns:viewmodel="clr-namespace:IDCA.Client.ViewModel" 
         d:DataContext="{d:DesignInstance Type=viewmodel:VariableSettingViewModel}"
         mc:Ignorable="d"
-        Title="新建变量配置" 
+        Title="" 
         Height="800" 
         MinWidth="1200"
         ResizeMode="NoResize"
         Background="{StaticResource IDCA.Brushes.Window.Background}">
-
-    <Window.Resources>
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-        <Style TargetType="TextBlock">
-            <Setter Property="Margin" Value="5"/>
-            <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
-            <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-        </Style>
-        <Style TargetType="TextBox">
-            <Setter Property="Margin" Value="5"/>
-            <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
-            <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-        </Style>
-        <Style TargetType="ComboBox">
-            <Setter Property="Width" Value="60"/>
-            <Setter Property="Height" Value="23"/>
-            <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
-            <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-        </Style>
-        <Style TargetType="CheckBox">
-            <Setter Property="Margin" Value="5"/>
-            <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
-            <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-        </Style>
-        <Style x:Key="IDCA.VariableSetting.DataGrid.ElementStyle" TargetType="TextBlock">
-            <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
-            <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="Background" Value="{StaticResource IDCA.Brushes.Window.Background}"/>
-        </Style>
-        <Style TargetType="DataGrid">
-            <Setter Property="Margin" Value="10 5"/>
-            <Setter Property="GridLinesVisibility" Value="Vertical"/>
-            <Setter Property="ColumnHeaderStyle">
-                <Setter.Value>
-                    <Style TargetType="DataGridColumnHeader">
-                        <Setter Property="Margin" Value="2"/>
-                        <Setter Property="Background" Value="Transparent"/>
-                        <Setter Property="SeparatorVisibility" Value="Collapsed"/>
-                    </Style>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </Window.Resources>
     
     <Grid>
         <Grid.RowDefinitions>
@@ -84,7 +33,6 @@
             <TextBlock>变量类型</TextBlock>
             <ComboBox Width="130"
                       Height="23"
-                      FontSize="{StaticResource IDCA.Font.Size.Content}"
                       ItemsSource="{x:Static viewmodel:VariableSettingViewModel.FieldTypes}"
                       SelectedIndex="{Binding FieldTypeSelectedIndex}"
                       SelectedItem="{Binding FieldTypeSelectedItem}"/>
@@ -127,9 +75,12 @@
                         Command="{Binding NewPropertyCommand}"/>
             </Grid>
 
-            <DataGrid Grid.Row="1"
+            <DataGrid HeadersVisibility="Column" 
+                      Grid.Row="1"
                       ItemsSource="{Binding Properties}"
-                      d:ItemsSource="{d:SampleData ItemCount=5}">
+                      d:ItemsSource="{d:SampleData ItemCount=5}"
+                      Margin="10 5 10 20"
+                      Style="{StaticResource IDCA.Styles.DataGrid.Base}">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="属性名" Binding="{Binding Name}" Width="130"/>
                     <DataGridTextColumn Header="属性值" Binding="{Binding Value}" Width="80"/>
@@ -214,10 +165,12 @@
             </Grid>
 
 
-            <DataGrid Grid.Row="5"
-                      Margin="10 5 10 20"
+            <DataGrid HeadersVisibility="Column" 
+                      Grid.Row="5"
                       ItemsSource="{Binding SelectedField.Properties}"
-                      d:ItemsSource="{d:SampleData ItemCount=5}">
+                      d:ItemsSource="{d:SampleData ItemCount=5}"
+                      Margin="10 5 10 20"
+                      Style="{StaticResource IDCA.Styles.DataGrid.Base}">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="属性名" Binding="{Binding Name}" Width="130"/>
                     <DataGridTextColumn Header="属性值" Binding="{Binding Value}" Width="80"/>
@@ -256,10 +209,13 @@
                         Command="{Binding NewCategoricalCommand}">添加</Button>
             </Grid>
 
-            <DataGrid Grid.Row="1"
+            <DataGrid HeadersVisibility="Column" 
+                      Grid.Row="1"
                       ItemsSource="{Binding Categories}"
                       d:ItemsSource="{d:SampleData ItemCount=5}"
-                      SelectedItem="{Binding SelectedCategory}">
+                      Margin="10 5 10 20"
+                      SelectedItem="{Binding SelectedCategory}"
+                      Style="{StaticResource IDCA.Styles.DataGrid.Base}">
                 <DataGrid.Columns>
                     <DataGridTextColumn Width="80" Header="码号名" Binding="{Binding Name}"/>
                     <DataGridTextColumn Width="130" Header="描述" Binding="{Binding Description}"/>
@@ -328,11 +284,13 @@
                         Command="{Binding NewCategoricalCommand}" Cursor="Hand">添加</Button>
             </Grid>
 
-            <DataGrid Grid.Row="6"
-                      Margin="10 5 10 20"
+            <DataGrid HeadersVisibility="Column" 
+                      Grid.Row="6"
                       ItemsSource="{Binding SelectedField.Categories}"
+                      Margin="10 5 10 20"
                       d:ItemsSource="{d:SampleData ItemCount=5}"
-                      SelectedItem="{Binding SelectedField.SelectedCategory}">
+                      SelectedItem="{Binding SelectedField.SelectedCategory}"
+                      Style="{StaticResource IDCA.Styles.DataGrid.Base}">
                 <DataGrid.Columns>
                     <DataGridTextColumn Width="80" Header="码号名" Binding="{Binding Name}"/>
                     <DataGridTextColumn Width="130" Header="描述" Binding="{Binding Description}"/>
@@ -376,9 +334,12 @@
                         Command="{Binding NewPropertyCommand}" Cursor="Hand">添加</Button>
             </Grid>
 
-            <DataGrid Grid.Row="1"
+            <DataGrid HeadersVisibility="Column" 
+                      Grid.Row="1"
                       ItemsSource="{Binding SelectedCategory.Properties}"
-                      d:ItemsSource="{d:SampleData ItemCount=5}">
+                      d:ItemsSource="{d:SampleData ItemCount=5}"
+                      Margin="10 5 10 20"
+                      Style="{StaticResource IDCA.Styles.DataGrid.Base}">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="属性名" Binding="{Binding Name}" Width="130"/>
                     <DataGridTextColumn Header="属性值" Binding="{Binding Value}" Width="80"/>
@@ -482,7 +443,8 @@
 
             <DataGrid Grid.Row="5"
                       ItemsSource="{Binding SelectedField.SelectedCategory.Properties}"
-                      d:ItemsSource="{d:SampleData ItemCount=5}">
+                      d:ItemsSource="{d:SampleData ItemCount=5}"
+                      Style="{StaticResource IDCA.Styles.DataGrid.Base}">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="属性名" Binding="{Binding Name}" Width="130"/>
                     <DataGridTextColumn Header="属性值" Binding="{Binding Value}" Width="80"/>
@@ -534,9 +496,9 @@
 
         </Grid>
 
-        <Grid Grid.Row="1" Grid.Column="3">
+        <Grid Grid.Row="0" Grid.RowSpan="2" Grid.Column="3">
             <Grid.RowDefinitions>
-                <RowDefinition Height="45"/>
+                <RowDefinition Height="50"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0">脚本预览</TextBlock>
@@ -545,8 +507,9 @@
                      Margin="10 5 10 20"
                      FontFamily="{StaticResource IDCA.Font.Family}"
                      FontSize="{StaticResource IDCA.Font.Size.Content}"
+                     Height="700"
                      HorizontalAlignment="Stretch"
-                     VerticalAlignment="Stretch"
+                     VerticalAlignment="Center"
                      VerticalContentAlignment="Top"
                      TextWrapping="Wrap" 
                      Text="{Binding OverViewText}"/>

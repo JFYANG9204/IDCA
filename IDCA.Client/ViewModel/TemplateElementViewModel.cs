@@ -1,6 +1,6 @@
 ﻿
+using CommunityToolkit.Mvvm.ComponentModel;
 using IDCA.Model.Template;
-using Microsoft.Toolkit.Mvvm.ComponentModel;
 
 namespace IDCA.Client.ViewModel
 {

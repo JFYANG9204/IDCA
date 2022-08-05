@@ -1,5 +1,5 @@
-﻿using IDCA.Client.Common;
-using Microsoft.Toolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using IDCA.Client.Common;
 using System.Collections.ObjectModel;
 
 namespace IDCA.Client.ViewModel

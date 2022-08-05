@@ -1,17 +1,18 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <Style x:Key="IDCA.Styles.TextBox" TargetType="TextBox">
+    <Style x:Key="IDCA.Styles.TextBox" TargetType="TextBox" BasedOn="{StaticResource MahApps.Styles.TextBox}">
         <Setter Property="Background" Value="{StaticResource IDCA.Brushes.Control.Background}"/>
         <Setter Property="BorderBrush" Value="{StaticResource IDCA.Brushes.BorderBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="FontFamily" Value="{StaticResource IDCA.Font.Family}"/>
         <Setter Property="FontSize" Value="{StaticResource IDCA.Font.Size.Content}"/>
+        <Setter Property="Height" Value="30"/>
         <Setter Property="HorizontalContentAlignment" Value="Left"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Margin" Value="5"/>
         <Setter Property="MinHeight" Value="25"/>
         <Setter Property="Padding" Value="4"/>
-        <Setter Property="SelectionBrush" Value="{StaticResource IDCA.Brushes.Accent}"/>
         <Setter Property="SnapsToDevicePixels" Value="True"/>
     </Style>
 

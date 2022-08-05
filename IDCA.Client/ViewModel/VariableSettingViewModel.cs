@@ -1,6 +1,6 @@
-﻿using IDCA.Model.Spec;
-using Microsoft.Toolkit.Mvvm.ComponentModel;
-using Microsoft.Toolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using IDCA.Model.Spec;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
